@@ -61,7 +61,12 @@ def entity_register(entities: list[dict], decisions: list[dict]):
 
 
 def comparison_tasks(
-    records: list[dict], kind: str, token_budget: int, entity_names: dict[str, str] | None = None
+    records: list[dict],
+    kind: str,
+    token_budget: int,
+    entity_names: dict[str, str] | None = None,
+    task_limit: int | None = None,
+    store=None,
 ) -> dict:
     groups = defaultdict(set)
     lookup = {record["id"]: record for record in records}
@@ -85,7 +90,34 @@ def comparison_tasks(
         for key in keys:
             if key:
                 groups[key].add(record["id"])
-    tasks, seen, omissions = [], set(), []
+    omissions = []
+    largest_groups = sorted(
+        ({"key": key, "records": len(ids)} for key, ids in groups.items()),
+        key=lambda group: group["records"],
+        reverse=True,
+    )[:20]
+    tasks = iter_comparison_tasks(lookup, groups, token_budget, task_limit, omissions)
+    if store is None:
+        task_fields = {"tasks": list(tasks)}
+    else:
+        ref = store.put_table(
+            ({"id": str(index), "task": task} for index, task in enumerate(tasks)),
+            "comparison-queue",
+        )
+        task_fields = {"tasks_ref": ref, "task_count": store.get(ref)["count"]}
+    return {
+        **task_fields,
+        "unperformed": omissions,
+        "group_count": len(groups),
+        "largest_groups": largest_groups,
+        "candidate_policy_version": "1",
+        "candidate_policy": "Names, explicit aliases, shared name words, entity, rule and scope; "
+        "unrelated groups are not compared. Original records remain intact.",
+    }
+
+
+def iter_comparison_tasks(lookup, groups, token_budget, task_limit, omissions):
+    seen = set()
     for key, ids in sorted(groups.items()):
         if len(ids) < 2:
             continue
@@ -116,14 +148,48 @@ def comparison_tasks(
             signature = digest([left, right])
             if signature in seen:
                 continue
+            if task_limit is not None and len(seen) >= task_limit:
+                from docgen.model import ModelFailure
+
+                raise ModelFailure(
+                    "Reconciliation workload allowance exceeded; no candidate tail was discarded"
+                )
             seen.add(signature)
-            tasks.append({"id": signature[:20], "group": key, "left": left, "right": right})
+            yield {"id": signature[:20], "group": key, "left": left, "right": right}
+
+
+def comparison_count(plan):
+    return plan["task_count"] if "tasks_ref" in plan else len(plan["tasks"])
+
+
+def comparison_at(plan, index, store):
+    if "tasks_ref" in plan:
+        return store.table_rows(plan["tasks_ref"], [str(index)])[0]["task"]
+    return plan["tasks"][index]
+
+
+def iter_comparisons(plan, store):
+    if "tasks_ref" in plan:
+        for row in store.iter_table(plan["tasks_ref"]):
+            yield row["task"]
+    else:
+        yield from plan["tasks"]
+
+
+def replace_comparison(plan, index, children, store):
+
+    def replacement():
+        for position, row in enumerate(iter_comparisons(plan, store)):
+            yield from children if position == index else [row]
+
+    ref = store.put_table(
+        ({"id": str(position), "task": task} for position, task in enumerate(replacement())),
+        "comparison-queue",
+    )
     return {
-        "tasks": tasks,
-        "unperformed": omissions,
-        "group_count": len(groups),
-        "candidate_policy": "Names, explicit aliases, shared name words, entity, rule and scope; "
-        "unrelated groups are not compared. Original records remain intact.",
+        **{key: value for key, value in plan.items() if key != "tasks"},
+        "tasks_ref": ref,
+        "task_count": store.get(ref)["count"],
     }
 
 

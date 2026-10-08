@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     budget_pln: float = Field(200, gt=0, le=200, validation_alias="DOCGEN_BUDGET_PLN")
     billing_headroom: float = Field(1.3, ge=1.25, validation_alias="DOCGEN_BILLING_HEADROOM")
     pricing_file: Path = Field(Path(".docgen/pricing.json"), validation_alias="DOCGEN_PRICING_FILE")
+    planning_tokens: int = Field(12000, ge=2048, validation_alias="DOCGEN_PLANNING_TOKENS")
+    writing_tokens: int = Field(16000, ge=4096, validation_alias="DOCGEN_WRITING_TOKENS")
+    page_split_words: int = Field(2500, ge=500, validation_alias="DOCGEN_PAGE_SPLIT_WORDS")
+    workload_tasks: int = Field(20000, ge=1, validation_alias="DOCGEN_WORKLOAD_TASKS")
 
     @model_validator(mode="after")
     def check_budgets(self):

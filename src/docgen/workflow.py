@@ -12,8 +12,16 @@ from docgen.batching import plan_batches, split_batch
 from docgen.config import Settings
 from docgen.contracts import Batch, Block, Comparison, Extraction, Verification
 from docgen.ingestion import snapshot_sources
-from docgen.model import RequestTooLarge, TruncatedOutput
-from docgen.reconciliation import comparison_tasks, entity_register, split_comparison
+from docgen.model import ModelFailure, RequestTooLarge, TruncatedOutput
+from docgen.reconciliation import (
+    comparison_at,
+    comparison_count,
+    comparison_tasks,
+    entity_register,
+    iter_comparisons,
+    replace_comparison,
+    split_comparison,
+)
 from docgen.review import make_issues, persist_decisions, report, validate_decisions
 from docgen.storage import Artifacts, atomic_write, digest, write_json, write_jsonl
 from docgen.validation import finding, qualify_ids, validate_duplicate_chains, validate_extraction
@@ -22,6 +30,8 @@ from docgen.validation import finding, qualify_ids, validate_duplicate_chains, v
 class PipelineState(TypedDict, total=False):
     run_id: str
     source: str
+    selection: str
+    workflow: str
     signature: str
     route: str
     snapshot_ref: str
@@ -31,6 +41,8 @@ class PipelineState(TypedDict, total=False):
     draft_ref: str
     feedback_ref: str
     verified_ref: str
+    records_ref: str
+    blocks_ref: str
     entity_plan_ref: str
     entity_index: int
     entity_results_ref: str
@@ -67,6 +79,7 @@ class Pipeline:
 
     def gate(self, state, stage, revision, findings):
         issues = make_issues(stage, revision, findings)
+        issues = list({issue["id"]: issue for issue in issues}.values())
         decisions = self.read(state, "decisions_ref", [])
         resolved = {
             item["issue_id"]
@@ -96,7 +109,10 @@ class Pipeline:
         snapshot = self.read(state, "snapshot_ref")
         if snapshot is None:
             snapshot = snapshot_sources(
-                Path(state["source"]), self.store, min(2000, self.settings.batch_tokens)
+                Path(state["source"]),
+                self.store,
+                min(2000, self.settings.batch_tokens),
+                state.get("selection"),
             )
         ref = state.get("snapshot_ref") or self.store.put(snapshot, "snapshot")
         update = {"snapshot_ref": ref}
@@ -257,11 +273,19 @@ class Pipeline:
     def reconcile_claims(self, state):
         return self.reconcile(state, "claims", "claim", "finalize_knowledge")
 
+    def comparison_results(self, state, prefix):
+        ref = state.get(f"{prefix}_results_ref")
+        if not ref:
+            return
+        value = self.store.get(ref)
+        if "previous" in value and "rows" in value:
+            for row in self.store.iter_parts(ref):
+                yield row["task_id"], row["response_ref"]
+        else:
+            yield from value.items()
+
     def reconcile(self, state, kind, prefix, next_stage):
         stage = f"reconcile_{kind}"
-        claims, entities, _ = self.records(state)
-        records = entities if kind == "entities" else claims
-        lookup = {record["id"]: record for record in records}
         plan_key, index_key, results_key = (
             f"{prefix}_plan_ref",
             f"{prefix}_index",
@@ -269,9 +293,28 @@ class Pipeline:
         )
         plan = self.read(state, plan_key)
         if plan is None:
+            claims, entities, _ = self.records(state)
+            records = entities if kind == "entities" else claims
             names = {entity["id"]: entity["canonical_name"] for entity in entities}
-            plan = comparison_tasks(records, kind, self.settings.reconciliation_tokens, names)
-            return {plan_key: self.store.put(plan, f"{prefix}-plan"), index_key: 0, "route": stage}
+            plan = comparison_tasks(
+                records,
+                kind,
+                self.settings.reconciliation_tokens,
+                names,
+                self.settings.workload_tasks,
+                store=self.store,
+            )
+            return {
+                plan_key: self.store.put(plan, f"{prefix}-plan"),
+                index_key: 0,
+                "route": stage,
+                "records_ref": state.get("records_ref")
+                or self.store.put_table(claims + entities, "reconciliation-records"),
+                "blocks_ref": state.get("blocks_ref")
+                or self.store.put_table(
+                    self.read(state, "snapshot_ref")["blocks"], "reconciliation-blocks"
+                ),
+            }
         if plan["unperformed"]:
             gate = self.gate(
                 state,
@@ -289,23 +332,44 @@ class Pipeline:
             if gate:
                 return gate
         index = state.get(index_key, 0)
-        if index >= len(plan["tasks"]):
+        if index >= comparison_count(plan):
             return {"route": next_stage}
-        task = plan["tasks"][index]
+        task = comparison_at(plan, index, self.store)
+        lookup = {
+            row["id"]: row
+            for row in self.store.table_rows(state["records_ref"], task["left"] + task["right"])
+        }
         payload = {
             "group": task["group"],
-            "revision": state["verified_ref"],
+            "revision": digest(lookup),
             "left": [lookup[key] for key in task["left"]],
             "right": [lookup[key] for key in task["right"]],
+            "source_blocks": self.store.table_rows(
+                state["blocks_ref"],
+                sorted({e["block_id"] for row in lookup.values() for e in row["evidence"]}),
+            ),
         }
+        if state.get("attempt", 0):
+            payload.update(
+                repair_attempt=state["attempt"], feedback=self.read(state, "feedback_ref", [])
+            )
         expected = set(task["left"] + task["right"])
         try:
             result = self.model.call(kind, payload, Comparison)
         except (TruncatedOutput, RequestTooLarge):
             children = split_comparison(task)
             if children:
-                plan["tasks"][index : index + 1] = children
-                return {plan_key: self.store.put(plan, f"{prefix}-plan"), "route": stage}
+                if comparison_count(plan) - 1 + len(children) > self.settings.workload_tasks:
+                    raise ModelFailure(
+                        "Split reconciliation queue exceeds workload allowance"
+                    ) from None
+                plan = replace_comparison(plan, index, children, self.store)
+                return {
+                    plan_key: self.store.put(plan, f"{prefix}-plan"),
+                    "attempt": 0,
+                    "feedback_ref": "",
+                    "route": stage,
+                }
             return self.gate(
                 state,
                 stage,
@@ -318,7 +382,13 @@ class Pipeline:
                     }
                 ],
             )
-        except ValidationError:
+        except ValidationError as error:
+            if state.get("attempt", 0) < 2:
+                return {
+                    "attempt": state.get("attempt", 0) + 1,
+                    "feedback_ref": self.store.put([str(error)], "comparison-feedback"),
+                    "route": stage,
+                }
             return self.gate(
                 state,
                 stage,
@@ -332,13 +402,14 @@ class Pipeline:
                 ],
             )
         findings = [item.model_dump() for item in result.findings]
+        invalid = []
         if set(result.checked_ids) != expected or len(result.checked_ids) != len(expected):
-            findings.append(
+            invalid.append(
                 {"kind": "unsupported", "description": "Comparison did not inspect all records"}
             )
         for relation in result.relations:
             if {relation.left, relation.right} - expected or relation.left == relation.right:
-                findings.append(
+                invalid.append(
                     {
                         "kind": "unsupported",
                         "description": "Comparison has invalid record references",
@@ -358,24 +429,52 @@ class Pipeline:
                         "block_ids": sorted({item["block_id"] for item in evidence}),
                     }
                 )
-        all_blocks = set(self.blocks(state))
         for item in result.findings:
-            if not set(item.record_ids) <= expected or not set(item.block_ids) <= all_blocks:
-                findings.append(
+            try:
+                self.store.table_rows(state["blocks_ref"], item.block_ids)
+                valid_blocks = True
+            except ValueError:
+                valid_blocks = False
+            if not set(item.record_ids) <= expected or not valid_blocks:
+                invalid.append(
                     {
                         "kind": "unsupported",
                         "description": "Comparison finding has invalid references",
                     }
                 )
+        if invalid and state.get("attempt", 0) < 2:
+            return {
+                "attempt": state.get("attempt", 0) + 1,
+                "feedback_ref": self.store.put(
+                    {"errors": invalid, "expected_record_ids": sorted(expected)},
+                    "comparison-feedback",
+                ),
+                "route": stage,
+            }
+        findings.extend(invalid)
         ref = self.store.put(result, f"{prefix}-comparison")
         gate = self.gate(state, stage, ref, findings)
         if gate:
             return gate
-        results = self.read(state, results_key, {})
-        results[task["id"]] = ref
+        previous = state.get(results_key)
+        if previous and "previous" not in self.store.get(previous):
+            previous = self.store.append_part(
+                None,
+                [
+                    {"task_id": key, "response_ref": value}
+                    for key, value in self.comparison_results(state, prefix)
+                ],
+                f"{prefix}-comparisons",
+            )
         return {
-            results_key: self.store.put(results, f"{prefix}-comparisons"),
+            results_key: self.store.append_part(
+                previous,
+                [{"task_id": task["id"], "response_ref": ref}],
+                f"{prefix}-comparisons",
+            ),
             index_key: index + 1,
+            "attempt": 0,
+            "feedback_ref": "",
             "route": stage,
             "status": "running",
         }
@@ -461,10 +560,14 @@ class Pipeline:
             findings.append(
                 {"kind": "source_issue", "description": "All extraction batches must be verified"}
             )
+        comparison_maps = {
+            prefix: dict(self.comparison_results(state, prefix)) for prefix in ("entity", "claim")
+        }
         for prefix in ("entity", "claim"):
             plan = self.read(state, f"{prefix}_plan_ref", {"tasks": [], "unperformed": []})
-            results = self.read(state, f"{prefix}_results_ref", {})
-            if len(results) != len(plan["tasks"]) or plan["unperformed"]:
+            results = comparison_maps[prefix]
+            expected = {task["id"] for task in iter_comparisons(plan, self.store)}
+            if set(results) != expected or plan["unperformed"]:
                 findings.append(
                     {
                         "kind": "unperformed_comparison",
@@ -502,14 +605,19 @@ class Pipeline:
                 claim["review_status"] = "ineligible"
         register, canonical_ids = entity_register(entities, decisions)
         relationships = {}
-        for prefix in ("entity", "claim"):
-            for comparison_ref in self.read(state, f"{prefix}_results_ref", {}).values():
+        for comparisons in comparison_maps.values():
+            for comparison_ref in comparisons.values():
                 for relation in self.store.get(comparison_ref)["relations"]:
                     relationships[digest(relation)] = {**relation, "revision": comparison_ref}
         bundle = {
             "schema_version": "1",
             "signature": state["signature"],
             "snapshot_ref": state["snapshot_ref"],
+            "selection_ref": self.store.put(
+                self.read(state, "snapshot_ref")["selection"], "selection"
+            )
+            if "selection" in self.read(state, "snapshot_ref")
+            else None,
             "batches_ref": state["batches_ref"],
             "claims": claims,
             "entities": entities,
@@ -519,8 +627,8 @@ class Pipeline:
             "coverage": coverage,
             "decisions": decisions,
             "resolved_issues": resolved_issues,
-            "entity_comparisons": self.read(state, "entity_results_ref", {}),
-            "claim_comparisons": self.read(state, "claim_results_ref", {}),
+            "entity_comparisons": comparison_maps["entity"],
+            "claim_comparisons": comparison_maps["claim"],
             "reviewer_evidence": [
                 {"decision": decision, "issue": history[decision["issue_id"]]}
                 for decision in decisions

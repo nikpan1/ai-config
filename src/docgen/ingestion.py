@@ -6,7 +6,7 @@ from urllib.parse import unquote, urlsplit
 from markdown_it import MarkdownIt
 
 from docgen.contracts import Block, Link
-from docgen.storage import Artifacts, atomic_write, digest
+from docgen.storage import Artifacts, atomic_write, digest, read_json
 
 
 def estimate_tokens(text: str) -> int:
@@ -115,12 +115,29 @@ def parse_markdown_fragment(content, path, snapshot, number, offset):
     ]
 
 
-def snapshot_sources(source: Path, store: Artifacts, max_tokens=2000) -> dict:
+def snapshot_sources(source: Path, store: Artifacts, max_tokens=2000, selection=None) -> dict:
     source = source.resolve()
     if not source.exists():
         raise ValueError("Source path does not exist")
     root = source if source.is_dir() else source.parent
     files = sorted(source.rglob("*")) if source.is_dir() else [source]
+    if selection:
+        manifest = read_json(Path(selection))
+        if set(manifest) != {"schema_version", "files"} or manifest["schema_version"] != "1":
+            raise ValueError("Selection requires schema_version=1 and a files list")
+        names = manifest["files"]
+        if not isinstance(names, list) or not names or any(not isinstance(n, str) for n in names):
+            raise ValueError("Selection files must be a nonempty list of relative paths")
+        if len({name.casefold() for name in names}) != len(names):
+            raise ValueError("Duplicate selected paths")
+        files = []
+        for name in names:
+            candidate = root / name
+            if Path(name).is_absolute() or not candidate.resolve().is_relative_to(root):
+                raise ValueError(f"Selected path leaves source root: {name}")
+            if not candidate.is_file():
+                raise ValueError(f"Selected file is missing: {name}")
+            files.append(candidate)
     inventory, blocks, problems = [], [], []
     for file in files:
         if file.is_dir():
@@ -181,12 +198,18 @@ def snapshot_sources(source: Path, store: Artifacts, max_tokens=2000) -> dict:
         problems.append({"kind": "empty_source", "description": "No source files found"})
     link_targets, link_problems = resolve_links(blocks, inventory)
     problems.extend(link_problems)
-    return {
+    snapshot = {
         "inventory": inventory,
         "blocks": [b.model_dump() for b in blocks],
         "links": link_targets,
         "problems": problems,
     }
+    snapshot["selection"] = {
+        "schema_version": "1",
+        "origin": "explicit" if selection else "path_invocation",
+        "files": [{k: entry[k] for k in ("path", "snapshot") if k in entry} for entry in inventory],
+    }
+    return snapshot
 
 
 def resolve_links(blocks: list[Block], inventory: list[dict]):

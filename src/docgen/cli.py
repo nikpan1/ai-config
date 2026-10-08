@@ -2,6 +2,7 @@ import argparse
 import json
 import re
 import sys
+from contextlib import nullcontext
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -11,19 +12,13 @@ from pydantic import ValidationError
 
 from docgen.budget import BudgetExceeded, BudgetLedger, Pricing
 from docgen.config import Settings
-from docgen.model import GeminiModel, ModelFailure, implementation_signature, prompt_text
-from docgen.storage import Artifacts, configure_logging, digest, read_json, run_lock, write_json
+from docgen.generation import STAGES as GENERATION_STAGES
+from docgen.generation import GenerationPipeline
+from docgen.model import GeminiModel, ModelFailure, RequestTooLarge, TruncatedOutput
+from docgen.planning import STAGES, PlanningPipeline
+from docgen.signatures import runtime_signature
+from docgen.storage import Artifacts, configure_logging, read_json, run_lock, write_json
 from docgen.workflow import Pipeline, persistent_graph
-
-
-def runtime_signature(settings: Settings):
-    return digest(
-        [
-            settings.signature(),
-            implementation_signature(),
-            {name: prompt_text(name) for name in ("extract", "verify", "entities", "claims")},
-        ]
-    )
 
 
 def run_config(run_id):
@@ -43,6 +38,10 @@ def status_payload(snapshot):
 
 def execute(args, settings: Settings):
     store = Artifacts(settings.workspace)
+    if args.command == "workload":
+        from docgen.workload import workload_report
+
+        return workload_report(settings, store, args.source, args.knowledge, args.selection)
     if args.command == "budget":
         return BudgetLedger(settings.budget_ledger, settings.budget_pln).summary()
     if args.command == "record-pricing":
@@ -66,9 +65,28 @@ def execute(args, settings: Settings):
         return pricing.model_dump(mode="json")
     config = run_config(args.thread_id)
     model = GeminiModel(settings, store, args.thread_id)
-    pipeline = Pipeline(settings, store, model)
+    metadata_path = store.path(f"runs/{args.thread_id}/workflow.json")
+    metadata = read_json(metadata_path) if metadata_path.exists() else {}
+    workflow = (
+        "documentation_generation"
+        if args.command == "generate-documentation"
+        else "documentation_planning"
+        if args.command == "plan-documentation"
+        else metadata.get("workflow", "knowledge")
+    )
+    if args.command == "run" and workflow != "knowledge":
+        raise ValueError("Thread belongs to another workflow; choose a new thread ID")
+    if metadata and workflow != metadata["workflow"]:
+        raise ValueError("Thread belongs to another workflow; choose a new thread ID")
+    pipeline = (
+        GenerationPipeline(settings, store, model)
+        if workflow == "documentation_generation"
+        else PlanningPipeline(settings, store, model)
+        if workflow == "documentation_planning"
+        else Pipeline(settings, store, model)
+    )
     with (
-        run_lock(store, args.thread_id),
+        nullcontext() if args.command in {"status", "history"} else run_lock(store, args.thread_id),
         persistent_graph(pipeline, getattr(args, "stop_after", None)) as graph,
     ):
         current = graph.get_state(config)
@@ -86,23 +104,54 @@ def execute(args, settings: Settings):
                 }
                 for state in graph.get_state_history(config, limit=args.limit)
             ]
-        signature = runtime_signature(settings)
+        signature = runtime_signature(settings, workflow)
         if current.values and current.values.get("signature") != signature:
             raise ValueError(
                 "Code, prompts, schema, model or configuration changed; start a new thread revision"
             )
-        if args.command == "run":
+        if args.command in {"run", "plan-documentation", "generate-documentation"}:
             if current.values:
                 raise ValueError("Thread already exists; use resume or choose a new thread ID")
             payload = {
                 "run_id": args.thread_id,
-                "source": str(Path(args.source).resolve()),
+                "workflow": workflow,
                 "signature": signature,
                 "status": "running",
             }
+            if args.command == "run":
+                payload.update(
+                    source=str(Path(args.source).resolve()),
+                    selection=str(Path(args.selection).resolve()) if args.selection else "",
+                )
+            elif args.command == "generate-documentation":
+                payload.update(
+                    plan=args.plan,
+                    brief=str(Path(args.brief).resolve()) if args.brief else "",
+                    cache_mode=args.cache_mode,
+                )
+            else:
+                payload.update(
+                    knowledge=args.knowledge,
+                    template=str(Path(args.template).resolve()),
+                    brief=str(Path(args.brief).resolve()) if args.brief else "",
+                    previous_plan=args.previous_plan or "",
+                )
+            write_json(metadata_path, {"workflow": workflow, "signature": signature})
         else:
             if not current.values:
                 raise ValueError("Thread does not exist")
+            if (
+                args.decisions
+                and any(task.error for task in current.tasks)
+                and current.next in {("review_issues",), ("review_plan",), ("review_generation",)}
+            ):
+                graph.update_state(
+                    config,
+                    {"route": current.next[0]},
+                    as_node=current.values["review_stage"],
+                )
+                graph.invoke(None, config, durability="sync")
+                current = graph.get_state(config)
             if current.interrupts:
                 if not args.decisions:
                     return status_payload(current)
@@ -113,7 +162,7 @@ def execute(args, settings: Settings):
                 payload = None
         try:
             graph.invoke(payload, config, durability="sync")
-        except (BudgetExceeded, ModelFailure) as error:
+        except (BudgetExceeded, ModelFailure, RequestTooLarge, TruncatedOutput) as error:
             snapshot = status_payload(graph.get_state(config))
             return {**snapshot, "technical_failure": str(error), "resumable": True}
         return status_payload(graph.get_state(config))
@@ -126,6 +175,7 @@ def parser():
     run = commands.add_parser("run", help="Start a new immutable source revision")
     run.add_argument("source")
     run.add_argument("--thread-id", required=True)
+    run.add_argument("--selection", help="Exact file-list JSON relative to the source root")
     run.add_argument(
         "--stop-after",
         choices=["snapshot_sources", "plan_batches", "extract_batch", "verify_batch"],
@@ -135,14 +185,42 @@ def parser():
     resume.add_argument("--decisions")
     resume.add_argument(
         "--stop-after",
-        choices=["snapshot_sources", "plan_batches", "extract_batch", "verify_batch"],
+        choices=[
+            "snapshot_sources",
+            "plan_batches",
+            "extract_batch",
+            "verify_batch",
+            *STAGES,
+            *GENERATION_STAGES,
+        ],
     )
+    plan = commands.add_parser(
+        "plan-documentation", help="Plan documentation from completed knowledge"
+    )
+    plan.add_argument("--knowledge", required=True)
+    plan.add_argument("--template", required=True)
+    plan.add_argument("--thread-id", required=True)
+    plan.add_argument("--brief")
+    plan.add_argument("--previous-plan")
+    plan.add_argument("--stop-after", choices=STAGES)
+    generation = commands.add_parser(
+        "generate-documentation", help="Generate evidence-backed Markdown from a completed plan"
+    )
+    generation.add_argument("--plan", required=True)
+    generation.add_argument("--thread-id", required=True)
+    generation.add_argument("--brief")
+    generation.add_argument("--cache-mode", choices=["off", "validated"], default="off")
+    generation.add_argument("--stop-after", choices=GENERATION_STAGES)
     for name in ("status", "history"):
         command = commands.add_parser(name)
         command.add_argument("--thread-id", required=True)
         if name == "history":
             command.add_argument("--limit", type=int, default=20)
     commands.add_parser("budget")
+    workload = commands.add_parser("workload", help="Report workload without paid model calls")
+    workload.add_argument("--source")
+    workload.add_argument("--knowledge")
+    workload.add_argument("--selection")
     pricing = commands.add_parser(
         "record-pricing", help="Record verified official prices and refresh NBP FX"
     )
@@ -159,9 +237,9 @@ def main():
         settings = Settings(_env_file=arguments.env_file)
         result = execute(arguments, settings)
         print(json.dumps(result, indent=2, ensure_ascii=True))
-        if "technical_failure" in result:
+        if isinstance(result, dict) and "technical_failure" in result:
             return 3
-        if result.get("interrupts"):
+        if isinstance(result, dict) and result.get("interrupts"):
             return 2
         return 0
     except ValidationError:

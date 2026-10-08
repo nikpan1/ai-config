@@ -2,7 +2,15 @@ from itertools import combinations
 
 import pytest
 
-from docgen.reconciliation import comparison_tasks, entity_register
+from docgen.reconciliation import (
+    comparison_at,
+    comparison_count,
+    comparison_tasks,
+    entity_register,
+    iter_comparisons,
+    replace_comparison,
+    split_comparison,
+)
 from docgen.review import validate_decisions
 
 
@@ -36,6 +44,24 @@ def test_partitioned_comparisons_cover_every_candidate_pair():
     }
     assert performed == expected
     assert not plan["unperformed"]
+
+
+def test_persisted_queue_matches_exhaustive_candidate_policy_and_split(store):
+    records = [entity(f"e{number}") for number in range(500)]
+    expected = comparison_tasks(records, "entities", 2048)
+    stored = comparison_tasks(records, "entities", 2048, store=store)
+    assert "tasks" not in stored
+    assert len(store.get(stored["tasks_ref"])["parts"]) > 1
+    assert list(iter_comparisons(stored, store)) == expected["tasks"]
+    assert comparison_count(stored) == len(expected["tasks"])
+    position = len(expected["tasks"]) // 2
+    task = comparison_at(stored, position, store)
+    children = split_comparison(task)
+    assert children
+    changed = replace_comparison(stored, position, children, store)
+    expected["tasks"][position : position + 1] = children
+    assert list(iter_comparisons(changed, store)) == expected["tasks"]
+    assert comparison_count(changed) == comparison_count(stored) - 1 + len(children)
 
 
 def test_register_never_merges_similar_names_without_decision():

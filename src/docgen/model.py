@@ -52,7 +52,18 @@ class GeminiModel:
         self.ledger = BudgetLedger(settings.budget_ledger, settings.budget_pln)
 
     def call(self, stage: str, payload: dict, schema: type[BaseModel]):
+        from docgen.signatures import workflow_manifest
+
         instruction = prompt_text(stage)
+        generation = stage.startswith("gen_")
+        output_tokens = (
+            min(
+                payload.get("generation_output_limit", self.settings.output_tokens),
+                self.settings.output_tokens,
+            )
+            if generation
+            else self.settings.output_tokens
+        )
         request = encode(payload)
         schema_json = schema.model_json_schema()
         signature = digest(
@@ -61,11 +72,17 @@ class GeminiModel:
                 payload,
                 schema_json,
                 self.settings.signature(),
-                implementation_signature(),
+                workflow_manifest(
+                    "documentation_generation"
+                    if generation
+                    else "documentation_planning"
+                    if stage.startswith("plan_")
+                    else "knowledge"
+                ),
             ]
         )
         cache_path = self.store.path(f"cache/{signature}.json")
-        if cache_path.exists():
+        if not generation and cache_path.exists():
             cached = read_json(cache_path)
             if digest(cached["result"]) != cached["checksum"]:
                 raise ValueError("Model cache integrity check failed")
@@ -73,7 +90,7 @@ class GeminiModel:
             return schema.model_validate(cached["result"])
         material = instruction + request + encode(schema_json)
         estimated = estimate_tokens(material)
-        if estimated + self.settings.output_tokens > self.settings.request_tokens:
+        if estimated + output_tokens > self.settings.request_tokens:
             raise RequestTooLarge("Serialized request exceeds configured context budget")
         key = self.settings.gemini_api_key.get_secret_value()
         if not key:
@@ -94,7 +111,7 @@ class GeminiModel:
             + len(encode(schema_json).encode("utf-8"))
             + 4096
         )
-        if input_bound + self.settings.output_tokens > self.settings.request_tokens:
+        if input_bound + output_tokens > self.settings.request_tokens:
             raise RequestTooLarge("Counted request plus schema and output headroom exceeds budget")
         for attempt in range(self.settings.technical_retries + 1):
             charge = self.ledger.reserve(self.run_id, stage, reservation, pricing)
@@ -116,7 +133,7 @@ class GeminiModel:
                         system_instruction=instruction,
                         response_mime_type="application/json",
                         response_json_schema=schema_json,
-                        max_output_tokens=self.settings.output_tokens,
+                        max_output_tokens=output_tokens,
                         thinking_config=types.ThinkingConfig(
                             thinking_level=self.settings.thinking_level
                         ),
@@ -179,8 +196,10 @@ class GeminiModel:
                 raise ModelFailure("Gemini returned no complete candidate; checkpoint retained")
             result = schema.model_validate_json(response.text)
             value = result.model_dump(mode="json")
-            write_json(
-                cache_path, {"result": value, "checksum": digest(value), "response_ref": raw_ref}
-            )
+            if not generation:
+                write_json(
+                    cache_path,
+                    {"result": value, "checksum": digest(value), "response_ref": raw_ref},
+                )
             return result
         raise ModelFailure("Retry limit reached")

@@ -4,7 +4,7 @@ from langgraph.types import Command
 
 from docgen.contracts import Finding
 from docgen.model import TruncatedOutput
-from docgen.storage import digest
+from docgen.storage import digest, write_json
 from docgen.workflow import Pipeline, persistent_graph
 
 
@@ -130,3 +130,61 @@ def test_artifact_tampering_rejected(store):
     with pytest.raises(ValueError, match="integrity"):
         store.get(ref)
     assert digest({"a": 1, "b": 2}) == digest({"b": 2, "a": 1})
+
+
+def test_cli_can_replace_invalid_review_response(tmp_path, settings, store, monkeypatch):
+    from docgen import cli
+
+    model = FixtureModel()
+    monkeypatch.setattr(cli, "GeminiModel", lambda *args: model)
+    source = initial(tmp_path, "# Rules\n\nA [missing definition](absent.md).\n")["source"]
+
+    def execute(arguments):
+        return cli.execute(cli.parser().parse_args(arguments), settings)
+
+    result = execute(["run", source, "--thread-id", "invalid-review"])
+    issue = result["interrupts"][0]["issues"][0]
+    decision = {
+        "issue_id": issue["id"],
+        "revision": issue["revision"],
+        "action": "acknowledge_unknown",
+        "reviewer": "automated fixture",
+        "rationale": "The missing linked document remains explicitly unknown",
+    }
+    path = tmp_path / "decisions.json"
+    write_json(path, {"decisions": [decision, decision]})
+    arguments = ["resume", "--thread-id", "invalid-review", "--decisions", str(path)]
+    with pytest.raises(ValueError, match="Only one decision"):
+        execute(arguments)
+    assert model.calls == []
+    write_json(path, {"decisions": [decision]})
+    completed = execute(arguments)
+    assert completed["values"]["status"] == "complete"
+    assert model.calls.count("extract") == 1
+    assert len(store.get(completed["values"]["decisions_ref"])) == 1
+    history = execute(["history", "--thread-id", "invalid-review", "--limit", "1000"])
+    assert len([item for item in history if "review_issues" in item["next"]]) >= 2
+
+
+def test_review_gate_deduplicates_identical_findings(settings, store):
+    pipeline = Pipeline(settings, store, FixtureModel())
+    item = {"kind": "source_issue", "description": "Source leaves a boundary unknown"}
+    result = pipeline.gate({"run_id": "duplicate"}, "verify_batch", "revision", [item, item])
+    assert len(store.get(result["issues_ref"])) == 1
+
+
+@pytest.mark.parametrize("permanent", [False, True])
+def test_comparison_identity_repairs_are_bounded(tmp_path, settings, store, permanent):
+    def transform(stage, payload, result):
+        if stage == "claims" and (permanent or not payload.get("feedback")):
+            result.checked_ids = []
+        return result
+
+    model = FixtureModel(transform)
+    with persistent_graph(Pipeline(settings, store, model)) as graph:
+        result = graph.invoke(initial(tmp_path), config())
+    assert result["status"] == ("review" if permanent else "complete")
+    assert model.calls.count("claims") == (3 if permanent else 2)
+    assert model.calls.count("extract") == 1
+    if permanent:
+        assert not result.get("bundle_ref")
