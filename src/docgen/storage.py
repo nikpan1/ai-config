@@ -3,7 +3,7 @@ import json
 import os
 import shutil
 import sqlite3
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
@@ -46,6 +46,7 @@ def fingerprint(stage: str, settings: Settings) -> str:
         {
             "code": __version__,
             "schema": 1,
+            "algorithm": {"parse": 2, "extract": 2, "reconcile": 2}.get(stage, 1),
             "settings": stage_settings(stage, settings),
             "prompts": {name: load_prompt(name)[1] for name in PROMPTS.get(stage, ())},
         }
@@ -56,6 +57,7 @@ class Store:
     def __init__(self, root: Path):
         self.root = root.resolve()
         self.manifest = read_json(self.root / "manifest.json")
+        self.on_event: Callable[[dict], None] | None = None
 
     @classmethod
     def create(cls, runs: Path, source: Path, settings: Settings) -> "Store":
@@ -82,7 +84,13 @@ class Store:
                     }
                     for name, deps in STAGES.items()
                 },
-                "usage": {"calls": 0, "reserved_tokens": 0, "input_tokens": 0, "output_tokens": 0},
+                "usage": {
+                    "calls": 0,
+                    "reserved_tokens": 0,
+                    "budget_tokens": 0,
+                    "input_tokens": 0,
+                    "output_tokens": 0,
+                },
                 "exports": [],
                 "cleanup": [],
                 "feedback": {},
@@ -108,8 +116,11 @@ class Store:
             lock.release()
 
     def event(self, kind: str, data: dict) -> None:
+        event = {"time": now(), "event": kind, **data}
         with (self.root / "events.jsonl").open("a", encoding="utf-8") as stream:
-            stream.write(json.dumps({"time": now(), "event": kind, **data}) + "\n")
+            stream.write(json.dumps(event) + "\n")
+        if self.on_event:
+            self.on_event(event)
 
     def stage(self, name: str) -> dict:
         return self.manifest["stages"][name]
@@ -187,7 +198,7 @@ class Store:
             if p.is_file() and p.name != "metadata.json"
         }
         self.persist_attempt(stage, attempt)
-        if stage in {"reconcile", "review_knowledge"}:
+        if stage in {"extract", "reconcile", "review_knowledge"}:
             with sqlite3.connect(self.root / "knowledge.sqlite") as db:
                 db.execute(
                     "CREATE TABLE IF NOT EXISTS revisions (hash TEXT PRIMARY KEY, data TEXT)"

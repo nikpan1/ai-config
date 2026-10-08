@@ -13,9 +13,15 @@ negation, conditional requirements and deliberately conflicting statements. No
 Markdown or HTML image references were found. These are synthetic specifications,
 not evidence about a real insurance product.
 
-The parser produced 2,319 source spans, including 207 tables, and 180 extraction
+The original parser produced 2,319 source spans, including 207 tables, and 180 extraction
 batches at the default 16,000-character batch limit. Explicit HTML anchors resolve;
 the supplied corpus has no missing local-link warnings after parsing.
+
+The full-run root `data/` produced 182 original batches because its source paths
+include the additional directory component. The improved row-level parser retains
+4,702 spans, including 2,590 table rows, in 151 compact extraction batches at that
+same root. See the [two-run comparison](pipeline-run-comparison.md) for the live
+results, implemented corrections and limits of these metrics.
 
 `markdown-it-py` 4.2.0 is pinned by `uv.lock`, with tables and footnotes enabled.
 Source spans preserve snapshot ID, path, line ranges, heading context, exact text
@@ -89,9 +95,9 @@ corpus-scale accuracy measurement, a readability score or a cost estimate.
   comprehension. Resolve the supplied corpus's intentional contradictions explicitly.
 - Evaluate informative screenshots and text/image disagreements with real Gemini
   image input; generated fixture assets only verify the deterministic image path.
-- Measure corpus-scale graph size, context needs and review effort. Reconciliation
-  and outline calls currently require the structured graph to fit the configured
-  context limit. No unbounded or silent truncation is implemented.
+- Assess corpus-scale semantic support and review effort. Identity/conflict checks
+  now use bounded batches with explicit grouping/split limitations. Outlining still
+  requires the structured graph to fit the configured context limit.
 
 Source lookup integrity, model semantic assessments and human quality scores must
 be reported separately. The optional M6 Streamlit interface and cross-run change

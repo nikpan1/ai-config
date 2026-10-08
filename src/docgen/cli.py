@@ -20,6 +20,13 @@ def emit(value: object) -> None:
     typer.echo(json.dumps(value, ensure_ascii=False, indent=2, default=str))
 
 
+def progress(event: dict) -> None:
+    if event["event"] == "stage_completed":
+        typer.echo(f"Completed: {event['stage']}", err=True)
+    elif event["event"] in {"extraction_batch", "reconciliation_batch"}:
+        typer.echo(f"{event['event']}: {event['completed']}/{event['total']}", err=True)
+
+
 def find_run(run_id: str, runs: Path) -> Store:
     path = (runs / run_id).resolve()
     if not path.is_relative_to(runs.resolve()) or path == runs.resolve():
@@ -37,6 +44,7 @@ def inspect(path: Path, runs: Runs = Path("runs")) -> None:
 def run(path: Path, config: Path | None = None, runs: Runs = Path("runs")) -> None:
     """Start a run; source excerpts and informative images will be sent to Gemini."""
     store = Store.create(runs, path, Settings.load(config))
+    store.on_event = progress
     typer.echo(f"Run: {store.manifest['run_id']}")
     try:
         emit(run_pipeline(store))
@@ -48,7 +56,11 @@ def run(path: Path, config: Path | None = None, runs: Runs = Path("runs")) -> No
 def resume(run_id: str, config: Path | None = None, runs: Runs = Path("runs")) -> None:
     """Resume from retained valid artifacts and persistent checkpoints."""
     store = find_run(run_id, runs)
-    emit(run_pipeline(store, settings=Settings.load(config) if config else None))
+    store.on_event = progress
+    try:
+        emit(run_pipeline(store, settings=Settings.load(config) if config else None))
+    finally:
+        typer.echo(f"Report: {run_report(store)}")
 
 
 @app.command()

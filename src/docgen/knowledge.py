@@ -10,7 +10,7 @@ def unique(items: list, name: str) -> set[str]:
     return set(ids)
 
 
-def validate_extraction(batch: Extraction, supplied: set[str]) -> None:
+def validate_extraction(batch: Extraction, supplied: set[str], complete: bool = False) -> None:
     entities = unique(batch.entities, "entity")
     claims = unique(batch.claims, "claim")
     unique(batch.relationships, "relationship")
@@ -37,6 +37,10 @@ def validate_extraction(batch: Extraction, supplied: set[str]) -> None:
             claim = next(c for c in batch.claims if c.id == claim_id)
             if row.evidence_id not in claim.evidence_ids:
                 raise ValueError("Coverage claim does not reference its evidence")
+    if complete:
+        covered = [row.evidence_id for row in batch.coverage]
+        if set(covered) != supplied or len(covered) != len(supplied):
+            raise ValueError("Every supplied span requires exactly one coverage disposition")
 
 
 def namespace(batch: Extraction, prefix: str) -> Extraction:
@@ -65,10 +69,12 @@ def apply_resolution(graph: Knowledge, resolution: Resolution) -> Knowledge:
         if source not in entities or target not in entities or source == target:
             raise ValueError("Invalid alias mapping")
         if target in resolution.aliases:
-            raise ValueError("Alias chains and cycles require explicit review")
+            raise ValueError(f"Alias chain or cycle: {source} -> {target}")
         old, retained = entities[source], entities[target]
         if (old.scope, old.version, old.type) != (retained.scope, retained.version, retained.type):
-            raise ValueError("Cannot merge entities with different type, scope or version")
+            raise ValueError(
+                f"Incompatible alias {source} -> {target}: type, scope or version differs"
+            )
         retained.aliases = sorted(set(retained.aliases + old.aliases + [old.name]))
         retained.evidence_ids = sorted(set(retained.evidence_ids + old.evidence_ids))
     graph.entities = [e for e in graph.entities if e.id not in resolution.aliases]
@@ -128,7 +134,7 @@ def validate_knowledge(graph: Knowledge, approved: bool = False) -> None:
     if len(graph.coverage) != len(evidence):
         raise ValueError("Duplicate coverage dispositions")
     for conflict in graph.conflicts:
-        if len(conflict.claim_ids) < 2 or not set(conflict.claim_ids) <= claims.keys():
+        if len(set(conflict.claim_ids)) < 2 or not set(conflict.claim_ids) <= claims.keys():
             raise ValueError("Invalid competing claims")
         if conflict.status == "resolved" and not conflict.rationale.strip():
             raise ValueError("Conflict resolution requires a rationale")

@@ -60,7 +60,7 @@ function showEvidence(id, parent) {
   const span = spans.get(ev.span_id);
   if (span) {
     element("p", `${span.path}:${span.start_line}-${span.end_line}`, details);
-    element("pre", span.excerpt, details);
+    element("pre", (span.table_header_excerpt || "") + span.excerpt, details);
   }
   if (ev.kind === "reviewer") element("p", `${ev.reviewer}: ${ev.statement}`, details);
   const asset = assets.get(ev.asset_id);

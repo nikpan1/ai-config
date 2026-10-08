@@ -16,7 +16,6 @@ from docgen.authoring import (
 from docgen.config import STAGES, Settings
 from docgen.ingestion import batches, inventory, parse_inventory
 from docgen.knowledge import (
-    apply_resolution,
     consolidate_coverage,
     namespace,
     validate_extraction,
@@ -74,16 +73,18 @@ class Pipeline:
             return self.extract(directory)
         if stage == "reconcile":
             graph = Knowledge.model_validate(store.output("extract"))
-            resolution = self.model.call(
-                "reconcile_entities",
-                {
-                    "knowledge": graph.model_dump(),
-                    "feedback": store.manifest["feedback"].get(stage, ""),
-                },
-                Resolution,
+            from docgen.reconciliation import reconcile
+
+            graph = reconcile(
+                graph,
+                store.output("parse"),
+                self.settings.reconcile_chars,
                 directory,
+                lambda prompt, context, knowledge, identity, index: self.resolve_batch(
+                    prompt, context, knowledge, identity, index, directory
+                ),
+                store.event,
             )
-            graph = apply_resolution(graph, resolution)
             from docgen.preview import graph_preview
 
             graph_preview(directory / "graph-preview", graph, store.output("parse"), store.root)
@@ -174,7 +175,7 @@ class Pipeline:
                         extracted.model_dump(),
                     )
                     try:
-                        validate_extraction(extracted, supplied)
+                        validate_extraction(extracted, supplied, complete=True)
                         break
                     except ValueError as exc:
                         write_json(
@@ -273,11 +274,78 @@ class Pipeline:
                 if receipt["key"] != key or receipt["output_hash"] != digest(data):
                     continue
                 result = Extraction.model_validate(data)
-                validate_extraction(result, supplied)
+                validate_extraction(result, supplied, complete=True)
                 return result, previous["id"]
             except (OSError, ValueError, KeyError):
                 continue
         return None, None
+
+    def resolve_batch(
+        self,
+        prompt: str,
+        context: dict,
+        graph: Knowledge,
+        identity: bool,
+        index: int,
+        directory: Path,
+    ) -> Resolution:
+        from docgen.reconciliation import validate_resolution
+
+        attempt = self.store.active("reconcile")
+        assert attempt is not None
+        context = {**context, "feedback": self.store.manifest["feedback"].get("reconcile", "")}
+        key = digest([context, attempt["fingerprint"], attempt["dependencies"]])
+        name = f"{prompt}-{index}"
+        result = None
+        reused_from = None
+        for previous in reversed(self.store.stage("reconcile")["attempts"]):
+            if (
+                previous["id"] == attempt["id"]
+                or previous["status"] != "superseded"
+                or previous["execution_id"] != attempt["execution_id"]
+            ):
+                continue
+            folder = self.store.attempt_dir("reconcile", previous) / "batches"
+            try:
+                receipt = read_json(folder / f"{name}.receipt.json")
+                data = read_json(folder / f"{name}.json")
+                if receipt["key"] != key or receipt["output_hash"] != digest(data):
+                    continue
+                recovered = Resolution.model_validate(data)
+                validate_resolution(recovered, context, graph, identity)
+                result, reused_from = recovered, previous["id"]
+                break
+            except (OSError, ValueError, KeyError):
+                continue
+        if result is None:
+            call_context = context
+            for repair in range(self.settings.repair_attempts + 1):
+                result = self.model.call(prompt, call_context, Resolution, directory)
+                write_json(
+                    directory / "batch-drafts" / f"{name}-{repair}.json", result.model_dump()
+                )
+                try:
+                    validate_resolution(result, context, graph, identity)
+                    break
+                except ValueError as exc:
+                    write_json(
+                        directory / "batch-drafts" / f"{name}-{repair}-error.json",
+                        {"error": str(exc)},
+                    )
+                    if repair == self.settings.repair_attempts:
+                        raise
+                    call_context = {
+                        **context,
+                        "previous_resolution": result.model_dump(),
+                        "validation_error": str(exc),
+                    }
+        assert result is not None
+        write_json(directory / "batches" / f"{name}.json", result.model_dump())
+        write_json(
+            directory / "batches" / f"{name}.receipt.json",
+            {"key": key, "output_hash": digest(result.model_dump()), "reused_from": reused_from},
+        )
+        return result
 
     def compose(self, directory: Path) -> dict:
         graph = Knowledge.model_validate(self.store.output("review_knowledge")["artifact"])

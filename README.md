@@ -85,14 +85,46 @@ Missing/corrupt artifacts and prompt/configuration changes invalidate dependent
 results before resumption. Raising operational budgets or timeouts does not erase
 completed work. Repeated failures terminate with inspectable errors. Resume a
 failed stage to retry; reset a cancelled run before continuing. Each retry may incur
-another API charge. Budget reservations conservatively use input characters plus
-output allowance and an image estimate; actual reported tokens are tracked separately.
+another API charge. Before a request, the budget reserves serialized input bytes,
+schema/prompt overhead, output allowance and an image estimate. A response with
+complete usage metadata settles that reservation to actual input/output tokens.
+Unknown usage retains its full reservation. `usage.budget_tokens` is the enforced
+accounting total; `reserved_tokens` remains the historical sum of all reservations.
+Legacy manifests without settled accounting retain conservative prior reservations.
+
+Provider errors retain safe numeric/status codes, not raw transport messages.
+HTTP 402 is not automatically retried, even when labelled `RESOURCE_EXHAUSTED`;
+local budget increases cannot clear a provider-side refusal. Verified batches
+remain resumable when the provider accepts requests again.
 
 Extraction validates each batch before saving it. Invalid structured references get
 at most `repair_attempts` corrective model calls with the original evidence.
 Resuming a failed extraction reuses verified batches from the same execution and
 configuration; reset or prompt changes require fresh requests. Batch progress is
-recorded in `events.jsonl` with completed/total counts.
+recorded in `events.jsonl` and printed by the CLI with completed/total counts.
+
+Markdown table rows have individual evidence IDs, exact row excerpts and source
+locations. Table headers are retained separately and supplied to the model with
+every row. Every supplied text span requires exactly one coverage disposition.
+
+Reconciliation first checks size-bounded identity candidate groups, then qualified
+claims grouped by topic and explicit source conflict markers. It retains full
+claims and source evidence in the graph while omitting redundant transport fields
+from model requests. `reconcile_chars` bounds each initial batch. Invalid responses
+receive at most `repair_attempts` repairs, and verified batches survive a failed
+stage resume. Oversized identity groups stay separate with a recorded gap;
+split conflict topics explicitly disclose incomplete cross-chunk comparisons.
+Candidate grouping is not an exhaustive all-pairs conflict search.
+
+For the full supplied corpus, use the bounded evaluation configuration:
+
+```powershell
+uv run docgen run data --config config.corpus.yaml
+```
+
+This still stops at knowledge review. See the [two-run comparison](docs/pipeline-run-comparison.md)
+for measured results and limitations. The comparison metrics can be reproduced
+without mutating historical runs using `python scripts/summarize_run.py runs/<run-id>`.
 
 ## Diagrams and exports
 
@@ -134,10 +166,11 @@ Browser verification uses `python tests/build_preview_fixture.py`, then
 `node tests/verify-preview.cjs`; set `DOCGEN_BROWSER` for your local browser path.
 See [evaluation status](docs/evaluation.md) for tested behavior and release gates.
 
-The supplied corpus is synthetic and intentionally contradictory. Its full live
-Gemini quality, latency, cost and human readability targets remain unmeasured.
-Extraction batches are bounded; reconciliation and outlining require their
-structured graph to fit `context_chars`. Oversized inputs stop visibly rather than
+The supplied corpus is synthetic and intentionally contradictory. Full-corpus
+usage and latency are measured separately from semantic accuracy and human
+readability, which still need domain evaluation. Extraction and reconciliation
+are batched; outlining still requires its structured graph to fit `context_chars`.
+Oversized inputs stop or receive explicit review gaps rather than silently
 discarding evidence. Evaluate a small selected corpus first and set limits for your
 chosen model. A domain reviewer must assess semantics and missing preparation
 details. Reference integrity and model semantic review do not establish truth.

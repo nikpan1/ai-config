@@ -4,6 +4,24 @@ from docgen.storage import Store, read_json
 from docgen.workflow import run_pipeline
 
 
+def test_missing_coverage_triggers_bounded_repair(store, model):
+    original = model.call
+    repairs = []
+
+    def call(prompt, context, schema, directory, images=None):
+        if prompt == "repair_extraction":
+            repairs.append(context["validation_error"])
+            return original("extract_claims", context, schema, directory, images)
+        result = original(prompt, context, schema, directory, images)
+        if prompt == "extract_claims":
+            result.coverage.pop()
+        return result
+
+    model.call = call
+    run_pipeline(store, model)
+    assert len(repairs) == 1 and "exactly one" in repairs[0]
+
+
 def test_invalid_coverage_is_repaired_without_loosening_validation(store, model):
     original = model.call
     repairs = []

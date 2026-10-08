@@ -44,7 +44,11 @@ class FixtureModel:
                 claims.append(
                     {
                         "id": claim_id,
-                        "assertion": span["excerpt"].strip(),
+                        "assertion": span["excerpt"].strip()
+                        or "; ".join(
+                            f"{header}: {value}"
+                            for header, value in zip(*span["table"], strict=True)
+                        ),
                         "entity_ids": [entity_id],
                         "evidence_ids": [span["id"]],
                     }
@@ -70,7 +74,7 @@ class FixtureModel:
                 "classification": "decorative",
                 "reason": "Fixture",
             }
-        elif prompt == "reconcile_entities":
+        elif prompt in {"reconcile_entities", "detect_conflicts"}:
             value = {"aliases": {}, "conflicts": []}
         elif prompt == "plan_outline":
             value = {

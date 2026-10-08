@@ -27,7 +27,8 @@ def test_images_tables_html_and_snapshots(tmp_path):
     parsed = parse_inventory(destination, data)
     table = next(s for s in parsed["spans"] if s["kind"] == "table")
     assert table["table"] == [["Value", "Units"], ["3", "attempts"]]
-    assert "| Value | Units |" in table["excerpt"]
+    assert "| Value | Units |" in table["table_header_excerpt"]
+    assert table["excerpt"].rstrip("\r\n") == "| 3 | attempts |"
     assert any("colspan" in s["excerpt"] for s in parsed["spans"])
     source.joinpath("test.md").write_text("changed", "utf-8")
     assert parse_inventory(destination, data) == parsed
@@ -106,3 +107,25 @@ def test_supplied_corpus_parses_without_lost_table_context(tmp_path):
             "warnings": len(parsed["warnings"]),
         }
     )
+
+
+def test_table_rows_have_exact_locators_headers_and_reference_images(tmp_path):
+    Image.new("RGB", (100, 80), "white").save(tmp_path / "image.png")
+    text = (
+        "# Rows\n\n| Name | Limit |\n| --- | --- |\n| A | 3 |\n"
+        "| ![Diagram][pic] | 5 |\n\n[pic]: image.png\n"
+    )
+    source = tmp_path / "source.md"
+    source.write_bytes(text.encode("utf-8"))
+    run = tmp_path / "run"
+    parsed = parse_inventory(run, inventory(source, run))
+    rows = [s for s in parsed["spans"] if s["table"]]
+    assert len(rows) == 2 and rows[0]["id"] != rows[1]["id"]
+    for row in rows:
+        assert row["excerpt"] == "".join(
+            text.splitlines(keepends=True)[row["start_line"] - 1 : row["end_line"]]
+        )
+        assert row["table"][0] == ["Name", "Limit"]
+        assert row["table_header_start_line"] == 3
+    assert parsed["images"][0]["span_ids"] == [rows[1]["id"]]
+    assert parsed["images"][0]["status"] == "pending"

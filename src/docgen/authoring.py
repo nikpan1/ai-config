@@ -242,7 +242,9 @@ def export_bundle(
                 "",
                 "Excerpt from the retained run snapshot; original Markdown is not bundled.",
                 "",
-                "<pre>" + html.escape(span["excerpt"]) + "</pre>",
+                "<pre>"
+                + html.escape(span.get("table_header_excerpt", "") + span["excerpt"])
+                + "</pre>",
             ]
         if evidence.asset_id:
             asset = assets[evidence.asset_id]

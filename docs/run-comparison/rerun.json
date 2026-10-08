@@ -1,0 +1,290 @@
+{
+  "run_id": "run-20261007-223031-d22eb286",
+  "status": "failed",
+  "source": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\data",
+  "created_at": "2026-10-07T22:30:31.600140+00:00",
+  "to_knowledge_review_seconds": null,
+  "total_attempt_processing_seconds": 1779.92,
+  "usage": {
+    "calls": 93,
+    "reserved_tokens": 5040886,
+    "budget_tokens": 1399381,
+    "input_tokens": 388024,
+    "output_tokens": 796197
+  },
+  "stages": {
+    "inventory": {
+      "status": "completed",
+      "attempts": 1,
+      "active_seconds": 0.41
+    },
+    "parse": {
+      "status": "completed",
+      "attempts": 1,
+      "active_seconds": 1.25
+    },
+    "extract": {
+      "status": "failed",
+      "attempts": 2,
+      "active_seconds": 9.08
+    },
+    "reconcile": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "review_knowledge": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "outline": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "review_outline": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "compose": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "validate": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "review_documentation": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "export": {
+      "status": "pending",
+      "attempts": 0
+    }
+  },
+  "model_calls": {
+    "extract_claims": {
+      "calls": 91,
+      "input_tokens": 365936,
+      "output_tokens": 770440,
+      "reasoning_tokens": 67687,
+      "repair_calls": 0,
+      "max_context_chars": 15252
+    },
+    "repair_extraction": {
+      "calls": 2,
+      "input_tokens": 22088,
+      "output_tokens": 25757,
+      "reasoning_tokens": 4068,
+      "repair_calls": 2,
+      "max_context_chars": 40833
+    }
+  },
+  "stage_errors": [
+    {
+      "path": "stages/extract/attempts/1/error.json",
+      "error": {
+        "type": "ValueError",
+        "message": "Model request failed (ChatGoogleGenerativeAIError); inspect model-calls"
+      }
+    },
+    {
+      "path": "stages/extract/attempts/2/error.json",
+      "error": {
+        "type": "ValueError",
+        "message": "Model request failed (ChatGoogleGenerativeAIError); inspect model-calls"
+      }
+    }
+  ],
+  "model_errors": [
+    {
+      "path": "stages/extract/attempts/1/model-calls/00090-extract_claims/error.json",
+      "error": {
+        "type": "ChatGoogleGenerativeAIError",
+        "category": "transport",
+        "transient": false,
+        "time": "2026-10-07T23:00:02.506003+00:00"
+      }
+    },
+    {
+      "path": "stages/extract/attempts/2/model-calls/00091-extract_claims/error.json",
+      "error": {
+        "type": "ChatGoogleGenerativeAIError",
+        "category": "quota",
+        "transient": true,
+        "status_code": 402,
+        "provider_status": "RESOURCE_EXHAUSTED",
+        "time": "2026-10-07T23:02:10.860500+00:00"
+      }
+    },
+    {
+      "path": "stages/extract/attempts/2/model-calls/00092-extract_claims/error.json",
+      "error": {
+        "type": "ChatGoogleGenerativeAIError",
+        "category": "quota",
+        "transient": true,
+        "status_code": 402,
+        "provider_status": "RESOURCE_EXHAUSTED",
+        "time": "2026-10-07T23:02:12.043134+00:00"
+      }
+    },
+    {
+      "path": "stages/extract/attempts/2/model-calls/00093-extract_claims/error.json",
+      "error": {
+        "type": "ChatGoogleGenerativeAIError",
+        "category": "quota",
+        "transient": true,
+        "status_code": 402,
+        "provider_status": "RESOURCE_EXHAUSTED",
+        "time": "2026-10-07T23:02:14.300864+00:00"
+      }
+    }
+  ],
+  "graph_state": "partial_extraction",
+  "extraction_progress": {
+    "time": "2026-10-07T23:02:10.480665+00:00",
+    "event": "extraction_batch",
+    "completed": 87,
+    "total": 151,
+    "attempt": 2,
+    "reused_from": 1
+  },
+  "documents": [
+    {
+      "path": "legacy-insurance/functional-specification.md",
+      "content_hash": "625c2153967f9526fa60100499e261e1364b3b5c038af50b40a90d72960c297b"
+    },
+    {
+      "path": "legacy-insurance/integration-data-and-compliance.md",
+      "content_hash": "25a3177d4f106a519923c404430b90511c22eb3771b7b02e9a0f9c932413f050"
+    },
+    {
+      "path": "legacy-insurance/product-and-feature-register.md",
+      "content_hash": "7475275c784a43b5ffd36cbbdfa7002c37cc96af233861c0d9f7e43e49d6ec88"
+    }
+  ],
+  "source_spans": {
+    "legacy-insurance/functional-specification.md": 2274,
+    "legacy-insurance/integration-data-and-compliance.md": 1651,
+    "legacy-insurance/product-and-feature-register.md": 777
+  },
+  "table_rows": 2590,
+  "graph": {
+    "entities": 562,
+    "claims": 2547,
+    "relationships": 213,
+    "aliases": 0,
+    "conflicts": 0,
+    "evidence": 4702
+  },
+  "coverage": {
+    "excluded": 558,
+    "covered": 2489
+  },
+  "processed_source_spans": {
+    "legacy-insurance/functional-specification.md": 2274,
+    "legacy-insurance/integration-data-and-compliance.md": 773
+  },
+  "excluded_kinds": {
+    "paragraph": 157,
+    "heading": 401
+  },
+  "duplicate_name_excess": 180,
+  "possible_page_ids_in_entity_version": 0,
+  "review_gaps": [],
+  "version_examples": [],
+  "conflicts": [],
+  "seeded_conflict_groups_linked_across_sections": {
+    "CG-01": [],
+    "CG-02": [],
+    "CG-03": [],
+    "CG-04": [],
+    "CG-05": [],
+    "CG-06": []
+  },
+  "seeded_requirement_fragments": [
+    {
+      "path": "legacy-insurance/functional-specification.md",
+      "start_line": 103,
+      "claim_ids": [
+        "b1-claim-cg01-conflict-record"
+      ]
+    },
+    {
+      "path": "legacy-insurance/functional-specification.md",
+      "start_line": 164,
+      "claim_ids": [
+        "b2-c-1524d1722a2dc73fba9f-1"
+      ]
+    },
+    {
+      "path": "legacy-insurance/functional-specification.md",
+      "start_line": 815,
+      "claim_ids": [
+        "b11-claim-f013-conflict-cg02-details"
+      ]
+    },
+    {
+      "path": "legacy-insurance/functional-specification.md",
+      "start_line": 1169,
+      "claim_ids": [
+        "b16-c-f019-cg03-conflict"
+      ]
+    },
+    {
+      "path": "legacy-insurance/functional-specification.md",
+      "start_line": 1353,
+      "claim_ids": [
+        "b19-c-40b12d0bc4d9bd6ab944"
+      ]
+    },
+    {
+      "path": "legacy-insurance/functional-specification.md",
+      "start_line": 1414,
+      "claim_ids": [
+        "b20-c-f023-conflict-cg03"
+      ]
+    },
+    {
+      "path": "legacy-insurance/functional-specification.md",
+      "start_line": 1531,
+      "claim_ids": [
+        "b22-claim-f025-conflict-cg04"
+      ]
+    },
+    {
+      "path": "legacy-insurance/functional-specification.md",
+      "start_line": 1999,
+      "claim_ids": [
+        "b28-claim-3dfd"
+      ]
+    },
+    {
+      "path": "legacy-insurance/functional-specification.md",
+      "start_line": 2257,
+      "claim_ids": [
+        "b32-c-17"
+      ]
+    },
+    {
+      "path": "legacy-insurance/functional-specification.md",
+      "start_line": 2373,
+      "claim_ids": [
+        "b34-c-6"
+      ]
+    },
+    {
+      "path": "legacy-insurance/functional-specification.md",
+      "start_line": 2723,
+      "claim_ids": [
+        "b39-claim-f8fc3c43"
+      ]
+    },
+    {
+      "path": "legacy-insurance/functional-specification.md",
+      "start_line": 4078,
+      "claim_ids": [
+        "b58-claim-f068-conflict"
+      ]
+    }
+  ]
+}

@@ -13,7 +13,7 @@ from PIL import Image
 from docgen.models import EvidenceRef, ImageAsset, SourceDocument, SourceSpan
 from docgen.storage import digest
 
-PARSER_VERSION = "markdown-it-py/" + version("markdown-it-py")
+PARSER_VERSION = "markdown-it-py/" + version("markdown-it-py") + "/rows-v2"
 
 
 def parser() -> MarkdownIt:
@@ -93,22 +93,49 @@ def scan_document(document: SourceDocument, text: str) -> tuple[list[SourceSpan]
             parser_version=PARSER_VERSION,
             table=table,
         )
-        spans.append(span)
+        row_refs = {}
+        if table and len(table) > 1:
+            # Give each data row its own locator and coverage disposition.
+            rows = [t for t in selected if t.type == "tr_open" and t.map]
+            for row_index, (row, row_token) in enumerate(zip(table[1:], rows[1:], strict=True)):
+                assert row_token.map is not None
+                row_start, row_end = row_token.map
+                row_refs[row_start] = span.id + f"-r{row_index + 1}"
+                spans.append(
+                    span.model_copy(
+                        update={
+                            "id": span.id + f"-r{row_index + 1}",
+                            "start_line": row_start + 1,
+                            "end_line": row_end,
+                            "excerpt": "".join(lines[row_start:row_end]),
+                            "table_header_start_line": start + 1,
+                            "table_header_excerpt": "".join(lines[start : start + 2]),
+                            "table": [table[0], row],
+                        }
+                    )
+                )
+        else:
+            spans.append(span)
+        reference_id = next(iter(row_refs.values()), span.id)
         for selected_token in selected:
+            if selected_token.type == "tr_open" and selected_token.map:
+                reference_id = row_refs.get(selected_token.map[0], reference_id)
             for child in selected_token.children or []:
                 if child.type == "text":
                     for match in re.finditer(r"!\[([^\]]*)\](?:\[([^\]]*)\])?", child.content):
                         label = match.group(2) or match.group(1)
-                        images.append((f"unresolved-reference:{label}", match.group(1), span.id))
+                        images.append(
+                            (f"unresolved-reference:{label}", match.group(1), reference_id)
+                        )
                 if child.type == "image":
-                    images.append((str(child.attrGet("src") or ""), child.content, span.id))
+                    images.append((str(child.attrGet("src") or ""), child.content, reference_id))
                 if child.type == "link_open":
-                    links.append((str(child.attrGet("href") or ""), span.id))
+                    links.append((str(child.attrGet("href") or ""), reference_id))
                 if child.type == "html_inline":
                     html = HTMLReferences()
                     html.feed(child.content)
-                    images.extend((src, alt, span.id) for src, alt in html.images)
-                    links.extend((link, span.id) for link in html.links)
+                    images.extend((src, alt, reference_id) for src, alt in html.images)
+                    links.extend((link, reference_id) for link in html.links)
         if token.type == "html_block":
             html = HTMLReferences()
             html.feed(excerpt)
@@ -284,7 +311,8 @@ def batches(spans: list[dict], limit: int) -> list[list[dict]]:
     result: list[list[dict]] = []
     current: list[dict] = []
     size = 0
-    for span in spans:
+    for original in spans:
+        span = model_span(original)
         parts = [span]
         if len(json.dumps(span)) > limit:
             # Keep one stable locator while selecting table rows with their headers.
@@ -308,4 +336,12 @@ def batches(spans: list[dict], limit: int) -> list[list[dict]]:
             size += length
     if current:
         result.append(current)
+    return result
+
+
+def model_span(span: dict) -> dict:
+    """Keep semantic content; snapshots and full locators remain in parse artifacts."""
+    result = {k: span[k] for k in ("id", "path", "headings", "kind")}
+    result["excerpt"] = "" if span["table"] else span["excerpt"]
+    result["table"] = span["table"]
     return result

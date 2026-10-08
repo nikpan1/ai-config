@@ -28,6 +28,8 @@ class SourceSpan(Record):
     kind: str
     parser_version: str
     table: list[list[str]] = Field(default_factory=list)
+    table_header_start_line: int | None = None
+    table_header_excerpt: str = ""
     warnings: list[str] = Field(default_factory=list)
 
 

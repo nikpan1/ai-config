@@ -16,6 +16,7 @@ class Settings(BaseModel):
     temperature: float = Field(default=1.0, ge=0, le=2)
     max_output_tokens: int = Field(default=8192, ge=256)
     batch_chars: int = Field(default=16000, ge=1000)
+    reconcile_chars: int = Field(default=48000, ge=4000)
     context_chars: int = Field(default=100000, ge=1000)
     max_calls: int = Field(default=200, ge=1)
     token_budget: int = Field(default=2000000, ge=1000)
@@ -48,7 +49,7 @@ STAGES: dict[str, tuple[str, ...]] = {
 
 PROMPTS = {
     "extract": ("extract_claims", "analyze_image", "repair_extraction"),
-    "reconcile": ("reconcile_entities",),
+    "reconcile": ("reconcile_entities", "detect_conflicts"),
     "outline": ("plan_outline",),
     "compose": ("compose_chapter", "plan_diagram", "repair_output"),
     "validate": ("review_semantics",),
@@ -62,6 +63,8 @@ def stage_settings(stage: str, settings: Settings) -> dict:
     if stage == "export":
         return {"customer_evidence": settings.customer_evidence}
     if stage in PROMPTS:
+        if stage != "reconcile":
+            data.pop("reconcile_chars")
         for field in (
             "max_calls",
             "token_budget",
