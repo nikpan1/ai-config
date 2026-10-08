@@ -8,11 +8,16 @@ from pydantic import ValidationError
 from docgen.generation_assets import prepare_inventory
 from docgen.generation_contracts import (
     AssetRequest,
+    EditorialPage,
     GenerationDecision,
-    PageVerification,
     TechnicalTerm,
     WritingFragment,
     WritingVerification,
+)
+from docgen.generation_editorial import (
+    content_pages,
+    polish_documentation,
+    verify_editorial_revision,
 )
 from docgen.generation_export import assemble, mermaid_text, publish, render_fragment
 from docgen.generation_inputs import freeze_inputs, load_plan
@@ -27,7 +32,7 @@ from docgen.generation_validation import (
 from docgen.ingestion import estimate_tokens
 from docgen.model import ModelFailure, RequestTooLarge, TruncatedOutput
 from docgen.planning_contracts import PlanningInputs
-from docgen.planning_helpers import evidence_context, require_exact
+from docgen.planning_helpers import require_exact
 from docgen.storage import digest, encode
 
 STAGES = (
@@ -38,6 +43,8 @@ STAGES = (
     "verify_writing_job",
     "write_mermaid_diagrams",
     "assemble_pages",
+    "polish_documentation",
+    "verify_editorial_revision",
     "validate_documentation",
     "review_markdown_presentation",
     "finalize_documentation",
@@ -66,6 +73,12 @@ class GenerationState(TypedDict, total=False):
     attempt: int
     diagrams_ref: str
     pages_ref: str
+    unpolished_pages_ref: str
+    editorial_index: int
+    editorial_attempt: int
+    editorial_draft_ref: str
+    editorial_feedback_ref: str
+    editorial_review_ref: str
     page_index: int
     page_reviews_ref: str
     validation_ref: str
@@ -143,6 +156,7 @@ class GenerationPipeline:
                 state.get("language_ref"),
                 state.get("draft_ref"),
                 state.get("pages_ref"),
+                state.get("editorial_draft_ref"),
                 stage,
                 descriptions,
             ]
@@ -317,13 +331,26 @@ class GenerationPipeline:
 
     def assemble_pages(self, state):
         pages = assemble(self, state)
+        pages_ref = self.store.put(pages, "generation-pages")
         return {
-            "pages_ref": self.store.put(pages, "generation-pages"),
+            "pages_ref": pages_ref,
+            "unpolished_pages_ref": pages_ref,
+            "editorial_index": 0,
+            "editorial_attempt": 0,
+            "editorial_draft_ref": "",
+            "editorial_feedback_ref": "",
+            "editorial_review_ref": "",
             "page_index": 0,
             "page_reviews_ref": "",
             "release_approval_ref": "",
-            "route": "validate_documentation",
+            "route": "polish_documentation",
         }
+
+    def polish_documentation(self, state):
+        return polish_documentation(self, state)
+
+    def verify_editorial_revision(self, state):
+        return verify_editorial_revision(self, state)
 
     def validate_documentation(self, state):
         load_plan(self.settings, self.store, self.inputs(state)["plan_ref"])
@@ -354,60 +381,17 @@ class GenerationPipeline:
             if a["disposition"] == "full_treatment"
         ]
         require_exact(coverage, expected, "Global canonical obligation coverage")
-        review_pages = [p for p in self.rows(state, "pages") if p["role"] != "sources"]
-        index = state.get("page_index", 0)
+        review_pages = content_pages(self, state)
         reviews = self.read(state, "page_reviews_ref", [])
-        if index < len(review_pages):
-            page = review_pages[index]
-            sections = set(page["section_ids"])
-            ids = {
-                key
-                for job in jobs
-                if job["section_id"] in sections
-                for key in job["obligation_ids"]
-            }
-            originals = evidence_context(
-                self.store,
-                self.planning_inputs(state),
-                [o for o in self.rows(state, "content-obligations") if o["id"] in ids],
-            )
-            result = self.call(
-                "gen_page_review",
-                {
-                    "page": page,
-                    "markdown": pages[page["path"]],
-                    "originals": originals,
-                    "language_contract": self.read(state, "language_ref"),
-                    "page_tree": [
-                        {k: p[k] for k in ("id", "path", "title", "section_ids")}
-                        for p in self.rows(state, "pages")
-                    ],
-                    "allocations": [
-                        a
-                        for a in self.rows(state, "content-allocations")
-                        if a["obligation_id"] in ids
-                    ],
-                },
-                PageVerification,
-            )
-            require_exact(result.checked_section_ids, page["section_ids"], "Full-page review scope")
-            refs = self.store.put(
-                [*reviews, {"page_id": page["id"], "review": result}], "generation-page-reviews"
-            )
-            if any(f.blocking for f in result.findings):
-                return {
-                    **self.gate(
-                        state,
-                        "validate_documentation",
-                        [f.description for f in result.findings if f.blocking],
-                    ),
-                    "page_reviews_ref": refs,
-                }
-            return {
-                "page_index": index + 1,
-                "page_reviews_ref": refs,
-                "route": "validate_documentation",
-            }
+        require_exact(
+            [r["page_id"] for r in reviews],
+            [p["id"] for p in review_pages],
+            "Reviewed editorial pages",
+        )
+        by_id = {p["id"]: p for p in review_pages}
+        for review in reviews:
+            if review["output_hash"] != digest(pages[by_id[review["page_id"]]["path"]]):
+                raise ValueError("Editorial review does not match the final page")
         report.update(
             coverage={"canonical": len(coverage), "in_scope": len(expected), "passed": True},
             semantic={"job_checks": len(jobs), "page_reviews": reviews},
@@ -477,6 +461,8 @@ class GenerationPipeline:
                 "revision": state["review_revision"],
                 "export_path": state.get("export_path"),
                 "draft_ref": state.get("draft_ref"),
+                "editorial_draft_ref": state.get("editorial_draft_ref"),
+                "editorial_review_ref": state.get("editorial_review_ref"),
                 "manifest_path": state.get("manifest_path"),
             }
         )
@@ -548,6 +534,19 @@ class GenerationPipeline:
             if len(refs) != 1 or None in refs:
                 raise ValueError("Correct the affected fragment with one immutable replacement")
             fragment_ref = next(iter(refs))
+            if state["review_stage"] == "verify_editorial_revision":
+                page = EditorialPage.model_validate(self.store.get_object(fragment_ref))
+                expected = content_pages(self, state)[state.get("editorial_index", 0)]
+                if page.page_id != expected["id"]:
+                    raise ValueError("Correction is not for the interrupted editorial page")
+                return {
+                    **update,
+                    "editorial_draft_ref": fragment_ref,
+                    "editorial_feedback_ref": "",
+                    "editorial_attempt": 0,
+                    "release_approval_ref": "",
+                    "route": "verify_editorial_revision",
+                }
             fragment = WritingFragment.model_validate(self.store.get_object(fragment_ref))
             jobs = {j["id"]: j for j in self.rows(state, "writing-jobs")}
             if fragment.job_id not in jobs:

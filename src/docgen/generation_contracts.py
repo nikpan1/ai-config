@@ -113,3 +113,30 @@ class PageVerification(Record):
     checked_section_ids: list[str]
     findings: list[GenerationFinding]
     readability: str
+
+
+class EditorialCoverage(Record):
+    obligation_id: str
+    excerpt: str = Field(min_length=1)
+    evidence_ids: list[str] = Field(min_length=1)
+
+
+class EditorialPage(Record):
+    page_id: str
+    markdown: str = Field(min_length=1)
+    coverage: list[EditorialCoverage]
+    changes: list[str]
+
+
+class TemplateAssessment(Record):
+    span_id: str
+    satisfied: bool
+    explanation: str = Field(min_length=1)
+
+
+class EditorialVerification(PageVerification):
+    checked_obligation_ids: list[str]
+    template_assessments: list[TemplateAssessment]
+    narrative_flows: bool
+    repetition_controlled: bool
+    source_links_readable: bool

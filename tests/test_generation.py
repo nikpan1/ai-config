@@ -7,7 +7,7 @@ from planning_fixtures import knowledge_fixture, planning_state, run_plan
 
 from docgen.generation import STAGES, GenerationPipeline
 from docgen.generation_contracts import WritingFragment
-from docgen.generation_export import mermaid_text
+from docgen.generation_export import citations, evidence_id, mermaid_text
 from docgen.generation_inputs import load_plan
 from docgen.generation_validation import markdown_report, validate_fragment
 from docgen.storage import digest, read_json
@@ -83,11 +83,39 @@ class GenerationModel:
                 else [],
                 "language_review_scope": "Deterministic fixture only, not semantic acceptance",
             }
+        elif stage == "gen_polish":
+            passages, coverage = [], []
+            for obligation in payload["originals"]["obligations"]:
+                excerpt = obligation["evidence"][0]["excerpt"].strip()
+                passages.append(
+                    excerpt + " " + citations(obligation["evidence"], payload["page"]["path"])
+                )
+                coverage.append(
+                    {
+                        "obligation_id": obligation["id"],
+                        "excerpt": excerpt,
+                        "evidence_ids": [evidence_id(e) for e in obligation["evidence"]],
+                    }
+                )
+            value = {
+                "page_id": payload["page"]["id"],
+                "markdown": payload["markdown"] + "\n\n" + "\n\n".join(passages),
+                "coverage": coverage,
+                "changes": ["Fixture only; does not demonstrate real editorial quality"],
+            }
         else:
             value = {
                 "checked_section_ids": payload["page"]["section_ids"],
                 "findings": [],
                 "readability": "Fixture only",
+                "checked_obligation_ids": [o["id"] for o in payload["originals"]["obligations"]],
+                "template_assessments": [
+                    {"span_id": key, "satisfied": True, "explanation": "Fixture only"}
+                    for key in payload["applicable_template_span_ids"]
+                ],
+                "narrative_flows": True,
+                "repetition_controlled": True,
+                "source_links_readable": True,
             }
         return schema.model_validate(value)
 
@@ -116,7 +144,7 @@ def test_generation_publishes_only_markdown_and_requires_human_release(generatio
     pipeline, model, initial, config = generation
     with persistent_graph(pipeline) as graph:
         result = graph.invoke(initial, config, durability="sync")
-        assert result["status"] == "ready_for_review", result
+        assert result["status"] == "ready_for_review", pipeline.read(result, "issues_ref")
         assert graph.get_state(config).interrupts
     output = Path(result["export_path"])
     assert {p.suffix for p in output.rglob("*") if p.is_file()} == {".md"}
@@ -370,6 +398,6 @@ def test_page_semantic_findings_block_publication(generation):
     with persistent_graph(pipeline) as graph:
         result = graph.invoke(initial, config)
     assert result["status"] == "awaiting_review"
-    assert result["review_stage"] == "validate_documentation"
+    assert result["review_stage"] == "verify_editorial_revision"
     assert not result.get("export_path")
     assert not pipeline.store.path("runs/generation/documentation").exists()

@@ -290,6 +290,8 @@ def publish(pipeline, state, status):
             "assets_ref",
             "fragments_ref",
             "diagrams_ref",
+            "unpolished_pages_ref",
+            "page_reviews_ref",
             "validation_ref",
             "presentation_ref",
             "decisions_ref",
@@ -325,6 +327,8 @@ def publish(pipeline, state, status):
         "Language: professional plain English, using the user-authorized simplified policy. "
         "No ASD-STE100 compliance or certification is claimed.\n\n"
         f"Human review: {'recorded' if status == 'complete' else 'not performed'}.\n\n"
+        "The original assembled pages are in unpolished_pages.json; editorial changes, "
+        "coverage references and independent template/readability checks are in page_reviews.json. "
         "Semantic checks, language findings, Markdown checks and evidence coverage "
         "are recorded separately in validation.json and presentation.json. "
         "Source links require this workspace.\n"

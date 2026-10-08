@@ -275,7 +275,26 @@ uv run docgen status --thread-id documentation-v1
 uv run docgen resume --thread-id documentation-v1
 ```
 
-The workflow validates frozen knowledge, template, plan components and writing contexts. It writes jobs in dependency order, checks exact citations and table cells, and independently reviews each fragment with Gemini. Each job has a persistent checkpoint and at most two automatic repair attempts. Mermaid diagrams come from the evidence-backed plan. A separate page review checks assembled prose and qualifications. Headings, links, source locations and canonical obligation coverage are checked in code.
+The workflow validates frozen knowledge, template, plan components and writing contexts. It writes jobs in dependency order, checks exact citations and table cells, and independently reviews each fragment with Gemini. Each job has a persistent checkpoint and at most two automatic repair attempts. Mermaid diagrams come from the evidence-backed plan. After assembly, an editorial stage rewrites each complete content page for readability and checks it independently before publication. Headings, links, source locations and canonical obligation coverage are checked in code.
+
+### Editorial pass: reading the document as a chapter
+
+The editorial pass runs automatically with `generate-documentation`; no additional command is needed:
+
+```text
+assemble_pages → polish_documentation → verify_editorial_revision
+               → validate_documentation → review_markdown_presentation → finalize_documentation
+```
+
+The editor receives the original template, its compiled requirements, the audience brief, the entire draft page and its original evidence. It builds a connected explanation, introduces concepts before using them, adds supported transitions, simplifies phrasing and consolidates repetition. Template characteristics must remain visible, including the purpose of each section and applicable summaries, tables, flows and limitations. Existing headings, navigation destinations and code/diagram fences stay unchanged. New subordinate headings may clarify the text if they preserve existing anchors; changing the planned page hierarchy requires a new plan.
+
+Every unique source destination remains present. Repeated citations can be grouped beside their claims or in a table's source column. A coverage map connects every page obligation to an actual paragraph, table row or protected diagram label with an adjacent supporting citation. The source and attachment indexes are not rewritten. An independent review checks the rewritten text against the evidence and template, including conditions, exceptions, modality, false unknowns, narrative continuity and excessive repetition. Editorial checks do not constitute human acceptance.
+
+Each page has separate rewrite and verification checkpoints. The normal cost is one editorial model call plus the page review that generation already performs. One automatic editorial repair is allowed; further failures enter `review_generation`. Successful pages are retained on resume. Oversized pages stop without silently truncating source material and require a smaller page in a new plan.
+
+To inspect a checkpoint, add `--stop-after polish_documentation` or `--stop-after verify_editorial_revision`, then use the usual `status` and `resume` commands. For an editorial content interrupt, `action=correct` takes an immutable `EditorialPage` in `correction_ref` (page ID, Markdown, obligation coverage and change log), rather than a `WritingFragment`. It re-enters editorial verification. `request_upstream` is available for protected plan or diagram defects.
+
+Published metadata includes `unpolished_pages.json` for comparison and `page_reviews.json` with input/output hashes, independent template assessments and references to the editorial coverage maps and change logs. The reader-facing `index.md` contains the verified editorial candidate, still awaiting human release approval. Existing immutable runs are not changed by installing this stage; start a new generation thread to use it.
 
 The user approved a simplified language policy in place of the official ASD-STE100 standard: professional, plain English with consistent terminology and preserved technical meaning. The versioned `plain-technical-english-v1` contract and source-backed terminology register are retained in metadata. Mechanical sentence and paragraph findings are review hints; independent model review checks meaning and language. No formal STE compliance or certification is claimed, and an official dictionary is not required.
 
