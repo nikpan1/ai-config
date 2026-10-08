@@ -7,3 +7,4 @@
 - Centralize logging, configuration, model setup, and file I/O in shared code. Reuse immutable clients through a small factory or singleton when useful, but never keep mutable run state in a global singleton.
 - Use the Gemini API with `gemini-3.8-flash` for every model call. Reject a different `GEMINI_MODEL` value rather than silently switching models. Read secrets and configurable runtime settings from `.env`; maintain a placeholder-only `.env.example` and never commit `.env`.
 - Preserve source provenance and full information coverage as described in `.ai/development-plan.md`.
+- Gemini API development testing is authorized within a cumulative PLN 200 budget, including retries. Track spending across runs and reserve conservatively using current pricing and currency conversion; pause before exceeding the allowance.

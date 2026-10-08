@@ -47,13 +47,12 @@ Robocze notatki z rozmów o pipeline. Zapisują kontekst decyzji i pomysły do d
 ## Otwarte decyzje
 
 - Dokładna struktura szablonu i format końcowy.
-- Reguły hierarchii wiarygodności źródeł i rozstrzygania konfliktów.
-- Sposób pomiaru pominięć oraz zniekształceń na próbce kontrolnej.
-- Zakres i forma interfejsu do przeglądu.
+- Próbka kontrolna pozostaje do przygotowania przez Codex i sprawdzenia przez użytkownika; odpowiedzialność, budżet oraz progi jakości są już ustalone poniżej.
+- Ewentualna przyszła potrzeba interfejsu Streamlit; pierwsza wersja używa CLI.
 
 ## Propozycja doprecyzowania pipeline — 8 października 2026
 
-Poniższe rozwiązania są rekomendacjami do omówienia, nie wynikami pomiarów. Największą korzyść przewiduję z pełnego przejścia po źródłach, weryfikacji wydobycia względem oryginału oraz osobnego uzgadniania informacji między dokumentami. Aktualny Development Plan pozostaje krótkim opisem zakresu.
+Użytkownik zaakceptował wstępny kierunek poniższej propozycji. Szczegółowe decyzje obowiązujące przy implementacji są w angielskim Development Plan; poniżej pozostają uzasadnienia i warianty do pomiaru. Największą korzyść przewiduję z pełnego przejścia po źródłach, weryfikacji wydobycia względem oryginału oraz osobnego uzgadniania informacji między dokumentami.
 
 ### Proponowane nody i wyniki
 
@@ -123,3 +122,15 @@ Porównać wielkości partii oraz ekstrakcję z weryfikacją i bez niej. Mierzy�
 Optymalizację kosztów przez cache proponuję dopiero po pomiarach. Gemini oferuje implicit caching powtarzanych prefiksów; trafienia można obserwować w użyciu tokenów. Cache nie rozszerza okna kontekstowego ani nie zwiększa kompletności wydobycia. [Context caching — Google](https://ai.google.dev/gemini-api/docs/caching).
 
 Źródła techniczne powyżej to dokumentacja Google i LangChain, odczytana 8 października 2026 r. Dobór etapów, wielkości partii i próbki kontrolnej jest propozycją dla tego projektu, nie zaleceniem gwarantującym określony poziom jakości.
+
+## Potwierdzone decyzje użytkownika — 8 października 2026
+
+- Pierwsza wersja działa lokalnie dla jednej osoby.
+- Nierozstrzygnięte kwestie zatrzymują ukończenie etapu. Można zapisać wyniki robocze; nie wolno oznaczyć niekompletnego etapu jako ukończonego.
+- Sprzeczności źródeł są przedstawiane użytkownikowi do decyzji. Pipeline nie wybiera automatycznie wiążącej wersji.
+- Przegląd odbywa się przez CLI i czytelny raport z odsyłaczami do źródeł.
+- Obrazy i diagramy nie są interpretowane przez model. Są przedstawiane jako kwestie wymagające wyjaśnienia przez użytkownika; niewyjaśnione informacje podlegają tej samej zasadzie zatrzymania etapu.
+- Development Plan ma być po angielsku, rzeczowy i zawierać diagram Mermaid. Ważne decyzje projektowe pozostają po stronie użytkownika; agent powinien zadawać pytania zwiększające pewność dopasowania rozwiązania.
+- Codex wybierze około 40 fragmentów istniejących danych syntetycznych i rozpisze oczekiwane informacje oraz dowody. Użytkownik sprawdzi wzorzec przed użyciem go do oceny.
+- Użytkownik daje swobodę testowania Gemini API podczas prac w granicach łącznego limitu 200 zł. Limit obejmuje wszystkie serie testów, powtórzenia i poprawki; nie odnawia się przy kolejnym uruchomieniu. Koszty trzeba zapisywać i konserwatywnie rozliczać w PLN przed kolejnymi wywołaniami.
+- Warunek zaliczenia próbki: zachowanie wszystkich oznaczonych informacji, warunków i wyjątków, poprawne odsyłacze, zero niepopartych dodatków i błędnych scaleń pojęć. Wynik na próbce nie jest gwarancją bezstratności całego korpusu.
