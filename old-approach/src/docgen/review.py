@@ -117,8 +117,12 @@ def validate_decisions(values: list[dict], issues: list[dict], revision: str) ->
                 raise ValueError(
                     "Acknowledging unknowns cannot approve unsupported facts or conflicts"
                 )
-        elif decision.action == "correct" and decision.replacement is None:
-            raise ValueError("Correction requires a complete replacement extraction")
+        elif (
+            decision.action == "correct"
+            and decision.replacement is None
+            and decision.comparison_ref is None
+        ):
+            raise ValueError("Correction requires a complete replacement artifact")
         elif decision.action == "exclude" and issue["kind"] not in {
             "asset",
             "unreadable",

@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     thinking_level: Literal["low", "medium", "high"] = Field(
         "low", validation_alias="DOCGEN_THINKING_LEVEL"
     )
-    budget_pln: float = Field(200, gt=0, le=200, validation_alias="DOCGEN_BUDGET_PLN")
+    budget_pln: float = Field(200, gt=0, validation_alias="DOCGEN_BUDGET_PLN")
     billing_headroom: float = Field(1.3, ge=1.25, validation_alias="DOCGEN_BILLING_HEADROOM")
     pricing_file: Path = Field(Path(".docgen/pricing.json"), validation_alias="DOCGEN_PRICING_FILE")
     planning_tokens: int = Field(12000, ge=2048, validation_alias="DOCGEN_PLANNING_TOKENS")

@@ -11,6 +11,7 @@ class Settings:
     workspace: Path
     shared_data: Path
     budget_ledger: Path
+    budget_pln: float
     pricing_file: Path
     api_key: str
     model: str
@@ -29,11 +30,15 @@ class Settings:
         model = str(values.get("GEMINI_MODEL") or "gemini-3.8-flash")
         if model != "gemini-3.8-flash":
             raise ValueError("GEMINI_MODEL must be gemini-3.8-flash")
+        budget_pln = float(values.get("DOCGEN_BUDGET_PLN") or 200)
+        if budget_pln <= 0:
+            raise ValueError("DOCGEN_BUDGET_PLN must be positive")
         return cls(
             env_file=selected,
             workspace=path("DOCGEN_WORKSPACE", ".docgen"),
             shared_data=path("DOCGEN_SHARED_DATA", "../data"),
             budget_ledger=path("DOCGEN_BUDGET_LEDGER", "../.docgen/budget.sqlite"),
+            budget_pln=budget_pln,
             pricing_file=path("DOCGEN_PRICING_FILE", "../.docgen/pricing.json"),
             api_key=str(values.get("GEMINI_API_KEY") or ""),
             model=model,

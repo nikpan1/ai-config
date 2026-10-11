@@ -116,11 +116,12 @@ def git_revision(root: Path) -> dict:
 
 
 def snapshot_inputs(
-    store: ArtifactStore, docs: Path, code: Path, template: Path, brief: str
+    store: ArtifactStore, docs: Path, code: Path | None, template: Path, brief: str
 ) -> dict:
     files = []
     exclusions = []
-    for kind, root in (("docs", docs), ("code", code)):
+    sources = (("docs", docs), ("code", code)) if code else (("docs", docs),)
+    for kind, root in sources:
         root = root.resolve()
         selected, skipped = selected_files(root, kind)
         exclusions.extend({"kind": kind, **item} for item in skipped)
@@ -152,7 +153,7 @@ def snapshot_inputs(
             )
     if not any(item["kind"] == "docs" for item in files):
         raise ValueError("No readable Markdown documentation remains after selection")
-    if not any(item["kind"] == "code" for item in files):
+    if code and not any(item["kind"] == "code" for item in files):
         raise ValueError("No readable code remains after selection")
     template_bytes = template.resolve().read_bytes()
     template_bytes.decode("utf-8")
@@ -160,8 +161,8 @@ def snapshot_inputs(
         "schema": 1,
         "files": files,
         "exclusions": exclusions,
-        "roots": {"docs": str(docs.resolve()), "code": str(code.resolve())},
-        "code_revision": git_revision(code),
+        "roots": {"docs": str(docs.resolve()), "code": str(code.resolve()) if code else None},
+        "code_revision": git_revision(code) if code else None,
         "template_hash": store.put_bytes(template_bytes),
         "template_path": str(template.resolve()),
         "brief": brief,

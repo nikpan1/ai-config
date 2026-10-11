@@ -23,7 +23,12 @@ from docgen_graph.contracts import (
 from docgen_graph.ingestion import inventory, snapshot_inputs
 from docgen_graph.knowledge import KnowledgeGraph, normalized_assertion
 from docgen_graph.model import implementation_signature
-from docgen_graph.source_links import source_url_from_markdown, text_fragment_url
+from docgen_graph.source_links import (
+    citation_labels,
+    link_citations,
+    source_url_from_markdown,
+    text_fragment_url,
+)
 from docgen_graph.storage import ArtifactStore, digest
 
 
@@ -82,6 +87,59 @@ def _chunks(items: list[str], size: int) -> list[list[str]]:
     return [items[index : index + size] for index in range(0, len(items), size)]
 
 
+def _section_body(title: str, markdown: str) -> str:
+    lines = []
+    fenced = False
+    for line in markdown.splitlines():
+        if line.lstrip().startswith("```"):
+            fenced = not fenced
+        match = None if fenced else re.match(r"^#{1,2}\s+(.+)$", line)
+        if match and match.group(1).strip().casefold() == title.casefold():
+            continue
+        lines.append(f"### {match.group(1)}" if match else line)
+    return "\n".join(lines).strip()
+
+
+def _bounded_evidence_packet(packet: dict, limit: int = 45000) -> dict:
+    assertions = {item["id"]: item for item in packet["assertions"]}
+    evidence = {item["id"]: item for item in packet["evidence"]}
+    required = set(packet["mandatory_closure"])
+    selected = [item for item in packet["assertions"] if item["id"] in required]
+    evidence_ids = {key for item in selected for key in item["evidence_ids"]}
+    size = sum(len(evidence[key]["text"]) for key in evidence_ids)
+    optional = [identifier for identifier in packet["seed_matches"] if identifier in assertions]
+    optional.extend(sorted(set(assertions) - set(optional) - required))
+    for identifier in optional:
+        if identifier in required:
+            continue
+        item = assertions[identifier]
+        extra = set(item["evidence_ids"]) - evidence_ids
+        extra_size = sum(len(evidence[key]["text"]) for key in extra)
+        if size + extra_size > limit:
+            continue
+        selected.append(item)
+        evidence_ids.update(extra)
+        size += extra_size
+    return {
+        **packet,
+        "assertions": selected,
+        "evidence": [item for item in packet["evidence"] if item["id"] in evidence_ids],
+        "context_characters": size,
+    }
+
+
+def _normalized_section_draft(draft: dict, packet: dict) -> dict:
+    labels = {item["id"]: item["label"] for item in packet["evidence"]}
+    for mapping in draft["mappings"]:
+        normalized = []
+        for key in mapping["citation_ids"]:
+            label = labels.get(key, key)
+            match = re.fullmatch(r"\[?(?:Legacy|Code)\s+([CD]\d+)\]?", label)
+            normalized.append(match.group(1) if match else label)
+        mapping["citation_ids"] = normalized
+    return draft
+
+
 class Pipeline:
     def __init__(self, store: ArtifactStore, model, run_id: str):
         self.store = store
@@ -130,7 +188,7 @@ class Pipeline:
         snapshot = snapshot_inputs(
             self.store,
             Path(state["docs"]),
-            Path(state["code"]),
+            Path(state["code"]) if state.get("code") else None,
             Path(state["template"]),
             state.get("brief", ""),
         )
@@ -806,7 +864,9 @@ class Pipeline:
         section = plan["sections"][state["section_index"]]
         ids = self._units(section)[state["unit_index"]]
         required = ids + (section["supporting_obligation_ids"] if state["unit_index"] == 0 else [])
-        packet = self.graph.retrieve(section["queries"] or [section["title"]], required)
+        packet = _bounded_evidence_packet(
+            self.graph.retrieve(section["queries"] or [section["title"]], required)
+        )
         present = {item["id"] for item in packet["assertions"]}
         if not set(ids).issubset(present):
             return self.issue(
@@ -822,7 +882,11 @@ class Pipeline:
                 ["Required evidence closure exceeds the section request limit"],
                 "retrieve_section_evidence",
             )
-        return {"packet_ref": self.store.put(packet), "status": "generating"}
+        return {
+            "packet_ref": self.store.put(packet),
+            "status": "generating",
+            "route": "write_section",
+        }
 
     def write_section(self, state: PipelineState) -> dict:
         plan = self._approved_plan(state)
@@ -864,7 +928,7 @@ class Pipeline:
                 },
                 SectionDraft,
             )
-        draft = SectionDraft.model_validate(draft).model_dump()
+        draft = _normalized_section_draft(SectionDraft.model_validate(draft).model_dump(), packet)
         return {"draft_ref": self.store.put(draft)}
 
     def verify_section(self, state: PipelineState) -> dict:
@@ -907,13 +971,17 @@ class Pipeline:
                     "section": section["title"],
                     "markdown": draft["markdown"],
                     "mappings": draft["mappings"],
+                    "mandatory_obligation_ids": canonical,
+                    "supporting_obligation_ids": [
+                        identifier for identifier in writing_ids if identifier not in canonical
+                    ],
                     "assertions": [assertions[key] for key in writing_ids],
                     "original_evidence": packet["evidence"],
                 },
                 AuditDraft,
             )
-            if not audit.get("accepted") or set(audit.get("covered_obligation_ids", [])) != set(
-                writing_ids
+            if not audit.get("accepted") or not set(canonical).issubset(
+                audit.get("covered_obligation_ids", [])
             ):
                 findings.extend(str(item) for item in audit.get("findings", []))
                 if not findings:
@@ -1029,6 +1097,10 @@ class Pipeline:
                 {
                     "original_markdown": section["markdown"],
                     "edited_markdown": markdown,
+                    "mandatory_obligation_ids": sorted(
+                        {item["obligation_id"] for item in section["mappings"]}
+                    ),
+                    "supporting_obligation_ids": section["supporting_obligation_ids"],
                     "obligations": [self.graph.assertion(identifier) for identifier in ids],
                     "original_evidence": [self.graph.evidence(key) for key in evidence_ids],
                 },
@@ -1083,7 +1155,7 @@ class Pipeline:
                 for label in mapping["citation_ids"]:
                     if not self.graph.evidence(label):
                         findings.append(f"Citation does not resolve: {label}")
-            for label in re.findall(r"\[(?:Code|Legacy) ([CD]\d+)\]", section["markdown"]):
+            for label in citation_labels(section["markdown"]):
                 if not self.graph.evidence(label):
                     findings.append(f"Citation does not resolve: {label}")
         if findings:
@@ -1109,11 +1181,7 @@ class Pipeline:
                 for mapping in section["mappings"]
                 for label in mapping["citation_ids"]
             }
-            | {
-                label
-                for section in sections
-                for label in re.findall(r"\[(?:Code|Legacy) ([CD]\d+)\]", section["markdown"])
-            }
+            | {label for section in sections for label in citation_labels(section["markdown"])}
         )
         evidence = [self.graph.evidence(label) for label in citations]
         snapshot = self.read(state, "snapshot_ref")
@@ -1129,17 +1197,14 @@ class Pipeline:
             for item in evidence
             if item["kind"] == "docs" and source_urls.get(item["path"])
         }
-        candidate_hash = digest([state["plan_hash"], sections, evidence])
+        rendered_sections = [
+            link_citations(_section_body(section["title"], section["markdown"]), direct_links)
+            for section in sections
+        ]
+        candidate_hash = digest([state["plan_hash"], rendered_sections, evidence])
         base = f"runs/{self.run_id}/candidates/{candidate_hash}"
         lines = [f"# {plan['title']}", "", "[Source index](../source-index.md)", ""]
-        for section in sections:
-            markdown = section["markdown"]
-            for label in citations:
-                kind = "Code" if label.startswith("C") else "Legacy"
-                href = direct_links.get(label) or f"../evidence/{label}.md"
-                markdown = markdown.replace(
-                    f"[{kind} {label}]", f"[{kind} {label}](<{href}>)"
-                )
+        for section, markdown in zip(sections, rendered_sections, strict=True):
             lines.extend([f"## {section['title']}", "", markdown, ""])
         self.store.write(f"{base}/documentation/index.md", "\n".join(lines))
         index = ["# Source index", ""]
@@ -1333,9 +1398,7 @@ class Pipeline:
         builder.add_edge("analyze_code_unit", "verify_code_unit")
         builder.add_edge("extract_document_batch", "verify_document_batch")
         builder.add_edge("link_graph_batch", "verify_graph_batch")
-        builder.add_edge("retrieve_section_evidence", "write_section")
         builder.add_edge("write_section", "verify_section")
-        builder.add_edge("assemble_pages", "edit_page")
         builder.add_edge("edit_page", "verify_edited_page")
         builder.add_edge("export_candidate", "review_release")
         builder.add_edge("finalize_release", END)
@@ -1354,12 +1417,14 @@ class Pipeline:
             "retrieve_plan_evidence": ["retrieve_plan_evidence", "validate_page_plan"],
             "validate_page_plan": ["draft_page_plan", "review_plan", "review_issues"],
             "review_plan": ["retrieve_section_evidence", "draft_page_plan", "review_plan", END],
+            "retrieve_section_evidence": ["write_section", "review_issues"],
             "verify_section": [
                 "write_section",
                 "retrieve_section_evidence",
                 "assemble_pages",
                 "review_issues",
             ],
+            "assemble_pages": ["edit_page", "review_issues"],
             "verify_edited_page": ["edit_page", "audit_documentation", "review_issues"],
             "audit_documentation": ["export_candidate", "review_issues"],
             "review_release": ["finalize_release", "edit_page", "review_release", END],

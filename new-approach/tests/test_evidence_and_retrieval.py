@@ -3,6 +3,7 @@ import sqlite3
 from docgen_graph.ingestion import inventory, snapshot_inputs
 from docgen_graph.knowledge import KnowledgeGraph, normalized_assertion
 from docgen_graph.storage import ArtifactStore
+from docgen_graph.workflow import Pipeline, _bounded_evidence_packet, _normalized_section_draft
 
 
 def test_snapshot_preserves_bytes_and_excludes_secrets(tmp_path):
@@ -96,3 +97,72 @@ def test_graph_traversal_recovers_related_qualification(tmp_path):
     assert not graph.verify()
     with sqlite3.connect(graph.path) as connection:
         assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
+
+
+def test_section_packet_keeps_required_closure_within_limit():
+    packet = {
+        "mandatory_closure": ["required", "qualified"],
+        "seed_matches": ["optional"],
+        "assertions": [
+            {"id": "required", "evidence_ids": ["source-a"]},
+            {"id": "qualified", "evidence_ids": ["source-b"]},
+            {"id": "optional", "evidence_ids": ["source-c"]},
+        ],
+        "evidence": [
+            {"id": "source-a", "text": "a" * 8},
+            {"id": "source-b", "text": "b" * 8},
+            {"id": "source-c", "text": "c" * 8},
+        ],
+    }
+    bounded = _bounded_evidence_packet(packet, limit=16)
+    assert {item["id"] for item in bounded["assertions"]} == {"required", "qualified"}
+    assert {item["id"] for item in bounded["evidence"]} == {"source-a", "source-b"}
+    assert bounded["context_characters"] == 16
+    assert _bounded_evidence_packet(packet, limit=8)["context_characters"] == 16
+
+
+def test_section_mapping_normalizes_evidence_ids_to_citation_labels():
+    draft = {
+        "markdown": "A supported statement [Legacy D7].",
+        "mappings": [
+            {
+                "obligation_id": "required",
+                "citation_ids": ["evidence-id", "Legacy D8", "[Code C2]"],
+                "passage": "A supported statement [Legacy D7].",
+            }
+        ],
+    }
+    packet = {"evidence": [{"id": "evidence-id", "label": "D7"}]}
+    normalized = _normalized_section_draft(draft, packet)
+    assert normalized["mappings"][0]["citation_ids"] == ["D7", "D8", "C2"]
+
+
+def test_supporting_summary_does_not_require_every_context_assertion(tmp_path):
+    store = ArtifactStore(tmp_path / "runtime")
+    pipeline = Pipeline(store, None, "summary-audit")
+    section = {"title": "Executive Summary", "obligation_ids": []}
+    pipeline._approved_plan = lambda state: {"sections": [section]}
+    pipeline._units = lambda section: [["support-a", "support-b"]]
+    observed = {}
+
+    def audit(stage, payload, schema):
+        observed.update(payload)
+        return {"accepted": True, "findings": [], "covered_obligation_ids": ["support-a"]}
+
+    pipeline.call = audit
+    state = {
+        "section_index": 0,
+        "unit_index": 0,
+        "packet_ref": store.put(
+            {
+                "assertions": [{"id": "support-a"}, {"id": "support-b"}],
+                "evidence": [{"label": "D1"}],
+            }
+        ),
+        "draft_ref": store.put({"markdown": "A cited summary [Legacy D1].", "mappings": []}),
+        "written_ref": store.put([]),
+    }
+    result = pipeline.verify_section(state)
+    assert result["route"] == "assemble_pages"
+    assert observed["mandatory_obligation_ids"] == []
+    assert observed["supporting_obligation_ids"] == ["support-a", "support-b"]

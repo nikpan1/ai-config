@@ -164,4 +164,5 @@ class Decision(Record):
     claim_ids: list[str] = Field(default_factory=list)
     entity_ids: list[str] = Field(default_factory=list)
     replacement: Extraction | None = None
+    comparison_ref: str | None = None
     explanation: str | None = None

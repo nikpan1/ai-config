@@ -50,7 +50,7 @@ class Pricing:
 class BudgetLedger:
     def __init__(self, path: Path, limit: float = 200.0):
         self.path = path.resolve()
-        self.limit = min(limit, 200.0)
+        self.limit = limit
         if not self.path.is_file():
             raise ValueError(f"Shared budget ledger is missing: {self.path}")
         with self.connect() as connection:

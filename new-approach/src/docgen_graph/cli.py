@@ -22,7 +22,7 @@ def parser() -> argparse.ArgumentParser:
     subcommands = command.add_subparsers(dest="command", required=True)
     run = subcommands.add_parser("run")
     run.add_argument("--docs", type=Path, required=True)
-    run.add_argument("--code", type=Path, required=True)
+    run.add_argument("--code", type=Path)
     run.add_argument("--template", type=Path)
     run.add_argument("--brief", default="")
     run.add_argument("--thread-id", required=True)
@@ -42,7 +42,7 @@ def main() -> None:
             json.dumps(
                 {
                     "ledger": str(settings.budget_ledger),
-                    **BudgetLedger(settings.budget_ledger).summary(),
+                    **BudgetLedger(settings.budget_ledger, settings.budget_pln).summary(),
                 },
                 indent=2,
             )
@@ -72,7 +72,7 @@ def main() -> None:
             inputs = {
                 "run_id": args.thread_id,
                 "docs": str(args.docs.resolve()),
-                "code": str(args.code.resolve()),
+                "code": str(args.code.resolve()) if args.code else "",
                 "template": str((args.template or settings.shared_data / "template.md").resolve()),
                 "brief": args.brief,
                 "status": "running",

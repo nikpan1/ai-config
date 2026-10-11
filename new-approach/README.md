@@ -18,6 +18,14 @@ uv run --project new-approach docgen-graph run --docs data/legacy-insurance --co
 uv run --project new-approach docgen-graph status --thread-id insurance-v1
 ```
 
+For a legacy-document-only run, omit `--code`:
+
+```powershell
+uv run --project new-approach docgen-graph run --docs data/test_data_1 --template data/template.md --thread-id furniture-docs-v1
+```
+
+The resulting graph contains documentation evidence only. It does not make claims about a software implementation.
+
 The first run stops at `review_plan`. Read `new-approach/.docgen/runs/insurance-v1/documentation-plan.md`, then supply a decision file:
 
 ```json

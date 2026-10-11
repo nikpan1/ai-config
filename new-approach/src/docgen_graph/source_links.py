@@ -2,6 +2,32 @@ import html
 import re
 from urllib.parse import quote, urlsplit, urlunsplit
 
+CITATION_GROUP = re.compile(
+    r"\[(Code|Legacy) ((?:(?:Code|Legacy) )?[CD]\d+)(?:,\s*(?:(?:Code|Legacy) )?[CD]\d+)*\]"
+)
+
+
+def citation_labels(markdown: str) -> list[str]:
+    return [
+        label
+        for match in CITATION_GROUP.finditer(markdown)
+        for label in re.findall(r"[CD]\d+", match.group())
+    ]
+
+
+def link_citations(markdown: str, direct_links: dict[str, str]) -> str:
+    def replace(match: re.Match) -> str:
+        if markdown[match.end() :].startswith("("):
+            return match.group()
+        kind = match.group(1)
+        labels = re.findall(r"[CD]\d+", match.group())
+        return " ".join(
+            f"[{kind} {label}](<{direct_links.get(label) or f'../evidence/{label}.md'}>)"
+            for label in labels
+        )
+
+    return CITATION_GROUP.sub(replace, markdown)
+
 
 def source_url_from_markdown(markdown: str) -> str | None:
     lines = markdown.splitlines()

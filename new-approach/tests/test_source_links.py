@@ -2,7 +2,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
-from docgen_graph.ingestion import document_spans
+from docgen_graph.ingestion import document_spans, inventory, snapshot_inputs
 from docgen_graph.source_links import source_url_from_markdown, text_fragment_url
 from docgen_graph.storage import ArtifactStore
 from docgen_graph.workflow import Pipeline
@@ -79,7 +79,18 @@ def test_candidate_export_links_legacy_evidence_to_original_html(tmp_path, monke
                 "heading": "Kitchen 3D planning",
                 "text": story_row,
                 "role": "legacy_document",
-            }
+            },
+            {
+                "id": "row-2",
+                "kind": "docs",
+                "path": "kitchen-3d-planning.md",
+                "file_hash": source_hash,
+                "start_line": 13,
+                "end_line": 13,
+                "heading": "Kitchen 3D planning",
+                "text": story_row,
+                "role": "legacy_document",
+            },
         ]
     )
     monkeypatch.setattr(pipeline, "_approved_plan", lambda state: {"title": "Kitchen guidance"})
@@ -87,8 +98,8 @@ def test_candidate_export_links_legacy_evidence_to_original_html(tmp_path, monke
         [
             {
                 "title": "Room setup",
-                "markdown": "A room starts with measurements. [Legacy D1]",
-                "mappings": [{"citation_ids": ["D1"]}],
+                "markdown": "## Room setup\n\nA room starts with measurements. [Legacy D1, D2]",
+                "mappings": [{"citation_ids": ["D1", "D2"]}],
             }
         ]
     )
@@ -102,5 +113,23 @@ def test_candidate_export_links_legacy_evidence_to_original_html(tmp_path, monke
     )
     candidate = tmp_path / "runs" / "citation-check" / "candidates" / result["candidate_ref"]
     markdown = (candidate / "documentation" / "index.md").read_text("utf-8")
-    assert "http://127.0.0.1:8765/kitchen-3d-planning.html#:~:text=" in markdown
+    assert markdown.count("http://127.0.0.1:8765/kitchen-3d-planning.html#:~:text=") == 2
+    assert "[Legacy D1, D2]" not in markdown
+    assert markdown.count("## Room setup") == 1
     assert (candidate / "evidence" / "D1.md").exists()
+    assert (candidate / "evidence" / "D2.md").exists()
+
+
+def test_docs_only_snapshot_has_no_code_units(tmp_path):
+    docs = tmp_path / "docs"
+    docs.mkdir()
+    (docs / "source.md").write_text("# Product\n\nA documented rule.\n", encoding="utf-8")
+    template = tmp_path / "template.md"
+    template.write_text("# Documentation\n\n## Rules\n", encoding="utf-8")
+    store = ArtifactStore(tmp_path / "artifacts")
+    snapshot = snapshot_inputs(store, docs, None, template, "Document-only evaluation")
+    assert snapshot["roots"]["code"] is None
+    assert snapshot["code_revision"] is None
+    result = inventory(store, snapshot)
+    assert result["code_units"] == []
+    assert result["document_batches"]

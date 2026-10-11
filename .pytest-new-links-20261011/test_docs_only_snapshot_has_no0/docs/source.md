@@ -1,0 +1,3 @@
+# Product
+
+A documented rule.

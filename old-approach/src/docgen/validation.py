@@ -89,7 +89,7 @@ def validate_extraction(
                 )
         if coverage.disposition == "excluded" and coverage.block_id in blocks:
             block = blocks[coverage.block_id]
-            structural = block.kind == "heading" or (
+            structural = block.kind in {"heading", "hr"} or (
                 block.kind == "table" and block.table_row in {0, 1}
             )
             structural = structural or bool(

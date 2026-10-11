@@ -12,7 +12,7 @@ New runs default to consolidated source inventory review, exact comparison cover
 
 This directory contains the original implementation, its tests, scripts and evaluation results. Source inputs and templates live in the repository-root `data/` directory shared with `new-approach`. The independent replacement is described in the [new development plan](../.ai/new-approach/development-plan.md). Historical plans and reports remain in the repository-root `.ai/` directory.
 
-The existing `.env`, `.docgen/`, `.venv/` and `dist/` remain at the repository root. Checkpoints, frozen implementations and artifacts have not been migrated. Keep `.docgen/budget.sqlite` as the cumulative development ledger across approaches. A separate implementation or artifact workspace does not create another PLN 200 allowance.
+The existing `.env`, `.docgen/`, `.venv/` and `dist/` remain at the repository root. Checkpoints, frozen implementations and artifacts have not been migrated. Keep `.docgen/budget.sqlite` as the cumulative development ledger across approaches. A separate implementation or artifact workspace does not create another budget allowance.
 
 1. **Prepare the project and inputs.** Complete [Setup](#setup), including the API key and current pricing. Put source Markdown files in a dedicated directory and choose a template. The commands below use `data/legacy-insurance` and `data/template.md`; replace them with your own paths.
 
@@ -95,7 +95,7 @@ uv run --project old-approach docgen record-pricing --input-usd 0.75 --output-us
 uv run --project old-approach docgen budget
 ```
 
-Pricing expires after at most seven days; the exchange observation must also be at most seven days old. Recheck prices when refreshing. No model request is sent without valid pricing and a successful cost reservation. The cumulative development ceiling is 200 PLN, including retries and repairs. Each request reserves an input byte bound, the model's full 65,536 output-token ceiling, and at least 25% billing headroom (30% by default). Recorded usage releases the unused reservation; failures with unknown usage retain the full amount. Interrupted reservations are retained across restarts. These are conservative estimates, not an invoice.
+Pricing expires after at most seven days; the exchange observation must also be at most seven days old. Recheck prices when refreshing. No model request is sent without valid pricing and a successful cost reservation. The default cumulative development ceiling is 200 PLN, including retries and repairs; `DOCGEN_BUDGET_PLN` can set an explicitly authorized higher limit while preserving the same ledger. Each request reserves an input byte bound, the model's full 65,536 output-token ceiling, and at least 25% billing headroom (30% by default). Recorded usage releases the unused reservation; failures with unknown usage retain the full amount. Interrupted reservations are retained across restarts. These are conservative estimates, not an invoice.
 
 `DOCGEN_BUDGET_LEDGER` defaults to `.docgen/budget.sqlite` independently of the artifact workspace. Keep the same ledger for every development experiment. Moving or deleting it would lose cumulative accounting; do not reset it to obtain another allowance.
 

@@ -66,7 +66,7 @@ class GeminiModel:
         ):
             raise ValueError("Model request exceeds configured context budget")
         pricing = Pricing.load(self.settings.pricing_file)
-        ledger = BudgetLedger(self.settings.budget_ledger)
+        ledger = BudgetLedger(self.settings.budget_ledger, self.settings.budget_pln)
         reserve = pricing.cost(
             len((prompt + request).encode()) + 4096, self.settings.output_tokens * 2
         )
@@ -90,6 +90,7 @@ class GeminiModel:
                     config=types.GenerateContentConfig(
                         system_instruction=prompt,
                         response_mime_type="application/json",
+                        response_json_schema=schema.model_json_schema() if schema else None,
                         max_output_tokens=self.settings.output_tokens,
                     ),
                 )

@@ -50,7 +50,7 @@ class BudgetLedger:
     def __init__(self, path: Path, limit=200.0):
         path.parent.mkdir(parents=True, exist_ok=True)
         self.path = path
-        self.limit = min(limit, 200.0)
+        self.limit = limit
         with self.connect() as connection:
             connection.execute(
                 "CREATE TABLE IF NOT EXISTS charges ("

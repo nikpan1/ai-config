@@ -50,6 +50,7 @@ class PipelineState(TypedDict, total=False):
     claim_plan_ref: str
     claim_index: int
     claim_results_ref: str
+    manual_comparison_ref: str
     issues_ref: str
     issue_history_ref: str
     decisions_ref: str
@@ -376,8 +377,13 @@ class Pipeline:
                 repair_attempt=state["attempt"], feedback=self.read(state, "feedback_ref", [])
             )
         expected = set(task["left"] + task["right"])
+        manual_ref = state.get("manual_comparison_ref")
         try:
-            result = self.model.call(kind, payload, Comparison)
+            result = (
+                Comparison.model_validate(self.store.get(manual_ref))
+                if manual_ref
+                else self.model.call(kind, payload, Comparison)
+            )
         except (TruncatedOutput, RequestTooLarge):
             children = split_comparison(task)
             if children:
@@ -539,6 +545,7 @@ class Pipeline:
             index_key: index + 1,
             "attempt": 0,
             "feedback_ref": "",
+            "manual_comparison_ref": "",
             "route": stage,
             "status": "running",
         }
@@ -576,12 +583,54 @@ class Pipeline:
             return {"route": "review_issues", "decisions_ref": ref, "status": "review"}
         corrections = [decision for decision in decisions if decision.action == "correct"]
         if corrections:
-            if len(corrections) != 1 or state["review_stage"] not in {
-                "extract_batch",
-                "verify_batch",
-            }:
-                raise ValueError("Submit one extraction correction for the affected batch")
+            if len(corrections) != 1:
+                raise ValueError("Submit one correction for the affected stage")
+            if state["review_stage"] in {"reconcile_entities", "reconcile_claims"}:
+                decision = corrections[0]
+                if not decision.comparison_ref:
+                    raise ValueError("Comparison correction requires a replacement reference")
+                comparison = Comparison.model_validate(self.store.get(decision.comparison_ref))
+                prefix = "entity" if state["review_stage"] == "reconcile_entities" else "claim"
+                plan = self.read(state, f"{prefix}_plan_ref")
+                task = comparison_at(plan, state[f"{prefix}_index"], self.store)
+                expected = set(task["left"] + task["right"])
+                required_pairs = {tuple(sorted(pair)) for pair in task.get("required_pairs", [])}
+                checked_pairs = [tuple(sorted(pair)) for pair in comparison.checked_pairs]
+                if (
+                    set(comparison.checked_ids) != expected
+                    or len(comparison.checked_ids) != len(expected)
+                ):
+                    raise ValueError("Corrected comparison omitted records")
+                if "required_pairs" in task and (
+                    set(checked_pairs) != required_pairs
+                    or len(checked_pairs) != len(required_pairs)
+                ):
+                    raise ValueError("Corrected comparison omitted required pairs")
+                if comparison.findings or any(
+                    relation.left not in expected
+                    or relation.right not in expected
+                    or relation.left == relation.right
+                    or (
+                        required_pairs
+                        and tuple(sorted((relation.left, relation.right))) not in required_pairs
+                    )
+                    for relation in comparison.relations
+                ):
+                    raise ValueError("Corrected comparison contains unresolved findings")
+                ref = persist_decisions(self.store, state.get("decisions_ref"), decisions)
+                return {
+                    "decisions_ref": ref,
+                    "manual_comparison_ref": decision.comparison_ref,
+                    "feedback_ref": "",
+                    "attempt": 0,
+                    "route": state["review_stage"],
+                    "status": "running",
+                }
+            if state["review_stage"] not in {"extract_batch", "verify_batch"}:
+                raise ValueError("Correction does not match the affected stage")
             replacement = corrections[0].replacement
+            if replacement is None:
+                raise ValueError("Extraction correction requires a complete replacement")
             errors = validate_extraction(replacement, self.current_batch(state), self.blocks(state))
             if errors:
                 raise ValueError("Corrected extraction failed evidence or coverage validation")
