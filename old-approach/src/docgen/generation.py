@@ -405,8 +405,14 @@ class GenerationPipeline:
     def validate_documentation(self, state):
         load_plan(self.settings, self.store, self.inputs(state)["plan_ref"])
         pages = self.read(state, "pages_ref")
+        from docgen.generation_export import source_urls
+
         report = markdown_report(
-            pages, self.output_root(state), self.store, self.read(state, "assets_ref")
+            pages,
+            self.output_root(state),
+            self.store,
+            self.read(state, "assets_ref"),
+            {url.split("#", 1)[0] for url in source_urls(self, state).values() if url},
         )
         if report["findings"]:
             return self.gate(state, "validate_documentation", report["findings"], "structure")

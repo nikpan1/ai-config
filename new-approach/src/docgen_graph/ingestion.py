@@ -190,6 +190,7 @@ def document_spans(file: dict, text: str) -> list[dict]:
     headings = []
     current = []
     start = 0
+    table_columns = []
 
     def flush():
         nonlocal current, start
@@ -222,13 +223,24 @@ def document_spans(file: dict, text: str) -> list[dict]:
         match = re.match(r"^(#{1,6})\s+(.+)$", line)
         if match:
             flush()
+            table_columns = []
             level = len(match.group(1))
             headings = headings[: level - 1] + [match.group(2).strip()]
             current, start = [line], number
             flush()
+        elif line.lstrip().startswith("|"):
+            flush()
+            cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+            if not table_columns:
+                table_columns = cells
+            span = _span(file, number, number, " / ".join(headings), line, "legacy_document")
+            span["table_columns"] = table_columns
+            blocks.append(span)
         elif not line.strip():
             flush()
+            table_columns = []
         else:
+            table_columns = []
             if not current:
                 start = number
             current.append(line)

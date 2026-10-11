@@ -6,6 +6,7 @@ from urllib.parse import quote
 
 from docgen.generation_validation import heading_slug, table_specs
 from docgen.planning_helpers import validate_paths
+from docgen.source_links import source_url_from_markdown, text_fragment_url
 from docgen.storage import atomic_write, digest, file_digest, read_json, write_json
 from docgen.storage import publish_directory as move_directory
 
@@ -37,22 +38,37 @@ def source_labels(pipeline, state):
     return {key: f"S{index}" for index, key in enumerate(sorted(entries), 1)}
 
 
-def citations(evidence, page, source_labels_by_id=None):
+def source_urls(pipeline, state):
+    snapshot = pipeline.store.get_object(pipeline.planning_inputs(state).snapshot_ref)
+    return {
+        entry["path"]: source_url_from_markdown(
+            pipeline.store.path(entry["ref"]).read_text(encoding="utf-8")
+        )
+        for entry in snapshot["inventory"]
+        if entry.get("status") == "parsed"
+    }
+
+
+def citations(evidence, page, source_labels_by_id=None, source_links_by_id=None):
     target = relative_link(Path(page), Path("sources/index.md"))
     unique = {evidence_id(e): e for e in evidence}
-    return " ".join(
-        f"[{source_labels_by_id[key]}]({target}#{source_labels_by_id[key].lower()})"
-        if source_labels_by_id is not None
-        else f"[Source {key[:6]}]({target}#source-{key})"
-        for key in unique
-    )
+    links = []
+    for key in unique:
+        label = source_labels_by_id[key] if source_labels_by_id is not None else f"Source {key[:6]}"
+        anchor = label.lower() if source_labels_by_id is not None else f"source-{key}"
+        direct = (source_links_by_id or {}).get(key)
+        href = f"<{direct}>" if direct else f"{target}#{anchor}"
+        links.append(f"[{label}]({href})")
+    return " ".join(links)
 
 
 def table_text(text):
     return text.replace("|", "\\|").replace("\n", " ")
 
 
-def render_fragment(fragment, job, context, page, source_labels_by_id=None):
+def render_fragment(
+    fragment, job, context, page, source_labels_by_id=None, source_links_by_id=None
+):
     lines = []
     labels = {
         "requirement": "Requirement",
@@ -73,7 +89,7 @@ def render_fragment(fragment, job, context, page, source_labels_by_id=None):
                         for line in text.splitlines()
                     ),
                     "",
-                    citations(passage["evidence"], page, source_labels_by_id),
+                    citations(passage["evidence"], page, source_labels_by_id, source_links_by_id),
                     "",
                 ]
             )
@@ -88,7 +104,7 @@ def render_fragment(fragment, job, context, page, source_labels_by_id=None):
                     (f"**{prefix}:** " if prefix else "")
                     + text
                     + " "
-                    + citations(passage["evidence"], page, source_labels_by_id),
+                    + citations(passage["evidence"], page, source_labels_by_id, source_links_by_id),
                     "",
                 ]
             )
@@ -105,7 +121,9 @@ def render_fragment(fragment, job, context, page, source_labels_by_id=None):
             cells = [table_text(cell["text"]) for cell in row["cells"]]
             row_evidence = [entry for cell in row["cells"] for entry in cell["evidence"]]
             if row_evidence:
-                cells[-1] += " " + citations(row_evidence, page, source_labels_by_id)
+                cells[-1] += " " + citations(
+                    row_evidence, page, source_labels_by_id, source_links_by_id
+                )
             lines.append("| " + " | ".join(cells) + " |")
         lines.append("")
     return "\n".join(lines).strip()
@@ -156,6 +174,16 @@ def assemble(pipeline, state):
     page_by_section = {key: page for page in plans for key in page["section_ids"]}
     by_id = {p["id"]: p for p in plans}
     evidence = source_catalog(pipeline, state)
+    blocks = {
+        block["id"]: block
+        for block in pipeline.store.iter_table(pipeline.planning_inputs(state).blocks_ref)
+    }
+    urls = source_urls(pipeline, state)
+    source_links_by_id = {}
+    for key, entry in evidence.items():
+        block = blocks[entry["block_id"]]
+        if url := urls.get(block["path"]):
+            source_links_by_id[key] = text_fragment_url(url, block["content"])
     output = {}
     diagrams = pipeline.read(state, "diagrams_ref", {})
     for page in plans:
@@ -198,7 +226,14 @@ def assemble(pipeline, state):
             for job in section_jobs:
                 fragment = pipeline.store.get_object(fragments[job["id"]]["fragment_ref"])
                 context = pipeline.store.get_object(job["context_ref"])
-                lines.extend([render_fragment(fragment, job, context, page["path"], labels), ""])
+                lines.extend(
+                    [
+                        render_fragment(
+                            fragment, job, context, page["path"], labels, source_links_by_id
+                        ),
+                        "",
+                    ]
+                )
                 for obligation in context["originals"]["obligations"]:
                     for entry in obligation["evidence"]:
                         evidence[evidence_id(entry)] = entry
@@ -210,7 +245,9 @@ def assemble(pipeline, state):
                                 diagram["markdown"],
                                 "",
                                 "Diagram source: "
-                                + citations(diagram["evidence"], page["path"], labels),
+                                + citations(
+                                    diagram["evidence"], page["path"], labels, source_links_by_id
+                                ),
                                 "",
                             ]
                         )
@@ -237,9 +274,6 @@ def assemble(pipeline, state):
                     links.append(f"[{sections[target]['title']}]({href})")
                 lines.extend(["Related: " + ", ".join(links) + ".", ""])
         output[page["path"]] = "\n".join(lines).strip() + "\n"
-    blocks = {
-        b["id"]: b for b in pipeline.store.iter_table(pipeline.planning_inputs(state).blocks_ref)
-    }
     assets = pipeline.read(state, "assets_ref", [])
     sources = {a["path"]: a for a in assets if a["kind"] == "source"}
     source_lines = []
@@ -248,6 +282,7 @@ def assemble(pipeline, state):
         target = relative_link(
             pipeline.output_root(state) / "sources/index.md", Path(sources[block["path"]]["target"])
         )
+        target = source_links_by_id.get(key) or target
         source_lines.extend(
             [
                 f"## {labels[key]}",
@@ -353,6 +388,7 @@ def publish(pipeline, state, status):
         block["id"]: block
         for block in pipeline.store.iter_table(pipeline.planning_inputs(state).blocks_ref)
     }
+    urls = source_urls(pipeline, state)
     source_map = {}
     for obligation in pipeline.rows(state, "content-obligations"):
         for evidence in obligation["evidence"]:
@@ -368,6 +404,10 @@ def publish(pipeline, state, status):
                     "path": block["path"],
                     "line_start": block["line_start"],
                     "line_end": block["line_end"],
+                    "source_url": urls.get(block["path"]),
+                    "direct_url": text_fragment_url(urls[block["path"]], block["content"])
+                    if urls.get(block["path"])
+                    else None,
                     "obligation_ids": [],
                 },
             )

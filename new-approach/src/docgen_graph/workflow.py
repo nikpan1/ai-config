@@ -23,6 +23,7 @@ from docgen_graph.contracts import (
 from docgen_graph.ingestion import inventory, snapshot_inputs
 from docgen_graph.knowledge import KnowledgeGraph, normalized_assertion
 from docgen_graph.model import implementation_signature
+from docgen_graph.source_links import source_url_from_markdown, text_fragment_url
 from docgen_graph.storage import ArtifactStore, digest
 
 
@@ -1115,6 +1116,19 @@ class Pipeline:
             }
         )
         evidence = [self.graph.evidence(label) for label in citations]
+        snapshot = self.read(state, "snapshot_ref")
+        source_urls = {
+            file["path"]: source_url_from_markdown(
+                self.store.get_bytes(file["hash"]).decode("utf-8")
+            )
+            for file in snapshot["files"]
+            if file["kind"] == "docs"
+        }
+        direct_links = {
+            item["label"]: text_fragment_url(source_urls[item["path"]], item["text"])
+            for item in evidence
+            if item["kind"] == "docs" and source_urls.get(item["path"])
+        }
         candidate_hash = digest([state["plan_hash"], sections, evidence])
         base = f"runs/{self.run_id}/candidates/{candidate_hash}"
         lines = [f"# {plan['title']}", "", "[Source index](../source-index.md)", ""]
@@ -1122,16 +1136,18 @@ class Pipeline:
             markdown = section["markdown"]
             for label in citations:
                 kind = "Code" if label.startswith("C") else "Legacy"
+                href = direct_links.get(label) or f"../evidence/{label}.md"
                 markdown = markdown.replace(
-                    f"[{kind} {label}]", f"[{kind} {label}](../evidence/{label}.md)"
+                    f"[{kind} {label}]", f"[{kind} {label}](<{href}>)"
                 )
             lines.extend([f"## {section['title']}", "", markdown, ""])
         self.store.write(f"{base}/documentation/index.md", "\n".join(lines))
         index = ["# Source index", ""]
         for item in evidence:
             label = item["label"]
+            href = direct_links.get(label) or f"evidence/{label}.md"
             index.append(
-                f"- [{label}](evidence/{label}.md): {item['path']} lines "
+                f"- [{label}](<{href}>): {item['path']} lines "
                 f"{item['start_line']}-{item['end_line']}"
             )
             excerpt = "\n".join("    " + line for line in item["text"].splitlines())
@@ -1152,6 +1168,7 @@ class Pipeline:
                         mapping for section in sections for mapping in section["mappings"]
                     ],
                     "citations": citations,
+                    "source_links": direct_links,
                     "candidate_hash": candidate_hash,
                 },
                 ensure_ascii=False,

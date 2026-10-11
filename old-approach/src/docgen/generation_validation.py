@@ -162,7 +162,7 @@ def has_raw_html(tokens):
     )
 
 
-def markdown_report(pages, output_root, store, assets):
+def markdown_report(pages, output_root, store, assets, allowed_source_urls=None):
     findings, links, anchors = [], [], {}
     parser = MarkdownIt("commonmark").enable("table")
     for name, text in pages.items():
@@ -196,10 +196,13 @@ def markdown_report(pages, output_root, store, assets):
             findings.append(f"{name}: require exactly one page title")
         anchors[name] = slugs
     allowed_assets = {Path(a["target"]).resolve(): a["hash"] for a in assets if a.get("target")}
+    allowed_source_urls = allowed_source_urls or set()
     for name, href in links:
         parsed = urlsplit(href)
         if parsed.scheme or parsed.netloc:
-            findings.append(f"{name}: external link is not an authorized immutable asset: {href}")
+            source_page = parsed._replace(fragment="").geturl()
+            if parsed.scheme not in {"http", "https"} or source_page not in allowed_source_urls:
+                findings.append(f"{name}: external link is not an authorized source: {href}")
             continue
         target = (output_root / name).parent.joinpath(unquote(parsed.path)).resolve()
         if not parsed.path:
