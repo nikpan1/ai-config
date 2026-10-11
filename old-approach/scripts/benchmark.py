@@ -18,7 +18,7 @@ def main():
     args = parser.parse_args()
     settings = Settings()
     store = Artifacts(settings.workspace)
-    reference = load_reference()
+    reference = load_reference(Path("old-approach/evaluation/reference.json"))
     configure_logging()
     snapshot = snapshot_sources(Path("data/legacy-insurance"), store)
     selected = selected_snapshot(snapshot, reference, args.source_tokens)

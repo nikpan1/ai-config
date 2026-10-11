@@ -322,7 +322,7 @@ def main():
         "user_reviewed": False,
         "samples": samples,
     }
-    write_json(Path("evaluation/reference.json"), reference)
+    write_json(Path("old-approach/evaluation/reference.json"), reference)
     lines = [
         "# Provisional evaluation reference",
         "",
@@ -350,7 +350,7 @@ def main():
             + sample["entity_distinctions"]
         )
         lines.append("")
-    atomic_write(Path("evaluation/reference-review.md"), "\n".join(lines))
+    atomic_write(Path("old-approach/evaluation/reference-review.md"), "\n".join(lines))
 
 
 if __name__ == "__main__":

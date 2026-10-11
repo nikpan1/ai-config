@@ -30,7 +30,7 @@ def knowledge_fixture(tmp_path, settings, store, areas=("Archive",), count=2):
 
 
 def planning_state(tmp_path, bundle_ref, brief=None, run_id="planning"):
-    template = Path(__file__).resolve().parents[1] / "data/template.md"
+    template = Path(__file__).resolve().parents[2] / "data/template.md"
     brief_path = tmp_path / f"{run_id}-brief.json"
     write_json(brief_path, brief or {})
     return {

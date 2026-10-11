@@ -175,7 +175,7 @@ def make_fixture(root=Path(".docgen/phase2-medium-source")):
         "fixture_origin": "autonomously_authored_synthetic",
         "held_out": False,
     }
-    write_json(Path("evaluation/phase2-reference.json"), summary)
+    write_json(Path("old-approach/evaluation/phase2-reference.json"), summary)
     print(
         {"estimated_source_tokens": summary["estimated_source_tokens"], "profiles": len(reference)}
     )

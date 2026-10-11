@@ -13,7 +13,7 @@ from docgen.workflow import persistent_graph
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--thread-id", required=True)
-    parser.add_argument("--output", default="evaluation/phase3-results.json")
+    parser.add_argument("--output", default="old-approach/evaluation/phase3-results.json")
     args = parser.parse_args()
     settings = Settings()
     store = Artifacts(settings.workspace)

@@ -88,7 +88,7 @@ def main():
         "development_budget": budget,
         "request_outcomes": dict(rows),
     }
-    write_json(Path("evaluation/results.json"), results)
+    write_json(Path("old-approach/evaluation/results.json"), results)
     lines = [
         "# Implementation and validation report",
         "",
@@ -232,8 +232,9 @@ def main():
             "The saved pricing record expires on 2026-10-15 and must be refreshed before "
             "later live calls.",
             "",
-            "Portable results are in `evaluation/results.json`; reference annotations are in "
-            "`evaluation/reference.json` and `evaluation/reference-review.md`. "
+            "Portable results are in `old-approach/evaluation/results.json`; "
+            "reference annotations are in `old-approach/evaluation/reference.json` "
+            "and `old-approach/evaluation/reference-review.md`. "
             "Detailed model responses, token usage, checkpoints and source snapshots "
             "remain under ignored `.docgen/`.",
             "",

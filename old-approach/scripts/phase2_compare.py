@@ -100,7 +100,9 @@ if __name__ == "__main__":
     parser.add_argument("--auto", required=True)
     parser.add_argument("--single-page", required=True)
     parser.add_argument("--reference")
-    parser.add_argument("--output", default="evaluation/phase2-delivery-comparison.json")
+    parser.add_argument(
+        "--output", default="old-approach/evaluation/phase2-delivery-comparison.json"
+    )
     args = parser.parse_args()
     result = compare(Artifacts(Settings().workspace), args.auto, args.single_page, args.reference)
     write_json(Path(args.output), result)

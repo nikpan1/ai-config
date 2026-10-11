@@ -187,7 +187,7 @@ def run(target, full):
         report["workload_incomplete"] = True
         report["stop_reason"] = "Measured resources exceed the predeclared acceptance budget"
     report["capacity_claim"] = "Unvalidated; structural workload and stub measurements only"
-    write_json(Path(f"evaluation/phase2-scale-{target}.json"), report)
+    write_json(Path(f"old-approach/evaluation/phase2-scale-{target}.json"), report)
     print({k: v for k, v in report.items() if k not in {"validation", "largest_groups"}})
 
 

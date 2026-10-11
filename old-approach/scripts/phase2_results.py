@@ -159,7 +159,7 @@ def summarize(store, thread):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("threads", nargs="+")
-    parser.add_argument("--output", default="evaluation/phase2-results.json")
+    parser.add_argument("--output", default="old-approach/evaluation/phase2-results.json")
     args = parser.parse_args()
     settings = Settings()
     store = Artifacts(settings.workspace)
