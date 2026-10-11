@@ -8,9 +8,11 @@ The [phase 2 development plan](../.ai/development-plan-phase-2.md) defines the p
 
 Run every command in this document in PowerShell from the repository root, the parent of `old-approach/`. `uv run --project old-approach` selects this Python project without changing the working directory. Use a new thread ID for each new phase run. If a phase stops for review, resolve it using step 6 before continuing.
 
+New runs default to consolidated source inventory review, exact comparison coverage, compact source labels, and validated generation reuse. Existing checkpoints retain their original implementation signatures.
+
 This directory contains the original implementation, its tests, scripts and evaluation results. Source inputs and templates live in the repository-root `data/` directory shared with `new-approach`. The independent replacement is described in the [new development plan](../.ai/new-approach/development-plan.md). Historical plans and reports remain in the repository-root `.ai/` directory.
 
-The existing `.env`, `.docgen/`, `.venv/` and `dist/` remain at the repository root. The original runtime source and prompt bytes are preserved; checkpoints, frozen implementations and artifacts have not been migrated. Keep `.docgen/budget.sqlite` as the cumulative development ledger across approaches. A separate implementation or artifact workspace does not create another PLN 200 allowance.
+The existing `.env`, `.docgen/`, `.venv/` and `dist/` remain at the repository root. Checkpoints, frozen implementations and artifacts have not been migrated. Keep `.docgen/budget.sqlite` as the cumulative development ledger across approaches. A separate implementation or artifact workspace does not create another PLN 200 allowance.
 
 1. **Prepare the project and inputs.** Complete [Setup](#setup), including the API key and current pricing. Put source Markdown files in a dedicated directory and choose a template. The commands below use `data/legacy-insurance` and `data/template.md`; replace them with your own paths.
 
@@ -47,7 +49,7 @@ The existing `.env`, `.docgen/`, `.venv/` and `dist/` remain at the repository r
    Join-Path $generation.values.export_path "index.md"
    ```
 
-   Read `sources/index.md` for source evidence. `$generation.values.manifest_path` identifies the separate reports and metadata. `ready_for_review` means the files are available for inspection; only `complete` means the release has been approved. Check the current `status` for later blocking findings.
+   Read `sources/index.md` for source evidence. Reader citations use compact labels such as `[S1]`; the metadata directory contains `source-map.json` and `source-accounting.json` with exact evidence IDs, locations, and obligation dispositions. `$generation.values.manifest_path` identifies the separate reports and metadata. `ready_for_review` means the files are available for inspection; only `complete` means the release has been approved. Check the current `status` for later blocking findings.
 
 6. **Handle pauses and approve the release.** Replace `THREAD_ID` with the ID of the paused phase:
 
@@ -61,6 +63,15 @@ The existing `.env`, `.docgen/`, `.venv/` and `dist/` remain at the repository r
    ```powershell
    uv run --project old-approach docgen resume --thread-id THREAD_ID --decisions decisions.json
    ```
+
+   Common knowledge decisions can be selected without preparing JSON:
+
+   ```powershell
+   uv run --project old-approach docgen resume --thread-id THREAD_ID --reviewer YOUR_NAME --rationale "Dated source controls" --select-authority ISSUE_ID=CLAIM_ID
+   uv run --project old-approach docgen resume --thread-id THREAD_ID --reviewer YOUR_NAME --keep-distinct ISSUE_ID
+   ```
+
+   Other knowledge options are `--retain-unknown ISSUE_ID`, `--exclude ISSUE_ID`, and `--explain-asset ISSUE_ID=EXPLANATION`. Planning corrections still require an immutable evidence-backed replacement. After inspecting the final candidate for content accuracy, reader usefulness, language, and Markdown, use `--approve-release --reviewer YOUR_NAME` at its release interrupt. This records the decision through LangGraph resume.
 
    Use the decision format for the relevant phase: [knowledge review](#review), [planning review](#documentation-planning), or [generation review and release approval](#phase-3-generate-markdown-documentation). Approve the final release with `approve_release` only after checking the text and resolving blocking findings. After a resume, rerun that phase's `status` assignment above to refresh its references.
 
@@ -111,6 +122,10 @@ reconcile_entities → reconcile_claims → finalize_knowledge
 ```
 
 Each successful node checkpoints before the next starts. One process holds the worker lock for a run. Immutable artifacts are atomically saved before their references enter graph state. Extraction repairs are limited to two attempts. Truncated outputs are never accepted: batches are split, with source locations, headings, table headers, context bounds, and ownership preserved. Reconciliation comparisons are also partitioned, including cross-partition comparisons. Technical failures retain a resumable checkpoint and do not masquerade as content issues.
+
+`DOCGEN_REVIEW_POLICY=consolidated` lets independent extraction continue when the source inventory reports a problem and collects evidence-backed reconciliation questions until the final knowledge barrier. The review package shows each issue's own revision; selected CLI decisions bind to that revision. Invalid extraction, unsupported comparison references, and incomplete coverage still stop at their affected stage. `strict` retains immediate review. Neither policy can approve unsupported facts or incomplete coverage.
+
+`DOCGEN_COMPARISON_POLICY=exact` groups only records with byte-equivalent content, qualifications, and evidence. All originals remain in the knowledge bundle and map to their representative. Comparison tasks list required record pairs; overlapping candidate groups discharge each pair once. `strict` retains the earlier task policy. The default `DOCGEN_RECONCILIATION_TOKENS=48000` was measured on the preserved dense 500k fixture; oversized requests still split, and `DOCGEN_REQUEST_TOKENS` remains the final bound. `workload --knowledge` reports task counts and checked relationship counts.
 
 `--stop-after snapshot_sources`, `plan_batches`, `extract_batch`, or `verify_batch` creates a diagnostic checkpoint; `resume` continues it. This is useful for restart tests. Human feedback always uses LangGraph `interrupt()` and `Command(resume=...)`.
 
@@ -186,13 +201,13 @@ uv run --project old-approach docgen workload --knowledge objects/knowledge-HASH
 
 Unselected linked files are reported as missing context, never silently ingested. Selection hashes travel with the knowledge bundle. The workload report performs no paid model calls; it may cache immutable snapshots and indexes. It reports heuristic source tokens, batches, available record counts, comparison tasks, largest candidate groups, remaining allowance and disk usage. Before extraction, comparison counts are unknown. Its conservative reservation bound is not a prediction of a complete pipeline's cost.
 
-`DOCGEN_PLANNING_TOKENS` bounds owned planning material, `DOCGEN_WRITING_TOKENS` bounds resolved future writing contexts, and `DOCGEN_PAGE_SPLIT_WORDS` is an editorial review heuristic. `DOCGEN_WORKLOAD_TASKS` stops oversized queues without discarding their tail. Whole-request preflight also includes prompts, schemas and output headroom. The broad phase 1 candidate policy retains its dense worst case; some global joins and manifests still use memory proportional to their inventory.
+`DOCGEN_PLANNING_TOKENS` bounds owned planning material, `DOCGEN_WRITING_TOKENS` bounds resolved future writing contexts, and `DOCGEN_PAGE_SPLIT_WORDS` is an editorial review heuristic. `DOCGEN_WORKLOAD_TASKS` stops oversized queues without discarding their tail. Whole-request preflight also includes prompts, schemas and output headroom. Exact token-count preflight results are reused by counted input and model. Generation defaults to `--cache-mode validated`; it rechecks cached writing and editorial results against immutable inputs and current validators. Use `--cache-mode off` for an uncached comparison. The broad candidate policy still retains its dense worst case; some global joins and manifests still use memory proportional to their inventory.
 
 Workflow signatures explicitly list relevant modules, Pydantic schema modules and versioned prompts in `old-approach/src/docgen/signatures.py`. Old runs can still be inspected with `status` and `history`; incompatible resumes require the matching implementation or a new thread. A finalized old knowledge bundle can be imported into a new planning run without resuming phase 1. A crash after a provider request but before durable response storage can leave completion uncertain; its conservative charge is retained. Exactly-once remote execution is not promised.
 
 ## Review
 
-An unresolved issue stops its producing stage, writes a Markdown report with exact excerpts and source locations, and returns exit code 2. The report path, issue IDs, and artifact revision appear in `status`. There is no automatic choice of conflicting authority.
+With the default consolidated policy, source inventory and evidence-backed reconciliation findings are collected while independent comparison work continues. The knowledge graph pauses at its final dependency barrier with one Markdown report containing the unresolved questions, exact excerpts, source locations, issue IDs, and individual evidence revisions. Invalid extraction or unsupported comparison references can still stop the affected stage immediately. The `strict` policy retains earlier stage-level pauses. No policy chooses conflicting source authority automatically. The `status` command shows the report path and current issues.
 
 Save a decision file and submit it:
 
@@ -287,22 +302,23 @@ The editorial pass runs automatically with `generate-documentation`; no addition
 
 ```text
 assemble_pages → polish_documentation → verify_editorial_revision
-               → validate_documentation → review_markdown_presentation → finalize_documentation
+               → validate_documentation → prepare_claim_audit → audit_claim_batch
+               → finalize_claim_audit → review_markdown_presentation → finalize_documentation
 ```
 
-The editor receives the original template, its compiled requirements, the audience brief, the entire draft page and its original evidence. It builds a connected explanation, introduces concepts before using them, adds supported transitions, simplifies phrasing and consolidates repetition. Template characteristics must remain visible, including the purpose of each section and applicable summaries, tables, flows and limitations. Existing headings, navigation destinations and code/diagram fences stay unchanged. New subordinate headings may clarify the text if they preserve existing anchors; changing the planned page hierarchy requires a new plan.
+The editor receives the original template, its compiled requirements, the audience brief, the entire draft page and its original evidence. It builds a connected explanation, introduces concepts before using them, adds supported transitions, simplifies phrasing and consolidates repetition. Template characteristics must remain visible, including the purpose of each section and applicable summaries, tables, flows and limitations. Existing headings and navigation destinations stay unchanged. New subordinate headings may clarify the text if they preserve existing anchors; changing the planned page hierarchy requires a new plan.
 
-Every unique source destination remains present. Repeated citations can be grouped beside their claims or in a table's source column. A coverage map connects every page obligation to an actual paragraph, table row or protected diagram label with an adjacent supporting citation. The source and attachment indexes are not rewritten. An independent review checks the rewritten text against the evidence and template, including conditions, exceptions, modality, false unknowns, narrative continuity and excessive repetition. Editorial checks do not constitute human acceptance.
+Every unique source destination remains present. Repeated citations can be grouped beside their claims or in a table's source column. A coverage map connects every page obligation to an actual paragraph, table row or protected diagram label with an adjacent supporting citation. The source and attachment indexes are not rewritten. An independent page review checks the rewritten text against the evidence and template. A second, narrower audit checks each reader-facing paragraph, table row, and Mermaid edge against its local cited passages in bounded checkpointed batches. Unsupported or insufficiently cited prose receives up to two page-level editorial repairs. An optional unsupported diagram may be removed when its cited evidence remains in the same section's prose; otherwise the run requests an upstream correction. Model findings remain evidence for review, not proof of corpus-wide semantic correctness.
 
-Each page has separate rewrite and verification checkpoints. The normal cost is one editorial model call plus the page review that generation already performs. One automatic editorial repair is allowed; further failures enter `review_generation`. Successful pages are retained on resume. Oversized pages stop without silently truncating source material and require a smaller page in a new plan.
+Each page has separate rewrite and verification checkpoints. The factual audit adds model requests proportional to the number of reader-facing claims and repeats after substantive page repairs. Bounded automatic editorial repairs are attempted before unresolved findings enter `review_generation`. Successful pages are retained on resume. Oversized pages stop without silently truncating source material and require a smaller page in a new plan.
 
 To inspect a checkpoint, add `--stop-after polish_documentation` or `--stop-after verify_editorial_revision`, then use the usual `status` and `resume` commands. For an editorial content interrupt, `action=correct` takes an immutable `EditorialPage` in `correction_ref` (page ID, Markdown, obligation coverage and change log), rather than a `WritingFragment`. It re-enters editorial verification. `request_upstream` is available for protected plan or diagram defects.
 
-Published metadata includes `unpolished_pages.json` for comparison and `page_reviews.json` with input/output hashes, independent template assessments and references to the editorial coverage maps and change logs. The reader-facing `index.md` contains the verified editorial candidate, still awaiting human release approval. Existing immutable runs are not changed by installing this stage; start a new generation thread to use it.
+Published metadata includes `unpolished_pages.json` for comparison, `page_reviews.json` with input/output hashes and template assessments, and `claim_audit.json` with claim verdict counts and findings. The reader-facing `index.md` contains the verified editorial candidate, still awaiting human release approval. Existing immutable runs are not changed by installing this stage; start a new generation thread to use it.
 
 The user approved a simplified language policy in place of the official ASD-STE100 standard: professional, plain English with consistent terminology and preserved technical meaning. The versioned `plain-technical-english-v1` contract and source-backed terminology register are retained in metadata. Mechanical sentence and paragraph findings are review hints; independent model review checks meaning and language. No formal STE compliance or certification is claimed, and an official dictionary is not required.
 
-The reader-facing directory is `.docgen/runs/THREAD/documentation/REVISION/` and contains only `.md` files. Start at `index.md`; use `sources/index.md` for exact source excerpts, original snapshot links and disposition accounting. Requested attachments have an index and links to immutable source snapshots. The pipeline does not copy images or create binary deliverables. Source links require the original workspace.
+The reader-facing directory is `.docgen/runs/THREAD/documentation/REVISION/` and contains only `.md` files. Start at `index.md`; use `sources/index.md` for exact source excerpts and original snapshot links. Detailed disposition accounting and the exact evidence map are in generation metadata. Requested attachments have an index and links to immutable source snapshots. The pipeline does not copy images or create binary deliverables. Source links require the original workspace.
 
 Workflow records, input and language revisions, evidence mappings, checks and release status are separate under `.docgen/runs/THREAD/generation-metadata/REVISION/`. Artifact references resolve in the same workspace. Directories are immutable and the final manifest is written last. A run publishes `ready_for_review` before its human release interrupt; only a revision-bound human approval changes the status to `complete`, in a new output revision.
 
@@ -329,7 +345,7 @@ uv run --project old-approach docgen resume --thread-id documentation-v1 --decis
 
 Content corrections use `action=correct` and an immutable `correction_ref` containing a complete `WritingFragment`. Corrections re-enter verification and invalidate dependent summaries and output checks. `approve_term` and `asset_decision` require immutable typed replacement records; `request_upstream` records the need for a new plan, and `defer` retains the interrupt. Decisions cannot waive unsupported facts or missing mandatory coverage. Technical failures preserve the checkpoint without entering content review.
 
-Generation caches are disabled by default. `--cache-mode validated` permits reuse only of fragments with successful evidence and semantic checks, keyed by frozen inputs, dependencies, language contract and implementation. The acceptance example uses no cached model responses. `--stop-after` supports each named generation node for restart inspection.
+Generation defaults to `--cache-mode validated`. It rechecks previously accepted fragments and editorial revisions against frozen inputs and the current validators before reuse. Use `--cache-mode off` for a cold comparison. The earlier acceptance example used no cached model responses. `--stop-after` supports each named generation node for restart inspection.
 
 For a live example with a frozen implementation that remains resumable during development:
 

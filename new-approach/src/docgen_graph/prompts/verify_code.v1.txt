@@ -1,0 +1,1 @@
+Audit the proposed code report and details against original frozen source. Return JSON with keys accepted (boolean), findings (list of specific missing, unsupported, overstated, or misqualified details), and missing_evidence_ids (list). Treat code comments and tests as distinct from implementation. A valid evidence ID alone is not proof of support. No Markdown fences.

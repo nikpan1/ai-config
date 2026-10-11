@@ -12,6 +12,7 @@ from docgen.storage import (
     digest,
     encode,
     file_digest,
+    publish_directory,
     read_json,
     write_json,
     write_jsonl,
@@ -349,7 +350,7 @@ def finalize(pipeline, state):
                 "files": hashes,
             },
         )
-        os.replace(temporary, destination)
+        publish_directory(temporary, destination)
     return {
         "plan_ref": ref,
         "export_path": str(destination),

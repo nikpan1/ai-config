@@ -88,7 +88,13 @@ class GenerationModel:
             for obligation in payload["originals"]["obligations"]:
                 excerpt = obligation["evidence"][0]["excerpt"].strip()
                 passages.append(
-                    excerpt + " " + citations(obligation["evidence"], payload["page"]["path"])
+                    excerpt
+                    + " "
+                    + citations(
+                        obligation["evidence"],
+                        payload["page"]["path"],
+                        payload.get("source_labels"),
+                    )
                 )
                 coverage.append(
                     {
@@ -102,6 +108,18 @@ class GenerationModel:
                 "markdown": payload["markdown"] + "\n\n" + "\n\n".join(passages),
                 "coverage": coverage,
                 "changes": ["Fixture only; does not demonstrate real editorial quality"],
+            }
+        elif stage == "gen_claim_audit":
+            value = {
+                "checks": [
+                    {
+                        "claim_id": claim["id"],
+                        "verdict": "supported" if claim["citations"] else "nonfactual",
+                        "supporting_labels": claim["citations"][:1],
+                        "reason": "Fixture only",
+                    }
+                    for claim in payload["claims"]
+                ]
             }
         else:
             value = {
@@ -152,6 +170,7 @@ def test_generation_publishes_only_markdown_and_requires_human_release(generatio
     assert all(
         digest((output / key).read_bytes()) == value for key, value in manifest["files"].items()
     )
+
     assert pipeline.read(result, "validation_ref")["coverage"]["passed"]
     count = len(model.calls)
     issue = pipeline.read(result, "issues_ref")[0]
@@ -182,6 +201,41 @@ def test_generation_publishes_only_markdown_and_requires_human_release(generatio
     assert final["status"] == "complete"
     assert output.exists() and final["export_path"] != str(output)
     assert len(model.calls) == count
+
+
+def test_generation_skips_paid_calls_for_empty_evidence_free_job(settings, store, monkeypatch):
+    model = GenerationModel()
+    pipeline = GenerationPipeline(settings, store, model)
+    job = {
+        "id": "empty-job",
+        "section_id": "empty-section",
+        "brief_id": "empty-brief",
+        "fragment": 0,
+        "obligation_ids": [],
+    }
+    context = {
+        "originals": {"obligations": [], "source_blocks": []},
+        "brief": {
+            "content": {"unknowns": [], "tables": [], "diagrams": []},
+            "canonical_links": {},
+        },
+    }
+    payload = {
+        "job": job,
+        "context": context,
+        "tables": [],
+        "diagram_ids": [],
+        "language_contract": {"quote_policy": "none"},
+    }
+    monkeypatch.setattr(pipeline, "job", lambda state: job)
+    monkeypatch.setattr(pipeline, "payload", lambda state, selected: payload)
+    state = {"run_id": "empty-run", "signature": "fixture", "cache_mode": "off", "job_index": 0}
+    draft = pipeline.draft_writing_job(state)
+    accepted = pipeline.verify_writing_job({**state, **draft})
+    assert accepted["job_index"] == 1
+    assert model.calls == []
+    fragment = pipeline.read(accepted, "fragments_ref")["empty-job"]["fragment_ref"]
+    assert store.get_object(fragment)["passages"] == []
 
 
 @pytest.mark.parametrize("stage", [s for s in STAGES if s != "review_generation"])

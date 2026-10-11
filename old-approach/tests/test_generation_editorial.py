@@ -29,7 +29,13 @@ def editorial_example():
         {
             "page": {"id": "p1"},
             "markdown": markdown,
-            "originals": {"obligations": [{"id": "o1", "evidence": [evidence]}]},
+            "knowledge_revision": "knowledge-revision",
+            "selection_ref": "objects/selection-example.json",
+            "source_catalog": {},
+            "originals": {
+                "obligations": [{"id": "o1", "evidence": [evidence]}],
+                "source_blocks": [],
+            },
         },
     )
 

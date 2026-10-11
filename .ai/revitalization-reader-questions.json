@@ -1,0 +1,56 @@
+{
+  "schema_version": "1",
+  "fixture": "synthetic ArchiveService specification, fixture tenant A, version 1",
+  "questions": [
+    {
+      "question": "When does the scheduled archival run execute?",
+      "required_answer": "Once daily at 02:00 UTC.",
+      "source_rule": "ARCH-1"
+    },
+    {
+      "question": "Which revisions are eligible for scheduled archival?",
+      "required_answer": "Status approved and archive hold false.",
+      "source_rule": "ARCH-1"
+    },
+    {
+      "question": "What happens when a revision has an archive hold?",
+      "required_answer": "Skip it, record the reason, and leave it unchanged.",
+      "source_rule": "ARCH-2"
+    },
+    {
+      "question": "Who may clear an archive hold and what must they provide?",
+      "required_answer": "Only an operator assigned the ArchiveOperator role for fixture tenant A may clear it, with a nonempty reason; clearing does not itself archive the revision.",
+      "source_rule": "ARCH-5"
+    },
+    {
+      "question": "What does an exact replay using the same logical request key return?",
+      "required_answer": "The original result.",
+      "source_rule": "ARCH-3"
+    },
+    {
+      "question": "What happens when content changes under the same logical request key?",
+      "required_answer": "Reject it with ARCHIVE_KEY_CONFLICT.",
+      "source_rule": "ARCH-3"
+    },
+    {
+      "question": "What happens after an archival write fails?",
+      "required_answer": "Preserve the previous stored revision; the next daily run retries the eligible revision using the original logical request key.",
+      "source_rule": "ARCH-6"
+    },
+    {
+      "question": "What must happen before policy details are read for a request from another tenant?",
+      "required_answer": "Check tenant scope first and reject the other-tenant request without returning details.",
+      "source_rule": "ARCH-4"
+    },
+    {
+      "question": "Does the specification prove ArchiveService is implemented?",
+      "required_answer": "No. It specifies required behavior only, for fixture tenant A and version 1.",
+      "source_rule": "scope note"
+    },
+    {
+      "question": "Which scheduler and persistence technologies are required?",
+      "required_answer": "The source does not specify either technology.",
+      "source_rule": "source boundary"
+    }
+  ]
+}

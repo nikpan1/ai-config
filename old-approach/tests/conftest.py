@@ -14,6 +14,8 @@ def settings(tmp_path):
         gemini_api_key="test-key",
         DOCGEN_WORKSPACE=tmp_path / "workspace",
         DOCGEN_BUDGET_LEDGER=tmp_path / "workspace/budget.sqlite",
+        DOCGEN_COMPARISON_POLICY="strict",
+        DOCGEN_REVIEW_POLICY="strict",
     )
 
 
@@ -73,5 +75,6 @@ class FixtureModel:
                 relations=[],
                 findings=[],
                 checked_ids=[record["id"] for record in payload["left"] + payload["right"]],
+                checked_pairs=payload.get("required_pairs", []),
             )
         return self.transform(stage, deepcopy(payload), result) if self.transform else result

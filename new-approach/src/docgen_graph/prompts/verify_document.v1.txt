@@ -1,0 +1,1 @@
+Check extracted assertions against every original legacy documentation block. Return JSON with accepted (boolean), findings (list of missing or distorted information), and missing_evidence_ids (list). Preserve table qualifiers, procedure order, conditions, exceptions, modality, and scope. No Markdown fences.

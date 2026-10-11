@@ -99,13 +99,33 @@ class GeminiModel:
         reservation = pricing.cost(len(material.encode("utf-8")) + 4096, 65536)
         reservation *= self.settings.billing_headroom
         client = client_for(key, self.settings.timeout_seconds)
-        try:
-            counted = client.models.count_tokens(
-                model=self.settings.gemini_model,
-                contents=instruction + "\n\n" + request,
-            ).total_tokens
-        except Exception as error:
-            raise ModelFailure(f"Token preflight failed ({type(error).__name__})") from None
+        counted_input = instruction + "\n\n" + request
+        count_key = digest([self.settings.gemini_model, counted_input])
+        count_path = self.store.path(f"token-count-cache/{count_key}.json")
+        if count_path.exists():
+            counted = read_json(count_path)["total_tokens"]
+            self.store.event(
+                self.run_id, stage=stage, event="token_preflight_cache_hit", key=count_key
+            )
+        else:
+            preflight_started = time.monotonic()
+            try:
+                counted = client.models.count_tokens(
+                    model=self.settings.gemini_model,
+                    contents=counted_input,
+                ).total_tokens
+            except Exception as error:
+                raise ModelFailure(f"Token preflight failed ({type(error).__name__})") from None
+            if counted is None or counted < 0:
+                raise ModelFailure("Token preflight returned no usable count")
+            write_json(count_path, {"total_tokens": counted})
+            self.store.event(
+                self.run_id,
+                stage=stage,
+                event="token_preflight",
+                key=count_key,
+                seconds=time.monotonic() - preflight_started,
+            )
         input_bound = (
             (counted or len(material.encode("utf-8")))
             + len(encode(schema_json).encode("utf-8"))

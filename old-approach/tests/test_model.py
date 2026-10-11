@@ -64,3 +64,28 @@ def test_failed_request_keeps_reservation_as_charge(settings, store, monkeypatch
     assert "secret-api-key" not in str(error.value)
     assert BudgetLedger(store.path("budget.sqlite")).summary()["charged_pln"] > 0
     assert "secret-api-key" not in store.path("runs/test/events.jsonl").read_text()
+
+
+def test_token_preflight_reuses_exact_count_after_truncated_response(settings, store, monkeypatch):
+    settings = settings.model_copy(update={"pricing_file": store.path("pricing.json")})
+    write_json(settings.pricing_file, pricing())
+    counts = []
+
+    class Response:
+        usage_metadata = None
+        candidates = [SimpleNamespace(finish_reason="MAX_TOKENS")]
+        text = "partial"
+
+        def model_dump(self, **kwargs):
+            return {"text": self.text}
+
+    models = SimpleNamespace(
+        generate_content=lambda **kwargs: Response(),
+        count_tokens=lambda **kwargs: counts.append(kwargs) or SimpleNamespace(total_tokens=100),
+    )
+    monkeypatch.setattr("docgen.model.client_for", lambda *args: SimpleNamespace(models=models))
+    model = GeminiModel(settings, store, "preflight")
+    for _ in range(2):
+        with pytest.raises(TruncatedOutput):
+            model.call("extract", {"source": "fixture"}, Extraction)
+    assert len(counts) == 1

@@ -140,3 +140,14 @@ class EditorialVerification(PageVerification):
     narrative_flows: bool
     repetition_controlled: bool
     source_links_readable: bool
+
+
+class ClaimCheck(Record):
+    claim_id: str
+    verdict: Literal["supported", "unsupported", "unclear", "nonfactual"]
+    supporting_labels: list[str]
+    reason: str
+
+
+class ClaimAudit(Record):
+    checks: list[ClaimCheck]

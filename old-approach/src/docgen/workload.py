@@ -22,7 +22,7 @@ def workload_report(settings, store, source=None, knowledge=None, selection=None
     else:
         raise ValueError("Workload report requires --source or --knowledge")
     batches = plan_batches(snapshot, settings)
-    record_counts, stages, largest = {}, {}, {}
+    record_counts, stages, largest, relationships = {}, {}, {}, {}
     stages["extraction_and_verification"] = 2 * len(batches)
     if bundle:
         names = {row["id"]: row["canonical_name"] for row in bundle["entities"]}
@@ -30,10 +30,19 @@ def workload_report(settings, store, source=None, knowledge=None, selection=None
             records = bundle[kind]
             record_counts[kind] = len(records)
             comparisons = comparison_tasks(
-                records, kind, settings.reconciliation_tokens, names, settings.workload_tasks
+                records,
+                kind,
+                settings.reconciliation_tokens,
+                names,
+                settings.workload_tasks,
+                policy=settings.comparison_policy,
             )
             stages[f"reconcile_{kind}"] = len(comparisons["tasks"])
             largest[kind] = comparisons["largest_groups"]
+            relationships[kind] = {
+                "required": comparisons["required_relationships"],
+                "exact_pairs_discharged": comparisons["exact_pairs_discharged"],
+            }
     cost_bound = None
     try:
         pricing = load_pricing(settings.pricing_file)
@@ -55,6 +64,7 @@ def workload_report(settings, store, source=None, knowledge=None, selection=None
         "records": record_counts,
         "stage_call_estimates": stages,
         "largest_groups": largest,
+        "comparison_relationships": relationships,
         "request_tokens": settings.request_tokens,
         "planning_tokens": settings.planning_tokens,
         "output_tokens": settings.output_tokens,

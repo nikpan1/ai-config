@@ -21,7 +21,7 @@ class Settings(BaseSettings):
         100000, ge=4096, le=1048576, validation_alias="DOCGEN_REQUEST_TOKENS"
     )
     reconciliation_tokens: int = Field(
-        12000, ge=1024, validation_alias="DOCGEN_RECONCILIATION_TOKENS"
+        48000, ge=1024, validation_alias="DOCGEN_RECONCILIATION_TOKENS"
     )
     timeout_seconds: int = Field(180, ge=1, validation_alias="DOCGEN_TIMEOUT_SECONDS")
     technical_retries: int = Field(2, ge=0, le=5, validation_alias="DOCGEN_TECHNICAL_RETRIES")
@@ -35,6 +35,12 @@ class Settings(BaseSettings):
     writing_tokens: int = Field(16000, ge=4096, validation_alias="DOCGEN_WRITING_TOKENS")
     page_split_words: int = Field(2500, ge=500, validation_alias="DOCGEN_PAGE_SPLIT_WORDS")
     workload_tasks: int = Field(20000, ge=1, validation_alias="DOCGEN_WORKLOAD_TASKS")
+    comparison_policy: Literal["strict", "exact"] = Field(
+        "exact", validation_alias="DOCGEN_COMPARISON_POLICY"
+    )
+    review_policy: Literal["strict", "consolidated"] = Field(
+        "consolidated", validation_alias="DOCGEN_REVIEW_POLICY"
+    )
 
     @model_validator(mode="after")
     def check_budgets(self):

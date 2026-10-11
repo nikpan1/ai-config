@@ -1,0 +1,15 @@
+{
+  "status": "inventory_only",
+  "selected_files": 13,
+  "selected_bytes": 957590,
+  "excluded_inputs": 11,
+  "source_spans": 1734,
+  "code_units": 55,
+  "document_batches": 166,
+  "parser_capabilities": [
+    "python_ast"
+  ],
+  "seconds": 0.308,
+  "python_peak_allocated_bytes": 8444419,
+  "source_revision": "e20659aa4c0699c854d8b3a1f017b1bd6f085c1d56e5214a1c1d979f7057a234"
+}

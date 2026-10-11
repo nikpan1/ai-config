@@ -970,6 +970,16 @@ class PlanningPipeline:
             def validate(result):
                 require_exact(result.checked_obligation_ids, ids, "Brief content")
                 validate_brief(result, ids)
+                reader_contract = encode(result.model_dump(exclude={"checked_obligation_ids"}))
+                inputs = self.inputs(state)
+                if any(
+                    value and value in reader_contract
+                    for value in (inputs.knowledge_revision, inputs.selection_ref)
+                ):
+                    raise ValueError(
+                        "Reader brief exposes an internal source artifact; "
+                        "use a readable revision label and source inventory"
+                    )
                 return SectionBrief(
                     id=stable_id("brief", task["section"]["id"], ids),
                     section_id=task["section"]["id"],

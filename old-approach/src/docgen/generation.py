@@ -6,8 +6,10 @@ from langgraph.types import interrupt
 from pydantic import ValidationError
 
 from docgen.generation_assets import prepare_inventory
+from docgen.generation_claim_audit import audit_jobs, remove_section_diagrams, validate_audit
 from docgen.generation_contracts import (
     AssetRequest,
+    ClaimAudit,
     EditorialPage,
     GenerationDecision,
     TechnicalTerm,
@@ -19,7 +21,7 @@ from docgen.generation_editorial import (
     polish_documentation,
     verify_editorial_revision,
 )
-from docgen.generation_export import assemble, mermaid_text, publish, render_fragment
+from docgen.generation_export import assemble, mermaid_text, publish, render_fragment, source_labels
 from docgen.generation_inputs import freeze_inputs, load_plan
 from docgen.generation_language import language_contract, language_findings
 from docgen.generation_validation import (
@@ -46,6 +48,9 @@ STAGES = (
     "polish_documentation",
     "verify_editorial_revision",
     "validate_documentation",
+    "prepare_claim_audit",
+    "audit_claim_batch",
+    "finalize_claim_audit",
     "review_markdown_presentation",
     "finalize_documentation",
     "review_generation",
@@ -73,15 +78,24 @@ class GenerationState(TypedDict, total=False):
     attempt: int
     diagrams_ref: str
     pages_ref: str
+    source_labels_ref: str
     unpolished_pages_ref: str
     editorial_index: int
     editorial_attempt: int
     editorial_draft_ref: str
     editorial_feedback_ref: str
     editorial_review_ref: str
+    editorial_cached_review_ref: str
     page_index: int
     page_reviews_ref: str
     validation_ref: str
+    claim_jobs_ref: str
+    claim_index: int
+    claim_results_ref: str
+    claim_attempt: int
+    claim_feedback_ref: str
+    claim_audit_ref: str
+    claim_repair_round: int
     presentation_ref: str
     issues_ref: str
     decisions_ref: str
@@ -227,6 +241,23 @@ class GenerationPipeline:
             if any(f.blocking for f in verification.findings):
                 raise ValueError("Failed generation response cannot be reused")
             return self.accept(state, job, refs)
+        if (
+            not job["obligation_ids"]
+            and not payload["tables"]
+            and not payload["diagram_ids"]
+            and not payload["context"]["brief"]["content"]["unknowns"]
+        ):
+            fragment = WritingFragment(
+                job_id=job["id"],
+                section_id=job["section_id"],
+                passages=[],
+                tables=[],
+                covered_obligation_ids=[],
+            )
+            return {
+                "draft_ref": self.store.put(fragment, "generation-fragment"),
+                "route": "verify_writing_job",
+            }
         feedback = self.read(state, "feedback_ref", [])
         if feedback:
             payload.update(feedback=feedback, previous_fragment=self.read(state, "draft_ref"))
@@ -271,9 +302,25 @@ class GenerationPipeline:
             validate_fragment(fragment, job, payload["context"], payload["language_contract"])
         except ValueError as error:
             return self.repair(state, [str(error)])
-        verification = self.call(
-            "gen_verify", {**payload, "fragment": fragment.model_dump()}, WritingVerification
-        )
+        if (
+            not job["obligation_ids"]
+            and not payload["tables"]
+            and not payload["diagram_ids"]
+            and not payload["context"]["brief"]["content"]["unknowns"]
+            and not fragment.passages
+            and not fragment.tables
+        ):
+            verification = WritingVerification(
+                checked_obligation_ids=[],
+                checked_table_rows=[],
+                checked_diagram_ids=[],
+                findings=[],
+                language_review_scope="No authored factual content",
+            )
+        else:
+            verification = self.call(
+                "gen_verify", {**payload, "fragment": fragment.model_dump()}, WritingVerification
+            )
         try:
             validate_verification(verification, job, payload["context"])
         except ValueError as error:
@@ -334,14 +381,17 @@ class GenerationPipeline:
         pages_ref = self.store.put(pages, "generation-pages")
         return {
             "pages_ref": pages_ref,
+            "source_labels_ref": self.store.put(source_labels(self, state), "source-labels"),
             "unpolished_pages_ref": pages_ref,
             "editorial_index": 0,
             "editorial_attempt": 0,
             "editorial_draft_ref": "",
             "editorial_feedback_ref": "",
             "editorial_review_ref": "",
+            "editorial_cached_review_ref": "",
             "page_index": 0,
             "page_reviews_ref": "",
+            "claim_repair_round": 0,
             "release_approval_ref": "",
             "route": "polish_documentation",
         }
@@ -400,6 +450,149 @@ class GenerationPipeline:
         )
         return {
             "validation_ref": self.store.put(report, "generation-validation"),
+            "route": "prepare_claim_audit",
+        }
+
+    def prepare_claim_audit(self, state):
+        return {
+            "claim_jobs_ref": self.store.put(audit_jobs(self, state), "claim-audit-jobs"),
+            "claim_index": 0,
+            "claim_results_ref": "",
+            "claim_attempt": 0,
+            "claim_feedback_ref": "",
+            "route": "audit_claim_batch",
+        }
+
+    def audit_claim_batch(self, state):
+        jobs = self.read(state, "claim_jobs_ref")
+        index = state.get("claim_index", 0)
+        if index >= len(jobs):
+            return {"route": "finalize_claim_audit"}
+        job = jobs[index]
+        payload = {
+            **job,
+            "feedback": self.read(state, "claim_feedback_ref", []),
+        }
+        try:
+            result = self.call("gen_claim_audit", payload, ClaimAudit, 8000)
+            checks = validate_audit(result, job)
+        except (ValidationError, ValueError) as error:
+            if state.get("claim_attempt", 0) < 1:
+                return {
+                    "claim_attempt": state.get("claim_attempt", 0) + 1,
+                    "claim_feedback_ref": self.store.put([str(error)], "claim-audit-feedback"),
+                    "route": "audit_claim_batch",
+                }
+            return self.gate(state, "audit_claim_batch", [str(error)], "audit")
+        results = [*self.read(state, "claim_results_ref", []), *checks]
+        return {
+            "claim_results_ref": self.store.put(results, "claim-audit-results"),
+            "claim_index": index + 1,
+            "claim_attempt": 0,
+            "claim_feedback_ref": "",
+            "route": "audit_claim_batch",
+        }
+
+    def finalize_claim_audit(self, state):
+        checks = self.read(state, "claim_results_ref", [])
+        jobs = self.read(state, "claim_jobs_ref")
+        require_exact(
+            [check["claim_id"] for check in checks],
+            [claim["id"] for job in jobs for claim in job["claims"]],
+            "Complete factual audit",
+        )
+        claims = {claim["id"]: claim for job in jobs for claim in job["claims"]}
+        findings = [
+            f"{claims[check['claim_id']]['path']} / {claims[check['claim_id']]['section']}: "
+            f"{check['reason']} Claim: {claims[check['claim_id']]['text'][:300]}"
+            for check in checks
+            if check["verdict"] in {"unsupported", "unclear"}
+        ]
+        report = {
+            "checked_claims": len(checks),
+            "findings": findings,
+            "verdicts": {
+                verdict: sum(check["verdict"] == verdict for check in checks)
+                for verdict in ("supported", "unsupported", "unclear", "nonfactual")
+            },
+        }
+        audit_ref = self.store.put(report, "claim-audit-report")
+        if findings:
+            problematic = [
+                claims[check["claim_id"]]
+                for check in checks
+                if check["verdict"] in {"unsupported", "unclear"}
+            ]
+            pages = content_pages(self, state)
+            affected = next(
+                (
+                    index
+                    for index, page in enumerate(pages)
+                    if page["path"] in {item["path"] for item in problematic}
+                ),
+                None,
+            )
+            if affected is not None and state.get("claim_repair_round", 0) < 2:
+                page = pages[affected]
+                baseline = self.read(state, "pages_ref")
+                diagrams = [
+                    item
+                    for item in problematic
+                    if item["path"] == page["path"] and item["kind"] == "diagram_edge"
+                ]
+                if diagrams:
+                    retained = {
+                        label
+                        for job in jobs
+                        for item in job["claims"]
+                        if item["path"] == page["path"]
+                        and item["section"] in {edge["section"] for edge in diagrams}
+                        and item["kind"] != "diagram_edge"
+                        for label in item["citations"]
+                    }
+                    if any(set(item["citations"]) - retained for item in diagrams):
+                        return {
+                            **self.gate(state, "finalize_claim_audit", findings, "upstream"),
+                            "claim_audit_ref": audit_ref,
+                        }
+                    try:
+                        revised, removed = remove_section_diagrams(
+                            baseline[page["path"]], {item["section"] for item in diagrams}
+                        )
+                    except ValueError:
+                        removed = 0
+                    if not removed:
+                        return {
+                            **self.gate(state, "finalize_claim_audit", findings, "upstream"),
+                            "claim_audit_ref": audit_ref,
+                        }
+                    baseline = {**baseline, page["path"]: revised}
+                feedback = [
+                    finding
+                    for finding, item in zip(findings, problematic, strict=True)
+                    if item["path"] == page["path"]
+                ]
+                baseline_ref = self.store.put(baseline, "generation-pages")
+                return {
+                    "claim_audit_ref": audit_ref,
+                    "claim_repair_round": state.get("claim_repair_round", 0) + 1,
+                    "pages_ref": baseline_ref,
+                    "unpolished_pages_ref": baseline_ref,
+                    "editorial_index": affected,
+                    "editorial_attempt": 0,
+                    "editorial_draft_ref": "",
+                    "editorial_cached_review_ref": "",
+                    "editorial_feedback_ref": self.store.put(feedback, "editorial-feedback"),
+                    "route": "polish_documentation",
+                }
+            return {
+                **self.gate(state, "finalize_claim_audit", findings, "factual"),
+                "claim_audit_ref": audit_ref,
+            }
+        validation = {**self.read(state, "validation_ref"), "claim_audit": report}
+        return {
+            "claim_audit_ref": audit_ref,
+            "validation_ref": self.store.put(validation, "generation-validation"),
             "route": "review_markdown_presentation",
         }
 
@@ -534,14 +727,23 @@ class GenerationPipeline:
             if len(refs) != 1 or None in refs:
                 raise ValueError("Correct the affected fragment with one immutable replacement")
             fragment_ref = next(iter(refs))
-            if state["review_stage"] == "verify_editorial_revision":
+            if state["review_stage"] in {
+                "verify_editorial_revision",
+                "finalize_claim_audit",
+            }:
                 page = EditorialPage.model_validate(self.store.get_object(fragment_ref))
-                expected = content_pages(self, state)[state.get("editorial_index", 0)]
-                if page.page_id != expected["id"]:
+                pages = content_pages(self, state)
+                matching = [index for index, item in enumerate(pages) if item["id"] == page.page_id]
+                if not matching or (
+                    state["review_stage"] == "verify_editorial_revision"
+                    and matching[0] != state.get("editorial_index", 0)
+                ):
                     raise ValueError("Correction is not for the interrupted editorial page")
                 return {
                     **update,
+                    "editorial_index": matching[0],
                     "editorial_draft_ref": fragment_ref,
+                    "editorial_cached_review_ref": "",
                     "editorial_feedback_ref": "",
                     "editorial_attempt": 0,
                     "release_approval_ref": "",

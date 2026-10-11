@@ -131,6 +131,7 @@ class Comparison(Record):
     relations: list[Relation]
     findings: list[Finding]
     checked_ids: list[str]
+    checked_pairs: list[list[str]] = Field(default_factory=list)
 
 
 class Issue(Record):

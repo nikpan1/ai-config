@@ -1,0 +1,36 @@
+{
+  "schema_version": "1",
+  "candidate": ".docgen/runs/revitalization-generation-repair/documentation/0418c1321020c41e93c6095c889f1d6d3701b6f4926f52e12341a95b5ccc0992/index.md",
+  "fixture": "synthetic ArchiveService specification, fixture tenant A, version 1",
+  "method": "Manual answer-location check against the ten preregistered questions; this is not a blinded human editorial rubric.",
+  "questions_total": 10,
+  "questions_fully_answered": 9,
+  "question_numbers_fully_answered": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+  "answer_locations": {
+    "1": "index.md:93",
+    "2": "index.md:93",
+    "3": "index.md:95",
+    "4": "index.md:126-127",
+    "5": "index.md:146",
+    "6": "index.md:147",
+    "7": "index.md:148-149",
+    "8": "index.md:213-215",
+    "9": "index.md:9",
+    "10": "index.md:170"
+  },
+  "partial_answer": "Question 10: the document explicitly says physical storage subsystems are unspecified but does not explicitly state that scheduler technology is unspecified.",
+  "reader_quality_findings": [
+    "The same six rules recur in multiple sections, tables, and related links.",
+    "Some prose retains internal wording such as 'Claim ARCH-5' and repeats qualifications within a paragraph.",
+    "No blinded human rubric or rendered Mermaid review was performed."
+  ],
+  "local_markdown_links": 259,
+  "broken_local_links": 0,
+  "claim_audit": {
+    "units": 115,
+    "supported": 111,
+    "nonfactual": 4,
+    "unsupported": 0,
+    "unclear": 0
+  }
+}

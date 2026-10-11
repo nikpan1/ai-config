@@ -5,6 +5,7 @@ import os
 import re
 import sqlite3
 import tempfile
+import time
 from contextlib import closing, contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
@@ -58,6 +59,17 @@ def atomic_write(path: Path, content: str | bytes):
         os.replace(name, path)
     finally:
         Path(name).unlink(missing_ok=True)
+
+
+def publish_directory(source: Path, destination: Path):
+    for attempt in range(5):
+        try:
+            os.replace(source, destination)
+            return
+        except PermissionError:
+            if attempt == 4:
+                raise
+            time.sleep(0.1 * 2**attempt)
 
 
 def write_json(path: Path, value):

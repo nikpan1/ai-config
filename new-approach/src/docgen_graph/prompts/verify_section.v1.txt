@@ -1,0 +1,1 @@
+Audit this section against frozen original source and approved obligations. Return JSON with accepted (boolean), findings (list), and covered_obligation_ids (list). Reject unsupported claims, lost qualifications, false unknowns, wrong citations, and omitted obligations. No Markdown fences.

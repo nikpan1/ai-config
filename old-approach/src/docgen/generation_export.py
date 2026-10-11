@@ -7,6 +7,7 @@ from urllib.parse import quote
 from docgen.generation_validation import heading_slug, table_specs
 from docgen.planning_helpers import validate_paths
 from docgen.storage import atomic_write, digest, file_digest, read_json, write_json
+from docgen.storage import publish_directory as move_directory
 
 
 def relative_link(source, target):
@@ -17,17 +18,41 @@ def evidence_id(evidence):
     return digest(evidence)[:20]
 
 
-def citations(evidence, page):
+def source_catalog(pipeline, state):
+    identifiers = {
+        identifier
+        for job in pipeline.rows(state, "writing-jobs")
+        for identifier in job["obligation_ids"]
+    }
+    return {
+        evidence_id(entry): entry
+        for obligation in pipeline.rows(state, "content-obligations")
+        if obligation["id"] in identifiers
+        for entry in obligation["evidence"]
+    }
+
+
+def source_labels(pipeline, state):
+    entries = source_catalog(pipeline, state)
+    return {key: f"S{index}" for index, key in enumerate(sorted(entries), 1)}
+
+
+def citations(evidence, page, source_labels_by_id=None):
     target = relative_link(Path(page), Path("sources/index.md"))
     unique = {evidence_id(e): e for e in evidence}
-    return " ".join(f"[Source {key[:6]}]({target}#source-{key})" for key in unique)
+    return " ".join(
+        f"[{source_labels_by_id[key]}]({target}#{source_labels_by_id[key].lower()})"
+        if source_labels_by_id is not None
+        else f"[Source {key[:6]}]({target}#source-{key})"
+        for key in unique
+    )
 
 
 def table_text(text):
     return text.replace("|", "\\|").replace("\n", " ")
 
 
-def render_fragment(fragment, job, context, page):
+def render_fragment(fragment, job, context, page, source_labels_by_id=None):
     lines = []
     labels = {
         "requirement": "Requirement",
@@ -48,18 +73,22 @@ def render_fragment(fragment, job, context, page):
                         for line in text.splitlines()
                     ),
                     "",
-                    citations(passage["evidence"], page),
+                    citations(passage["evidence"], page, source_labels_by_id),
                     "",
                 ]
             )
         else:
             prefix = labels.get(passage["kind"])
+            if passage["kind"] == "requirement" and re.search(
+                r"\b(must|shall|required to)\b", text, re.IGNORECASE
+            ):
+                prefix = None
             lines.extend(
                 [
                     (f"**{prefix}:** " if prefix else "")
                     + text
                     + " "
-                    + citations(passage["evidence"], page),
+                    + citations(passage["evidence"], page, source_labels_by_id),
                     "",
                 ]
             )
@@ -73,14 +102,11 @@ def render_fragment(fragment, job, context, page):
             ]
         )
         for row in table["rows"]:
-            lines.append(
-                "| "
-                + " | ".join(
-                    table_text(cell["text"]) + " " + citations(cell["evidence"], page)
-                    for cell in row["cells"]
-                )
-                + " |"
-            )
+            cells = [table_text(cell["text"]) for cell in row["cells"]]
+            row_evidence = [entry for cell in row["cells"] for entry in cell["evidence"]]
+            if row_evidence:
+                cells[-1] += " " + citations(row_evidence, page, source_labels_by_id)
+            lines.append("| " + " | ".join(cells) + " |")
         lines.append("")
     return "\n".join(lines).strip()
 
@@ -106,14 +132,30 @@ def mermaid_text(spec):
     return "\n".join([*lines, "```"])
 
 
+def empty_section_job(pipeline, job, diagrams):
+    if job["obligation_ids"]:
+        return False
+    context = pipeline.store.get_object(job["context_ref"])
+    return not any(
+        (
+            context["brief"]["content"]["unknowns"],
+            context["brief"]["content"]["diagrams"],
+            context["brief"]["canonical_links"],
+            table_specs(context, job),
+            diagrams.get(job["brief_id"]),
+        )
+    )
+
+
 def assemble(pipeline, state):
+    labels = source_labels(pipeline, state)
     plans = list(pipeline.rows(state, "pages"))
     sections = {r["id"]: r for r in pipeline.rows(state, "logical-sections")}
     jobs = sorted(pipeline.rows(state, "writing-jobs"), key=lambda j: j["assembly_order"])
     fragments = pipeline.read(state, "fragments_ref", {})
     page_by_section = {key: page for page in plans for key in page["section_ids"]}
     by_id = {p["id"]: p for p in plans}
-    evidence = {}
+    evidence = source_catalog(pipeline, state)
     output = {}
     diagrams = pipeline.read(state, "diagrams_ref", {})
     for page in plans:
@@ -135,34 +177,40 @@ def assemble(pipeline, state):
         rendered_briefs = set()
         for key in page["section_ids"]:
             section = sections[key]
+            section_jobs = [job for job in jobs if job["section_id"] == key]
+            empty_leaf = (
+                section["role"] not in {"sources", "catalog"}
+                and not any(
+                    candidate["parent_id"] == key and candidate["id"] in page["section_ids"]
+                    for candidate in sections.values()
+                )
+                and section_jobs
+                and all(empty_section_job(pipeline, job, diagrams) for job in section_jobs)
+            )
+            if empty_leaf:
+                continue
             level, parent = 2, section["parent_id"]
             while parent and parent in page["section_ids"]:
                 level += 1
                 parent = sections[parent]["parent_id"]
             lines.extend(["#" * min(level, 6) + " " + section["title"], ""])
-            for job in (j for j in jobs if j["section_id"] == key):
+            section_links = set()
+            for job in section_jobs:
                 fragment = pipeline.store.get_object(fragments[job["id"]]["fragment_ref"])
                 context = pipeline.store.get_object(job["context_ref"])
-                lines.extend([render_fragment(fragment, job, context, page["path"]), ""])
+                lines.extend([render_fragment(fragment, job, context, page["path"], labels), ""])
                 for obligation in context["originals"]["obligations"]:
                     for entry in obligation["evidence"]:
                         evidence[evidence_id(entry)] = entry
-                for target in sorted(set(context["brief"]["canonical_links"].values())):
-                    canonical_page = page_by_section[target]
-                    href = relative_link(Path(page["path"]), Path(canonical_page["path"]))
-                    titles = [sections[s]["title"] for s in canonical_page["section_ids"]]
-                    if titles.count(sections[target]["title"]) == 1:
-                        href += "#" + quote(heading_slug(sections[target]["title"]))
-                    lines.extend(
-                        [f"See [{sections[target]['title']}]({href}) for the full explanation.", ""]
-                    )
+                section_links.update(context["brief"]["canonical_links"].values())
                 if job["brief_id"] not in rendered_briefs:
                     for diagram in diagrams.get(job["brief_id"], []):
                         lines.extend(
                             [
                                 diagram["markdown"],
                                 "",
-                                "Diagram source: " + citations(diagram["evidence"], page["path"]),
+                                "Diagram source: "
+                                + citations(diagram["evidence"], page["path"], labels),
                                 "",
                             ]
                         )
@@ -178,6 +226,16 @@ def assemble(pipeline, state):
                         for unknown in diagram["spec"]["unknown_transitions"]:
                             lines.extend([f"**Unknown transition:** {unknown}", ""])
                     rendered_briefs.add(job["brief_id"])
+            if section_links:
+                links = []
+                for target in sorted(section_links, key=lambda item: sections[item]["title"]):
+                    canonical_page = page_by_section[target]
+                    href = relative_link(Path(page["path"]), Path(canonical_page["path"]))
+                    titles = [sections[s]["title"] for s in canonical_page["section_ids"]]
+                    if titles.count(sections[target]["title"]) == 1:
+                        href += "#" + quote(heading_slug(sections[target]["title"]))
+                    links.append(f"[{sections[target]['title']}]({href})")
+                lines.extend(["Related: " + ", ".join(links) + ".", ""])
         output[page["path"]] = "\n".join(lines).strip() + "\n"
     blocks = {
         b["id"]: b for b in pipeline.store.iter_table(pipeline.planning_inputs(state).blocks_ref)
@@ -185,17 +243,16 @@ def assemble(pipeline, state):
     assets = pipeline.read(state, "assets_ref", [])
     sources = {a["path"]: a for a in assets if a["kind"] == "source"}
     source_lines = []
-    for key, entry in sorted(evidence.items()):
+    for key, entry in sorted(evidence.items(), key=lambda item: int(labels[item[0]][1:])):
         block = blocks[entry["block_id"]]
         target = relative_link(
             pipeline.output_root(state) / "sources/index.md", Path(sources[block["path"]]["target"])
         )
         source_lines.extend(
             [
-                f"## Source {key}",
+                f"## {labels[key]}",
                 "",
-                f"[{block['path']}]({target}) — lines {block['line_start']}–{block['line_end']}. "
-                f"Block: `{block['id']}`.",
+                f"[{block['path']}]({target}) — lines {block['line_start']}–{block['line_end']}.",
                 "",
                 "Source quotation:",
                 "",
@@ -206,14 +263,6 @@ def assemble(pipeline, state):
             for line in entry["excerpt"].splitlines()
         )
         source_lines.append("")
-    source_lines.extend(
-        ["## Source accounting", "", "| Obligation | Disposition | Reason |", "| --- | --- | --- |"]
-    )
-    for allocation in pipeline.rows(state, "content-allocations"):
-        source_lines.append(
-            f"| `{allocation['obligation_id']}` | {allocation['disposition']} | "
-            f"{table_text(allocation['reason'])} |"
-        )
     output["sources/index.md"] = (
         output.get("sources/index.md", "# Sources\n\n") + "\n" + "\n".join(source_lines) + "\n"
     )
@@ -262,7 +311,7 @@ def publish_directory(destination, files):
         if not target.is_relative_to(temporary):
             raise ValueError("Export path escapes output directory")
         atomic_write(target, text)
-    os.replace(temporary, destination)
+    move_directory(temporary, destination)
 
 
 def publish(pipeline, state, status):
@@ -293,13 +342,40 @@ def publish(pipeline, state, status):
             "unpolished_pages_ref",
             "page_reviews_ref",
             "validation_ref",
+            "claim_audit_ref",
             "presentation_ref",
             "decisions_ref",
+            "source_labels_ref",
         )
     }
+    labels = records["source_labels_ref"]
+    source_blocks = {
+        block["id"]: block
+        for block in pipeline.store.iter_table(pipeline.planning_inputs(state).blocks_ref)
+    }
+    source_map = {}
+    for obligation in pipeline.rows(state, "content-obligations"):
+        for evidence in obligation["evidence"]:
+            key = evidence_id(evidence)
+            if key not in labels:
+                continue
+            block = source_blocks[evidence["block_id"]]
+            entry = source_map.setdefault(
+                labels[key],
+                {
+                    "evidence_id": key,
+                    "evidence": evidence,
+                    "path": block["path"],
+                    "line_start": block["line_start"],
+                    "line_end": block["line_end"],
+                    "obligation_ids": [],
+                },
+            )
+            if obligation["id"] not in entry["obligation_ids"]:
+                entry["obligation_ids"].append(obligation["id"])
     hashes = {name: digest(text.encode("utf-8")) for name, text in pages.items()}
     manifest = {
-        "schema_version": "1",
+        "schema_version": "2",
         "workflow": "documentation_generation",
         "revision": revision,
         "status": status,
@@ -309,6 +385,7 @@ def publish(pipeline, state, status):
         "files": hashes,
         "components": {key: state.get(key) for key in records},
         "language_policy": "plain-technical-english-v1",
+        "citation_scheme": "compact-source-labels-v2",
         "formal_ste_compliance": "not_claimed",
         "human_review": pipeline.read(state, "release_approval_ref", {"status": "not_performed"}),
         "source_location_dependency": True,
@@ -322,6 +399,10 @@ def publish(pipeline, state, status):
     files = {
         key.removesuffix("_ref") + ".json": encode(value) + "\n" for key, value in records.items()
     }
+    files["source-accounting.json"] = (
+        encode(list(pipeline.rows(state, "content-allocations"))) + "\n"
+    )
+    files["source-map.json"] = encode(source_map) + "\n"
     files["release-report.md"] = (
         f"# Generation release report\n\nStatus: {status}.\n\n"
         "Language: professional plain English, using the user-authorized simplified policy. "

@@ -36,6 +36,113 @@ def status_payload(snapshot):
     }
 
 
+def selected_decisions(args, snapshot, workflow):
+    choices = args.select_authority or []
+    distinct = args.keep_distinct or []
+    unknowns = args.retain_unknown or []
+    excluded = args.exclude or []
+    explanations = args.explain_asset or []
+    approve = args.approve_release
+    if not any((choices, distinct, unknowns, excluded, explanations, approve)):
+        return None
+    if not snapshot.interrupts:
+        raise ValueError("There is no pending review interrupt")
+    if not args.reviewer:
+        raise ValueError("--reviewer is required for a selected decision")
+    issues = {issue["id"]: issue for issue in snapshot.interrupts[0].value["issues"]}
+    decisions = []
+    for value in choices:
+        issue_id, separator, claims = value.partition("=")
+        if not separator or issue_id not in issues or not claims:
+            raise ValueError("Use --select-authority ISSUE=CLAIM[,CLAIM]")
+        decisions.append(
+            {
+                "issue_id": issue_id,
+                "revision": issues[issue_id]["revision"],
+                "action": "select_authority",
+                "claim_ids": claims.split(","),
+                "reviewer": args.reviewer,
+                "rationale": args.rationale or "Selected source authority after review",
+            }
+        )
+    for issue_id in distinct:
+        if issue_id not in issues:
+            raise ValueError("Unknown review issue: " + issue_id)
+        decisions.append(
+            {
+                "issue_id": issue_id,
+                "revision": issues[issue_id]["revision"],
+                "action": "keep_distinct",
+                "reviewer": args.reviewer,
+                "rationale": args.rationale or "Reviewed distinct entity meanings",
+            }
+        )
+    for issue_id in unknowns:
+        if issue_id not in issues:
+            raise ValueError("Unknown review issue: " + issue_id)
+        if workflow == "documentation_planning":
+            raise ValueError("Planning unknowns require an evidence-backed correction reference")
+        decisions.append(
+            {
+                "issue_id": issue_id,
+                "revision": issues[issue_id]["revision"],
+                "action": "acknowledge_unknown",
+                "reviewer": args.reviewer,
+                "rationale": args.rationale or "Reviewed the documented information gap",
+            }
+        )
+    for issue_id in excluded:
+        if issue_id not in issues:
+            raise ValueError("Unknown review issue: " + issue_id)
+        decisions.append(
+            {
+                "issue_id": issue_id,
+                "revision": issues[issue_id]["revision"],
+                "action": "exclude",
+                "reviewer": args.reviewer,
+                "rationale": args.rationale or "Reviewed exclusion from this source revision",
+            }
+        )
+    for value in explanations:
+        issue_id, separator, explanation = value.partition("=")
+        if not separator or issue_id not in issues or not explanation:
+            raise ValueError("Use --explain-asset ISSUE=EXPLANATION")
+        decisions.append(
+            {
+                "issue_id": issue_id,
+                "revision": issues[issue_id]["revision"],
+                "action": "explain_asset",
+                "reviewer": args.reviewer,
+                "rationale": args.rationale or "Reviewed source asset",
+                "explanation": explanation,
+            }
+        )
+    if approve:
+        if workflow != "documentation_generation" or any(
+            issue["kind"] != "release" for issue in issues.values()
+        ):
+            raise ValueError("Release approval is available only at the final generation review")
+        decisions.extend(
+            {
+                "issue_id": issue_id,
+                "revision": issues[issue_id]["revision"],
+                "action": "approve_release",
+                "reviewer": args.reviewer,
+                "rationale": args.rationale or "Reviewed the release candidate",
+                "reviewed_scope": [
+                    "content_accuracy",
+                    "reader_usefulness",
+                    "language",
+                    "markdown",
+                ],
+            }
+            for issue_id in issues
+        )
+    if len({decision["issue_id"] for decision in decisions}) != len(decisions):
+        raise ValueError("Only one selected decision per issue is allowed")
+    return {"decisions": decisions}
+
+
 def execute(args, settings: Settings):
     store = Artifacts(settings.workspace)
     if args.command == "workload":
@@ -140,6 +247,11 @@ def execute(args, settings: Settings):
         else:
             if not current.values:
                 raise ValueError("Thread does not exist")
+            choice_payload = (
+                selected_decisions(args, current, workflow) if args.command == "resume" else None
+            )
+            if choice_payload and args.decisions:
+                raise ValueError("Use selected decisions or --decisions, not both")
             if (
                 args.decisions
                 and any(task.error for task in current.tasks)
@@ -153,11 +265,13 @@ def execute(args, settings: Settings):
                 graph.invoke(None, config, durability="sync")
                 current = graph.get_state(config)
             if current.interrupts:
-                if not args.decisions:
+                if not args.decisions and not choice_payload:
                     return status_payload(current)
-                payload = Command(resume=read_json(Path(args.decisions)))
+                payload = Command(
+                    resume=choice_payload if choice_payload else read_json(Path(args.decisions))
+                )
             else:
-                if args.decisions:
+                if args.decisions or choice_payload:
                     raise ValueError("There is no pending review interrupt")
                 payload = None
         try:
@@ -183,6 +297,14 @@ def parser():
     resume = commands.add_parser("resume", help="Resume a checkpoint or submit review decisions")
     resume.add_argument("--thread-id", required=True)
     resume.add_argument("--decisions")
+    resume.add_argument("--select-authority", action="append", metavar="ISSUE=CLAIM[,CLAIM]")
+    resume.add_argument("--keep-distinct", action="append", metavar="ISSUE")
+    resume.add_argument("--retain-unknown", action="append", metavar="ISSUE")
+    resume.add_argument("--exclude", action="append", metavar="ISSUE")
+    resume.add_argument("--explain-asset", action="append", metavar="ISSUE=EXPLANATION")
+    resume.add_argument("--approve-release", action="store_true")
+    resume.add_argument("--reviewer")
+    resume.add_argument("--rationale")
     resume.add_argument(
         "--stop-after",
         choices=[
@@ -209,7 +331,7 @@ def parser():
     generation.add_argument("--plan", required=True)
     generation.add_argument("--thread-id", required=True)
     generation.add_argument("--brief")
-    generation.add_argument("--cache-mode", choices=["off", "validated"], default="off")
+    generation.add_argument("--cache-mode", choices=["off", "validated"], default="validated")
     generation.add_argument("--stop-after", choices=GENERATION_STAGES)
     for name in ("status", "history"):
         command = commands.add_parser(name)

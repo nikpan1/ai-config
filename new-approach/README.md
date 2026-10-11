@@ -1,17 +1,37 @@
-# New approach
+# Documentation graph pipeline
 
-This directory is reserved for an independent implementation of the [development plan](../.ai/new-approach/development-plan.md).
+This package implements an independent pipeline for source-backed Markdown documentation. Shared input files live in the repository-root `data/` directory. Checkpoints, snapshots, graph indexes, reviews, and exports live under `new-approach/.docgen/`.
 
-The intended pipeline is:
+## Setup
 
-1. Snapshot legacy documentation and source code.
-2. Produce concise, source-backed code analysis with a separate detail and coverage inventory.
-3. Index that analysis and the legacy documentation in a persistent knowledge graph linked to original evidence.
-4. Prepare a documentation page plan from the user's template and request explicit approval.
-5. Retrieve graph context and original evidence to write and verify the approved documentation.
+```powershell
+uv sync --project new-approach --group dev
+Copy-Item new-approach/.env.example new-approach/.env
+```
 
-Status: planning only. There is no runnable package, CLI, dependency lockfile, or generated documentation here yet. The plan defines the implementation milestones and acceptance criteria.
+Set `GEMINI_API_KEY` in `new-approach/.env`. Live calls require the shared budget ledger and a current pricing file. The configured model must be `gemini-3.8-flash`.
 
-Use the repository-root [data directory](../data/) for source inputs and templates shared with the old approach. Keep generated reports, indexes, checkpoints, and other runtime artifacts in this approach's own workspace; do not write them into shared input data.
+## Run
 
-Implement the new package, tests, approach-specific fixtures, configuration, and runtime state here without importing modules, prompts, schemas, or checkpoints from `../old-approach`. Shared input fixtures may live in `../data/`. The repository-wide instructions still apply. Development spending must use the same cumulative budget ledger as the old approach, through an independently implemented accounting adapter; runtime independence does not create a new budget.
+```powershell
+uv run --project new-approach docgen-graph run --docs data/legacy-insurance --code path/to/source --template data/template.md --thread-id insurance-v1
+uv run --project new-approach docgen-graph status --thread-id insurance-v1
+```
+
+The first run stops at `review_plan`. Read `new-approach/.docgen/runs/insurance-v1/documentation-plan.md`, then supply a decision file:
+
+```json
+{"action":"approve_plan","plan_hash":"exact hash from status","reviewer":"name","rationale":"Reviewed allocations and source previews"}
+```
+
+```powershell
+uv run --project new-approach docgen-graph resume --thread-id insurance-v1 --decisions plan-decision.json
+```
+
+The candidate stops at `review_release`. Its decision uses `approve_release`, `request_changes`, or `reject_release` and the exact `candidate_hash`. Plan decisions also support `request_changes` and `reject_plan`. Blocking issues accept `retry` or `reject` with their exact issue revision. Every decision requires reviewer and rationale. `resume` without a decision resumes only technical interruptions.
+
+When plan review reports cross-source candidates or discrepancies, an approval also needs `conflict_decisions` and `discrepancy_decisions` maps keyed by the IDs in `status`. Values are `present_both`, `code_applies`, `docs_apply`, or `not_conflict`. The chosen applicability remains reviewer input and does not replace the original evidence.
+
+Other commands are `history`, `inspect-evidence --citation C1`, and `budget`.
+
+The code adapter uses Python AST for `.py` files and reports structural limitations for other selected text formats. Source text and template examples are treated as data. Source coverage, assertions, citations, graph paths, and final mappings are inspectable in the run artifacts. Automated checks never bypass either human review.

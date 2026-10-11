@@ -20,45 +20,58 @@ def make_issues(stage: str, revision: str, findings: list[dict]) -> list[dict]:
 
 
 def report(issues: list[dict], blocks: dict[str, Block], revision: str) -> str:
+    grouped = {}
+    for value in issues:
+        grouped.setdefault(value["kind"], []).append(value)
     lines = [
         "# Knowledge review",
         "",
         f"Artifact revision: `{revision}`",
         "",
-        "Open issues block finalization. Decisions must name this revision and a reviewer.",
+        "Open issues block finalization. Each decision needs its issue revision and a reviewer.",
         "",
     ]
-    for value in issues:
-        issue = Issue.model_validate(value)
-        lines.extend(
-            [
-                f"## {issue.id}",
-                "",
-                f"Stage: {issue.stage}; type: {issue.kind}",
-                "",
-                issue.description,
-                "",
-                f"Records: {', '.join(issue.record_ids) or 'None'}",
-                "",
-            ]
-        )
-        if issue.source_path:
-            lines.extend([f"Source asset: {issue.source_path}", ""])
-        for key in issue.block_ids:
-            block = blocks.get(key)
-            if block:
+    for kind, values in sorted(grouped.items()):
+        lines.extend([f"## {kind.replace('_', ' ').title()} ({len(values)})", ""])
+        for value in values:
+            issue = Issue.model_validate(value)
+            lines.extend(
+                [
+                    f"### {issue.id}",
+                    "",
+                    f"Stage: {issue.stage}; type: {issue.kind}; revision: `{issue.revision}`",
+                    "",
+                    issue.description,
+                    "",
+                    f"Records: {', '.join(issue.record_ids) or 'None'}",
+                    "",
+                ]
+            )
+            if issue.kind == "conflict":
+                lines.extend(["Decision: select supported claim IDs as source authority.", ""])
+            elif issue.kind == "ambiguous_entity":
                 lines.extend(
-                    [
-                        f"### {block.path}:{block.line_start}-{block.line_end}",
-                        "",
-                        f"Snapshot: `{block.snapshot}`; block: `{block.id}`",
-                        "",
-                        "````markdown",
-                        block.content.rstrip(),
-                        "````",
-                        "",
-                    ]
+                    ["Decision: keep the entities distinct or submit a reviewed merge.", ""]
                 )
+            elif issue.kind in {"source_issue", "missing_context", "missing_link"}:
+                lines.extend(["Decision: retain a documented unknown or correct the evidence.", ""])
+            if issue.source_path:
+                lines.extend([f"Source asset: {issue.source_path}", ""])
+            for key in issue.block_ids:
+                block = blocks.get(key)
+                if block:
+                    lines.extend(
+                        [
+                            f"#### {block.path}:{block.line_start}-{block.line_end}",
+                            "",
+                            f"Snapshot: `{block.snapshot}`; block: `{block.id}`",
+                            "",
+                            "````markdown",
+                            block.content.rstrip(),
+                            "````",
+                            "",
+                        ]
+                    )
     return "\n".join(lines)
 
 
@@ -68,7 +81,10 @@ def validate_decisions(values: list[dict], issues: list[dict], revision: str) ->
     if len({decision.issue_id for decision in decisions}) != len(decisions):
         raise ValueError("Only one decision per issue is allowed")
     for decision in decisions:
-        if decision.revision != revision or decision.issue_id not in open_issues:
+        if (
+            decision.issue_id not in open_issues
+            or decision.revision != open_issues[decision.issue_id]["revision"]
+        ):
             raise ValueError("Decision does not match the current artifact revision and issue")
         issue = open_issues[decision.issue_id]
         if issue.get("stage") == "finalize_knowledge" and decision.action != "defer":

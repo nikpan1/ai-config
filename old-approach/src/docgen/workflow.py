@@ -16,6 +16,7 @@ from docgen.model import ModelFailure, RequestTooLarge, TruncatedOutput
 from docgen.reconciliation import (
     comparison_at,
     comparison_count,
+    comparison_record,
     comparison_tasks,
     entity_register,
     iter_comparisons,
@@ -54,6 +55,7 @@ class PipelineState(TypedDict, total=False):
     decisions_ref: str
     review_revision: str
     review_stage: str
+    review_return_stage: str
     review_report: str
     bundle_ref: str
     status: str
@@ -77,7 +79,7 @@ class Pipeline:
     def current_batch(self, state) -> Batch:
         return Batch.model_validate(self.read(state, "batches_ref")[state["batch_index"]])
 
-    def gate(self, state, stage, revision, findings):
+    def gate(self, state, stage, revision, findings, return_stage=None):
         issues = make_issues(stage, revision, findings)
         issues = list({issue["id"]: issue for issue in issues}.values())
         decisions = self.read(state, "decisions_ref", [])
@@ -100,6 +102,7 @@ class Pipeline:
             "issues_ref": ref,
             "issue_history_ref": self.store.put(history, "issue-history"),
             "review_stage": stage,
+            "review_return_stage": return_stage or stage,
             "review_revision": revision,
             "review_report": report_path,
             "status": "review",
@@ -116,7 +119,11 @@ class Pipeline:
             )
         ref = state.get("snapshot_ref") or self.store.put(snapshot, "snapshot")
         update = {"snapshot_ref": ref}
-        gate = self.gate({**state, **update}, "snapshot_sources", ref, snapshot["problems"])
+        gate = (
+            self.gate({**state, **update}, "snapshot_sources", ref, snapshot["problems"])
+            if self.settings.review_policy == "strict"
+            else None
+        )
         return {**update, **(gate or {"route": "plan_batches", "status": "running"})}
 
     def plan_batches(self, state):
@@ -303,6 +310,7 @@ class Pipeline:
                 names,
                 self.settings.workload_tasks,
                 store=self.store,
+                policy=self.settings.comparison_policy,
             )
             return {
                 plan_key: self.store.put(plan, f"{prefix}-plan"),
@@ -342,13 +350,27 @@ class Pipeline:
         payload = {
             "group": task["group"],
             "revision": digest(lookup),
-            "left": [lookup[key] for key in task["left"]],
-            "right": [lookup[key] for key in task["right"]],
+            "left": [
+                comparison_record(lookup[key])
+                if plan.get("comparison_policy_version") == "2"
+                else lookup[key]
+                for key in task["left"]
+            ],
+            "right": [
+                comparison_record(lookup[key])
+                if plan.get("comparison_policy_version") == "2"
+                else lookup[key]
+                for key in task["right"]
+            ],
             "source_blocks": self.store.table_rows(
                 state["blocks_ref"],
                 sorted({e["block_id"] for row in lookup.values() for e in row["evidence"]}),
             ),
         }
+        if "required_pairs" in task:
+            payload["required_pairs"] = task["required_pairs"]
+            payload["shared_contexts"] = task["shared_contexts"]
+            payload["pair_contexts"] = task["pair_contexts"]
         if state.get("attempt", 0):
             payload.update(
                 repair_attempt=state["attempt"], feedback=self.read(state, "feedback_ref", [])
@@ -401,18 +423,46 @@ class Pipeline:
                     }
                 ],
             )
-        findings = [item.model_dump() for item in result.findings]
+        members = plan.get("representative_members", {})
+
+        def original_ids(ids):
+            return sorted({member for key in ids for member in members.get(key, [key])})
+
+        findings = [
+            {**item.model_dump(), "record_ids": original_ids(item.record_ids)}
+            for item in result.findings
+        ]
         invalid = []
         if set(result.checked_ids) != expected or len(result.checked_ids) != len(expected):
             invalid.append(
                 {"kind": "unsupported", "description": "Comparison did not inspect all records"}
             )
+        required_pairs = {tuple(sorted(pair)) for pair in task.get("required_pairs", [])}
+        if "required_pairs" in task:
+            checked_pairs = [tuple(sorted(pair)) for pair in result.checked_pairs]
+            if len(checked_pairs) != len(required_pairs) or set(checked_pairs) != required_pairs:
+                invalid.append(
+                    {
+                        "kind": "unsupported",
+                        "description": "Comparison did not inspect every required pair",
+                    }
+                )
         for relation in result.relations:
             if {relation.left, relation.right} - expected or relation.left == relation.right:
                 invalid.append(
                     {
                         "kind": "unsupported",
                         "description": "Comparison has invalid record references",
+                    }
+                )
+            elif (
+                required_pairs
+                and tuple(sorted((relation.left, relation.right))) not in required_pairs
+            ):
+                invalid.append(
+                    {
+                        "kind": "unsupported",
+                        "description": "Relation is outside required pair coverage",
                     }
                 )
             elif relation.kind in {"conflict", "same_entity", "missing_dependency"}:
@@ -425,7 +475,7 @@ class Pipeline:
                     {
                         "kind": finding_kind,
                         "description": relation.explanation,
-                        "record_ids": [relation.left, relation.right],
+                        "record_ids": original_ids([relation.left, relation.right]),
                         "block_ids": sorted({item["block_id"] for item in evidence}),
                     }
                 )
@@ -453,9 +503,22 @@ class Pipeline:
             }
         findings.extend(invalid)
         ref = self.store.put(result, f"{prefix}-comparison")
-        gate = self.gate(state, stage, ref, findings)
-        if gate:
-            return gate
+        deferred = {}
+        if (
+            self.settings.review_policy == "consolidated"
+            and findings
+            and all(
+                item["kind"] in {"conflict", "ambiguous_entity", "missing_context"}
+                for item in findings
+            )
+        ):
+            history = self.read(state, "issue_history_ref", {})
+            history.update({issue["id"]: issue for issue in make_issues(stage, ref, findings)})
+            deferred["issue_history_ref"] = self.store.put(history, "issue-history")
+        else:
+            gate = self.gate(state, stage, ref, findings)
+            if gate:
+                return gate
         previous = state.get(results_key)
         if previous and "previous" not in self.store.get(previous):
             previous = self.store.append_part(
@@ -467,6 +530,7 @@ class Pipeline:
                 f"{prefix}-comparisons",
             )
         return {
+            **deferred,
             results_key: self.store.append_part(
                 previous,
                 [{"task_id": task["id"], "response_ref": ref}],
@@ -533,7 +597,11 @@ class Pipeline:
         ref = persist_decisions(self.store, state.get("decisions_ref"), decisions)
         if any(decision.action == "merge_entities" for decision in decisions):
             entity_register(entities, self.store.get(ref))
-        return {"decisions_ref": ref, "route": state["review_stage"], "status": "running"}
+        return {
+            "decisions_ref": ref,
+            "route": state.get("review_return_stage", state["review_stage"]),
+            "status": "running",
+        }
 
     def finalize_knowledge(self, state):
         claims, entities, coverage = self.records(state)
@@ -581,6 +649,17 @@ class Pipeline:
             return gate
         decisions = self.read(state, "decisions_ref", [])
         history = self.read(state, "issue_history_ref", {})
+        if self.settings.review_policy == "consolidated":
+            history.update(
+                {
+                    issue["id"]: issue
+                    for issue in make_issues(
+                        "snapshot_sources",
+                        state["snapshot_ref"],
+                        self.read(state, "snapshot_ref")["problems"],
+                    )
+                }
+            )
         actions = {decision["issue_id"]: decision for decision in decisions}
         corrected = {
             decision["revision"] for decision in decisions if decision["action"] == "correct"
@@ -599,18 +678,42 @@ class Pipeline:
             else:
                 pending.append(issue)
         if pending:
+            if self.settings.review_policy == "consolidated" and all(
+                issue["stage"] in {"snapshot_sources", "reconcile_entities", "reconcile_claims"}
+                for issue in pending
+            ):
+                revision = digest(sorted((issue["id"], issue["revision"]) for issue in pending))
+                report_path = f"runs/{state['run_id']}/review-{revision[:16]}.md"
+                atomic_write(self.store.path(report_path), report(pending, blocks, revision))
+                return {
+                    "route": "review_issues",
+                    "issues_ref": self.store.put(pending, "issues"),
+                    "issue_history_ref": self.store.put(history, "issue-history"),
+                    "review_stage": "finalize_knowledge",
+                    "review_return_stage": "finalize_knowledge",
+                    "review_revision": revision,
+                    "review_report": report_path,
+                    "status": "review",
+                }
             raise ValueError("Issue history contains unresolved decisions; finalization rejected")
         for claim in claims:
             if claim["id"] in rejected:
                 claim["review_status"] = "ineligible"
         register, canonical_ids = entity_register(entities, decisions)
         relationships = {}
-        for comparisons in comparison_maps.values():
+        for prefix, comparisons in comparison_maps.items():
+            plan = self.read(state, f"{prefix}_plan_ref", {})
+            members = plan.get("representative_members", {})
             for comparison_ref in comparisons.values():
                 for relation in self.store.get(comparison_ref)["relations"]:
-                    relationships[digest(relation)] = {**relation, "revision": comparison_ref}
+                    relationships[digest(relation)] = {
+                        **relation,
+                        "revision": comparison_ref,
+                        "left_members": members.get(relation["left"], [relation["left"]]),
+                        "right_members": members.get(relation["right"], [relation["right"]]),
+                    }
         bundle = {
-            "schema_version": "1",
+            "schema_version": "2",
             "signature": state["signature"],
             "snapshot_ref": state["snapshot_ref"],
             "selection_ref": self.store.put(
@@ -629,6 +732,24 @@ class Pipeline:
             "resolved_issues": resolved_issues,
             "entity_comparisons": comparison_maps["entity"],
             "claim_comparisons": comparison_maps["claim"],
+            "comparison_coverage": {
+                prefix: {
+                    "plan_ref": state.get(f"{prefix}_plan_ref"),
+                    "policy_version": self.read(state, f"{prefix}_plan_ref", {}).get(
+                        "comparison_policy_version", "1"
+                    ),
+                    "representative_members": self.read(state, f"{prefix}_plan_ref", {}).get(
+                        "representative_members", {}
+                    ),
+                    "exact_pairs_discharged": self.read(state, f"{prefix}_plan_ref", {}).get(
+                        "exact_pairs_discharged", 0
+                    ),
+                    "required_relationships": self.read(state, f"{prefix}_plan_ref", {}).get(
+                        "required_relationships"
+                    ),
+                }
+                for prefix in ("entity", "claim")
+            },
             "reviewer_evidence": [
                 {"decision": decision, "issue": history[decision["issue_id"]]}
                 for decision in decisions
@@ -647,6 +768,7 @@ class Pipeline:
             ("coverage", coverage),
             ("decisions", decisions),
             ("blocks", [block.model_dump() for block in blocks.values()]),
+            ("comparison-coverage", [bundle["comparison_coverage"]]),
         ):
             write_jsonl(destination / f"{name}.jsonl", rows)
         write_json(

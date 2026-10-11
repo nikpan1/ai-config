@@ -57,9 +57,12 @@ def validate_knowledge(bundle, store):
         "unresolved_issues",
         "status",
     }
-    if set(bundle) - required - {"selection_ref"} or required - set(bundle):
+    optional = {"selection_ref"}
+    if bundle.get("schema_version") == "2":
+        required.add("comparison_coverage")
+    if set(bundle) - required - optional or required - set(bundle):
         raise ValueError("Unsupported knowledge bundle fields")
-    if bundle["schema_version"] != "1" or not bundle["signature"]:
+    if bundle["schema_version"] not in {"1", "2"} or not bundle["signature"]:
         raise ValueError("Unsupported knowledge schema or missing original signature")
     if bundle["unresolved_issues"]:
         raise ValueError("Unresolved knowledge issues block planning")
@@ -99,6 +102,41 @@ def validate_knowledge(bundle, store):
                 if block is None or evidence.excerpt not in block.content:
                     raise ValueError("Knowledge evidence does not resolve to an exact excerpt")
     entity_ids = {row["id"] for row in bundle["entities"]}
+    if bundle["schema_version"] == "2":
+        for prefix, kind in (("entity", "entities"), ("claim", "claims")):
+            coverage = bundle["comparison_coverage"][prefix]
+            if coverage["plan_ref"]:
+                plan = store.get_object(coverage["plan_ref"])
+                if (
+                    plan["comparison_policy_version"] != coverage["policy_version"]
+                    or plan["representative_members"] != coverage["representative_members"]
+                    or plan["exact_pairs_discharged"] != coverage["exact_pairs_discharged"]
+                    or plan["required_relationships"] != coverage["required_relationships"]
+                ):
+                    raise ValueError("Comparison coverage differs from its immutable plan")
+            members = coverage["representative_members"]
+            records = {row["id"]: row for row in bundle[kind]}
+            mapped = [identifier for group in members.values() for identifier in group]
+            if coverage["policy_version"] == "1":
+                if members or coverage["exact_pairs_discharged"]:
+                    raise ValueError("Strict comparison policy cannot discharge exact pairs")
+                continue
+            if (
+                coverage["policy_version"] != "2"
+                or set(mapped) != set(records)
+                or len(mapped) != len(set(mapped))
+            ):
+                raise ValueError("Comparison representatives do not cover every original record")
+            for representative, group in members.items():
+                if representative not in group or any(
+                    {key: value for key, value in records[member].items() if key != "id"}
+                    != {key: value for key, value in records[representative].items() if key != "id"}
+                    for member in group
+                ):
+                    raise ValueError("Comparison representative loses a source qualification")
+            expected = sum(len(group) * (len(group) - 1) // 2 for group in members.values())
+            if coverage["exact_pairs_discharged"] != expected:
+                raise ValueError("Exact comparison coverage count is inconsistent")
     if any(set(row["entities"]) - entity_ids for row in bundle["claims"]):
         raise ValueError("Claim references missing entities")
     decisions = [Decision.model_validate(row).model_dump() for row in bundle["decisions"]]
@@ -106,9 +144,18 @@ def validate_knowledge(bundle, store):
     if register != bundle["entity_register"] or mapping != bundle["canonical_entity_ids"]:
         raise ValueError("Entity register disagrees with effective review decisions")
     for row in bundle["relationships"]:
-        relation = Relation.model_validate({k: v for k, v in row.items() if k != "revision"})
+        relation = Relation.model_validate(
+            {k: v for k, v in row.items() if k not in {"revision", "left_members", "right_members"}}
+        )
         if {relation.left, relation.right} - ids:
             raise ValueError("Relationship references missing records")
+        if bundle["schema_version"] == "2":
+            prefix = "entity" if relation.left in entity_ids else "claim"
+            members = bundle["comparison_coverage"][prefix]["representative_members"]
+            if row["left_members"] != members.get(relation.left, [relation.left]) or row[
+                "right_members"
+            ] != members.get(relation.right, [relation.right]):
+                raise ValueError("Relationship coverage differs from its representatives")
     coverage = [Coverage.model_validate(row).model_dump() for row in bundle["coverage"]]
     if (
         len(coverage) != len(blocks)

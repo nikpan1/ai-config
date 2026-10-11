@@ -80,6 +80,12 @@ def validate_fragment(fragment, job, context, contract):
     require_exact(value["covered_obligation_ids"], job["obligation_ids"], "Fragment coverage")
     obligations = {o["id"]: o for o in context["originals"]["obligations"]}
     blocks = {b["id"]: b for b in context["originals"]["source_blocks"]}
+    internal = {
+        context.get("knowledge_revision"),
+        *context.get("inherited_references", {}).values(),
+        *(Path(ref).name for ref in context.get("inherited_references", {}).values()),
+        *blocks,
+    }
     allowed, used = set(job["obligation_ids"]), set()
     for passage_index, passage in enumerate(value["passages"]):
         validate_annotation(
@@ -99,6 +105,8 @@ def validate_fragment(fragment, job, context, contract):
                 raise ValueError("Source quotation was modified or not authorized")
         else:
             check_inline(passage["text"])
+            if any(identifier and identifier in passage["text"] for identifier in internal):
+                raise ValueError("Reader passage exposes an internal artifact identifier")
         used.update(passage["obligation_ids"])
     specs = {s["index"]: s for s in table_specs(context, job)}
     require_exact([t["index"] for t in value["tables"]], specs, "Planned tables")
@@ -122,6 +130,8 @@ def validate_fragment(fragment, job, context, contract):
                 if set(cell["obligation_ids"]) - set(original["obligation_ids"]):
                     raise ValueError("Table cell evidence belongs to another row")
                 check_inline(cell["text"])
+                if any(identifier and identifier in cell["text"] for identifier in internal):
+                    raise ValueError("Reader table cell exposes an internal artifact identifier")
                 used.update(cell["obligation_ids"])
     require_exact(sorted(used), job["obligation_ids"], "Evidence-backed treatment")
     return value

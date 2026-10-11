@@ -14,7 +14,13 @@ PROMPTS = {
         "plan_brief",
         "plan_audit",
     ),
-    "documentation_generation": ("gen_write", "gen_verify", "gen_polish", "gen_page_review"),
+    "documentation_generation": (
+        "gen_write",
+        "gen_verify",
+        "gen_polish",
+        "gen_page_review",
+        "gen_claim_audit",
+    ),
 }
 
 SHARED = (
@@ -53,6 +59,7 @@ MODULES["documentation_generation"] = MODULES["documentation_planning"] + (
     "generation_validation.py",
     "generation_export.py",
     "generation_editorial.py",
+    "generation_claim_audit.py",
 )
 
 

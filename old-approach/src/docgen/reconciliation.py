@@ -1,6 +1,6 @@
 import re
 from collections import defaultdict
-from itertools import combinations_with_replacement
+from itertools import combinations, combinations_with_replacement
 
 from docgen.ingestion import estimate_tokens
 from docgen.storage import digest, encode
@@ -8,6 +8,19 @@ from docgen.storage import digest, encode
 
 def normalize(text: str) -> str:
     return re.sub(r"\W+", " ", text.casefold()).strip()
+
+
+def comparison_record(record):
+    statement = record.get("statement", record.get("definition"))
+    return {
+        **record,
+        "evidence": [
+            {"block_id": item["block_id"], "excerpt_from_statement": True}
+            if item["excerpt"] == statement
+            else item
+            for item in record["evidence"]
+        ],
+    }
 
 
 def entity_register(entities: list[dict], decisions: list[dict]):
@@ -67,7 +80,20 @@ def comparison_tasks(
     entity_names: dict[str, str] | None = None,
     task_limit: int | None = None,
     store=None,
+    policy: str = "strict",
 ) -> dict:
+    if policy not in {"strict", "exact"}:
+        raise ValueError("Unknown comparison policy")
+    representatives = {}
+    if policy == "exact":
+        equivalent = defaultdict(list)
+        for record in records:
+            equivalent[digest({key: value for key, value in record.items() if key != "id"})].append(
+                record["id"]
+            )
+        representatives = {sorted(members)[0]: sorted(members) for members in equivalent.values()}
+        selected = set(representatives)
+        records = [record for record in records if record["id"] in selected]
     groups = defaultdict(set)
     lookup = {record["id"]: record for record in records}
     entity_names = entity_names or {}
@@ -96,7 +122,21 @@ def comparison_tasks(
         key=lambda group: group["records"],
         reverse=True,
     )[:20]
-    tasks = iter_comparison_tasks(lookup, groups, token_budget, task_limit, omissions)
+    group_keys = defaultdict(set)
+    for key, ids in groups.items():
+        for identifier in ids:
+            group_keys[identifier].add(key)
+    relationship_count = 0
+
+    def counted_tasks():
+        nonlocal relationship_count
+        for task in iter_comparison_tasks(
+            lookup, groups, token_budget, task_limit, omissions, policy, group_keys
+        ):
+            relationship_count += len(task.get("required_pairs", []))
+            yield task
+
+    tasks = counted_tasks()
     if store is None:
         task_fields = {"tasks": list(tasks)}
     else:
@@ -111,19 +151,31 @@ def comparison_tasks(
         "group_count": len(groups),
         "largest_groups": largest_groups,
         "candidate_policy_version": "1",
+        "comparison_policy_version": "2" if policy == "exact" else "1",
+        "representative_members": representatives,
+        "exact_pairs_discharged": sum(
+            len(members) * (len(members) - 1) // 2 for members in representatives.values()
+        ),
+        "required_relationships": relationship_count if policy == "exact" else None,
         "candidate_policy": "Names, explicit aliases, shared name words, entity, rule and scope; "
         "unrelated groups are not compared. Original records remain intact.",
     }
 
 
-def iter_comparison_tasks(lookup, groups, token_budget, task_limit, omissions):
+def iter_comparison_tasks(
+    lookup, groups, token_budget, task_limit, omissions, policy="strict", group_keys=None
+):
     seen = set()
+    produced = 0
     for key, ids in sorted(groups.items()):
         if len(ids) < 2:
             continue
         chunks, chunk, size = [], [], 0
         for identifier in sorted(ids):
-            cost = estimate_tokens(encode(lookup[identifier]))
+            record = (
+                comparison_record(lookup[identifier]) if policy == "exact" else lookup[identifier]
+            )
+            cost = estimate_tokens(encode(record))
             if cost > token_budget // 2:
                 omissions.append(
                     {
@@ -146,16 +198,70 @@ def iter_comparison_tasks(lookup, groups, token_budget, task_limit, omissions):
             if len(left) + len(right) < 2:
                 continue
             signature = digest([left, right])
-            if signature in seen:
+            if policy == "strict":
+                if signature in seen:
+                    continue
+                admit_comparison(produced, task_limit)
+                seen.add(signature)
+                produced += 1
+                yield {"id": signature[:20], "group": key, "left": left, "right": right}
                 continue
-            if task_limit is not None and len(seen) >= task_limit:
-                from docgen.model import ModelFailure
-
-                raise ModelFailure(
-                    "Reconciliation workload allowance exceeded; no candidate tail was discarded"
+            candidates = ((a, b) for a in left for b in right) if right else combinations(left, 2)
+            required = [[a, b] for a, b in candidates if key == min(group_keys[a] & group_keys[b])]
+            if not required:
+                continue
+            pair_limit = max(1, token_budget // 4)
+            pair_batch, pair_tokens = [], 0
+            for pair in required:
+                cost = estimate_tokens(encode(pair))
+                if pair_batch and pair_tokens + cost > pair_limit:
+                    admit_comparison(produced, task_limit)
+                    produced += 1
+                    yield relationship_task(
+                        key,
+                        left,
+                        right,
+                        pair_batch,
+                        [sorted(group_keys[a] & group_keys[b]) for a, b in pair_batch],
+                    )
+                    pair_batch, pair_tokens = [], 0
+                pair_batch.append(pair)
+                pair_tokens += cost
+            if pair_batch:
+                admit_comparison(produced, task_limit)
+                produced += 1
+                yield relationship_task(
+                    key,
+                    left,
+                    right,
+                    pair_batch,
+                    [sorted(group_keys[a] & group_keys[b]) for a, b in pair_batch],
                 )
-            seen.add(signature)
-            yield {"id": signature[:20], "group": key, "left": left, "right": right}
+
+
+def admit_comparison(produced, task_limit):
+    if task_limit is not None and produced >= task_limit:
+        from docgen.model import ModelFailure
+
+        raise ModelFailure(
+            "Reconciliation workload allowance exceeded; no candidate tail was discarded"
+        )
+
+
+def relationship_task(group, left, right, pairs, contexts):
+    used = {identifier for pair in pairs for identifier in pair}
+    selected_left = [identifier for identifier in left if identifier in used]
+    selected_right = [identifier for identifier in right if identifier in used]
+    shared_contexts = sorted(set.intersection(*(set(item) for item in contexts)))
+    return {
+        "id": digest([group, selected_left, selected_right, pairs])[:20],
+        "group": group,
+        "left": selected_left,
+        "right": selected_right,
+        "required_pairs": pairs,
+        "shared_contexts": shared_contexts,
+        "pair_contexts": [sorted(set(item) - set(shared_contexts)) for item in contexts],
+    }
 
 
 def comparison_count(plan):
@@ -209,14 +315,34 @@ def split_comparison(task: dict) -> list[dict]:
         middle = len(left) // 2
         first, second = left[:middle], left[middle:]
         partitions = [(first, []), (second, []), (first, second)]
-    return [
-        {
-            "id": digest([task["id"], first, second])[:20],
-            "group": task["group"],
-            "left": first,
-            "right": second,
-            "split_from": task["id"],
-        }
-        for first, second in partitions
-        if len(first) + len(second) >= 2
-    ]
+    children = []
+    for first, second in partitions:
+        if len(first) + len(second) < 2:
+            continue
+        if "required_pairs" in task:
+            available = {
+                tuple(sorted(pair))
+                for pair in (
+                    ((a, b) for a in first for b in second) if second else combinations(first, 2)
+                )
+            }
+            selected = [
+                (pair, sorted(set(task["shared_contexts"]) | set(context)))
+                for pair, context in zip(task["required_pairs"], task["pair_contexts"], strict=True)
+                if tuple(sorted(pair)) in available
+            ]
+            pairs = [pair for pair, _ in selected]
+            if not pairs:
+                continue
+            child = relationship_task(
+                task["group"], first, second, pairs, [context for _, context in selected]
+            )
+        else:
+            child = {
+                "id": digest([task["id"], first, second])[:20],
+                "group": task["group"],
+                "left": first,
+                "right": second,
+            }
+        children.append({**child, "split_from": task["id"]})
+    return children

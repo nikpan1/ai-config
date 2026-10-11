@@ -6,11 +6,16 @@ from docgen.generation_export import evidence_id
 from docgen.generation_validation import heading_slug, markdown_report
 from docgen.model import RequestTooLarge, TruncatedOutput
 from docgen.planning_helpers import evidence_context, require_exact
-from docgen.storage import digest
+from docgen.storage import digest, read_json, write_json
 
 
 def content_pages(pipeline, state):
     return [page for page in pipeline.rows(state, "pages") if page["role"] != "sources"]
+
+
+def editorial_cache_path(pipeline, state, payload):
+    key = digest([state["signature"], payload])
+    return pipeline.store.path(f"editorial-cache/{key}.json")
 
 
 def markdown_structure(markdown):
@@ -55,6 +60,16 @@ def markdown_structure(markdown):
     return headings, links, fences, blocks
 
 
+def visible_reader_text(markdown):
+    tokens = MarkdownIt("commonmark").enable("table").parse(markdown)
+    return "\n".join(
+        child.content
+        for token in tokens
+        for child in token.children or []
+        if child.type in {"text", "code_inline"}
+    )
+
+
 def editorial_payload(pipeline, state):
     page = content_pages(pipeline, state)[state.get("editorial_index", 0)]
     sections = [
@@ -95,6 +110,9 @@ def editorial_payload(pipeline, state):
         "markdown": markdown,
         "originals": evidence_context(pipeline.store, inputs, obligations),
         "source_catalog": {evidence_id(e): e for o in obligations for e in o["evidence"]},
+        "source_labels": pipeline.read(state, "source_labels_ref", {}),
+        "knowledge_revision": inputs.knowledge_revision,
+        "selection_ref": inputs.selection_ref,
         "template_markdown": bytes.fromhex(template["bytes_hex"]).decode("utf-8-sig"),
         "template_contract": {
             **contract,
@@ -136,6 +154,16 @@ def validate_editorial_page(result, payload):
         raise ValueError("Editorial revision loses or invents source/navigation destinations")
     if fences != original_fences:
         raise ValueError("Editorial revision changes a protected diagram or code example")
+    visible = visible_reader_text(result.markdown)
+    internal = {
+        payload["knowledge_revision"],
+        payload["selection_ref"],
+        payload["selection_ref"].rsplit("/", 1)[-1],
+        *payload["source_catalog"],
+        *(block["id"] for block in payload["originals"]["source_blocks"]),
+    }
+    if any(identifier in visible for identifier in internal if identifier):
+        raise ValueError("Editorial revision exposes an internal artifact identifier")
     obligations = {o["id"]: o for o in payload["originals"]["obligations"]}
     page_evidence = {evidence_id(e) for o in obligations.values() for e in o["evidence"]}
     require_exact([c.obligation_id for c in result.coverage], obligations, "Editorial coverage")
@@ -147,7 +175,12 @@ def validate_editorial_page(result, payload):
         if not any(
             coverage.excerpt in text
             and all(
-                any(href.endswith("#source-" + key) for href in targets)
+                any(
+                    href.endswith("#source-" + key)
+                    or bool(payload.get("source_labels", {}).get(key))
+                    and href.endswith("#" + payload["source_labels"][key].lower())
+                    for href in targets
+                )
                 for key in coverage.evidence_ids
             )
             for text, targets in blocks
@@ -172,6 +205,25 @@ def polish_documentation(pipeline, state):
     if state.get("editorial_index", 0) >= len(content_pages(pipeline, state)):
         return {"route": "validate_documentation"}
     payload = editorial_payload(pipeline, state)
+    cache = editorial_cache_path(pipeline, state, payload)
+    if (
+        state.get("cache_mode") == "validated"
+        and not state.get("editorial_attempt")
+        and not state.get("editorial_feedback_ref")
+        and cache.exists()
+    ):
+        cached = read_json(cache)
+        record = pipeline.store.get(cached["review_ref"])
+        result = EditorialPage.model_validate(pipeline.store.get(cached["editorial_ref"]))
+        if record["input_hash"] != digest(payload["markdown"]) or record["output_hash"] != digest(
+            result.markdown
+        ):
+            raise ValueError("Cached editorial review does not match the current page")
+        return {
+            "editorial_draft_ref": cached["editorial_ref"],
+            "editorial_cached_review_ref": cached["review_ref"],
+            "route": "verify_editorial_revision",
+        }
     payload["feedback"] = pipeline.read(state, "editorial_feedback_ref", [])
     if state.get("editorial_draft_ref"):
         payload["previous_revision"] = pipeline.read(state, "editorial_draft_ref")
@@ -187,6 +239,7 @@ def polish_documentation(pipeline, state):
         ) from None
     return {
         "editorial_draft_ref": pipeline.store.put(result, "editorial-page"),
+        "editorial_cached_review_ref": "",
         "route": "verify_editorial_revision",
     }
 
@@ -204,17 +257,21 @@ def verify_editorial_revision(pipeline, state):
             return repair_editorial(pipeline, state, report["findings"])
     except ValueError as error:
         return repair_editorial(pipeline, state, [str(error)])
-    review = pipeline.call(
-        "gen_page_review",
-        {
-            **payload,
-            "original_markdown": payload["markdown"],
-            "markdown": result.markdown,
-            "editorial_revision": result.model_dump(exclude={"markdown"}),
-        },
-        EditorialVerification,
-        output_limit=8000,
-    )
+    if state.get("editorial_cached_review_ref"):
+        cached = pipeline.store.get(state["editorial_cached_review_ref"])
+        review = EditorialVerification.model_validate(cached["review"])
+    else:
+        review = pipeline.call(
+            "gen_page_review",
+            {
+                **payload,
+                "original_markdown": payload["markdown"],
+                "markdown": result.markdown,
+                "editorial_revision": result.model_dump(exclude={"markdown"}),
+            },
+            EditorialVerification,
+            output_limit=8000,
+        )
     try:
         require_exact(
             review.checked_section_ids, payload["page"]["section_ids"], "Editorial section review"
@@ -252,15 +309,24 @@ def verify_editorial_revision(pipeline, state):
         )
     if findings:
         return {**repair_editorial(pipeline, state, findings), "editorial_review_ref": review_ref}
+    if state.get("cache_mode") == "validated":
+        write_json(
+            editorial_cache_path(pipeline, state, payload),
+            {"editorial_ref": state["editorial_draft_ref"], "review_ref": review_ref},
+        )
+    prior_reviews = [
+        row
+        for row in pipeline.read(state, "page_reviews_ref", [])
+        if row["page_id"] != result.page_id
+    ]
     return {
         "pages_ref": pipeline.store.put(pages, "generation-pages"),
-        "page_reviews_ref": pipeline.store.put(
-            [*pipeline.read(state, "page_reviews_ref", []), record], "generation-page-reviews"
-        ),
+        "page_reviews_ref": pipeline.store.put([*prior_reviews, record], "generation-page-reviews"),
         "editorial_review_ref": review_ref,
         "editorial_index": state.get("editorial_index", 0) + 1,
         "editorial_attempt": 0,
         "editorial_feedback_ref": "",
         "editorial_draft_ref": "",
+        "editorial_cached_review_ref": "",
         "route": "polish_documentation",
     }
