@@ -200,6 +200,8 @@ def test_sdk_contract_cache_errors_budget_and_provenance(tmp_path, provider):
         code_analysis_model="explicit-model",
         code_analysis_turn_limit=2,
         code_analysis_result_limit=10000,
+        code_analysis_timeout=120,
+        request_tokens=10000,
     )
     store = ArtifactStore(tmp_path / provider)
     payload = {"spans": [{"id": "e1", "text": "flag"}], "scope_id": "scope"}

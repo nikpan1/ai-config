@@ -3,10 +3,13 @@ from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Protocol
 
-from pydantic import ValidationError
-
 from docgen_graph.contracts import CodeAnalysisDraft
-from docgen_graph.evidence_contracts import AnalysisProvenance, EvidenceResult, FactRecord
+from docgen_graph.evidence_contracts import (
+    AnalysisProvenance,
+    EvidenceRelation,
+    EvidenceResult,
+    FactRecord,
+)
 from docgen_graph.knowledge import normalized_assertion
 from docgen_graph.storage import digest
 
@@ -33,7 +36,7 @@ def candidate_packet(raw, payload, provider, model, sdk_version="", session_id="
         input_hash=digest(payload),
         scope_id=payload.get("scope_id", "full"),
     )
-    allowed = {span["id"] for span in payload["spans"]}
+    allowed = {span["id"] for span in payload["spans"] + payload.get("context", [])}
     facts = [
         FactRecord.model_validate(
             normalized_assertion(
@@ -47,9 +50,26 @@ def candidate_packet(raw, payload, provider, model, sdk_version="", session_id="
         )
         for item in draft.details
     ]
+    relations = []
+    for relation in getattr(draft, "relations", []):
+        indexes = (relation.source_fact_index, relation.target_fact_index)
+        if any(index < 0 or index >= len(facts) for index in indexes):
+            raise ValueError("Code relation refers to an unknown candidate fact")
+        if not relation.evidence_ids or set(relation.evidence_ids) - allowed:
+            raise ValueError("Code relation lacks its own source evidence")
+        relations.append(
+            EvidenceRelation(
+                type=relation.type,
+                source_id=facts[indexes[0]].id,
+                target_id=facts[indexes[1]].id,
+                method=relation.method,
+                evidence_ids=relation.evidence_ids,
+            )
+        )
     return EvidenceResult(
         status="ok",
         facts=facts,
+        relations=relations,
         provenance=[provenance],
         warnings=["Candidate facts require an independent Gemini audit"],
     )
@@ -87,13 +107,27 @@ class SDKCodeBackend:
         self.frozen_root = Path(frozen_root).resolve()
         self.provider = settings.code_analysis_backend
         self.model = settings.code_analysis_model
+        if transport is None and self.provider == "codex_sdk":
+            from docgen_graph.code_analysis.native_codex import NativeCodexTransport
+
+            transport = NativeCodexTransport(settings, self.frozen_root)
         self.transport = transport or NativeSDKTransport(self.provider, settings, self.frozen_root)
         self.allowance = allowance
+        self.allowance_error = ""
+        if self.allowance is None and getattr(settings, "code_provider_allowance_file", None):
+            from docgen_graph.code_analysis.allowance import ProviderAllowance
+
+            try:
+                self.allowance = ProviderAllowance(settings, run_id)
+            except (OSError, ValueError, KeyError, TypeError):
+                self.allowance_error = "Provider allowance is missing, stale, or incompatible"
 
     def capabilities(self):
         return self.transport.capabilities()
 
     def analyze_unit(self, payload):
+        from docgen_graph.model import implementation_signature
+
         capability = self.capabilities()
         if capability["status"] != "ok":
             return EvidenceResult(status=capability["status"], warnings=[capability["reason"]])
@@ -105,6 +139,8 @@ class SDKCodeBackend:
                 payload,
                 self.settings.code_analysis_turn_limit,
                 self.settings.code_analysis_result_limit,
+                self.settings.code_analysis_timeout,
+                implementation_signature(),
             ]
         )
         cache = self.store.root / "code-cache" / f"{key}.json"
@@ -116,10 +152,20 @@ class SDKCodeBackend:
             return EvidenceResult(
                 status="budget_blocked",
                 warnings=[
-                    "Provider calls require an explicit funded allowance and shared-ledger reservation"
+                    self.allowance_error
+                    or "Provider calls require a funded allowance and shared-ledger reservation"
                 ],
             )
-        reservation = self.allowance.reserve(self.provider, self.model, key)
+        if len(json.dumps(payload).encode()) > self.settings.request_tokens:
+            return EvidenceResult(
+                status="unsupported", warnings=["Code context exceeds request limit"]
+            )
+        try:
+            reservation = self.allowance.reserve(self.provider, self.model, key)
+        except ValueError:
+            return EvidenceResult(
+                status="budget_blocked", warnings=["Shared provider budget is exhausted"]
+            )
         try:
             response = self.transport.run(payload)
             if len(json.dumps(response).encode()) > self.settings.code_analysis_result_limit:
@@ -140,7 +186,7 @@ class SDKCodeBackend:
                 json.dumps({"result_ref": self.store.put(packet.model_dump())}),
             )
             return packet
-        except (TimeoutError, OSError, ValueError, ValidationError) as error:
+        except Exception as error:
             self.allowance.settle(reservation, None)
             self.transport.close()
             self.store.event(
@@ -154,7 +200,7 @@ class SDKCodeBackend:
             return EvidenceResult(
                 status="unavailable",
                 warnings=[
-                    f"{self.provider} failed: {type(error).__name__}; outcome conservatively charged"
+                    f"{self.provider} failed: {type(error).__name__}; reservation charged"
                 ],
                 usage_ref=reservation,
             )
