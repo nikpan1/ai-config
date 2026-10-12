@@ -1,6 +1,7 @@
 import re
 from fnmatch import fnmatch
 from pathlib import PurePosixPath
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -8,7 +9,7 @@ from docgen_graph.storage import digest
 
 
 class CodeScope(BaseModel):
-    mode: str = "full"
+    mode: Literal["full", "feature", "paths", "tickets"] = "full"
     feature: str = ""
     paths: list[str] = []
     supporting_paths: list[str] = []

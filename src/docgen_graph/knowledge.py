@@ -214,12 +214,27 @@ class KnowledgeGraph:
                 "(id TEXT PRIMARY KEY REFERENCES assertions(id), payload TEXT NOT NULL)"
             )
             for item in assertions:
+                existing = connection.execute(
+                    "SELECT 1 FROM assertions WHERE id=?", (item["id"],)
+                ).fetchone()
+                if existing:
+                    connection.execute("DELETE FROM support WHERE assertion_id=?", (item["id"],))
+                    connection.execute(
+                        "DELETE FROM edges WHERE source_id=? AND type='SUPPORTED_BY'", (item["id"],)
+                    )
+                    connection.execute("DELETE FROM search WHERE id=?", (item["id"],))
+                    connection.execute("DELETE FROM indexed_search WHERE id=?", (item["id"],))
                 connection.execute(
                     "INSERT OR IGNORE INTO nodes VALUES (?,?,?,?)",
                     (item["id"], "Assertion", item["subject"], item["scope"]),
                 )
                 connection.execute(
-                    "INSERT OR IGNORE INTO assertions VALUES (?,?,?,?,?,?,?,?,?)",
+                    "INSERT INTO assertions VALUES (?,?,?,?,?,?,?,?,?) "
+                    "ON CONFLICT(id) DO UPDATE SET statement=excluded.statement, "
+                    "subject=excluded.subject, predicate=excluded.predicate, "
+                    "scope=excluded.scope, modality=excluded.modality, "
+                    "conditions=excluded.conditions, "
+                    "exceptions=excluded.exceptions, source_role=excluded.source_role",
                     (
                         item["id"],
                         item["statement"],
@@ -247,7 +262,7 @@ class KnowledgeGraph:
                 )
                 metadata = FactRecord.model_validate(item).model_dump()
                 connection.execute(
-                    "INSERT OR IGNORE INTO assertion_metadata VALUES (?,?)",
+                    "INSERT OR REPLACE INTO assertion_metadata VALUES (?,?)",
                     (item["id"], json.dumps(metadata, ensure_ascii=False)),
                 )
                 for evidence_id in item["evidence_ids"]:
@@ -287,6 +302,61 @@ class KnowledgeGraph:
             ):
                 issues.append(f"Edge lacks evidence: {tuple(row)}")
         return issues
+
+    def add_relations(self, relations):
+        from docgen_graph.evidence_contracts import EvidenceRelation
+
+        with self.connect() as connection:
+            connection.execute(
+                "CREATE TABLE IF NOT EXISTS verified_relations "
+                "(id TEXT PRIMARY KEY, payload TEXT NOT NULL)"
+            )
+            for raw in relations:
+                relation = EvidenceRelation.model_validate(raw)
+                if not self.assertion(relation.source_id) or not self.assertion(relation.target_id):
+                    raise ValueError("Relation endpoints must be existing facts")
+                if any(not self.evidence(eid) for eid in relation.evidence_ids):
+                    raise ValueError("Relation requires existing evidence")
+                payload = relation.model_dump()
+                connection.execute(
+                    "INSERT OR IGNORE INTO verified_relations VALUES (?,?)",
+                    (digest(payload), json.dumps(payload)),
+                )
+                connection.execute(
+                    "INSERT OR IGNORE INTO edges VALUES (?,?,?,?,?)",
+                    (
+                        relation.source_id,
+                        relation.target_id,
+                        relation.type,
+                        relation.method,
+                        relation.evidence_ids[0],
+                    ),
+                )
+
+    def relations(self):
+        with self.connect() as connection:
+            if connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE name='verified_relations'"
+            ).fetchone():
+                return [
+                    json.loads(row[0])
+                    for row in connection.execute(
+                        "SELECT payload FROM verified_relations ORDER BY id"
+                    )
+                ]
+            return [
+                dict(
+                    type=row["type"],
+                    source_id=row["source_id"],
+                    target_id=row["target_id"],
+                    method=row["method"],
+                    evidence_ids=[row["evidence_id"]],
+                )
+                for row in connection.execute(
+                    "SELECT e.* FROM edges e JOIN assertions a ON a.id=e.source_id "
+                    "JOIN assertions b ON b.id=e.target_id WHERE e.evidence_id IS NOT NULL"
+                )
+            ]
 
     def conflict_candidates(self) -> list[dict]:
         candidates = []

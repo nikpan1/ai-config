@@ -67,13 +67,32 @@ class FixtureEvidenceService:
 
     def search_graph(self, query):
         text = query.query.casefold()
-        facts = [
-            fact
-            for fact in self.packet.facts
-            if fact.id in query.mandatory_ids
-            or not text
-            or text in fact.model_dump_json().casefold()
-        ]
+        mandatory = set(query.mandatory_ids)
+        while True:
+            added = {
+                endpoint
+                for relation in self.packet.relations
+                if relation.type in {"QUALIFIES", "CONTRADICTS"}
+                and ({relation.source_id, relation.target_id} & mandatory)
+                for endpoint in (relation.source_id, relation.target_id)
+            } - mandatory
+            if not added:
+                break
+            mandatory |= added
+        supported_filters = {"categories", "relevance", "temporal_status", "source_kinds"}
+        if query.filters.keys() - supported_filters:
+            raise ValueError("Unsupported evidence query filter")
+
+        def matches(fact):
+            for key in ("categories", "relevance", "temporal_status"):
+                values = query.filters.get(key)
+                if values:
+                    actual = getattr(fact, key)
+                    if not (set(actual if isinstance(actual, list) else [actual]) & set(values)):
+                        return False
+            return not text or text in fact.model_dump_json().casefold()
+
+        facts = [fact for fact in self.packet.facts if fact.id in mandatory or matches(fact)]
         result = self._page(query, "facts", facts)
         missing = set(query.mandatory_ids) - {fact.id for fact in self.packet.facts}
         if missing:
@@ -90,7 +109,12 @@ class FixtureEvidenceService:
             if (not kinds or ref.source_kind in kinds)
             and (ref.id in query.mandatory_ids or not text or text in ref.text.casefold())
         ]
-        return self._page(query, "evidence", refs)
+        result = self._page(query, "evidence", refs)
+        missing = set(query.mandatory_ids) - {ref.id for ref in refs}
+        if missing:
+            result.status = "not_found"
+            result.warnings = ["Missing mandatory evidence: " + ", ".join(sorted(missing))]
+        return result
 
     def search_code(self, query):
         return self.search_sources(
@@ -152,6 +176,7 @@ class RevisionEvidenceService(FixtureEvidenceService):
             )
         graph.add_evidence(spans)
         graph.add_assertions([fact.model_dump() for fact in self.packet.facts])
+        graph.add_relations([relation.model_dump() for relation in self.packet.relations])
         with graph.connect() as connection:
             connection.execute(
                 "CREATE TABLE IF NOT EXISTS evidence_service_state "
@@ -183,7 +208,12 @@ class RevisionEvidenceService(FixtureEvidenceService):
 
     @classmethod
     def from_graph(cls, store, graph, snapshot_id, scope_id="full", coverage=None, provenance=None):
-        from docgen_graph.evidence_contracts import EvidenceLocator, EvidenceRef, FactRecord
+        from docgen_graph.evidence_contracts import (
+            EvidenceLocator,
+            EvidenceRef,
+            FactRecord,
+            SourceCoverageItem,
+        )
 
         with graph.connect() as connection:
             refs = [
@@ -202,6 +232,19 @@ class RevisionEvidenceService(FixtureEvidenceService):
                 }
                 coverage = coverage if coverage is not None else saved.get("coverage", [])
                 provenance = provenance if provenance is not None else saved.get("provenance", [])
+        snapshot = store.get(snapshot_id)
+        scope = snapshot.get("code_scope")
+        if scope:
+            allowed_paths = {
+                f["path"] for f in scope["files"] if f["disposition"] != "out_of_scope"
+            }
+            refs = [
+                ref
+                for ref in refs
+                if ref["kind"] != "code"
+                or ref["path"] in allowed_paths
+                or ref["path"].startswith("__history__/")
+            ]
         evidence = [
             EvidenceRef(
                 id=ref["id"],
@@ -219,10 +262,23 @@ class RevisionEvidenceService(FixtureEvidenceService):
             )
             for ref in refs
         ]
+        if coverage is None:
+            coverage = [
+                SourceCoverageItem(
+                    id=digest(["unverified", ref.id]),
+                    evidence_ids=[ref.id],
+                    unit_locator=ref.locator,
+                    aspect="Source coverage not audited",
+                    disposition="unresolved",
+                    reason="Legacy graph has no source aspect audit",
+                )
+                for ref in evidence
+            ]
         packet = EvidenceResult(
             status="ok",
             evidence=evidence,
             facts=[FactRecord.model_validate(graph.assertion(i)) for i in ids],
+            relations=graph.relations(),
             conflicts=graph.conflict_candidates(),
             coverage=coverage or [],
             provenance=provenance or [],
@@ -294,6 +350,16 @@ class RevisionEvidenceService(FixtureEvidenceService):
                 raise ValueError("Duplicate coverage requires a known original aspect")
             if item.disposition == "excluded_non_substantive" and not item.decision_ref:
                 raise ValueError("Coverage exclusion requires a versioned decision")
+        for conflict in packet.conflicts:
+            identifiers = [
+                conflict[key]
+                for key in ("source_id", "target_id", "code_id", "document_id")
+                if key in conflict
+            ]
+            if any(identifier not in facts for identifier in identifiers):
+                raise ValueError("Conflict references unknown facts")
+            if set(conflict.get("evidence_ids", [])) - evidence.keys():
+                raise ValueError("Conflict references unknown evidence")
 
     def verify_references(self, query):
         self._check(query)

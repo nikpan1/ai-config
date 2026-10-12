@@ -39,9 +39,18 @@ class AssertionDraft(VersionedRecord):
         return value
 
 
+class CodeRelationDraft(VersionedRecord):
+    type: str = Field(min_length=1)
+    source_fact_index: int = Field(ge=0)
+    target_fact_index: int = Field(ge=0)
+    method: str = "code_analysis_candidate"
+    evidence_ids: list[str] = Field(min_length=1)
+
+
 class CodeAnalysisDraft(VersionedRecord):
     report: str = Field(min_length=1)
     details: list[AssertionDraft]
+    relations: list[CodeRelationDraft] = []
 
 
 class ExclusionDraft(VersionedRecord):

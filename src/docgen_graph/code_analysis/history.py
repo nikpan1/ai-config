@@ -1,5 +1,6 @@
 import re
 import subprocess
+from fnmatch import fnmatch
 from pathlib import Path, PurePosixPath
 
 from docgen_graph.storage import digest
@@ -69,8 +70,45 @@ def freeze_history(store, root: Path, scope, selected_paths: list[str]) -> dict:
             .decode()
             .strip()
         )
+        from docgen_graph.ingestion import CODE_SUFFIXES, SECRET_NAMES, SKIP_NAMES
+
+        changes = (
+            _git(root, "diff", "--name-status", "-z", "--find-renames", base, head)
+            .decode()
+            .split("\0")
+        )
+        changed_groups, index = [], 0
+        while index < len(changes) and changes[index]:
+            status = changes[index]
+            count = 2 if status.startswith(("R", "C")) else 1
+            changed_groups.append(changes[index + 1 : index + count + 1])
+            index += count + 1
+        paths = set(selected_paths)
+        patterns = scope.paths + scope.supporting_paths
+        for ticket in scope.tickets + scope.dependency_tickets:
+            patterns.extend(scope.ticket_paths.get(ticket, []))
+        for group in changed_groups:
+            if scope.mode == "full" or any(
+                p in paths or any(fnmatch(p, pattern) for pattern in patterns) for p in group
+            ):
+                paths.update(group)
+        selected_paths = sorted(
+            p
+            for p in paths
+            if PurePosixPath(p).suffix in CODE_SUFFIXES
+            and PurePosixPath(p).name not in SECRET_NAMES
+            and not any(part in SKIP_NAMES for part in PurePosixPath(p).parts)
+            and not any(fnmatch(p, pattern) for pattern in scope.excluded_paths)
+        )
         if not selected_paths:
-            raise ValueError("History requires explicitly selected code paths")
+            return {
+                "schema_version": 1,
+                "base_commit": base,
+                "head_commit": head,
+                "versions": [],
+                "patches": [],
+                "scope_id": scope.id,
+            }
         for commit, side in ((base, "base"), (head, "head")):
             for path in selected_paths:
                 candidate = PurePosixPath(path)
@@ -111,8 +149,13 @@ def freeze_history(store, root: Path, scope, selected_paths: list[str]) -> dict:
             }
         )
     for relative in scope.patch_paths:
-        path = (root / relative).resolve()
-        if not path.is_relative_to(root.resolve()) or path.is_symlink():
+        unresolved = root / relative
+        path = unresolved.resolve()
+        if (
+            not path.is_relative_to(root.resolve())
+            or unresolved.is_symlink()
+            or any(parent.is_symlink() for parent in unresolved.parents if parent != root.parent)
+        ):
             raise ValueError("Patch must be a regular file inside the selected root")
         content = path.read_bytes()
         patches.append(

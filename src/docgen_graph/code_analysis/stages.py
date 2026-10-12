@@ -24,6 +24,12 @@ def inventory_code_scope(pipeline, state):
     path = getattr(settings, "code_scope_file", None)
     scope = CodeScope.model_validate(json.loads(path.read_text("utf-8"))) if path else CodeScope()
     record = scope_inventory(inventory, scope)
+    snapshot = pipeline.read(state, "snapshot_ref")
+    included = {f["path"] for f in record["files"] if f["disposition"] != "out_of_scope"}
+    inventory = {
+        **inventory,
+        "spans": [s for s in inventory["spans"] if s["kind"] != "code" or s["path"] in included],
+    }
     history = None
     if scope.base_commit or scope.head_commit or scope.patch_paths:
         history = freeze_history(
@@ -32,13 +38,53 @@ def inventory_code_scope(pipeline, state):
             scope,
             [f["path"] for f in record["files"] if f["disposition"] != "out_of_scope"],
         )
+        from docgen_graph.ingestion import code_spans
+
+        historical_files = []
+        for version in history["versions"]:
+            if version["status"] == "present":
+                historical_files.append(
+                    {
+                        "kind": "code",
+                        "path": f"__history__/{version['side']}/{version['path']}",
+                        "hash": version["hash"],
+                        "commit": version["commit"],
+                    }
+                )
+        historical_files.extend(
+            {"kind": "code", "path": "__history__/" + patch["path"], "hash": patch["hash"]}
+            for patch in history["patches"]
+        )
+        for file in historical_files:
+            spans, metadata = code_spans(
+                file, pipeline.store.get_bytes(file["hash"]).decode("utf-8")
+            )
+            for span in spans:
+                span["role"] = "change_history"
+                span["temporal_status"] = "historical"
+                record["units"].append(
+                    {
+                        "id": digest([scope.id, span["id"]]),
+                        "evidence_ids": [span["id"]],
+                        "context_ids": [],
+                        "omitted_context_ids": [],
+                        "context_truncated": False,
+                        "scope_role": "history",
+                    }
+                )
+            inventory["spans"].extend(spans)
+            inventory["analysis"][file["path"]] = metadata
+            pipeline.graph.add_evidence(spans)
+        snapshot = {**snapshot, "files": snapshot["files"] + historical_files}
     inventory = {**inventory, "code_units": [u["evidence_ids"] for u in record["units"]]}
     return {
+        "snapshot_ref": pipeline.store.put({**snapshot, "code_scope": record}),
         "code_scope_ref": pipeline.store.put(record),
         "code_history_ref": pipeline.store.put(history),
         "inventory_ref": pipeline.store.put(inventory),
         "code_index": 0,
         "code_provenance_ref": pipeline.store.put([]),
+        "code_relations_ref": pipeline.store.put([]),
         "route": "analyze_code_unit" if record["units"] else "extract_document_batch",
     }
 
@@ -59,7 +105,11 @@ def _payload(pipeline, state):
             for key in unit["evidence_ids"]
         },
         "feedback": pipeline.read(state, "feedback_ref", []),
-        "history": pipeline.read(state, "code_history_ref"),
+        "history": {
+            key: value
+            for key, value in (pipeline.read(state, "code_history_ref") or {}).items()
+            if key in {"scope_id", "base_commit", "head_commit"}
+        },
         "scope_role": unit["scope_role"],
     }
 
@@ -81,6 +131,7 @@ def analyze_code_unit(pipeline, state):
     draft = {
         "report": "Code evidence candidates",
         "details": [f.model_dump() for f in packet.facts],
+        "relations": [r.model_dump() for r in packet.relations],
     }
     return {
         "draft_ref": pipeline.store.put(draft),
@@ -102,6 +153,8 @@ def verify_code_unit(pipeline, state):
     findings = audit["findings"] + (
         [f"Code units lack records: {sorted(missing)}"] if missing else []
     )
+    if audit.get("missing_evidence_ids"):
+        findings.append("Audit found uncovered code: " + ", ".join(audit["missing_evidence_ids"]))
     if findings or not audit["accepted"]:
         if state.get("attempt", 0) < pipeline.repair_limit():
             return {
@@ -156,6 +209,11 @@ def verify_code_classification(pipeline, state):
     for fact in draft["details"]:
         if not fact.get("classification_reason") or not fact.get("relevance_reason"):
             findings.append("Classification lacks a reason")
+        roles = {pipeline.spans(state)[eid]["role"] for eid in fact["evidence_ids"]}
+        if "change_history" in roles and fact.get("temporal_status") != "historical":
+            findings.append("Historical evidence cannot establish current implementation")
+        if fact.get("categories") == ["UNKNOWN"] and fact.get("support_status") != "unresolved":
+            findings.append("Unknown classification must remain unresolved")
     audit = (
         pipeline.call(
             "verify_code_classification",
@@ -194,6 +252,20 @@ def publish_code_evidence(pipeline, state):
     ]
     provenance = pipeline.read(state, "code_provenance_ref", [])
     provenance.extend(pipeline.read(state, "code_candidate_ref")["provenance"])
+    original = pipeline.read(state, "verified_code_ref")
+    final_by_semantics = {digest([r["statement"], r["evidence_ids"]]): r["id"] for r in records}
+    identifiers = {
+        r["id"]: final_by_semantics[digest([r["statement"], r["evidence_ids"]])] for r in original
+    }
+    relations = pipeline.read(state, "code_relations_ref", [])
+    for relation in pipeline.read(state, "code_candidate_ref").get("relations", []):
+        relations.append(
+            {
+                **relation,
+                "source_id": identifiers[relation["source_id"]],
+                "target_id": identifiers[relation["target_id"]],
+            }
+        )
     next_index = state["code_index"] + 1
     pipeline.store.write(
         f"runs/{pipeline.run_id}/reports/code-{state['code_index']:04d}.md", draft["report"]
@@ -201,6 +273,7 @@ def publish_code_evidence(pipeline, state):
     return {
         "assertions_ref": pipeline.store.put(pipeline.assertions(state) + records),
         "code_provenance_ref": pipeline.store.put(provenance),
+        "code_relations_ref": pipeline.store.put(relations),
         "code_index": next_index,
         "attempt": 0,
         "feedback_ref": "",
