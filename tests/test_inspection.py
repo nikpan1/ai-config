@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 from docgen_graph.inspection import export_run
+from docgen_graph.inspection.quality import quality_data
 from docgen_graph.inspection.reader import RunReader, safe_sql_value
 from docgen_graph.stages import StageArtifacts
 from docgen_graph.storage import ArtifactStore, digest
@@ -142,6 +143,10 @@ def test_standalone_html_payload_and_csp(recorded, tmp_path):
     assert "fetch(" not in scripts[0]
     assert "innerHTML" not in scripts[0]
     assert "eval(" not in scripts[0]
+    assert scripts[0].isascii()
+    style = re.search(r"<style>(.*?)</style>", html, re.S)[1]
+    style_hash = base64.b64encode(hashlib.sha256(style.encode()).digest()).decode()
+    assert f"style-src 'sha256-{style_hash}'" in html
 
 
 def test_missing_corrupt_and_unsafe_references(recorded, tmp_path):
@@ -251,3 +256,147 @@ def test_early_partial_run_is_usable(tmp_path):
     assert not data["graphs"][0]["tables"]
     assert data["diagnostics"]
     assert "not available" in json.dumps(data["diagnostics"])
+
+
+def test_quality_denominators_and_passage_trace_use_recorded_revision():
+    data = {
+        "graphs": [
+            {
+                "id": "revision",
+                "tables": {
+                    "assertions": [{"id": "f1"}, {"id": "f2"}],
+                    "support": [{"assertion_id": "f1", "evidence_id": "original"}],
+                },
+            }
+        ],
+        "artifacts": {
+            "packet": {"value": {"assertions": [{"id": "f1"}]}},
+            "plan": {
+                "value": {
+                    "graph_revision": "revision",
+                    "sections": [{"obligation_ids": ["f1"], "supporting_obligation_ids": ["f2"]}],
+                }
+            },
+        },
+        "stages": [
+            {
+                "id": "stage/r1",
+                "result": {
+                    "value": {
+                        "stage": "retrieve_section_evidence",
+                        "inputs": {"graph_revision": "revision", "plan_ref": "plan"},
+                        "outputs": {"packet_ref": "packet"},
+                    }
+                },
+            }
+        ],
+        "candidates": [
+            {
+                "id": "c1",
+                "files": {
+                    "documentation/index.md": {"value": "😀 Valid fact."},
+                    "audit.json": {
+                        "value": {
+                            "graph_revision": "revision",
+                            "placements": [
+                                {
+                                    "start": 2,
+                                    "end": 13,
+                                    "passage": "Valid fact.",
+                                    "obligation_ids": ["f1"],
+                                },
+                                {
+                                    "start": 3,
+                                    "end": 13,
+                                    "passage": "Valid fact.",
+                                    "obligation_ids": ["f1"],
+                                },
+                            ],
+                        }
+                    },
+                },
+            }
+        ],
+    }
+    quality = quality_data(data)
+    metric = quality["utilization"][0]
+    assert metric["denominator"] == 2
+    assert metric["retrieved"] == ["f1"]
+    assert metric["assigned"] == ["f1", "f2"]
+    assert quality["passages"][0]["offset_status"] == "verified"
+    assert quality["passages"][0]["evidence_ids"] == ["original"]
+    assert quality["passages"][1]["offset_status"] == "mismatch_or_unavailable"
+    data["graphs"][0]["id"] = "unrelated"
+    quality = quality_data(data)
+    assert quality["utilization"][0]["retrieved"] is None
+    assert quality["passages"][0]["graph_binding"] == "unavailable"
+    assert quality["passages"][0]["evidence_ids"] == []
+
+
+def test_wal_snapshot_preserves_uncheckpointed_rows_and_inputs(tmp_path):
+    workspace = tmp_path / "workspace"
+    run = workspace / "runs" / "wal-run"
+    run.mkdir(parents=True)
+    connection = sqlite3.connect(run / "graph.sqlite")
+    try:
+        connection.execute("PRAGMA journal_mode=WAL")
+        connection.execute("CREATE TABLE nodes(id TEXT, type TEXT, name TEXT, scope TEXT)")
+        connection.execute("INSERT INTO nodes VALUES ('fresh','Assertion','Uncheckpointed','')")
+        connection.commit()
+        before = file_state(workspace)
+        data = RunReader(workspace, "wal-run").read()
+        assert data["graphs"][0]["tables"]["nodes"][0]["id"] == "fresh"
+        assert file_state(workspace) == before
+    finally:
+        connection.close()
+
+
+def test_symlink_escape_is_not_followed(recorded, tmp_path):
+    workspace, _ = recorded
+    external = tmp_path / "external"
+    external.mkdir()
+    (external / "candidate-manifest.json").write_text('{"private.txt":"hash"}', "utf-8")
+    (external / "private.txt").write_text("UNRELATED_SECRET", "utf-8")
+    candidate = workspace / "runs" / "example" / "candidates" / "escape"
+    candidate.parent.mkdir()
+    try:
+        candidate.symlink_to(external, target_is_directory=True)
+    except OSError:
+        pytest.skip("Creating symlinks is unavailable on this Windows account")
+    data = RunReader(workspace, "example").read()
+    assert "UNRELATED_SECRET" not in json.dumps(data)
+    assert any("Unsafe candidate" in item["message"] for item in data["diagnostics"])
+
+
+def test_quoted_secret_and_source_script_remain_inert(recorded):
+    workspace, _ = recorded
+    ArtifactStore(workspace).event(
+        "example", "test", "message", text="api_key='QUOTED_SECRET' javascript:evil() </script>"
+    )
+    data = RunReader(workspace, "example").read()
+    assert "QUOTED_SECRET" not in json.dumps(data)
+    assert "javascript:evil()" in json.dumps(data)
+    assert data["capture"]["redactions"]["strings"] >= 2
+
+
+def test_candidate_reference_is_not_a_missing_object(recorded):
+    workspace, _ = recorded
+    reader = RunReader(workspace, "example")
+    reader.references({"candidate_ref": "c" * 64}, "stage")
+    assert not reader.artifacts
+    assert reader.trace_links[0]["kind"] == "candidate_reference"
+
+
+def test_malformed_candidate_shape_preserved_with_diagnostic(recorded):
+    workspace, _ = recorded
+    store = ArtifactStore(workspace)
+    base = "runs/example/candidates/malformed"
+    content = json.dumps({"placements": "invalid", "mappings": {"incorrect": "shape"}})
+    store.write(f"{base}/audit.json", content)
+    store.write(
+        f"{base}/candidate-manifest.json", json.dumps({"audit.json": digest(content.encode())})
+    )
+    data = RunReader(workspace, "example").read()
+    assert data["candidates"][0]["files"]["audit.json"]["value"]["placements"] == "invalid"
+    assert not data["quality"]["passages"]
+    assert any("malformed rows" in item["message"] for item in data["diagnostics"])

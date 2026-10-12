@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+from docgen_graph.inspection.quality import quality_data
 from docgen_graph.storage import digest
 
 GRAPH_TABLES = (
@@ -259,6 +260,11 @@ class RunReader:
             for item in value:
                 self.references(item, origin, key)
         elif isinstance(value, str):
+            if key == "usage_ref" and value:
+                self.trace_links.append(
+                    {"origin": origin, "field": key, "target": value, "kind": "ledger_reference"}
+                )
+                return
             if key == "candidate_ref" and HASH.fullmatch(value):
                 self.trace_links.append(
                     {"origin": origin, "field": key, "target": value, "kind": "candidate_reference"}
@@ -376,6 +382,17 @@ class RunReader:
                 for filename, expected in sorted(values.items()):
                     files[filename] = self.read_file(candidate_root, filename, expected)
                     self.references(files[filename].get("value"), relative.parent.as_posix())
+                audit = files.get("audit.json", {}).get("value")
+                if audit is not None:
+                    if not isinstance(audit, dict):
+                        self.warn(relative, "Candidate audit has an unavailable structured shape")
+                    else:
+                        for field in ("placements", "mappings"):
+                            rows = audit.get(field, [])
+                            if not isinstance(rows, list) or any(
+                                not isinstance(row, dict) for row in rows
+                            ):
+                                self.warn(relative, f"Candidate audit {field} has malformed rows")
             candidates.append(
                 {"id": manifest_path.parent.name, "manifest": manifest, "files": files}
             )
@@ -456,5 +473,6 @@ class RunReader:
         }
         counts = {"fields": 0, "strings": 0}
         result = redact(result, counts)
+        result["quality"] = quality_data(result)
         result["capture"]["redactions"] = counts
         return result
