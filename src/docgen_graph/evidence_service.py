@@ -130,6 +130,44 @@ class RevisionEvidenceService(FixtureEvidenceService):
         )
         self.store = store
 
+    def sync_graph(self, graph):
+        spans = []
+        for ref in self.packet.evidence:
+            spans.append(
+                {
+                    "id": ref.id,
+                    "kind": "code" if ref.source_kind in {"code", "patch"} else "docs",
+                    "path": ref.path,
+                    "file_hash": ref.content_hash,
+                    "start_line": ref.locator.start or 1,
+                    "end_line": ref.locator.end or 1,
+                    "heading": "",
+                    "text": ref.text,
+                    "role": ref.source_role,
+                    "source_kind": ref.source_kind,
+                    "locator": ref.locator.model_dump(),
+                    "snapshot_id": ref.snapshot_id,
+                    "parent_ids": ref.parent_ids,
+                }
+            )
+        graph.add_evidence(spans)
+        graph.add_assertions([fact.model_dump() for fact in self.packet.facts])
+        with graph.connect() as connection:
+            connection.execute(
+                "CREATE TABLE IF NOT EXISTS evidence_service_state "
+                "(name TEXT PRIMARY KEY, payload TEXT NOT NULL)"
+            )
+            import json
+
+            for name, records in (
+                ("coverage", self.packet.coverage),
+                ("provenance", self.packet.provenance),
+            ):
+                connection.execute(
+                    "INSERT OR REPLACE INTO evidence_service_state VALUES (?,?)",
+                    (name, json.dumps([record.model_dump() for record in records])),
+                )
+
     @classmethod
     def publish(cls, store, packet, snapshot_id, scope_id="full"):
         cls._validate_packet(store, packet, snapshot_id)
@@ -153,6 +191,17 @@ class RevisionEvidenceService(FixtureEvidenceService):
                 for row in connection.execute("SELECT id FROM evidence ORDER BY id")
             ]
             ids = [row[0] for row in connection.execute("SELECT id FROM assertions ORDER BY id")]
+            if connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE name='evidence_service_state'"
+            ).fetchone():
+                import json
+
+                saved = {
+                    row[0]: json.loads(row[1])
+                    for row in connection.execute("SELECT name,payload FROM evidence_service_state")
+                }
+                coverage = coverage if coverage is not None else saved.get("coverage", [])
+                provenance = provenance if provenance is not None else saved.get("provenance", [])
         evidence = [
             EvidenceRef(
                 id=ref["id"],

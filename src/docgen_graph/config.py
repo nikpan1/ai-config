@@ -1,5 +1,5 @@
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from dotenv import dotenv_values
@@ -29,7 +29,11 @@ class Settings:
     code_analysis_result_limit: int = 100000
     code_scope_file: Path | None = None
     code_provider_allowance_file: Path | None = None
-    auggie_api_key: str = ""
+    auggie_api_key: str = field(default="", repr=False)
+    code_analysis_api_key: str = field(default="", repr=False)
+    authoring_turn_limit: int = 8
+    authoring_timeout_seconds: int = 300
+    authoring_result_limit: int = 60000
 
     @classmethod
     def load(cls, env_file: Path | None = None) -> "Settings":
@@ -96,4 +100,8 @@ class Settings:
             if values.get("DOCGEN_CODE_PROVIDER_ALLOWANCE_FILE")
             else None,
             auggie_api_key=str(values.get("AUGGIE_API_KEY") or ""),
+            code_analysis_api_key=str(values.get("OPENAI_API_KEY") or ""),
+            authoring_turn_limit=int(values.get("DOCGEN_AUTHORING_TURN_LIMIT") or 8),
+            authoring_timeout_seconds=int(values.get("DOCGEN_AUTHORING_TIMEOUT_SECONDS") or 300),
+            authoring_result_limit=int(values.get("DOCGEN_AUTHORING_RESULT_LIMIT") or 60000),
         )
