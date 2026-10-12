@@ -52,6 +52,10 @@ An independently moved copy of the actual-run HTML, without its companion JSON, 
 
 Final debug refinement: the reader includes the known `runs/<run>/live-result.json` outcome artifact. Run and Quality display its last state, next nodes, interrupts, and recorded execution error prominently, including failures that were never appended to the event log. The full payload remains redacted and inspectable; only declared references are followed. A focused regression verifies failure preservation, secret redaction, reference resolution, unchanged inputs, and exclusion of unrelated neighboring files. This brings the inspector suite to 19 passing tests.
 
+Final integration verification: the coordinating agent ran 169 tests successfully in 110 seconds before the last execution-result addition; the complete 19-test inspector suite passed after that addition. Browser QA also confirmed the Codex provider filter returns 12 facts, shows the actual `gpt-6-astra` model and original evidence, and preserves the complete run identifier.
+
+Both actual-run exports were refreshed with recorded execution results. `.docgen/inspection-live-d/index.html` shows the deeper completed graph and its subsequent provenance error. `.docgen/inspection-codex-live/index.html` shows the final `codex-risk-live-20261012-e` run, which stopped as `incomplete` at a quality gate: 183 current graph nodes, 188 edges, 11 stage revisions, 22 events, and six ledger charges. Both exports have zero integrity diagnostics; this means the captured artifacts passed inspection, not that the pipeline released documentation. The final run has no released documentation candidate.
+
 ## Explicit limitations
 
 - Checkpoint binary serialization is deliberately not deserialized. Full immutable stage state is available separately.
