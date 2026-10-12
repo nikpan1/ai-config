@@ -17,6 +17,36 @@ class FixtureModel:
 
     def call(self, stage, payload, schema=None):
         self.calls.append(stage)
+        if stage == "inventory_aspects":
+            return {
+                "aspects": [
+                    {
+                        "evidence_id": block["id"],
+                        "quote": block["text"],
+                        "kind": "obligation",
+                        "description": block["text"],
+                    }
+                    for block in payload["blocks"]
+                ],
+                "non_substantive": [],
+            }
+        if stage in {"audit_source_coverage", "audit_source_to_document"}:
+            return {
+                "decisions": [
+                    {
+                        "aspect_id": aspect["id"],
+                        "fact_ids": [
+                            fact["id"]
+                            for fact in payload["facts"]
+                            if aspect["evidence_id"] in fact["evidence_ids"]
+                        ],
+                        "status": "represented",
+                        "reason": "Fixture retains the exact source text",
+                    }
+                    for aspect in payload["aspects"]
+                ],
+                "findings": [],
+            }
         if stage == "analyze_code":
             return {
                 "report": "A function returns the supplied value.",
@@ -28,6 +58,19 @@ class FixtureModel:
                         "evidence_ids": [span["id"]],
                     }
                     for span in payload["spans"]
+                ],
+            }
+        if stage == "analyze_code_classification":
+            return {
+                "report": "Classified code evidence",
+                "details": [
+                    {
+                        **fact,
+                        "categories": ["IMPLEMENTATION_FEATURE"],
+                        "classification_reason": "Implementation behavior",
+                        "relevance_reason": "Retained implementation detail",
+                    }
+                    for fact in payload["facts"]
                 ],
             }
         if stage == "extract_document":
@@ -93,6 +136,16 @@ class FixtureModel:
         if stage == "edit_page":
             return {"markdown": payload["markdown"]}
         return {"accepted": True, "findings": []}
+
+    def tool_turn(self, payload, messages, declarations):
+        self.calls.append("authoring_action")
+        return {
+            "content": {
+                "role": "model",
+                "parts": [{"text": "Required fixture evidence is available."}],
+            },
+            "calls": [],
+        }
 
 
 def build(tmp_path: Path, model: FixtureModel):

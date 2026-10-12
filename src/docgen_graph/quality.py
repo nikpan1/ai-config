@@ -2,7 +2,10 @@ import re
 from collections import defaultdict
 from difflib import SequenceMatcher
 
+from markdown_it import MarkdownIt
+
 from docgen_graph.assets import asset_filename, image_references, meaningful_alt
+from docgen_graph.authoring.template import heading_tree
 from docgen_graph.contracts import ContentUnit, PresentationPlacement, TemplateRequirement
 from docgen_graph.source_links import CITATION_GROUP, citation_labels
 from docgen_graph.storage import digest
@@ -15,6 +18,18 @@ def compile_requirements(text: str, template_hash: str) -> dict:
     optional = False
     fenced = False
     lines = text.splitlines()
+    tokens = MarkdownIt().parse(text)
+    heading_lines = {
+        token.map[0]: (int(token.tag[1:]), tokens[index + 1].content)
+        for index, token in enumerate(tokens)
+        if token.type == "heading_open"
+    }
+    code_lines = {
+        line
+        for token in tokens
+        if token.type in {"fence", "code_block"}
+        for line in range(*token.map)
+    }
 
     def add(kind, value, order, columns=None, required=True):
         requirements.append(
@@ -36,12 +51,12 @@ def compile_requirements(text: str, template_hash: str) -> dict:
                 add("flow", "Source-backed primary flow with text alternative", index)
             fenced = not fenced
             continue
-        if fenced or not value:
+        if fenced or not value or index in code_lines:
             continue
-        heading = re.match(r"^(#{2,3})\s+(.+)$", value)
-        if heading:
-            title = heading[2]
-            if len(heading[1]) == 2:
+        heading = heading_lines.get(index)
+        if heading and heading[0] >= 2:
+            title = heading[1]
+            if heading[0] == 2:
                 section = title
                 headings.append(title)
                 optional = bool(re.search(r"\boptional\b", title, re.I))
@@ -84,6 +99,7 @@ def compile_requirements(text: str, template_hash: str) -> dict:
         "headings": headings,
         "text": text,
         "requirements": requirements,
+        "heading_tree": heading_tree(text),
     }
 
 
@@ -534,11 +550,14 @@ def section_anchor(title: str) -> str:
 
 def repetition_report(sections: list[dict]) -> dict:
     occurrences = defaultdict(list)
+    candidates = []
     for section in sections:
         for paragraph in section["markdown"].split("\n\n"):
             text = " ".join(reading_text(paragraph).casefold().split())
             if len(text.split()) >= 18 and not paragraph.lstrip().startswith(("|", "```", "#")):
                 occurrences[text].append(section["title"])
+            if len(text.split()) >= 8 and not paragraph.lstrip().startswith(("```", "#")):
+                candidates.append((section["title"], text))
     repeated = [
         {"text": text, "sections": titles}
         for text, titles in occurrences.items()
@@ -547,6 +566,18 @@ def repetition_report(sections: list[dict]) -> dict:
     return {
         "reader_words": sum(len(reading_text(s["markdown"]).split()) for s in sections),
         "duplicate_paragraphs": repeated,
+        "semantic_candidates": [
+            {
+                "sections": [title, other_title],
+                "passages": [text, other],
+                "action": "Compare scope, roles and qualifiers before merging; preserve evidence",
+            }
+            for index, (title, text) in enumerate(candidates)
+            for other_title, other in candidates[index + 1 :]
+            if title != other_title
+            and text != other
+            and SequenceMatcher(None, text, other).ratio() >= 0.88
+        ],
         "redundant_explanations": "Requires reader assessment; not inferred from word count",
     }
 

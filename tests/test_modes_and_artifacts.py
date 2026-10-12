@@ -141,13 +141,12 @@ def test_autopilot_accounts_for_unverified_document_batch(tmp_path):
         "exclusions_ref": store.put([]),
     }
     repair = pipeline.resolve_issues_automatically(state)
-    assert repair["route"] == "verify_document_batch"
-    excluded = pipeline.resolve_issues_automatically({**state, **repair})
-    assert excluded["status"] == "incomplete"
-    records = store.get(excluded["exclusions_ref"])
+    assert repair["status"] == "incomplete"
+    records = store.get(repair["unresolved_ref"])
     assert records[0]["path"] == "rules.md"
     assert records[0]["decision_ref"]
-    assert (store.root / "runs" / "excluded" / "exclusions.md").is_file()
+    assert store.get(state["exclusions_ref"]) == []
+    assert (store.root / "runs" / "excluded" / "unresolved.json").is_file()
 
 
 def test_autopilot_does_not_exclude_an_ambiguous_entire_batch(tmp_path):

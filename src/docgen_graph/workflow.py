@@ -14,6 +14,9 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.types import interrupt
 
 from docgen_graph.assets import asset_filename, validate_asset, verify_bundle
+from docgen_graph.authoring.template import document_title, number_generated_headings
+from docgen_graph.authoring.tools import AuthoringTools, declarations
+from docgen_graph.code_analysis import stages as code_stages
 from docgen_graph.contracts import (
     AuditDraft,
     CodeAnalysisDraft,
@@ -21,6 +24,14 @@ from docgen_graph.contracts import (
     EditDraft,
     PagePlanDraft,
     SectionDraft,
+)
+from docgen_graph.documentation_contracts import AspectInventory, SourceAudit
+from docgen_graph.evidence_contracts import (
+    DeltaVerification,
+    EvidenceLocator,
+    EvidenceQuery,
+    KnowledgeDelta,
+    SourceCoverageItem,
 )
 from docgen_graph.ingestion import inventory, snapshot_inputs
 from docgen_graph.knowledge import KnowledgeGraph, normalized_assertion
@@ -41,6 +52,7 @@ from docgen_graph.quality import (
     validate_visual_output,
     visual_evidence_ids,
 )
+from docgen_graph.source_coverage import audit_decisions, coverage_report, validate_aspect_inventory
 from docgen_graph.source_links import (
     CITATION_GROUP,
     citation_labels,
@@ -56,6 +68,28 @@ from docgen_graph.storage import ArtifactStore, digest
 
 
 class PipelineState(TypedDict, total=False):
+    source_aspects_ref: str
+    source_decisions_ref: str
+    source_aspect_index: int
+    source_audit_index: int
+    pending_document_ref: str
+    source_coverage_ref: str
+    authoring_ref: str
+    authoring_result_ref: str
+    authoring_context_ref: str
+    evidence_revision: str
+    authoring_return: str
+    knowledge_delta_ref: str
+    knowledge_revision_ref: str
+    unresolved_ref: str
+    code_scope_ref: str
+    code_history_ref: str
+    code_provenance_ref: str
+    code_candidate_ref: str
+    verified_code_ref: str
+    classified_code_ref: str
+    code_classification_verified_ref: str
+    code_relations_ref: str
     mode: str
     policy_version: str
     stage_record: dict
@@ -220,13 +254,31 @@ class Pipeline:
         prompts = files("docgen_graph").joinpath("prompts")
         prompt_hashes = {item.name: digest(item.read_bytes()) for item in prompts.iterdir()}
         model_name = getattr(getattr(self.model, "settings", None), "model", "test-double")
+        settings = getattr(self.model, "settings", None)
+        configuration = {
+            key: getattr(settings, key, None)
+            for key in (
+                "output_tokens",
+                "request_tokens",
+                "timeout_seconds",
+                "authoring_turn_limit",
+                "authoring_timeout_seconds",
+                "authoring_result_limit",
+                "code_analysis_backend",
+                "code_analysis_model",
+                "code_analysis_timeout",
+                "code_analysis_turn_limit",
+                "code_analysis_result_limit",
+            )
+        }
         return digest(
             [
                 implementation_signature(),
                 prompt_hashes,
                 model_name,
                 self.repair_limit(),
-                "pipeline-schema-v2",
+                configuration,
+                "pipeline-schema-v3",
             ]
         )
 
@@ -328,7 +380,39 @@ class Pipeline:
             "graph_index": 0,
             "assertions_ref": self.store.put([]),
             "exclusions_ref": self.store.put([]),
-            "route": "analyze_code_unit" if result["code_units"] else "extract_document_batch",
+            "source_aspect_index": 0,
+            "source_aspects_ref": self.store.put([]),
+            "source_decisions_ref": self.store.put([]),
+            "route": "inventory_code_scope",
+        }
+
+    def inventory_source_aspects(self, state: PipelineState) -> dict:
+        inventory_record = self.read(state, "inventory_ref")
+        index = state.get("source_aspect_index", 0)
+        batches = inventory_record["document_batches"]
+        if index >= len(batches):
+            return {
+                "route": "analyze_code_unit"
+                if inventory_record["code_units"]
+                else "extract_document_batch"
+            }
+        spans = self.spans(state)
+        blocks = [spans[key] for key in batches[index]]
+        draft = self.call("inventory_aspects", {"blocks": blocks}, AspectInventory)
+        aspects, findings = validate_aspect_inventory(draft["aspects"], spans)
+        covered = {item["evidence_id"] for item in aspects} | set(draft["non_substantive"])
+        if covered != set(batches[index]):
+            findings.append("Independent aspect inventory does not account for every source block")
+        if findings:
+            return self.issue(
+                state, "inventory_source_aspects", findings, "inventory_source_aspects"
+            )
+        return {
+            "source_aspects_ref": self.store.put(
+                self.read(state, "source_aspects_ref", []) + aspects
+            ),
+            "source_aspect_index": index + 1,
+            "route": "inventory_source_aspects",
         }
 
     def analyze_code_unit(self, state: PipelineState) -> dict:
@@ -403,6 +487,16 @@ class Pipeline:
 
     def extract_document_batch(self, state: PipelineState) -> dict:
         inventory_record = self.read(state, "inventory_ref")
+        if not inventory_record["document_batches"]:
+            return self.issue(
+                state,
+                "extract_document_batch",
+                [
+                    "Selected documents have no readable content; "
+                    "attachment interpretation is required"
+                ],
+                "inventory_sources",
+            )
         ids = inventory_record["document_batches"][state["document_index"]]
         spans = self.spans(state)
         draft = self.call(
@@ -462,10 +556,50 @@ class Pipeline:
                     "route": "extract_document_batch",
                 }
             return self.issue(state, "verify_document_batch", findings, "extract_document_batch")
+        return {
+            "pending_document_ref": self.store.put({"records": records, "excluded": excluded}),
+            "route": "audit_source_coverage",
+        }
+
+    def audit_source_coverage(self, state: PipelineState) -> dict:
+        inventory_record = self.read(state, "inventory_ref")
+        ids = inventory_record["document_batches"][state["document_index"]]
+        spans = self.spans(state)
+        pending = self.read(state, "pending_document_ref")
+        aspects = [
+            item
+            for item in self.read(state, "source_aspects_ref", [])
+            if item["evidence_id"] in ids
+        ]
+        audit = self.call(
+            "audit_source_coverage",
+            {
+                "blocks": [spans[key] for key in ids],
+                "aspects": aspects,
+                "facts": pending["records"],
+            },
+            SourceAudit,
+        )
+        findings = audit["findings"] + audit_decisions(
+            aspects, audit["decisions"], pending["records"]
+        )
+        if findings:
+            if state.get("attempt", 0) < self.repair_limit():
+                return {
+                    "attempt": state.get("attempt", 0) + 1,
+                    "feedback_ref": self.store.put(findings),
+                    "route": "extract_document_batch",
+                }
+            return self.issue(state, "audit_source_coverage", findings, "extract_document_batch")
         next_index = state["document_index"] + 1
         return {
-            "assertions_ref": self.store.put(self.assertions(state) + records),
-            "exclusions_ref": self.store.put(self.read(state, "exclusions_ref", []) + excluded),
+            "assertions_ref": self.store.put(self.assertions(state) + pending["records"]),
+            "exclusions_ref": self.store.put(
+                self.read(state, "exclusions_ref", []) + pending["excluded"]
+            ),
+            "source_decisions_ref": self.store.put(
+                self.read(state, "source_decisions_ref", []) + audit["decisions"]
+            ),
             "document_index": next_index,
             "attempt": 0,
             "draft_ref": "",
@@ -496,6 +630,8 @@ class Pipeline:
         spans = self.spans(state)
         assertions = self.assertions(state)
         exclusions = self.read(state, "exclusions_ref", [])
+        if self.read(state, "code_relations_ref", []):
+            self.graph.add_relations(self.read(state, "code_relations_ref", []))
         covered = {key for item in assertions for key in item["evidence_ids"]}
         covered.update(item["evidence_id"] for item in exclusions)
         missing = set(spans) - covered
@@ -573,7 +709,10 @@ class Pipeline:
     def compile_template(self, state: PipelineState) -> dict:
         source = self.read(state, "snapshot_ref")
         text = self.store.get_bytes(source["template_hash"]).decode("utf-8")
-        contract = compile_requirements(text, source["template_hash"])
+        try:
+            contract = compile_requirements(text, source["template_hash"])
+        except ValueError as error:
+            return self.issue(state, "compile_template", [str(error)], "compile_template")
         if not contract["headings"]:
             return self.issue(
                 state,
@@ -581,7 +720,12 @@ class Pipeline:
                 ["Template has no mandatory headings"],
                 "compile_template",
             )
-        return {"template_ref": self.store.put(contract), "route": "draft_page_plan"}
+        return {
+            "template_ref": self.store.put(contract),
+            "authoring_ref": "",
+            "authoring_return": "draft_page_plan",
+            "route": "plan_authoring_action",
+        }
 
     def _groups(self, state: PipelineState) -> list[dict]:
         return content_groups(self.assertions(state), self.spans(state))
@@ -635,6 +779,14 @@ class Pipeline:
             sections.append(
                 {
                     "title": str(raw.get("title", "")).strip(),
+                    "section_id": next(
+                        (
+                            node["section_id"]
+                            for node in contract.get("heading_tree", [])
+                            if node["title"] == raw.get("title")
+                        ),
+                        "section-" + digest([contract["hash"], len(sections)])[:12],
+                    ),
                     "purpose": str(raw.get("purpose", "")).strip(),
                     "group_ids": ids,
                     "support_group_ids": support_ids,
@@ -665,7 +817,11 @@ class Pipeline:
                     visual["diagram"]["source"] = diagram_source(visual["diagram"])
         plan = {
             "schema": 2,
-            "title": str(draft.get("title", "Documentation")),
+            "title": document_title(
+                str(draft.get("title", "Documentation")),
+                contract["text"],
+                self.read(state, "snapshot_ref")["brief"],
+            ),
             "sections": sections,
             "groups": groups,
             "content_units": units,
@@ -1128,7 +1284,10 @@ class Pipeline:
         return {
             "packet_ref": self.store.put(packet),
             "status": "generating",
-            "route": "write_section",
+            "authoring_ref": "",
+            "authoring_context_ref": "",
+            "authoring_return": "write_section",
+            "route": "plan_authoring_action",
         }
 
     def _writing_context(self, state: PipelineState) -> dict:
@@ -1154,6 +1313,274 @@ class Pipeline:
             ],
             "preceding_passages": list(reversed(blocks)),
             "purpose": "Writing continuity only; original_evidence remains the factual authority",
+        }
+
+    def authoring_tools(self, state: PipelineState):
+        from docgen_graph.evidence_service import RevisionEvidenceService
+
+        service = getattr(self, "evidence_service", None)
+        scope_id = self.read(state, "code_scope_ref", {}).get("scope_id", "full")
+        decisions = {
+            item["aspect_id"]: item for item in self.read(state, "source_decisions_ref", [])
+        }
+        spans = self.spans(state)
+        coverage = [
+            SourceCoverageItem(
+                id=aspect["id"],
+                evidence_ids=[aspect["evidence_id"]],
+                unit_locator=EvidenceLocator.model_validate(
+                    spans[aspect["evidence_id"]].get("locator")
+                    or {
+                        "kind": "lines",
+                        "start": spans[aspect["evidence_id"]]["start_line"],
+                        "end": spans[aspect["evidence_id"]]["end_line"],
+                    }
+                ),
+                aspect=aspect["description"],
+                disposition="represented"
+                if decisions.get(aspect["id"], {}).get("fact_ids")
+                else "unresolved",
+                fact_ids=decisions.get(aspect["id"], {}).get("fact_ids", []),
+                reason=decisions.get(aspect["id"], {}).get("reason", "Not audited"),
+            )
+            for aspect in self.read(state, "source_aspects_ref", [])
+        ]
+        if service is None:
+            service = (
+                RevisionEvidenceService(self.store, state["evidence_revision"])
+                if state.get("evidence_revision")
+                else RevisionEvidenceService.from_graph(
+                    self.store,
+                    self.graph,
+                    state["snapshot_ref"],
+                    scope_id,
+                    coverage=coverage,
+                    provenance=self.read(state, "code_provenance_ref", []),
+                )
+            )
+        query = EvidenceQuery(
+            snapshot_id=state["snapshot_ref"], graph_revision=service.revision, scope_id=scope_id
+        )
+        limit = getattr(getattr(self.model, "settings", None), "authoring_result_limit", 60000)
+        return AuthoringTools(
+            service,
+            query,
+            self.model,
+            self.read(state, "inventory_ref").get("attachments", []),
+            limit,
+        ), service.revision
+
+    def plan_authoring_action(self, state: PipelineState) -> dict:
+        session = self.read(
+            state,
+            "authoring_ref",
+            {"messages": [], "turns": 0, "queries": [], "started": datetime.now(UTC).timestamp()},
+        )
+        settings = getattr(self.model, "settings", None)
+        limit = getattr(settings, "authoring_turn_limit", 8)
+        seconds = getattr(settings, "authoring_timeout_seconds", 300)
+        if (
+            session["turns"] >= limit
+            or datetime.now(UTC).timestamp() - session["started"] > seconds
+        ):
+            return self.issue(
+                state,
+                "plan_authoring_action",
+                ["Authoring tool limit exhausted with unresolved readiness"],
+                "retrieve_section_evidence",
+            )
+        target = state.get("authoring_return", "write_section")
+        packet = (
+            self.read(state, "packet_ref", {})
+            if target == "write_section"
+            else {"groups": self._groups(state), "template": self.read(state, "template_ref")}
+        )
+        section = (
+            self._approved_plan(state)["sections"][state["section_index"]]
+            if target == "write_section"
+            else {"purpose": "Plan document content without losing source information"}
+        )
+        payload = {
+            "section": section,
+            "required_evidence": packet,
+            "objective": "Resolve missing context and prepare faithful, readable documentation",
+        }
+        response = self.model.tool_turn(payload, session["messages"], declarations())
+        calls = response.get("calls", [])
+        if len(calls) > 1:
+            return self.issue(
+                state,
+                "plan_authoring_action",
+                ["Parallel tool calls exceed the sequential checkpoint protocol"],
+                "retrieve_section_evidence",
+            )
+        session = {
+            **session,
+            "turns": session["turns"] + 1,
+            "messages": session["messages"] + [response["content"]],
+            "call": calls[0] if calls else None,
+        }
+        if calls:
+            fingerprint = digest([calls[0]["name"], calls[0].get("args", {})])
+            if fingerprint in session["queries"]:
+                return self.issue(
+                    state,
+                    "plan_authoring_action",
+                    ["Repeated authoring query gained no new knowledge"],
+                    "retrieve_section_evidence",
+                )
+            session["queries"] = session["queries"] + [fingerprint]
+        return {
+            "authoring_ref": self.store.put(session),
+            "route": "execute_authoring_tool" if calls else target,
+        }
+
+    def execute_authoring_tool(self, state: PipelineState) -> dict:
+        session = self.read(state, "authoring_ref")
+        tools, revision = self.authoring_tools(state)
+        call = session["call"]
+        try:
+            result = tools.execute(call["name"], call.get("args", {}))
+        except (ValueError, TypeError, KeyError) as error:
+            result = {
+                "status": "unresolved",
+                "warnings": [f"Invalid tool request: {type(error).__name__}"],
+            }
+        return {
+            "authoring_result_ref": self.store.put(result),
+            "evidence_revision": revision,
+            "route": "verify_tool_result",
+        }
+
+    def verify_tool_result(self, state: PipelineState) -> dict:
+        session = self.read(state, "authoring_ref")
+        result = self.read(state, "authoring_result_ref")
+        call = session["call"]
+        if result.get("status") == "ok" and result.get("evidence"):
+            tools, _ = self.authoring_tools(state)
+            identifiers = [item["id"] for item in result["evidence"]]
+            verified = tools.service.verify_references(
+                tools.query.model_copy(update={"mandatory_ids": identifiers, "limit": 1000})
+            )
+            if (
+                verified.status != "ok"
+                or verified.truncated
+                or {item.id for item in verified.evidence} != set(identifiers)
+            ):
+                return self.issue(
+                    state,
+                    "verify_tool_result",
+                    ["Tool evidence references did not verify against the frozen snapshot"],
+                    "retrieve_section_evidence",
+                )
+        known = {item["id"] for item in self.assertions(state)}
+        new_facts = [item for item in result.get("facts", []) if item["id"] not in known]
+        if new_facts:
+            return {
+                "knowledge_delta_ref": self.store.put(
+                    {
+                        "facts": new_facts,
+                        "evidence": result.get("evidence", []),
+                        "relations": result.get("relations", []),
+                        "conflicts": result.get("conflicts", []),
+                        "coverage": result.get("coverage", []),
+                        "provenance": result.get("provenance", []),
+                    }
+                ),
+                "route": "verify_knowledge_delta",
+            }
+        content = {
+            "role": "user",
+            "parts": [
+                {
+                    "function_response": {
+                        "name": call["name"],
+                        "response": result,
+                        **({"id": call["id"]} if call.get("id") else {}),
+                    }
+                }
+            ],
+        }
+        session = {**session, "messages": session["messages"] + [content]}
+        context = self.read(state, "authoring_context_ref", []) + [
+            {"tool": call["name"], "result_ref": state["authoring_result_ref"]}
+        ]
+        return {
+            "authoring_ref": self.store.put(session),
+            "authoring_context_ref": self.store.put(context),
+            "route": "plan_authoring_action",
+        }
+
+    def verify_knowledge_delta(self, state: PipelineState) -> dict:
+        candidate = self.read(state, "knowledge_delta_ref")
+        audit = self.call(
+            "verify_tool_content",
+            {
+                "new_facts": candidate["facts"],
+                "original_evidence": candidate["evidence"],
+                "relations": candidate["relations"],
+            },
+            AuditDraft,
+        )
+        if not audit["accepted"] or audit["findings"]:
+            return self.issue(
+                state,
+                "verify_knowledge_delta",
+                audit["findings"] or ["New knowledge is not independently supported"],
+                "retrieve_section_evidence",
+            )
+        delta = KnowledgeDelta(
+            base_revision=state["evidence_revision"],
+            **candidate,
+            verification=DeltaVerification(
+                accepted=True, verifier="gemini-3.8-flash", input_hash=""
+            ),
+        )
+        delta.verification.input_hash = digest(delta.verification_payload())
+        return {
+            "knowledge_delta_ref": self.store.put(delta.model_dump(mode="json")),
+            "route": "commit_knowledge_revision",
+        }
+
+    def commit_knowledge_revision(self, state: PipelineState) -> dict:
+        tools, _ = self.authoring_tools(state)
+        delta = KnowledgeDelta.model_validate(self.read(state, "knowledge_delta_ref"))
+        result = tools.service.apply_verified_delta(tools.query, delta)
+        if result.status != "ok" or not result.graph_revision:
+            return self.issue(
+                state,
+                "commit_knowledge_revision",
+                ["Verified knowledge revision could not be committed"],
+                "retrieve_section_evidence",
+            )
+        from docgen_graph.evidence_service import RevisionEvidenceService
+
+        published = RevisionEvidenceService(self.store, result.graph_revision)
+        published.sync_graph(self.graph)
+        inventory_record = self.read(state, "inventory_ref")
+        existing = {item["id"] for item in inventory_record["spans"]}
+        inventory_record["spans"].extend(
+            self.graph.evidence(ref.id) for ref in delta.evidence if ref.id not in existing
+        )
+        return {
+            "assertions_ref": self.store.put(
+                [item.model_dump(mode="json") for item in published.packet.facts]
+            ),
+            "inventory_ref": self.store.put(inventory_record),
+            "code_provenance_ref": self.store.put(
+                [item.model_dump(mode="json") for item in published.packet.provenance]
+            ),
+            "evidence_revision": result.graph_revision,
+            "plan_ref": "",
+            "plan_hash": "",
+            "approval_ref": "",
+            "release_ref": "",
+            "candidate_ref": "",
+            "written_ref": "",
+            "edited_ref": "",
+            "authoring_ref": "",
+            "authoring_context_ref": "",
+            "route": "finalize_graph",
         }
 
     def write_section(self, state: PipelineState) -> dict:
@@ -1207,6 +1634,10 @@ class Pipeline:
                         item for item in packet["assertions"] if item["id"] not in writing_ids
                     ],
                     "original_evidence": packet["evidence"],
+                    "authoring_context": [
+                        self.store.get(item["result_ref"])
+                        for item in self.read(state, "authoring_context_ref", [])
+                    ],
                     "conflict_decisions": self.read(state, "approval_ref").get(
                         "conflict_decisions", {}
                     ),
@@ -1219,6 +1650,16 @@ class Pipeline:
                 SectionDraft,
             )
         draft = _normalized_section_draft(SectionDraft.model_validate(draft).model_dump(), packet)
+        title_number = re.match(r"^(\d+(?:\.\d+)*)\.?\s", section["title"])
+        if title_number:
+            fixed = [
+                item["text"]
+                for item in plan["template_requirements"]
+                if item["section"] == section["title"]
+                and item["kind"] == "heading"
+                and item["text"] != section["title"]
+            ]
+            draft["markdown"] = number_generated_headings(draft["markdown"], title_number[1], fixed)
         visuals = render_visuals(
             packet.get("visuals", []), plan["source_assets"], packet["evidence"]
         )
@@ -1359,6 +1800,7 @@ class Pipeline:
             sections.append(
                 {
                     "title": section["title"],
+                    "section_id": section.get("section_id", section["title"]),
                     "markdown": "\n\n".join(item["markdown"] for item in parts),
                     "mappings": [mapping for item in parts for mapping in item["mappings"]],
                     "supporting_obligation_ids": section["supporting_obligation_ids"],
@@ -1688,7 +2130,62 @@ class Pipeline:
             "visual_count": sum(len(section.get("visuals", [])) for section in sections),
         }
         self.store.write(f"runs/{self.run_id}/audit.json", json.dumps(audit, indent=2))
-        return {"route": "export_candidate"}
+        return {"source_audit_index": 0, "route": "audit_source_to_document"}
+
+    def audit_source_to_document(self, state: PipelineState) -> dict:
+        inventory_record = self.read(state, "inventory_ref")
+        batches = inventory_record["document_batches"]
+        index = state.get("source_audit_index", 0)
+        sections = self.read(state, "edited_ref")
+        mapped = {item["obligation_id"] for section in sections for item in section["mappings"]}
+        aspects = self.read(state, "source_aspects_ref", [])
+        if index < len(batches):
+            ids = set(batches[index])
+            packet_aspects = [item for item in aspects if item["evidence_id"] in ids]
+            facts = [item for item in self.assertions(state) if ids & set(item["evidence_ids"])]
+            fact_ids = {item["id"] for item in facts}
+            passages = [
+                {
+                    "section_id": section.get("section_id", section["title"]),
+                    "mappings": [
+                        item for item in section["mappings"] if item["obligation_id"] in fact_ids
+                    ],
+                }
+                for section in sections
+            ]
+            audit = self.call(
+                "audit_source_to_document",
+                {
+                    "blocks": [self.spans(state)[key] for key in ids],
+                    "aspects": packet_aspects,
+                    "facts": facts,
+                    "final_passages": passages,
+                },
+                SourceAudit,
+            )
+            findings = audit["findings"] + audit_decisions(
+                packet_aspects, audit["decisions"], facts
+            )
+            if findings:
+                return self.issue(state, "audit_source_to_document", findings, "assemble_pages")
+            return {"source_audit_index": index + 1, "route": "audit_source_to_document"}
+        report = coverage_report(
+            aspects,
+            self.read(state, "source_decisions_ref", []),
+            mapped,
+            state["snapshot_ref"],
+            state["graph_revision"],
+            inventory_record.get("attachments", []),
+        )
+        if not report["complete"]:
+            return self.issue(
+                state,
+                "audit_source_to_document",
+                ["Source aspect or attachment coverage is incomplete"],
+                "assemble_pages",
+            )
+        self.store.write(f"runs/{self.run_id}/source-coverage.json", json.dumps(report, indent=2))
+        return {"source_coverage_ref": self.store.put(report), "route": "export_candidate"}
 
     def export_candidate(self, state: PipelineState) -> dict:
         plan = self._approved_plan(state)
@@ -1954,6 +2451,17 @@ class Pipeline:
             suffix = ".jpg" if asset["format"] == "jpeg" else "." + asset["format"]
             validate_asset(content, suffix, **snapshot["asset_limits"])
             self.store.write(f"{base}/documentation/assets/{asset_filename(asset)}", content)
+        for attachment in snapshot.get("attachments", []):
+            if attachment.get("hash"):
+                suffix = Path(attachment["path"]).suffix.lower()
+                self.store.write(
+                    f"{base}/attachments/{attachment['hash']}{suffix}",
+                    self.store.get_bytes(attachment["hash"]),
+                )
+        self.store.write(
+            f"{base}/attachments.json",
+            json.dumps(snapshot.get("attachments", []), ensure_ascii=False, indent=2),
+        )
         asset_index = ["# Source assets", ""]
         for asset in plan["source_assets"]:
             asset_index.extend(
@@ -2012,6 +2520,13 @@ class Pipeline:
                 )
                 + f"{excerpt}\n"
             )
+            if item.get("source_kind") == "attachment":
+                suffix = Path(item["path"]).suffix.lower()
+                locator = json.dumps(item["locator"], ensure_ascii=False, sort_keys=True)
+                content += (
+                    f"\nNative locator: `{locator}`\n\n"
+                    f"[Frozen attachment](../attachments/{item['file_hash']}{suffix})\n"
+                )
             self.store.write(f"{base}/evidence/{label}.md", content)
         self.store.write(f"{base}/source-index.md", "\n".join(index) + "\n")
         self.store.write(
@@ -2037,6 +2552,8 @@ class Pipeline:
                     "source_links": direct_links,
                     "citation_occurrences": citation_occurrences,
                     "candidate_hash": candidate_hash,
+                    "source_coverage": self.read(state, "source_coverage_ref"),
+                    "attachments": snapshot.get("attachments", []),
                 },
                 ensure_ascii=False,
                 indent=2,
@@ -2199,6 +2716,8 @@ class Pipeline:
         builder = StateGraph(PipelineState)
         for name in STEPS[:25]:
             builder.add_node(name, self.logged_node(name))
+        for name in STEPS[27:]:
+            builder.add_node(name, self.logged_node(name))
         builder.add_node("review_stage", self.review_stage)
         builder.add_node("resolve_issues_automatically", self.resolve_issues_automatically)
         builder.add_edge(START, "snapshot_inputs")
@@ -2255,13 +2774,18 @@ class Pipeline:
         }
         for name in STEPS[:25]:
             if name in {"review_plan", "review_release", "review_issues"}:
-                builder.add_conditional_edges(name, lambda state: state["route"], routed[name])
+                builder.add_conditional_edges(
+                    name, lambda state: state["route"], list(STEPS) + [END]
+                )
             else:
                 builder.add_edge(name, "review_stage")
+        for name in STEPS[27:]:
+            builder.add_edge(name, "review_stage")
         targets = sorted(
             set(fixed.values())
             | {target for values in routed.values() for target in values}
             | {"review_stage", "resolve_issues_automatically"}
+            | set(STEPS[27:])
         )
         builder.add_conditional_edges("review_stage", lambda state: state["route"], targets)
         builder.add_conditional_edges(
@@ -2279,7 +2803,11 @@ class Pipeline:
         return builder.compile(checkpointer=checkpointer)
 
     def logged_node(self, name: str):
-        function = getattr(self, name)
+        function = (
+            (lambda state: getattr(code_stages, name)(self, state))
+            if name in code_stages.CODE_STAGE_NAMES
+            else getattr(self, name)
+        )
 
         def execute(state: PipelineState) -> dict:
             if name not in {"snapshot_inputs", "review_plan", "review_release", "review_issues"}:
@@ -2289,6 +2817,11 @@ class Pipeline:
             event_path = self.store.root / "runs" / self.run_id / "events.jsonl"
             event_offset = event_path.stat().st_size if event_path.exists() else 0
             update = function(state)
+            if name == "inventory_code_scope" and update.get("route") not in {
+                "review_issues",
+                "resolve_issues_automatically",
+            }:
+                update["route"] = "inventory_source_aspects"
             cost_pln = 0.0
             if event_path.exists():
                 with event_path.open("rb") as events:
@@ -2427,146 +2960,32 @@ class Pipeline:
 
     def resolve_issues_automatically(self, state: PipelineState) -> dict:
         issue = self.read(state, "issue_ref")
-        record = {
+        unresolved = {
             "actor_type": "policy",
-            "policy_version": state.get("policy_version", "v2"),
-            "issue_revision": issue["revision"],
             "stage": issue["stage"],
-            "rationale": (
-                "Repair attempts were exhausted; "
-                "the affected content cannot be released as verified"
-            ),
             "findings": issue["findings"],
+            "source_revision": state.get("snapshot_ref"),
+            "reason": "Relevant unresolved information cannot be excluded to obtain completeness",
         }
-        ref = self.store.put(record)
-        self.store.write(
-            f"runs/{self.run_id}/reviews/automatic-{ref}.json", json.dumps(record, indent=2)
-        )
-        if issue["stage"] == "verify_document_batch":
-            inventory_record = self.read(state, "inventory_ref")
-            ids = inventory_record["document_batches"][state["document_index"]]
-            spans = self.spans(state)
-            draft = self.read(state, "draft_ref")
-            covered = {
-                key for item in draft.get("assertions", []) for key in item.get("evidence_ids", [])
+        ref = self.store.put(unresolved)
+        spans = self.spans(state) if state.get("inventory_ref") else {}
+        records = [
+            {
+                "source_id": key,
+                "path": span["path"],
+                "start_line": span["start_line"],
+                "end_line": span["end_line"],
+                "reason": unresolved["reason"],
+                "decision_ref": ref,
             }
-            covered.update(item.get("evidence_id") for item in draft.get("excluded", []))
-            missing = set(ids) - covered
-            if (
-                missing
-                and state.get("automatic_issue_attempts", 0) == 0
-                and all("lack coverage" in finding for finding in issue["findings"])
-            ):
-                updated = {
-                    **draft,
-                    "excluded": draft.get("excluded", [])
-                    + [
-                        {"evidence_id": key, "reason": "Uncovered after bounded extraction repair"}
-                        for key in sorted(missing)
-                    ],
-                }
-                result = {
-                    "draft_ref": self.store.put(updated),
-                    "automatic_issue_attempts": 1,
-                    "route": "verify_document_batch",
-                    "status": "running",
-                }
-                self.stages.record(
-                    "resolve_issues_automatically", state, {"decision_ref": ref, **result}
-                )
-                return result
-            if len(ids) > 1:
-                unresolved = [
-                    {
-                        "source_id": key,
-                        "path": spans[key]["path"],
-                        "start_line": spans[key]["start_line"],
-                        "end_line": spans[key]["end_line"],
-                        "reason": "The failed batch has no isolated unsupported source span",
-                        "decision_ref": ref,
-                    }
-                    for key in ids
-                ]
-                self.store.write(
-                    f"runs/{self.run_id}/unresolved.json", json.dumps(unresolved, indent=2)
-                )
-                self.store.write(
-                    f"runs/{self.run_id}/unresolved.md",
-                    "# Unresolved source spans\n\n"
-                    + "\n".join(
-                        f"- `{item['path']}` lines {item['start_line']}-{item['end_line']}: "
-                        f"{item['reason']}"
-                        for item in unresolved
-                    )
-                    + "\n",
-                )
-                result = {
-                    "unresolved_ref": self.store.put(unresolved),
-                    "decision_ref": ref,
-                    "status": "incomplete",
-                    "route": END,
-                }
-                self.stages.record("resolve_issues_automatically", state, result)
-                return result
-            exclusions = []
-            for key in ids:
-                span = spans[key]
-                exclusions.append(
-                    {
-                        "evidence_id": key,
-                        "source_id": key,
-                        "path": span["path"],
-                        "start_line": span["start_line"],
-                        "end_line": span["end_line"],
-                        "rejected_proposition": span["text"],
-                        "reason": "Independent verification failed after bounded repair",
-                        "dependent_items": [],
-                        "stage": issue["stage"],
-                        "decision_ref": ref,
-                    }
-                )
-            all_exclusions = self.read(state, "exclusions_ref", []) + exclusions
-            self.store.write(
-                f"runs/{self.run_id}/exclusions.json", json.dumps(all_exclusions, indent=2)
-            )
-            self.store.write(
-                f"runs/{self.run_id}/exclusions.md",
-                "# Exclusions\n\n"
-                + "\n".join(
-                    f"- `{item['path']}` lines {item['start_line']}-"
-                    f"{item['end_line']}: {item['reason']}"
-                    for item in all_exclusions
-                )
-                + "\n",
-            )
-            next_index = state["document_index"] + 1
-            destination = (
-                "extract_document_batch"
-                if next_index < len(inventory_record["document_batches"])
-                else ("link_graph_batch" if self.assertions(state) else END)
-            )
-            result = {
-                "exclusions_ref": self.store.put(all_exclusions),
-                "document_index": next_index,
-                "draft_ref": "",
-                "feedback_ref": "",
-                "attempt": 0,
-                "automatic_issue_attempts": 0,
-                "route": destination,
-                "status": "incomplete" if destination == END else "running",
-            }
-            self.stages.record(
-                "resolve_issues_automatically", state, {"decision_ref": ref, **result}
-            )
-            return result
-        self.store.write(
-            f"runs/{self.run_id}/exclusions.md",
-            "# Exclusions\n\n" + "\n".join(f"- {finding}" for finding in issue["findings"]) + "\n",
-        )
-        self.store.write(f"runs/{self.run_id}/exclusions.json", json.dumps([record], indent=2))
-        self.stages.record(
-            "resolve_issues_automatically",
-            state,
-            {"decision_ref": ref, "status": "incomplete", "route": END},
-        )
-        return {"status": "incomplete", "route": END}
+            for key, span in spans.items()
+        ]
+        self.store.write(f"runs/{self.run_id}/unresolved.json", json.dumps(unresolved, indent=2))
+        result = {
+            "status": "incomplete",
+            "route": END,
+            "source_coverage_ref": ref,
+            "unresolved_ref": self.store.put(records),
+        }
+        self.stages.record("resolve_issues_automatically", state, result)
+        return result

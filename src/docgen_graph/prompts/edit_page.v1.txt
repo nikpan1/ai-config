@@ -4,3 +4,5 @@ Make bounded local edits affecting at most 12 obligation mappings; keep every ot
 
 Remove copied template-writing instructions and document-detail metadata tables from section prose. Export assembles factual run metadata once outside the sections. Do not invent revision labels, review dates or reviewer names. Preserve every named field of required callouts using supported content and explicit uncertainty.
 When a factual passage changes, return updated support_quotes for its citations. Quote exact original evidence text and retain the condition or exception supporting the revised claim.
+
+Write connected reader-oriented prose explaining what people can do, prerequisites, triggers, outcomes and exceptions. Weave documented purpose into behavior only when the source explicitly establishes that rationale. Never invent security, performance or compliance explanations. Preserve roles, negation, quantifiers, numbers with units, modality, time and scope. Similar sentences or table rows with different conditions are distinct variants, not redundant text. Deduplicate only after checking every retained qualifier and evidence mapping. Word count is not the objective.

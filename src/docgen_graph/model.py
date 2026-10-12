@@ -22,13 +22,18 @@ def client_for(api_key: str, timeout_seconds: int):
 @lru_cache(maxsize=1)
 def implementation_signature() -> str:
     package = files("docgen_graph")
-    return digest(
-        {
-            item.name: item.read_bytes().hex()
-            for item in package.iterdir()
-            if item.name.endswith(".py")
-        }
-    )
+
+    def inventory(directory, prefix=""):
+        result = {}
+        for item in directory.iterdir():
+            name = prefix + item.name
+            if item.is_dir() and item.name != "__pycache__":
+                result.update(inventory(item, name + "/"))
+            elif item.name.endswith((".py", ".txt", ".json")):
+                result[name] = item.read_bytes().hex()
+        return result
+
+    return digest(inventory(package))
 
 
 def response_schema(schema) -> dict | None:
@@ -63,7 +68,10 @@ class GeminiModel:
         self.store = store
         self.run_id = run_id
 
-    def call(self, stage: str, payload: dict, schema=None) -> dict:
+    def tool_turn(self, payload: dict, messages: list[dict], declarations: list[dict]) -> dict:
+        return self.call("authoring_action", payload, tools=declarations, messages=messages)
+
+    def call(self, stage: str, payload: dict, schema=None, *, tools=None, messages=None) -> dict:
         prompt = files("docgen_graph").joinpath("prompts", f"{stage}.v1.txt").read_text("utf-8")
         signature = digest(
             [
@@ -73,6 +81,8 @@ class GeminiModel:
                 self.settings.output_tokens,
                 implementation_signature(),
                 schema.model_json_schema() if schema else None,
+                tools,
+                messages,
             ]
         )
         cache_path = self.store.root / "cache" / f"{signature}.json"
@@ -87,15 +97,20 @@ class GeminiModel:
         if not self.settings.api_key or self.settings.api_key == "replace-with-api-key":
             raise ValueError("GEMINI_API_KEY is required")
         request = json.dumps(payload, ensure_ascii=False)
+        contents = [types.Content(role="user", parts=[types.Part(text=request)])]
+        contents.extend(types.Content.model_validate(item) for item in (messages or []))
+        context = json.dumps(
+            [item.model_dump(mode="json") for item in contents], ensure_ascii=False
+        )
         if (
-            len((prompt + request).encode()) + self.settings.output_tokens
+            len((prompt + context).encode()) + self.settings.output_tokens
             > self.settings.request_tokens
         ):
             raise ValueError("Model request exceeds configured context budget")
         pricing = Pricing.load(self.settings.pricing_file)
         ledger = BudgetLedger(self.settings.budget_ledger, self.settings.budget_pln)
         reserve = pricing.cost(
-            len((prompt + request).encode()) + 4096, self.settings.output_tokens * 2
+            len((prompt + context).encode()) + 4096, self.settings.output_tokens * 2
         )
         for attempt in range(3):
             reservation = ledger.reserve(self.run_id, stage, max(reserve * 1.5, 0.01), pricing)
@@ -113,12 +128,16 @@ class GeminiModel:
                     self.settings.api_key, self.settings.timeout_seconds
                 ).models.generate_content(
                     model=self.settings.model,
-                    contents=request,
+                    contents=contents if tools else request,
                     config=types.GenerateContentConfig(
                         system_instruction=prompt,
-                        response_mime_type="application/json",
-                        response_json_schema=response_schema(schema),
+                        response_mime_type=None if tools else "application/json",
+                        response_json_schema=None if tools else response_schema(schema),
                         max_output_tokens=self.settings.output_tokens,
+                        tools=[types.Tool(function_declarations=tools)] if tools else None,
+                        automatic_function_calling=types.AutomaticFunctionCallingConfig(
+                            disable=True
+                        ),
                     ),
                 )
             except Exception as error:
@@ -153,11 +172,28 @@ class GeminiModel:
                 if usage
                 else {}
             )
-            if not response.text or not counts or getattr(finish, "name", None) != "STOP":
+            if (
+                (not tools and not response.text)
+                or not counts
+                or getattr(finish, "name", None) != "STOP"
+            ):
                 ledger.settle(reservation, None, {"status": "incomplete", "usage": counts})
                 raise ValueError("Incomplete or truncated Gemini response")
             try:
-                result = json.loads(response.text)
+                if tools:
+                    content = response.candidates[0].content
+                    calls = [
+                        part.function_call.model_dump(mode="json", exclude_none=True)
+                        for part in content.parts
+                        if part.function_call
+                    ]
+                    result = {
+                        "content": content.model_dump(mode="json", exclude_none=True),
+                        "calls": calls,
+                        "text": response.text or "",
+                    }
+                else:
+                    result = json.loads(response.text)
             except json.JSONDecodeError:
                 ledger.settle(reservation, None, {"status": "invalid_json", "usage": counts})
                 raise
