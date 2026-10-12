@@ -53,7 +53,7 @@ def test_codex_rejects_effective_policy_broadening(escape):
 
 
 def test_codex_worker_checks_permissions_before_authentication(monkeypatch):
-    import openai_codex
+    openai_codex = pytest.importorskip("openai_codex")
 
     from docgen_graph.code_analysis.sdk_worker import run
 
