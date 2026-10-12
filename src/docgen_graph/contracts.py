@@ -2,6 +2,8 @@ from typing import Literal
 
 from pydantic import AliasChoices, BaseModel, Field, field_validator
 
+from docgen_graph.evidence_contracts import Category
+
 
 class VersionedRecord(BaseModel):
     schema_version: Literal[1] = 1
@@ -17,6 +19,15 @@ class AssertionDraft(VersionedRecord):
     conditions: list[str] = []
     exceptions: list[str] = []
     source_role: str = "source"
+    categories: list[Category] = Field(default=["UNKNOWN"], min_length=1)
+    classification_reason: str = "Not classified"
+    relevance: Literal["essential", "supporting", "context", "unknown"] = "unknown"
+    relevance_reason: str = "Not assessed"
+    audience_scope: str = "selected audience"
+    support_status: Literal["direct", "inferred", "unresolved"] = "unresolved"
+    temporal_status: Literal["current_snapshot", "historical", "planned", "unknown"] = "unknown"
+    provenance_ids: list[str] = []
+    review_status: Literal["unreviewed", "verified", "rejected"] = "unreviewed"
 
     @field_validator("conditions", "exceptions", mode="before")
     @classmethod

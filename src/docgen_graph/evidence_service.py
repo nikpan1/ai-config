@@ -11,7 +11,9 @@ class EvidenceService(Protocol):
     def read_evidence(self, query: EvidenceQuery) -> EvidenceResult: ...
     def iter_coverage(self, query: EvidenceQuery) -> EvidenceResult: ...
     def verify_references(self, query: EvidenceQuery) -> EvidenceResult: ...
-    def apply_verified_delta(self, query: EvidenceQuery, delta: KnowledgeDelta) -> EvidenceResult: ...
+    def apply_verified_delta(
+        self, query: EvidenceQuery, delta: KnowledgeDelta
+    ) -> EvidenceResult: ...
 
 
 class FixtureEvidenceService:
@@ -23,7 +25,9 @@ class FixtureEvidenceService:
 
     def _check(self, query):
         if (query.snapshot_id, query.graph_revision, query.scope_id) != (
-            self.snapshot_id, self.revision, self.scope_id
+            self.snapshot_id,
+            self.revision,
+            self.scope_id,
         ):
             raise ValueError("Evidence query does not match snapshot, revision and scope")
 
@@ -38,18 +42,24 @@ class FixtureEvidenceService:
             if prefix != binding or not position.isdecimal():
                 raise ValueError("Cursor belongs to a different query")
             offset = int(position)
-        page = records[offset:offset + query.limit]
+        page = records[offset : offset + query.limit]
         more = offset + len(page) < len(records)
-        result = EvidenceResult(status="ok" if records else "not_found", graph_revision=self.revision,
-                                next_cursor=f"{binding}:{offset + len(page)}" if more else None,
-                                truncated=more)
+        result = EvidenceResult(
+            status="ok" if records else "not_found",
+            graph_revision=self.revision,
+            next_cursor=f"{binding}:{offset + len(page)}" if more else None,
+            truncated=more,
+        )
         setattr(result, field, page)
         if field == "facts":
             identifiers = {eid for fact in page for eid in fact.evidence_ids}
             result.evidence = [ref for ref in self.packet.evidence if ref.id in identifiers]
             fact_ids = {fact.id for fact in page}
-            result.relations = [r for r in self.packet.relations
-                                if r.source_id in fact_ids or r.target_id in fact_ids]
+            result.relations = [
+                r
+                for r in self.packet.relations
+                if r.source_id in fact_ids or r.target_id in fact_ids
+            ]
             result.conflicts = self.packet.conflicts
             provenance_ids = {pid for fact in page for pid in fact.provenance_ids}
             result.provenance = [p for p in self.packet.provenance if p.id in provenance_ids]
@@ -57,21 +67,37 @@ class FixtureEvidenceService:
 
     def search_graph(self, query):
         text = query.query.casefold()
-        facts = [fact for fact in self.packet.facts if fact.id in query.mandatory_ids
-                 or not text or text in fact.model_dump_json().casefold()]
-        return self._page(query, "facts", facts)
+        facts = [
+            fact
+            for fact in self.packet.facts
+            if fact.id in query.mandatory_ids
+            or not text
+            or text in fact.model_dump_json().casefold()
+        ]
+        result = self._page(query, "facts", facts)
+        missing = set(query.mandatory_ids) - {fact.id for fact in self.packet.facts}
+        if missing:
+            result.status = "not_found"
+            result.warnings.append("Missing mandatory facts: " + ", ".join(sorted(missing)))
+        return result
 
     def search_sources(self, query):
         text = query.query.casefold()
         kinds = query.filters.get("source_kinds")
-        refs = [ref for ref in self.packet.evidence
-                if (not kinds or ref.source_kind in kinds)
-                and (ref.id in query.mandatory_ids or not text or text in ref.text.casefold())]
+        refs = [
+            ref
+            for ref in self.packet.evidence
+            if (not kinds or ref.source_kind in kinds)
+            and (ref.id in query.mandatory_ids or not text or text in ref.text.casefold())
+        ]
         return self._page(query, "evidence", refs)
 
     def search_code(self, query):
-        return self.search_sources(query.model_copy(update={"filters": {
-            **query.filters, "source_kinds": ["code", "patch"]}}))
+        return self.search_sources(
+            query.model_copy(
+                update={"filters": {**query.filters, "source_kinds": ["code", "patch"]}}
+            )
+        )
 
     def read_evidence(self, query):
         refs = [ref for ref in self.packet.evidence if ref.id in query.mandatory_ids]
@@ -91,3 +117,183 @@ class FixtureEvidenceService:
     def apply_verified_delta(self, query, delta):
         self._check(query)
         raise NotImplementedError("The fixture double does not publish graph revisions")
+
+
+class RevisionEvidenceService(FixtureEvidenceService):
+    def __init__(self, store, revision: str):
+        record = store.get(revision)
+        super().__init__(
+            EvidenceResult.model_validate(record["packet"]),
+            record["snapshot_id"],
+            revision,
+            record["scope_id"],
+        )
+        self.store = store
+
+    @classmethod
+    def publish(cls, store, packet, snapshot_id, scope_id="full"):
+        cls._validate_packet(store, packet, snapshot_id)
+        revision = store.put(
+            {
+                "schema_version": 1,
+                "snapshot_id": snapshot_id,
+                "scope_id": scope_id,
+                "packet": packet.model_dump(),
+            }
+        )
+        return cls(store, revision)
+
+    @classmethod
+    def from_graph(cls, store, graph, snapshot_id, scope_id="full", coverage=None, provenance=None):
+        from docgen_graph.evidence_contracts import EvidenceLocator, EvidenceRef, FactRecord
+
+        with graph.connect() as connection:
+            refs = [
+                graph.evidence(row[0])
+                for row in connection.execute("SELECT id FROM evidence ORDER BY id")
+            ]
+            ids = [row[0] for row in connection.execute("SELECT id FROM assertions ORDER BY id")]
+        evidence = [
+            EvidenceRef(
+                id=ref["id"],
+                source_kind=ref.get("source_kind")
+                or ("code" if ref["kind"] == "code" else "document"),
+                snapshot_id=snapshot_id,
+                path=ref["path"],
+                content_hash=ref["file_hash"],
+                source_role=ref["role"],
+                locator=EvidenceLocator.model_validate(
+                    ref.get("locator")
+                    or {"kind": "lines", "start": ref["start_line"], "end": ref["end_line"]}
+                ),
+                text=ref["text"],
+            )
+            for ref in refs
+        ]
+        packet = EvidenceResult(
+            status="ok",
+            evidence=evidence,
+            facts=[FactRecord.model_validate(graph.assertion(i)) for i in ids],
+            conflicts=graph.conflict_candidates(),
+            coverage=coverage or [],
+            provenance=provenance or [],
+        )
+        return cls.publish(store, packet, snapshot_id, scope_id)
+
+    @staticmethod
+    def _validate_packet(store, packet, snapshot_id):
+        snapshot = store.get(snapshot_id)
+        manifest = {
+            (item["path"], item["hash"])
+            for item in snapshot.get("files", []) + snapshot.get("attachments", [])
+        }
+        evidence = {ref.id: ref for ref in packet.evidence}
+        facts = {fact.id: fact for fact in packet.facts}
+        provenance = {p.id for p in packet.provenance}
+        if len(evidence) != len(packet.evidence) or len(facts) != len(packet.facts):
+            raise ValueError("Duplicate evidence or fact identities")
+        for ref in evidence.values():
+            if ref.snapshot_id != snapshot_id:
+                raise ValueError("Evidence belongs to a foreign snapshot")
+            if (ref.path, ref.content_hash) not in manifest:
+                raise ValueError("Evidence path and hash are not in the frozen snapshot")
+            content = store.get_bytes(ref.content_hash)
+            locator = ref.locator
+            if ref.source_kind == "attachment":
+                from docgen_graph.attachments import extract_attachment
+
+                parsed = extract_attachment(ref.path, content)
+                if not any(
+                    span["text"] == ref.text
+                    and all(locator.model_dump().get(k) == v for k, v in span["locator"].items())
+                    for span in parsed.get("spans", [])
+                ):
+                    raise ValueError("Attachment locator differs from frozen source")
+            elif locator.kind == "lines":
+                lines = content.decode("utf-8").splitlines()
+                if locator.end > len(lines):
+                    raise ValueError("Evidence line exceeds frozen source")
+                if "\n".join(lines[locator.start - 1 : locator.end]) != ref.text:
+                    raise ValueError("Evidence text differs from frozen source")
+            elif locator.kind == "characters":
+                text = content.decode("utf-8")
+                if locator.end > len(text) or text[locator.start : locator.end] != ref.text:
+                    raise ValueError("Evidence character range differs from frozen source")
+            elif locator.kind == "diff_hunk":
+                from docgen_graph.code_analysis.history import parse_patch
+
+                hunks = parse_patch(content.decode("utf-8"))
+                if not any(h["header"] == locator.hunk and h["text"] == ref.text for h in hunks):
+                    raise ValueError("Diff hunk not found in frozen patch")
+            else:
+                raise ValueError("Unsupported locator for this source kind")
+        for fact in facts.values():
+            if set(fact.evidence_ids) - evidence.keys() or set(fact.provenance_ids) - provenance:
+                raise ValueError("Fact references unknown evidence or provenance")
+        for relation in packet.relations:
+            if relation.source_id not in facts or relation.target_id not in facts:
+                raise ValueError("Relation references unknown facts")
+            if set(relation.evidence_ids) - evidence.keys():
+                raise ValueError("Relation lacks its own evidence")
+        coverage_ids = {item.id for item in packet.coverage}
+        for item in packet.coverage:
+            if set(item.evidence_ids) - evidence.keys() or set(item.fact_ids) - facts.keys():
+                raise ValueError("Coverage references unknown records")
+            if item.disposition == "represented" and not item.fact_ids:
+                raise ValueError("Represented coverage requires facts")
+            if item.disposition == "duplicate" and item.duplicate_of not in coverage_ids:
+                raise ValueError("Duplicate coverage requires a known original aspect")
+            if item.disposition == "excluded_non_substantive" and not item.decision_ref:
+                raise ValueError("Coverage exclusion requires a versioned decision")
+
+    def verify_references(self, query):
+        self._check(query)
+        self._validate_packet(self.store, self.packet, self.snapshot_id)
+        return self.read_evidence(query)
+
+    def apply_verified_delta(self, query, delta):
+        self._check(query)
+        verification = delta.verification
+        if delta.base_revision != self.revision:
+            raise ValueError("Delta uses a foreign base revision")
+        if (
+            not verification.accepted
+            or verification.findings
+            or verification.verifier != "gemini-3.8-flash"
+            or verification.input_hash != digest(delta.verification_payload())
+        ):
+            raise ValueError("Delta requires a separate accepted Gemini audit of these exact bytes")
+        packet = self.packet.model_copy(deep=True)
+        for field in ("facts", "evidence", "coverage", "provenance"):
+            records = {record.id: record for record in getattr(packet, field)}
+            for record in getattr(delta, field):
+                if (
+                    field in {"evidence", "provenance"}
+                    and record.id in records
+                    and records[record.id] != record
+                ):
+                    raise ValueError("Immutable evidence/provenance ID was reused")
+                records[record.id] = record
+            setattr(packet, field, [records[key] for key in sorted(records)])
+        packet.relations = list(
+            {digest(r.model_dump()): r for r in packet.relations + delta.relations}.values()
+        )
+        packet.conflicts = list({digest(c): c for c in packet.conflicts + delta.conflicts}.values())
+        self._validate_packet(self.store, packet, self.snapshot_id)
+        revision = self.store.put(
+            {
+                "schema_version": 1,
+                "snapshot_id": self.snapshot_id,
+                "scope_id": self.scope_id,
+                "base_revision": self.revision,
+                "delta": delta.model_dump(),
+                "packet": packet.model_dump(),
+            }
+        )
+        return EvidenceResult(
+            status="ok",
+            graph_revision=revision,
+            facts=delta.facts,
+            evidence=delta.evidence,
+            coverage=delta.coverage,
+        )

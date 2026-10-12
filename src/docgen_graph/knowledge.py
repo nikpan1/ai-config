@@ -5,6 +5,7 @@ from collections import deque
 from contextlib import contextmanager
 from pathlib import Path
 
+from docgen_graph.evidence_contracts import FactRecord
 from docgen_graph.storage import digest
 
 SCHEMA = """
@@ -60,6 +61,10 @@ def normalized_assertion(raw: dict, allowed: set[str]) -> dict:
         "exceptions": terms(raw.get("exceptions")),
         "source_role": str(raw.get("source_role") or "source"),
     }
+    enriched = FactRecord.model_validate({**raw, **record, "id": "pending"}).model_dump()
+    record.update(
+        {key: value for key, value in enriched.items() if key not in {"id", "schema_version"}}
+    )
     record["id"] = digest(record)[:24]
     return record
 
@@ -83,10 +88,22 @@ class KnowledgeGraph:
             connection.close()
 
     def add_evidence(self, spans: list[dict]) -> None:
-        code = 0
-        docs = 0
         with self.connect() as connection:
+            connection.execute(
+                "CREATE TABLE IF NOT EXISTS evidence_metadata "
+                "(id TEXT PRIMARY KEY REFERENCES evidence(id), payload TEXT NOT NULL)"
+            )
+            code = connection.execute("SELECT COUNT(*) FROM evidence WHERE kind='code'").fetchone()[
+                0
+            ]
+            docs = connection.execute(
+                "SELECT COUNT(*) FROM evidence WHERE kind!='code'"
+            ).fetchone()[0]
             for span in spans:
+                if connection.execute(
+                    "SELECT 1 FROM evidence WHERE id=?", (span["id"],)
+                ).fetchone():
+                    continue
                 if span["kind"] == "code":
                     code += 1
                     label = f"C{code}"
@@ -109,6 +126,10 @@ class KnowledgeGraph:
                     ),
                 )
                 self._search(connection, span["id"], span["text"])
+                connection.execute(
+                    "INSERT OR IGNORE INTO evidence_metadata VALUES (?,?)",
+                    (span["id"], json.dumps(span, ensure_ascii=False)),
+                )
                 connection.execute(
                     "INSERT OR IGNORE INTO nodes VALUES (?,?,?,?)",
                     (span["id"], "SourceSpan", span["path"], ""),
@@ -188,6 +209,10 @@ class KnowledgeGraph:
 
     def add_assertions(self, assertions: list[dict]) -> None:
         with self.connect() as connection:
+            connection.execute(
+                "CREATE TABLE IF NOT EXISTS assertion_metadata "
+                "(id TEXT PRIMARY KEY REFERENCES assertions(id), payload TEXT NOT NULL)"
+            )
             for item in assertions:
                 connection.execute(
                     "INSERT OR IGNORE INTO nodes VALUES (?,?,?,?)",
@@ -219,6 +244,11 @@ class KnowledgeGraph:
                             " ".join(item["exceptions"]),
                         ]
                     ),
+                )
+                metadata = FactRecord.model_validate(item).model_dump()
+                connection.execute(
+                    "INSERT OR IGNORE INTO assertion_metadata VALUES (?,?)",
+                    (item["id"], json.dumps(metadata, ensure_ascii=False)),
                 )
                 for evidence_id in item["evidence_ids"]:
                     connection.execute(
@@ -293,7 +323,18 @@ class KnowledgeGraph:
             row = connection.execute(
                 "SELECT * FROM evidence WHERE id=? OR label=?", (identifier, identifier)
             ).fetchone()
-            return dict(row) if row else None
+            if not row:
+                return None
+            item = dict(row)
+            if connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE name='evidence_metadata'"
+            ).fetchone():
+                metadata = connection.execute(
+                    "SELECT payload FROM evidence_metadata WHERE id=?", (item["id"],)
+                ).fetchone()
+                if metadata:
+                    item.update(json.loads(metadata[0]))
+            return item
 
     def assertion(self, identifier: str) -> dict | None:
         with self.connect() as connection:
@@ -311,6 +352,16 @@ class KnowledgeGraph:
                     "SELECT evidence_id FROM support WHERE assertion_id=?", (identifier,)
                 )
             ]
+            has_metadata = connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE name='assertion_metadata'"
+            ).fetchone()
+            if has_metadata:
+                extra = connection.execute(
+                    "SELECT payload FROM assertion_metadata WHERE id=?", (identifier,)
+                ).fetchone()
+                if extra:
+                    item.update(json.loads(extra[0]))
+            item = FactRecord.model_validate(item).model_dump()
             return item
 
     def retrieve(

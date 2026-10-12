@@ -16,7 +16,12 @@ dependencies = [
   "pillow>=11,<13",
   "defusedxml>=0.7,<1",
   "markdown-it-py>=3,<5",
+  "pypdf>=5,<7",
+  "openpyxl>=3.1,<4",
 ]
+
+[project.optional-dependencies]
+code-analysis = ["openai-codex==0.162.1", "auggie-sdk==0.2.2"]
 
 [project.scripts]
 docgen = "docgen_graph.cli:main"

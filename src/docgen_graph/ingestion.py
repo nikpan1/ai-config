@@ -10,6 +10,7 @@ from docgen_graph.assets import (
     freeze_asset,
     resolve_asset_references,
 )
+from docgen_graph.code_analysis.inventory import source_role, structural_index
 from docgen_graph.storage import ArtifactStore, digest
 
 SKIP_NAMES = {
@@ -26,6 +27,11 @@ SKIP_NAMES = {
     "vendor",
 }
 CODE_SUFFIXES = {
+    ".java",
+    ".xml",
+    ".patch",
+    ".diff",
+    ".properties",
     ".py",
     ".ts",
     ".tsx",
@@ -41,6 +47,15 @@ CODE_SUFFIXES = {
     ".sh",
 }
 SECRET_NAMES = {".env", "id_rsa", "credentials.json", "secrets.json"}
+LOCK_NAMES = {
+    "package-lock.json",
+    "yarn.lock",
+    "pnpm-lock.yaml",
+    "poetry.lock",
+    "uv.lock",
+    "composer.lock",
+}
+ATTACHMENT_SUFFIXES = {".txt", ".pdf", ".docx", ".csv", ".xlsx"}
 
 
 def selected_files(root: Path, kind: str) -> tuple[list[Path], list[dict]]:
@@ -84,10 +99,14 @@ def selected_files(root: Path, kind: str) -> tuple[list[Path], list[dict]]:
             or path.name.startswith(".env.")
             or path.suffix.lower() in {".pem", ".key", ".p12"}
         )
-        if any(part in SKIP_NAMES for part in relative.parts) or secret:
+        if any(part in SKIP_NAMES for part in relative.parts) or secret or path.name in LOCK_NAMES:
             excluded.append({"path": str(relative), "reason": "excluded directory or secret"})
             continue
-        if kind == "docs" and path.suffix.lower() not in {".md", *ASSET_SUFFIXES}:
+        if kind == "docs" and path.suffix.lower() not in {
+            ".md",
+            *ASSET_SUFFIXES,
+            *ATTACHMENT_SUFFIXES,
+        }:
             excluded.append({"path": str(relative), "reason": "unsupported document or asset"})
             continue
         if kind == "code" and path.suffix.lower() not in CODE_SUFFIXES:
@@ -134,6 +153,7 @@ def snapshot_inputs(
 ) -> dict:
     files = []
     assets = []
+    attachments = []
     exclusions = []
     sources = (("docs", docs), ("code", code)) if code else (("docs", docs),)
     for kind, root in sources:
@@ -156,6 +176,19 @@ def snapshot_inputs(
             after = path.stat()
             if (before.st_size, before.st_mtime_ns) != (after.st_size, after.st_mtime_ns):
                 raise ValueError(f"Source changed during snapshot: {path}")
+            if kind == "docs" and path.suffix.lower() in ATTACHMENT_SUFFIXES:
+                from docgen_graph.attachments import extract_attachment
+
+                parsed = extract_attachment(relative.as_posix(), content)
+                attachments.append(
+                    {
+                        "path": relative.as_posix(),
+                        "hash": store.put_bytes(content),
+                        "size": len(content),
+                        **parsed,
+                    }
+                )
+                continue
             try:
                 content.decode("utf-8")
             except UnicodeDecodeError:
@@ -175,7 +208,7 @@ def snapshot_inputs(
                     "size": len(content),
                 }
             )
-    if not any(item["kind"] == "docs" for item in files):
+    if not any(item["kind"] == "docs" for item in files) and not attachments:
         raise ValueError("No readable Markdown documentation remains after selection")
     if code and not any(item["kind"] == "code" for item in files):
         raise ValueError("No readable code remains after selection")
@@ -186,6 +219,7 @@ def snapshot_inputs(
         "schema": 1,
         "files": files,
         "assets": assets,
+        "attachments": attachments,
         "asset_limits": {"maximum_bytes": asset_max_bytes, "maximum_pixels": asset_max_pixels},
         "exclusions": exclusions,
         "roots": {"docs": str(docs.resolve()), "code": str(code.resolve()) if code else None},
@@ -193,7 +227,9 @@ def snapshot_inputs(
         "template_hash": store.put_bytes(template_bytes),
         "template_path": str(template.resolve()),
         "brief": brief,
-        "revision": digest([files, assets, exclusions, store.put_bytes(template_bytes), brief]),
+        "revision": digest(
+            [files, assets, attachments, exclusions, store.put_bytes(template_bytes), brief]
+        ),
     }
 
 
@@ -322,11 +358,7 @@ def code_spans(file: dict, text: str) -> tuple[list[dict], dict]:
         intervals.append((cursor, len(lines), "module"))
     if not intervals and lines:
         intervals.append((1, len(lines), "module"))
-    role = (
-        "test_expectation"
-        if "test" in Path(file["path"]).parts or Path(file["path"]).name.startswith("test_")
-        else "code"
-    )
+    role = source_role(file["path"])
     non_substantive = []
     for start, last, name in intervals:
         if not any(line.strip() for line in lines[start - 1 : last]):
@@ -346,13 +378,16 @@ def code_spans(file: dict, text: str) -> tuple[list[dict], dict]:
             chunk = lines[offset:end]
             spans.append(_span(file, offset + 1, end, name, "\n".join(chunk), role))
             offset = end
-    return spans, {
+    metadata = {
         "capability": capability,
         "symbols": symbols,
         "imports": sorted(imports, key=lambda item: (item["name"], item["line"])),
         "calls": calls,
         "non_substantive": non_substantive,
     }
+    if capability == "generic_text":
+        metadata = structural_index(file["path"], text)
+    return spans, metadata
 
 
 def batches(
@@ -386,6 +421,20 @@ def inventory(store: ArtifactStore, snapshot: dict) -> dict:
             owned, metadata = code_spans(file, text)
             spans.extend(owned)
             analysis[file["path"]] = metadata
+    for attachment in snapshot.get("attachments", []):
+        for position, segment in enumerate(attachment.get("spans", []), 1):
+            file = {"kind": "docs", "path": attachment["path"], "hash": attachment["hash"]}
+            span = _span(
+                file, position, position, attachment["path"], segment["text"], "attachment"
+            )
+            span.update(
+                {
+                    "source_kind": "attachment",
+                    "locator": segment["locator"],
+                    "parser_version": attachment["parser_version"],
+                }
+            )
+            spans.append(span)
     code_units = batches([span for span in spans if span["kind"] == "code"], 12000, 1)
     document_batches = batches([span for span in spans if span["kind"] == "docs"])
     return {
@@ -395,5 +444,6 @@ def inventory(store: ArtifactStore, snapshot: dict) -> dict:
         "code_units": code_units,
         "document_batches": document_batches,
         "assets": attach_asset_evidence(snapshot.get("assets", []), spans),
+        "attachments": snapshot.get("attachments", []),
         "revision": digest([snapshot["revision"], [s["id"] for s in spans], analysis]),
     }

@@ -8,12 +8,17 @@ class EvidenceRecord(BaseModel):
 
 
 class EvidenceLocator(EvidenceRecord):
-    kind: Literal["lines", "characters", "page", "table_cell", "sheet_range", "diff_hunk"]
+    kind: Literal[
+        "lines", "characters", "page", "paragraph", "table_cell", "sheet_range", "diff_hunk"
+    ]
     start: int | None = Field(default=None, ge=0)
     end: int | None = Field(default=None, ge=0)
     page: int | None = Field(default=None, ge=1)
-    table: str | None = None
+    table: str | int | None = None
     cell: str | None = None
+    row: int | None = Field(default=None, ge=1)
+    column: int | None = Field(default=None, ge=1)
+    paragraph: int | None = Field(default=None, ge=1)
     sheet: str | None = None
     range: str | None = None
     hunk: str | None = None
@@ -23,21 +28,37 @@ class EvidenceLocator(EvidenceRecord):
     def valid_location(self):
         if self.kind in {"lines", "characters"}:
             minimum = 1 if self.kind == "lines" else 0
-            if self.start is None or self.end is None or self.start < minimum or self.end < self.start:
+            if (
+                self.start is None
+                or self.end is None
+                or self.start < minimum
+                or self.end < self.start
+            ):
                 raise ValueError("Invalid source range")
-        required = {"page": self.page, "table_cell": self.cell, "sheet_range": self.range,
-                    "diff_hunk": self.hunk}
+        required = {
+            "page": self.page,
+            "paragraph": self.paragraph,
+            "table_cell": self.cell or (self.row and self.column),
+            "sheet_range": self.range,
+            "diff_hunk": self.hunk,
+        }
         if self.kind in required and not required[self.kind]:
             raise ValueError("Locator lacks its typed position")
+        if self.kind == "sheet_range" and not self.sheet:
+            raise ValueError("Sheet locator requires a sheet name")
+        if self.kind == "table_cell" and not self.table:
+            raise ValueError("Cell locator requires a table identifier")
+        if self.kind == "diff_hunk" and not self.side:
+            raise ValueError("Diff locator requires a base or head side")
         return self
 
 
 class EvidenceRef(EvidenceRecord):
-    id: str
+    id: str = Field(min_length=1)
     source_kind: Literal["code", "document", "attachment", "patch", "reviewer"]
-    snapshot_id: str
-    path: str
-    content_hash: str
+    snapshot_id: str = Field(min_length=1)
+    path: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     locator: EvidenceLocator
     source_role: str
     text: str = ""
@@ -60,7 +81,9 @@ class AnalysisProvenance(EvidenceRecord):
     deterministic_method: str | None = None
 
 
-Category = Literal["GUI", "PRODUCT_CONFIGURATION", "PRODUCT_FEATURE", "IMPLEMENTATION_FEATURE", "UNKNOWN"]
+Category = Literal[
+    "GUI", "PRODUCT_CONFIGURATION", "PRODUCT_FEATURE", "IMPLEMENTATION_FEATURE", "UNKNOWN"
+]
 
 
 class FactRecord(EvidenceRecord):
@@ -98,7 +121,9 @@ class SourceCoverageItem(EvidenceRecord):
     evidence_ids: list[str] = Field(min_length=1)
     unit_locator: EvidenceLocator
     aspect: str
-    disposition: Literal["represented", "duplicate", "excluded_non_substantive", "unresolved"] = "unresolved"
+    disposition: Literal["represented", "duplicate", "excluded_non_substantive", "unresolved"] = (
+        "unresolved"
+    )
     fact_ids: list[str] = []
     duplicate_of: str | None = None
     reason: str = ""

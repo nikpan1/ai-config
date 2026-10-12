@@ -22,6 +22,14 @@ class Settings:
     asset_max_pixels: int = 20000000
     source_page_map: Path | None = None
     content_repair_limit: int = 2
+    code_analysis_backend: str = "gemini"
+    code_analysis_model: str = "gemini-3.8-flash"
+    code_analysis_timeout: int = 120
+    code_analysis_turn_limit: int = 8
+    code_analysis_result_limit: int = 100000
+    code_scope_file: Path | None = None
+    code_provider_allowance_file: Path | None = None
+    auggie_api_key: str = ""
 
     @classmethod
     def load(cls, env_file: Path | None = None) -> "Settings":
@@ -45,6 +53,19 @@ class Settings:
             raise ValueError("Asset byte and pixel limits must be positive")
         if content_repair_limit < 0 or content_repair_limit > 10:
             raise ValueError("DOCGEN_CONTENT_REPAIR_LIMIT must be between 0 and 10")
+        backend = str(values.get("DOCGEN_CODE_ANALYSIS_BACKEND") or "gemini")
+        if backend not in {"gemini", "codex_sdk", "auggie_sdk"}:
+            raise ValueError("Unsupported code analysis backend")
+        code_model = str(
+            values.get("DOCGEN_CODE_ANALYSIS_MODEL") or (model if backend == "gemini" else "")
+        )
+        if not code_model or (backend == "gemini" and code_model != model):
+            raise ValueError("An explicit compatible code analysis model is required")
+        code_timeout = int(values.get("DOCGEN_CODE_ANALYSIS_TIMEOUT") or 120)
+        code_turns = int(values.get("DOCGEN_CODE_ANALYSIS_TURN_LIMIT") or 8)
+        code_result = int(values.get("DOCGEN_CODE_ANALYSIS_RESULT_LIMIT") or 100000)
+        if min(code_timeout, code_turns, code_result) <= 0 or code_turns > 50:
+            raise ValueError("Code analysis limits must be positive and turns at most 50")
         return cls(
             env_file=selected,
             workspace=path("DOCGEN_WORKSPACE", ".docgen/graph"),
@@ -63,4 +84,16 @@ class Settings:
             if values.get("DOCGEN_SOURCE_PAGE_MAP")
             else None,
             content_repair_limit=content_repair_limit,
+            code_analysis_backend=backend,
+            code_analysis_model=code_model,
+            code_analysis_timeout=code_timeout,
+            code_analysis_turn_limit=code_turns,
+            code_analysis_result_limit=code_result,
+            code_scope_file=path("DOCGEN_CODE_SCOPE_FILE", "")
+            if values.get("DOCGEN_CODE_SCOPE_FILE")
+            else None,
+            code_provider_allowance_file=path("DOCGEN_CODE_PROVIDER_ALLOWANCE_FILE", "")
+            if values.get("DOCGEN_CODE_PROVIDER_ALLOWANCE_FILE")
+            else None,
+            auggie_api_key=str(values.get("AUGGIE_API_KEY") or ""),
         )
