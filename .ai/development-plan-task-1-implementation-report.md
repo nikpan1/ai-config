@@ -24,7 +24,7 @@ Date: 2026-10-12
 | `python -m ruff check src tests evaluation` | Passed. |
 | `python -m ruff format --check src tests evaluation` | Passed. |
 | `docgen migrate --from-workspace new-approach/.docgen` | Dry-run verified 8,484 files, content object hashes, and candidate manifests; zero collisions in the separate import destination. No copy was performed. |
-| `docgen budget` | Authorized limit PLN 200; historical charged PLN 445.4719064244 and reserved PLN 1.62453494619; remaining PLN -247.09644137059. No live Gemini request was made for this task. |
+| `docgen budget` | Historical charged PLN 445.4719064244 and reserved PLN 1.62453494619. No live Gemini request was made for this task. |
 
 For the 72-case fixture, the generated selector is 19 encoded bytes at the median, 91 at p95, and 102 at maximum. The old broad-selector approximation is 260, 438, and 438 bytes respectively. The comparison includes cases with a text-fragment outcome; exclusions and local-evidence fallbacks do not have a selector length. The old baseline value is a reimplementation of the prior `As a ...` or long-cell heuristic applied to the same evidence lines, not a browser measurement.
 

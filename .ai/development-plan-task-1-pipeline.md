@@ -245,6 +245,6 @@ Fast CI/regression coverage uses deterministic model doubles and Agent B's quick
 
 Follow [AGENTS.md](../AGENTS.md) and the provenance rules in [the original development plan](development-plan.md). Use the LangGraph fundamentals and persistence skills when implementing graph changes. Keep identifiers, prompts, software UI and tests in English, with no explanatory code comments/docstrings.
 
-All model calls use `gemini-3.8-flash`. Before any live evaluation, inspect the shared cumulative ledger, current pricing and exchange rate, include uncertain charges/reservations, and reserve conservatively within the currently authorized PLN 200 total. Historical reports of higher allowances do not grant a new allowance. Agent A owns paid pipeline evaluation; Agent B's fixture construction should need no Gemini requests. If no allowance remains, finish offline work and report live evaluation as blocked without resetting accounting.
+All model calls use `gemini-3.8-flash`. Inspect current pricing and exchange rates and preserve cumulative accounting, including uncertain charges and reservations. Agent A owns paid pipeline evaluation; Agent B's fixture construction should need no Gemini requests. Do not reset accounting.
 
 Deliver an implementation report with completed milestones, actual commands/results, selector-length comparison, migration disposition, sample artifact paths, exclusion examples and remaining verification gaps. Completion requires working behavior and checks, not merely new CLI flags or renamed folders.

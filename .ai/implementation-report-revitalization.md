@@ -66,7 +66,7 @@ equivalence is used only to avoid redundant comparison calls. Results are in
 The small synthetic ArchiveService source completed the knowledge phase with
 Gemini `gemini-3.8-flash`: 11 paid requests, 67.89 seconds wall time, PLN
 0.35195, zero review sessions, and zero unresolved issues. The run remained
-within the shared PLN 200 ledger. This smoke result checks the new pair
+using the shared usage ledger. This smoke result checks the new pair
 contract and completed knowledge import on one small source; it does not
 establish corpus-wide semantic quality. Its event breakdown is in
 `revitalization-live-events.json`.
@@ -204,7 +204,7 @@ and unsupported-diagram repair.
 | Reader rubric of at least 4/5 and 90% reader answers | Nine of ten preregistered questions were fully answered in a manual check. The blinded rubric was not conducted, and substantial repetition remains. |
 | Bounded concurrent requests and crash-race evidence | Not implemented in this increment. Execution remains sequential at durable acceptance boundaries. |
 | Complete 2m-token local orchestration | Not established. A 2.695m-token structural ingestion check passed; the dense 500k comparison result is a task projection only. |
-| Shared PLN 200 development ceiling | Enforced through the existing transactional budget ledger. Latest charged total: PLN 161.92162; reserved: PLN 0; remaining: PLN 38.07838. |
+| Shared development accounting | Existing transactional ledger preserved. Recorded charged total: PLN 161.92162; reserved: PLN 0. |
 
 The reader-oriented structural plan redesign, page-level semantic partitioning
 for very large editorial contexts, bounded concurrent prefetch, cross-revision

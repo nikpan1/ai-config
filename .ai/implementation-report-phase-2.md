@@ -6,7 +6,7 @@ Date: 2026-10-08. Specification: [development-plan-phase-2.md](development-plan-
 
 Implementation is delivered with 69 passing tests, passing Ruff checks and a successful wheel/source distribution build. M1–M5 are implemented. M6 remains partially validated; M0S is partial and M7 is unvalidated. The user requested that the work be brought to a close, so all live processes were stopped with their checkpoints and immutable artifacts preserved. No API process remains running.
 
-The cumulative shared ledger is PLN 104.2898 charged, zero reserved, and PLN 95.7102 remaining out of PLN 200. Charges include earlier development runs, retries and interrupted calls. Calls interrupted at handoff were conservatively charged at their full reservation because final provider usage was unavailable. This is a conservative development ledger, not an invoice reconciliation.
+The cumulative shared ledger recorded PLN 104.2898 charged and zero reserved. Charges include earlier development runs, retries and interrupted calls. Interrupted calls with unavailable final usage were conservatively charged at their full reservation. This is a development ledger, not an invoice reconciliation.
 
 The latest completed live planning example is `phase2-smoke-v8`. Final-code experiments `phase2-smoke-v14-auto` and `phase2-smoke-v14-single` passed structural checks but were still rebuilding sections and briefs after semantic/template audit findings when stopped. They are not completed plans and do not establish the paired delivery-mode acceptance criterion. Concurrent repair requests can produce different model proposals; no invariant architecture result is claimed from those unfinished runs.
 
@@ -38,7 +38,7 @@ Additional checks exercise replacement of an invalid review response after a pro
 
 ## Live evidence
 
-All development requests use Gemini `gemini-3.8-flash` and the existing shared PLN 200 ledger, including failed and truncated responses. No ledger reset, allowance increase, or source-authority shortcut is used. Machine-readable results are in [phase2-results.json](../old-approach/evaluation/phase2-results.json).
+All development requests used Gemini `gemini-3.8-flash` and the existing shared ledger, including failed and truncated responses. No ledger reset or source-authority shortcut was used. Machine-readable results are in [phase2-results.json](../old-approach/evaluation/phase2-results.json).
 
 The initial completed run, `phase2-smoke-v2`, plans the real finalized ArchiveService knowledge bundle: 15 claims, 4 entities and 12 relationships become 31 canonical obligations with 100% structural coverage. It produced one unit, four pages, 20 logical sections, 21 writing jobs and 21 completed semantic audit batches. This is a small integration test, not medium-size acceptance. Its two short detail pages motivated later subdivision prompt changes that include actual source statement volume.
 

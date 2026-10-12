@@ -39,7 +39,7 @@ A scope file can contain:
 }
 ```
 
-Ticket scopes use `tickets`, `dependency_tickets` and `ticket_paths` containing user-supplied path mappings. Evaluator expected behavior and status are not model inputs. A provider allowance must identify the provider, model, authorization reference, currently verified pricing and exchange rate, and a conservative reservation. It uses the existing shared ledger and cannot raise the repository's PLN 200 cap.
+Ticket scopes use `tickets`, `dependency_tickets` and `ticket_paths` containing user-supplied path mappings. Evaluator expected behavior and status are not model inputs. A provider allowance must identify the provider, model, authorization reference, currently verified pricing and exchange rate, and a conservative reservation. It uses the existing shared ledger; runtime limits are optional configuration.
 
 ## Verification and limits
 
@@ -47,7 +47,7 @@ The producer/configuration/retrieval/adapter/restart suites plus coordinator tra
 
 Final integrated validation passed 143/143 tests at the repository root. Two subsequently added Mermaid-tool regressions also pass, bringing the verified distinct cases to 145; all 12 coordinator review tests passed after that correction. Ruff passed across the implementation and tests, and the final wheel built successfully. Candidate provenance now binds current/base/head commit identifiers when available, while snapshots without Git metadata remain supported.
 
-No paid Gemini, Codex or Auggie analysis call was made. The existing shared ledger already exceeds the authorized PLN 200 budget; it was neither reset nor increased. Live provider trials and semantic acceptance against the full frozen human-reviewed reference set are not claimed. The Java/TypeScript text index and explicit import matching are bounded static discovery mechanisms; unresolved dynamic behavior remains a coverage issue for the independent audit.
+No paid Gemini, Codex or Auggie analysis call was made. The existing accounting ledger was preserved. Live provider trials and semantic acceptance against the full frozen human-reviewed reference set are not claimed. The Java/TypeScript text index and explicit import matching are bounded static discovery mechanisms; unresolved dynamic behavior remains a coverage issue for the independent audit.
 
 ## Revalidated primary references
 

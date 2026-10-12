@@ -65,7 +65,7 @@ Inventory referenced images and diagrams and present them for human explanation;
 - Persist checkpoints with a stable `thread_id`. Keep artifact references, progress, and decisions in graph state. Save large artifacts separately and atomically before returning their references.
 - Key reusable results by input, context, prompt, schema, model, and configuration versions. Invalidate dependent results and approvals when these change. Make repeated artifact writes safe; isolate human interrupts from costly calls.
 - Record stage inputs/outputs, attempts, errors, timing, and token usage. Distinguish technical failure from unresolved source knowledge. Never include secrets in logs.
-- Gemini API testing is authorized within a cumulative PLN 200 development budget, including experiments, retries, and repairs. Persist spending across runs; do not reset the allowance on restart. Before live calls, verify pricing and currency conversion, reserve a conservative request cost with billing headroom, and pause before the remaining allowance would be exceeded.
+- Persist model usage and spending across runs, including experiments, retries, repairs and uncertain outcomes. Verify current pricing and currency conversion before live calls. There is no fixed development spending ceiling.
 
 ## Delivery milestones
 
@@ -79,7 +79,7 @@ Inventory referenced images and diagrams and present them for human explanation;
 
 Evaluate owned-source batch sizes of 8k, 16k, and 32k tokens and the effect of the verification pass. Measure retained information, unsupported additions, lost qualifications, entity/conflict accuracy, token usage, and review effort.
 
-Acceptance on the user-approved reference set requires 100% of annotated information, conditions, and exceptions preserved; correct evidence references; zero unsupported additions; and zero incorrect entity merges. Every source block must have a disposition. Passing this sample does not establish complete semantic preservation across the entire corpus; report corpus-level findings separately. All test variants share the PLN 200 allowance.
+Acceptance on the user-approved reference set requires 100% of annotated information, conditions, and exceptions preserved; correct evidence references; zero unsupported additions; and zero incorrect entity merges. Every source block must have a disposition. Passing this sample does not establish complete semantic preservation across the entire corpus; report corpus-level findings separately. All test variants use the shared accounting ledger.
 
 ## User decisions
 
@@ -91,7 +91,7 @@ Acceptance on the user-approved reference set requires 100% of annotated informa
 | Review interface | CLI and a readable report showing source evidence. | Confirmed |
 | Referenced images | Inventory and present for human explanation; no model-based image interpretation. | Confirmed |
 | Evaluation ownership | Codex prepares approximately 40 annotated passages from existing synthetic data; the user reviews the expected results before evaluation. | Confirmed |
-| Development test budget | Autonomous Gemini API testing within PLN 200 total across all development test runs, including retries and repairs. | Confirmed |
+| Development accounting | Track usage and costs cumulatively across test runs, retries and repairs; runtime limits are optional. | Confirmed |
 | Reference-set acceptance | Preserve all annotated information and qualifications, with correct references, zero unsupported additions, and zero incorrect entity merges. | Confirmed |
 
 Background, examples, and technical references: [Notes.md](Notes.md).

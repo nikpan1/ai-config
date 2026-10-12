@@ -245,6 +245,6 @@ Do not turn a missing Docker/Java/Node runtime into a false success. Complete so
 
 The branches can merge in either order: Agent B imports no production code, while Agent A's baseline regressions use temporary standalone inputs. Agent A may run the new fixture integration suite once B1/B3 is present. A missing optional full fixture must not break unrelated pipeline tests before that merge, but the final joint acceptance cannot silently skip it.
 
-Fixture creation and static validation should use no Gemini API calls. If live pipeline evaluation is requested during integration, Agent A coordinates it through the existing shared ledger using `gemini-3.8-flash`, verified current pricing/conversion and the single cumulative PLN 200 allowance. Agent B must not create a second budget or run an untracked generation loop.
+Fixture creation and static validation should use no Gemini API calls. Agent A coordinates requested live evaluation using `gemini-3.8-flash`, current pricing/conversion and the shared usage ledger. Record all generation calls.
 
 Deliver a fixture-local README with regeneration, serving, application startup, history restoration and validation instructions, plus an implementation report listing actual counts, commits, test results, intended discrepancies and remaining gaps. Completion means the data is readable, internally consistent, testable and suitable for later ticket-scoped code analysis—not merely a directory of plausible source files.

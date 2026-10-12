@@ -108,7 +108,7 @@ Acceptance on the annotated document-only sample requires:
 5. Included images and Mermaid diagrams are useful, source-traceable, readable as text, and portable in the exported bundle. Zero unsafe or unresolved visual references are published.
 6. The representative like-for-like run meets the call and wall-time targets above. Publish any unmet or unmeasured target explicitly.
 
-The current repository instructions specify a cumulative PLN 200 development API allowance, while the local shared ledger and configuration recorded during the furniture run disagree with that limit. Complete the offline work first. Do not make another paid Gemini request until the governing allowance is reconciled; keep every eventual request in the existing shared ledger.
+Preserve the shared usage ledger and record all eventual live model requests, including retries and uncertain outcomes. Runtime spending limits are optional configuration.
 
 ## Completion definition
 

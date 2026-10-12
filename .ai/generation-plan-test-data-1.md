@@ -42,7 +42,7 @@ The fragment target is the rendered page text, not the source Markdown. Browser 
 | Validate | Allow only exact declared HTTP(S) source page URLs in addition to existing local links and immutable assets. | Check generated links and evidence mapping before candidate review. | An arbitrary external URL is rejected. |
 | Audit | Retain `sources/index.md`, snapshots, source labels, and source map. | Retain `source-index.md`, `evidence/D#.md`, snapshot hashes, and mapping audit. | Citation can be traced to frozen evidence after the web page changes. |
 
-Use the existing persistent LangGraph checkpoints and stable `thread_id` in each pipeline. Citation resolution belongs to the existing sequential export stage, so it does not introduce a separate pause path. Human review remains through `interrupt()` and `Command(resume=...)`. The fixture generator is deterministic and makes no Gemini call. Live pipeline evaluation uses the shared ledger and `gemini-3.8-flash`; the user authorized raising the cumulative limit from PLN 200 for this evaluation. Its execution and costs are recorded in `furniture-generation-protocol.md`.
+Use the existing persistent LangGraph checkpoints and stable `thread_id` in each pipeline. Citation resolution belongs to the existing sequential export stage, so it does not introduce a separate pause path. Human review remains through `interrupt()` and `Command(resume=...)`. The fixture generator is deterministic and makes no Gemini call. Live pipeline evaluation uses the shared ledger and `gemini-3.8-flash`; usage accounting was preserved for this evaluation. Its execution and costs are recorded in `furniture-generation-protocol.md`.
 
 ## Acceptance
 

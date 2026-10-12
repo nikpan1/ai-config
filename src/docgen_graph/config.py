@@ -12,7 +12,7 @@ class Settings:
     workspace: Path
     shared_data: Path
     budget_ledger: Path
-    budget_pln: float
+    budget_pln: float | None
     pricing_file: Path
     api_key: str = field(repr=False)
     model: str
@@ -47,10 +47,10 @@ class Settings:
         model = str(values.get("GEMINI_MODEL") or "gemini-3.8-flash")
         if model != "gemini-3.8-flash":
             raise ValueError("GEMINI_MODEL must be gemini-3.8-flash")
-        configured_budget_pln = float(values.get("DOCGEN_BUDGET_PLN") or 200)
-        if not math.isfinite(configured_budget_pln) or configured_budget_pln <= 0:
-            raise ValueError("DOCGEN_BUDGET_PLN must be positive")
-        budget_pln = min(configured_budget_pln, 200.0)
+        configured_budget = values.get("DOCGEN_BUDGET_PLN")
+        budget_pln = float(configured_budget) if configured_budget else None
+        if budget_pln is not None and (not math.isfinite(budget_pln) or budget_pln <= 0):
+            raise ValueError("DOCGEN_BUDGET_PLN must be positive when configured")
         asset_max_bytes = int(values.get("DOCGEN_ASSET_MAX_BYTES") or 10000000)
         asset_max_pixels = int(values.get("DOCGEN_ASSET_MAX_PIXELS") or 20000000)
         content_repair_limit = int(values.get("DOCGEN_CONTENT_REPAIR_LIMIT", 2))

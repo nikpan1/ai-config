@@ -14,7 +14,7 @@ Date: 2026-10-11. Source: `data/test_data_1`. Scope: four synthetic Markdown sou
 | Model | `gemini-3.8-flash` |
 | Pricing | USD 0.75 per 1M input tokens; USD 3.75 per 1M output tokens; USD/PLN 3.9132, recorded 2026-10-08 |
 | Shared ledger before this evaluation | PLN 161.92162294281 charged; PLN 0 reserved |
-| Evaluation limit | PLN 1,000 set in ignored `.env` files after the user explicitly relaxed the previous PLN 200 ceiling |
+| Evaluation configuration | Runtime accounting settings were kept in ignored `.env` files. |
 
 The API key stayed in ignored `.env` files and is absent from this protocol. Network calls to Gemini required an unsandboxed execution context. The local source mirror did not require external network access.
 

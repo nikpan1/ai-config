@@ -132,5 +132,5 @@ Optymalizację kosztów przez cache proponuję dopiero po pomiarach. Gemini ofer
 - Obrazy i diagramy nie są interpretowane przez model. Są przedstawiane jako kwestie wymagające wyjaśnienia przez użytkownika; niewyjaśnione informacje podlegają tej samej zasadzie zatrzymania etapu.
 - Development Plan ma być po angielsku, rzeczowy i zawierać diagram Mermaid. Ważne decyzje projektowe pozostają po stronie użytkownika; agent powinien zadawać pytania zwiększające pewność dopasowania rozwiązania.
 - Codex wybierze około 40 fragmentów istniejących danych syntetycznych i rozpisze oczekiwane informacje oraz dowody. Użytkownik sprawdzi wzorzec przed użyciem go do oceny.
-- Użytkownik daje swobodę testowania Gemini API podczas prac w granicach łącznego limitu 200 zł. Limit obejmuje wszystkie serie testów, powtórzenia i poprawki; nie odnawia się przy kolejnym uruchomieniu. Koszty trzeba zapisywać i konserwatywnie rozliczać w PLN przed kolejnymi wywołaniami.
+- Track cumulative Gemini API usage and costs across test runs, retries and repairs. Preserve accounting and use current pricing; no fixed development spending ceiling applies.
 - Warunek zaliczenia próbki: zachowanie wszystkich oznaczonych informacji, warunków i wyjątków, poprawne odsyłacze, zero niepopartych dodatków i błędnych scaleń pojęć. Wynik na próbce nie jest gwarancją bezstratności całego korpusu.

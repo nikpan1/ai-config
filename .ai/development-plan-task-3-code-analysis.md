@@ -40,7 +40,7 @@ The exception also covers the `search_code` tool invoked by the generator when i
 
 The current [Codex SDK documentation](https://learn.chatgpt.com/docs/codex-sdk) describes official Python and TypeScript libraries and read-only mode. Prefer Python in this repository; do not assume a Node bridge is necessary. The [Auggie Python SDK](https://docs.augmentcode.com/cli/sdk-python) provides workspace, model, and limit configuration, structured results, and events. Before implementation, pin verified SDK and CLI versions and check model availability and permissions for the actual account. Do not assume either SDK is merely a free search interface.
 
-Reading the shared ledger during planning showed PLN 445.4719064244 charged and PLN 1.62453494619 reserved against a PLN 200 limit. There is currently no available budget for new paid Gemini trials. Do not reset the ledger or restore the historical PLN 1000 limit from older reports. Continue implementation and offline tests; paid tests require new budget authorization. Account for Codex/Auggie costs explicitly according to the actual subscription or allowance; the model exception grants no new budget. Do not route calls to another provider to bypass the Gemini limit.
+The shared ledger records cumulative usage across providers. Preserve actual charges and uncertain outcomes. Account for Codex/Auggie according to the actual API or subscription billing mode; use explicit provider/model selection and never silently substitute models.
 
 ## 4. Division of work between agents
 

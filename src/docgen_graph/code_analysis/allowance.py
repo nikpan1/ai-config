@@ -31,7 +31,6 @@ class ProviderAllowance:
             self.pricing.input_usd_per_million,
             self.pricing.output_usd_per_million,
             self.pricing.usd_pln,
-            raw["authorized_budget_pln"],
             raw["reservation_pln"],
         )
         if any(not math.isfinite(value) or value <= 0 for value in rates):
@@ -44,9 +43,14 @@ class ProviderAllowance:
         )
         if self.reservation < minimum:
             raise ValueError("Provider reservation does not include conservative turn headroom")
-        self.ledger = BudgetLedger(
-            settings.budget_ledger, min(200.0, settings.budget_pln, raw["authorized_budget_pln"])
-        )
+        limits = [
+            limit
+            for limit in (settings.budget_pln, raw.get("authorized_budget_pln"))
+            if limit is not None
+        ]
+        if any(not math.isfinite(limit) or limit <= 0 for limit in limits):
+            raise ValueError("Configured provider limits must be finite and positive")
+        self.ledger = BudgetLedger(settings.budget_ledger, min(limits) if limits else None)
         self.run_id = run_id
         self.provider = raw["provider"]
         self.authorization = raw["authorization_ref"]

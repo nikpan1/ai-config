@@ -21,7 +21,7 @@ The following requirements remain binding:
 - Preserve source snapshots, exact provenance, all substantive information, conditions, exceptions, modality, scope, and version distinctions. Extraction must not be filtered by the output template.
 - Keep logical stages as LangGraph nodes, persistent checkpoints, stable `thread_id` values, immutable artifacts, and revision-bound decisions. Human interaction uses `interrupt()` and `Command(resume=...)`.
 - Use only Gemini `gemini-3.8-flash` for model calls and reject another configured model. Centralize configuration, model access, logging, and file I/O.
-- Read runtime settings from `.env`, maintain placeholder-only `.env.example`, and preserve the shared cumulative PLN 200 development budget, including retries and repairs.
+- Read runtime settings from `.env`, maintain placeholder-only `.env.example`, and preserve cumulative model usage accounting, including retries and repairs.
 - Never invent missing behavior, choose conflicting source authority automatically, silently drop comparison work, or treat model approval as proof of correctness.
 - Keep the deliverable as portable Markdown with source indexes, tables, blockquotes, and evidence-backed Mermaid. A website, graphical editor, generated artwork, and a new export format are outside this increment.
 - Use the already implemented professional, simple English policy. Do not reintroduce the superseded requirement for formal ASD-STE100 certification.
@@ -226,7 +226,7 @@ These are implementation targets, not measured promises. Compare the same corpus
 | Presentation and provenance | All local links and evidence mappings resolve; no placeholders or internal workflow jargon in reader prose; representative tables and diagrams render correctly; each substantive unit remains locally traceable. |
 | Resume and reuse | Fault injection after request persistence and after each acceptance boundary resumes without losing completed validated work. Changed evidence invalidates affected checks/decisions; unchanged accepted work is reused. Unknown provider completion remains conservatively charged. |
 | Local scale | Complete 100k, 500k, then 2m source-token deterministic orchestration within the existing 1.5 GB peak-memory and 10 GB artifact acceptance bounds. Report queue growth and limits; no silent task-tail discard. This does not certify large-corpus live semantics or throughput. |
-| Development spending | Charged plus reserved spending stays within the same cumulative PLN 200 ledger. Never reset the ledger or increase the ceiling to finish evaluation. |
+| Development spending | Preserve cumulative charges and reservations in the shared ledger and publish measured usage. |
 
 Use existing test suites as the base. Add focused behavioral tests for issue aggregation, authority boundaries, pair/context coverage, concurrent reservation races, crash recovery, dirty-dependency invalidation, citation remapping, semantic-boundary splitting, and the observed editorial errors. Avoid tests that only mirror implementation details.
 

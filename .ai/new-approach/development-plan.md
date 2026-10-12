@@ -317,13 +317,13 @@ Use the Gemini API with `gemini-3.8-flash` for every model call. Reject any othe
 
 Read secrets and runtime configuration from `.env`; commit only placeholder configuration. Centralize clients, timeouts, retries, structured logging, request limits, artifact I/O, and cost accounting. Reuse immutable clients where helpful and keep mutable run state in checkpoints/artifacts. Logs include run/stage/item/revision IDs, elapsed time, tokens, retries, retrieval sizes, and cost; never API keys or secret-bearing source text.
 
-The development ceiling is **PLN 200 cumulatively across both approaches**, including previous runs, repairs, and failures. The default shared ledger is the existing repository-root `.docgen/budget.sqlite`. Do not infer a remaining allowance from a historical report or create a new empty ledger because the codebase moved. No paid Gemini requests are needed to prepare this plan.
+Preserve cumulative usage accounting across both approaches, including previous runs, repairs, and failures. The default shared ledger is the existing repository-root `.docgen/budget.sqlite`. Do not create an empty replacement ledger because the codebase moved. No paid Gemini requests are needed to prepare this plan.
 
 Implement a small independent, schema-compatible accounting adapter against a versioned external accounting contract. Preserve existing `charges` records and their charged/reserved/uncertain semantics; document compatibility and test against a synthetic ledger shaped like the historical one. Prohibit destructive migrations and reclaiming another run's outstanding reservations. Use atomic reservations compatible with the old client so concurrent clients cannot spend the same remaining funds. A missing configured shared ledger or incompatible schema blocks live development requests until reconciled; it must not silently reset the budget. Resolve and record its absolute path.
 
 Before a live experiment, verify the applicable official model prices, billing categories, and fresh USD/PLN conversion. Store sources, verification time, effective dates, and expiry. Use Google's [Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing) and the [NBP exchange-rate API](https://api.nbp.pl/en.html). Do not freeze today's prices into implementation assumptions.
 
-Reserve conservatively for the complete request, output/thinking allowance, and billing headroom, with provision for planned retries. Reconcile using recorded usage, retaining reservations or conservative charges for uncertain provider completion. Admit an experiment only when its bounded request/retry plan fits the remaining allowance; reserve each call transactionally as well. Budget exhaustion is a resumable stop, never permission to exceed PLN 200.
+Reserve conservatively for the complete request, output/thinking usage and billing headroom. Reconcile recorded usage, retaining conservative charges for uncertain completion. Reserve each call transactionally and preserve prior spending.
 
 Measure calls and cost separately for analysis, document extraction, graph linking, planning, writing, repairs, and verification. Report cached versus fresh work, latency versus human waiting, and structural fixtures versus paid semantic experiments. Defer parallelism until serial cost and quality are understood.
 
@@ -357,7 +357,7 @@ Prepare new dual-source fixtures: agreeing code/docs; conflicting requirement an
 | Reader quality | Human rubric at least 4/5 for coherence, findability, clarity, repetition control, and template usefulness. Reader questions require accurate answers with their material qualifications. |
 | Resume | Fault injection around each stage, response persistence, graph transaction, review, and publication preserves accepted work; stale decisions fail; uncertain provider usage remains accounted for. |
 | Scale | Run local deterministic 100k, 500k, and then 2m combined-source-token fixtures, measuring actual nodes/edges, degree, queries, calls, RAM, disk, and context sizes. Initial acceptance bounds: 1.5 GB peak RAM and 10 GB artifact growth; any incomplete run is labeled incomplete. |
-| Cost | Charged plus reserved spending stays within the original PLN 200 ceiling across both codebases. Publish the current ledger snapshot with live results, not an estimated fresh allowance. |
+| Cost | Publish cumulative charged and reserved spending from the shared ledger with live results. |
 
 The retrieval target above measures relevant original spans, not just entity names. Also report evidence precision, irrelevant context tokens, conflict recall, entity-linking errors, truncation/overflow rate, citation entailment, and writer recovery attempts. A relevant passage can be retrieved without adequately supporting the wording eventually written.
 

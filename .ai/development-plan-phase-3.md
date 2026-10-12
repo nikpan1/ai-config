@@ -125,7 +125,7 @@ The `affected` box shows routing after a valid review decision, not an additiona
 
 `review_generation` is an additional node entered only for unresolved content, language, source-asset, or Markdown structure decisions. Use LangGraph `interrupt()` and `Command(resume=...)` with issue IDs and artifact revisions. A decision may correct a draft, approve a justified technical term, provide an asset explanation, retain a genuine unknown, or request an upstream revision. It cannot waive unsupported facts, broken provenance, missing mandatory coverage, or a required template section without evidence. Keep the interrupted stage and all completed jobs inspectable. Budget and technical failures remain resumable failures, not content decisions.
 
-Use only Gemini `gemini-3.8-flash` for model calls. Reuse the existing conservative PLN 200 cumulative development ledger and current verified pricing. Estimate and reserve the cost of each live request before dispatch; stop before the allowance would be exceeded. Cache only validated immutable responses keyed by source, plan, prompt, schema, model, style contract, glossary, and relevant configuration versions. Do not allow a cache hit to bypass changed evidence or STE rules.
+Use only Gemini `gemini-3.8-flash` for model calls. Preserve the cumulative usage ledger and current verified pricing, including retries and uncertain outcomes. Cache only validated immutable responses keyed by source, plan, prompt, schema, model, style contract, glossary, and relevant configuration versions. Do not allow a cache hit to bypass changed evidence or STE rules.
 
 ## Artifacts and release status
 

@@ -92,7 +92,7 @@ def test_provider_allowance_shares_prior_gemini_charges(tmp_path):
             "time TEXT, reserved REAL, charged REAL, status TEXT, usage TEXT, pricing TEXT)"
         )
         connection.execute(
-            "INSERT INTO charges VALUES ('old','old','gemini','now',0,199,'settled','{}','{}')"
+            "INSERT INTO charges VALUES ('old','old','gemini','now',0,49,'settled','{}','{}')"
         )
     today = date.today().isoformat()
     path = tmp_path / "allowance.json"
@@ -124,15 +124,15 @@ def test_provider_allowance_shares_prior_gemini_charges(tmp_path):
         code_analysis_model="explicit-model",
         code_analysis_turn_limit=2,
         budget_ledger=ledger,
-        budget_pln=200,
+        budget_pln=50,
         request_tokens=1000,
         output_tokens=1000,
     )
     allowance = ProviderAllowance(settings, "new")
     with pytest.raises(ValueError, match="Budget exhausted"):
         allowance.reserve("codex_sdk", "explicit-model", "request")
-    assert allowance.ledger.summary()["charged_pln"] == 199
-    assert allowance.ledger.summary()["limit_pln"] == 200
+    assert allowance.ledger.summary()["charged_pln"] == 49
+    assert allowance.ledger.summary()["limit_pln"] == 50
 
 
 def test_native_codex_timeout_closes_worker_without_inheriting_secrets(tmp_path, monkeypatch):

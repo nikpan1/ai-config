@@ -210,7 +210,7 @@ Time and cost comparisons require identical snapshots, template, brief, model co
 
 ## 11. Budget and checks actually performed
 
-Both tasks share one cumulative Gemini budget of PLN 200. Ledger reading on 2026-10-12: PLN 445.4719064244 charged, PLN 1.62453494619 reserved, PLN -247.09644137059 remaining. New paid calls are blocked until authorization changes. Implementation and offline tests can proceed in parallel. Do not move Gemini to another account/provider, reset accounting, or use the old PLN 1000 limit from the historical report.
+Both tasks share cumulative usage accounting. Preserve the existing ledger, record actual provider usage and retries, and use current pricing and currency conversion for API charges. Runtime spending limits are optional configuration.
 
 No paid generation was performed during this analysis. The attempt to run `test_documentation_quality.py` and `test_evidence_and_retrieval.py` stopped at the `PIL` and `defusedxml` imports; the budget CLI also failed to load because of a dependency. Budget values were read separately, directly from SQLite in read-only mode. Historical tests and evaluations provide regression material, not newly verified results.
 

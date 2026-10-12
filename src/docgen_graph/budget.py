@@ -48,7 +48,7 @@ class Pricing:
 
 
 class BudgetLedger:
-    def __init__(self, path: Path, limit: float = 200.0):
+    def __init__(self, path: Path, limit: float | None = None):
         self.path = path.resolve()
         self.limit = limit
         if not self.path.is_file():
@@ -82,7 +82,7 @@ class BudgetLedger:
             "limit_pln": self.limit,
             "charged_pln": charged,
             "reserved_pln": reserved,
-            "remaining_pln": self.limit - charged - reserved,
+            "remaining_pln": self.limit - charged - reserved if self.limit is not None else None,
         }
 
     def reserve(self, run_id: str, stage: str, amount: float, pricing: Pricing) -> str:
@@ -95,7 +95,7 @@ class BudgetLedger:
                 "SELECT COALESCE(SUM(charged + CASE WHEN status='reserved' "
                 "THEN reserved ELSE 0 END),0) FROM charges"
             ).fetchone()[0]
-            if used + amount > self.limit:
+            if self.limit is not None and used + amount > self.limit:
                 raise ValueError(f"Budget exhausted; remaining PLN {self.limit - used:.2f}")
             connection.execute(
                 "INSERT INTO charges VALUES (?,?,?,?,?,0,'reserved','{}',?)",

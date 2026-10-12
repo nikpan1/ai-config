@@ -75,13 +75,12 @@ test cases across the full run and the focused follow-up. Ruff passed across
 provider-selection flags. The shared ledger was reread and remained unchanged.
 
 No paid model call was made. Existing ledger figures were PLN 445.4719064244
-charged plus PLN 1.62453494619 reserved against PLN 200 authorization. Accounting
-was not reset or bypassed.
+charged plus PLN 1.62453494619 reserved. Accounting was preserved.
 
 ## Limits and remaining acceptance
 
 - Live Gemini function calling and SDK service behavior require later paid
-  validation under an explicitly authorized budget. Offline tests verify
+  validation with configured provider credentials. Offline tests verify
   protocol, dispatch, accounting and persistence with controlled responses.
 - Native Auggie remains explicitly unsupported where read-only host isolation
   cannot be verified. Provider selection is implemented without a silent

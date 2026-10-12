@@ -11,7 +11,7 @@ if (-not (Test-Path -LiteralPath .env)) { Copy-Item .env.example .env }
 
 Keep an existing `.env` if you already have one. Set `GEMINI_API_KEY` there. All model requests use `gemini-3.8-flash`; a different `GEMINI_MODEL` is rejected. The cumulative development budget ledger stays at `.docgen/budget.sqlite`, with pricing at `.docgen/pricing.json`. The active pipeline defaults to `.docgen/graph/`, separate from historical root checkpoints. An existing `.env` can be selected with `docgen --env-file path/to/file ...`.
 
-Before live model calls, inspect `uv run docgen budget`. Paid development evaluations share the authorized PLN 200 ceiling, including retries. The application requires current pricing and currency conversion before reserving a request. Offline tests and model doubles make no Gemini requests.
+Inspect `uv run docgen budget` for cumulative usage and charges. Accounting uses current pricing and currency conversion. `DOCGEN_BUDGET_PLN` is optional: leave it blank for uncapped accounting, or configure a positive runtime limit. Offline tests and model doubles make no provider requests.
 
 ## Run
 
@@ -128,7 +128,6 @@ silently shifted; conflicts are rejected. Editing retains exact fact mappings
 and source quotes, audits changes to qualifiers and causal explanations, and
 checks candidate repetition in prose and tables before removing it.
 
-The shared historical Gemini ledger is already above the authorized PLN 200
-development allowance. The implementation was exercised with offline fixtures;
-new paid validation requires an explicit budget change. Live SDK/Gemini
-compatibility and human readability acceptance remain separate acceptance steps.
+The implementation was initially exercised with offline fixtures. Live
+SDK/Gemini compatibility and human readability acceptance remain separate
+acceptance steps. Usage accounting persists across offline and live evaluations.

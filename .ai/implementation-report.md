@@ -46,7 +46,7 @@ Local review report: `.docgen/runs/legacy-final/review-c909bbddcb95f27a.md`.
 
 ## Cost and retained evidence
 
-The cumulative conservative charge is **10.4132 PLN** of 200 PLN, including retries, thinking/output usage and 30% billing headroom. Outstanding reservations: 0.0000 PLN. An API server failure with unknown usage was charged at its full reservation. The actual provider invoice may differ; the development ledger was never reset.
+The cumulative conservative charge was **10.4132 PLN**, including retries, thinking/output usage and billing headroom. Outstanding reservations: 0.0000 PLN. An API failure with unknown usage was charged at its full reservation. Actual provider invoices may differ; accounting was not reset.
 
 Verified prices: USD 0.75 per million input tokens and USD 3.75 per million output tokens through 2026-12-31, from [Google](https://ai.google.dev/gemini-api/docs/pricing). The [NBP USD rate](https://api.nbp.pl/api/exchangerates/rates/a/usd/?format=json) on 2026-10-08 was 3.9132 PLN (table 196/A/NBP/2026). The saved pricing record expires on 2026-10-15 and must be refreshed before later live calls.
 
