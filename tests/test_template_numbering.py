@@ -1,6 +1,11 @@
 import pytest
 
-from docgen_graph.authoring.template import document_title, heading_tree, number_generated_headings
+from docgen_graph.authoring.template import (
+    bind_plan_sections,
+    document_title,
+    heading_tree,
+    number_generated_headings,
+)
 
 
 def test_tree_ignores_fences_and_preserves_ids_on_title_changes():
@@ -30,3 +35,23 @@ def test_title_prefers_template_without_banning_product_plans():
     assert document_title("Plan for documentation", "## Rules", "") == "Product documentation"
     assert document_title("Disaster Recovery Plan", "## Rules", "") == "Disaster Recovery Plan"
     assert document_title("Pricing Plan", "## Rules", "") == "Pricing Plan"
+
+
+def test_repeated_dynamic_slot_and_fixed_numbers():
+    tree = heading_tree("## 3. [Topic]\n## 5. Sources")
+    result = bind_plan_sections(
+        tree, [{"title": "Orders"}, {"title": "Recovery"}, {"title": "5. Sources"}]
+    )
+    assert [item["title"] for item in result] == ["3 Orders", "4 Recovery", "5. Sources"]
+    assert len({item["section_id"] for item in result}) == 3
+    with pytest.raises(ValueError, match="conflicts"):
+        bind_plan_sections(
+            tree, [{"title": title} for title in ["One", "Two", "Three", "5. Sources"]]
+        )
+
+
+def test_generated_anchor_updates_without_rewriting_code():
+    source = "### Detail\n[Go](#detail)\n```text\n[Example](#detail)\n```"
+    result = number_generated_headings(source, "3", [])
+    assert "[Go](#31-detail)" in result
+    assert "[Example](#detail)" in result

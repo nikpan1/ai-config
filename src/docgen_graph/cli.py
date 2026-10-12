@@ -4,6 +4,7 @@ import re
 import sqlite3
 import sys
 from contextlib import closing
+from dataclasses import replace
 from pathlib import Path
 
 from langgraph.checkpoint.sqlite import SqliteSaver
@@ -21,6 +22,8 @@ from docgen_graph.workflow import Pipeline
 def parser() -> argparse.ArgumentParser:
     command = argparse.ArgumentParser(prog="docgen")
     command.add_argument("--env-file", type=Path)
+    command.add_argument("--code-backend", choices=("gemini", "codex_sdk", "auggie_sdk"))
+    command.add_argument("--code-model")
     subcommands = command.add_subparsers(dest="command", required=True)
     run = subcommands.add_parser("run")
     run.add_argument("--docs", type=Path, required=True)
@@ -178,6 +181,14 @@ def _drive(graph, config: dict, initial, decision: dict | None, interactive: boo
 def _main() -> int:
     args = parser().parse_args()
     settings = Settings.load(args.env_file)
+    if args.code_backend or args.code_model:
+        backend = args.code_backend or settings.code_analysis_backend
+        model = args.code_model or (settings.model if backend == "gemini" else "")
+        if not model or (backend == "gemini" and model != settings.model):
+            raise ValueError(
+                "Specify an explicit provider code model; Gemini remains gemini-3.8-flash"
+            )
+        settings = replace(settings, code_analysis_backend=backend, code_analysis_model=model)
     if args.command == "budget":
         print(
             json.dumps(

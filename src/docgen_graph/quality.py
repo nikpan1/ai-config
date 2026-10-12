@@ -5,7 +5,7 @@ from difflib import SequenceMatcher
 from markdown_it import MarkdownIt
 
 from docgen_graph.assets import asset_filename, image_references, meaningful_alt
-from docgen_graph.authoring.template import heading_tree
+from docgen_graph.authoring.template import bind_plan_sections, heading_tree
 from docgen_graph.contracts import ContentUnit, PresentationPlacement, TemplateRequirement
 from docgen_graph.source_links import CITATION_GROUP, citation_labels
 from docgen_graph.storage import digest
@@ -318,9 +318,18 @@ def validate_quality_plan(plan: dict, contract: dict, assets: list[dict], spans:
         and item["required"]
         and item["id"] not in omitted
     }
-    if [
-        title for title in contract["headings"] if title in titles
-    ] != titles or not required_titles.issubset(titles):
+    if contract.get("heading_tree"):
+        try:
+            bind_plan_sections(
+                contract["heading_tree"],
+                plan["sections"],
+                [item["text"] for item in contract["requirements"] if item["id"] in omitted],
+            )
+        except ValueError as error:
+            findings.append(str(error))
+    elif [title for title in contract["headings"] if title in titles] != titles:
+        findings.append("Plan must retain required heading order")
+    if not required_titles.issubset(titles):
         findings.append("Plan must retain required heading order")
     requirements = {item["id"]: item for item in contract["requirements"]}
     decisions = plan.get("template_decisions", [])

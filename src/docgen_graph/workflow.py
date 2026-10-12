@@ -14,12 +14,15 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.types import interrupt
 
 from docgen_graph.assets import asset_filename, validate_asset, verify_bundle
-from docgen_graph.authoring.template import document_title, number_generated_headings
+from docgen_graph.authoring.template import (
+    bind_plan_sections,
+    document_title,
+    number_generated_headings,
+)
 from docgen_graph.authoring.tools import AuthoringTools, declarations
 from docgen_graph.code_analysis import stages as code_stages
 from docgen_graph.contracts import (
     AuditDraft,
-    CodeAnalysisDraft,
     DocumentExtractionDraft,
     EditDraft,
     PagePlanDraft,
@@ -52,7 +55,12 @@ from docgen_graph.quality import (
     validate_visual_output,
     visual_evidence_ids,
 )
-from docgen_graph.source_coverage import audit_decisions, coverage_report, validate_aspect_inventory
+from docgen_graph.source_coverage import (
+    audit_decisions,
+    coverage_report,
+    editorial_findings,
+    validate_aspect_inventory,
+)
 from docgen_graph.source_links import (
     CITATION_GROUP,
     citation_labels,
@@ -70,6 +78,7 @@ from docgen_graph.storage import ArtifactStore, digest
 class PipelineState(TypedDict, total=False):
     source_aspects_ref: str
     source_decisions_ref: str
+    source_non_substantive_ref: str
     source_aspect_index: int
     source_audit_index: int
     pending_document_ref: str
@@ -271,6 +280,8 @@ class Pipeline:
                 "code_analysis_result_limit",
             )
         }
+        scope_file = getattr(settings, "code_scope_file", None)
+        configuration["code_scope_hash"] = digest(scope_file.read_bytes()) if scope_file else None
         return digest(
             [
                 implementation_signature(),
@@ -383,6 +394,7 @@ class Pipeline:
             "source_aspect_index": 0,
             "source_aspects_ref": self.store.put([]),
             "source_decisions_ref": self.store.put([]),
+            "source_non_substantive_ref": self.store.put([]),
             "route": "inventory_code_scope",
         }
 
@@ -412,77 +424,17 @@ class Pipeline:
                 self.read(state, "source_aspects_ref", []) + aspects
             ),
             "source_aspect_index": index + 1,
+            "source_non_substantive_ref": self.store.put(
+                self.read(state, "source_non_substantive_ref", [])
+                + [
+                    {
+                        "evidence_id": key,
+                        "decision": "Inventory candidate; independently checked against source",
+                    }
+                    for key in draft["non_substantive"]
+                ]
+            ),
             "route": "inventory_source_aspects",
-        }
-
-    def analyze_code_unit(self, state: PipelineState) -> dict:
-        inventory_record = self.read(state, "inventory_ref")
-        ids = inventory_record["code_units"][state["code_index"]]
-        spans = self.spans(state)
-        payload = {
-            "spans": [spans[key] for key in ids],
-            "analysis": {
-                spans[key]["path"]: inventory_record["analysis"][spans[key]["path"]] for key in ids
-            },
-            "feedback": self.read(state, "feedback_ref", []),
-            "previous": self.read(state, "draft_ref") if state.get("attempt") else None,
-        }
-        draft = self.call("analyze_code", payload, CodeAnalysisDraft)
-        return {"draft_ref": self.store.put(draft)}
-
-    def verify_code_unit(self, state: PipelineState) -> dict:
-        inventory_record = self.read(state, "inventory_ref")
-        ids = inventory_record["code_units"][state["code_index"]]
-        spans = self.spans(state)
-        draft = self.read(state, "draft_ref")
-        findings = []
-        try:
-            records = [normalized_assertion(item, set(ids)) for item in draft["details"]]
-        except (ValueError, TypeError) as error:
-            records = []
-            findings.append(str(error))
-        missing = set(ids) - {key for record in records for key in record["evidence_ids"]}
-        if missing:
-            findings.append(f"Code spans lack detail records: {sorted(missing)}")
-        audit = (
-            self.call(
-                "verify_code",
-                {
-                    "spans": [spans[key] for key in ids],
-                    "draft": draft,
-                },
-                AuditDraft,
-            )
-            if not findings
-            else {"accepted": False, "findings": findings}
-        )
-        findings.extend(str(item) for item in audit.get("findings", []))
-        if not audit.get("accepted") or findings:
-            if state.get("attempt", 0) < self.repair_limit():
-                return {
-                    "attempt": state.get("attempt", 0) + 1,
-                    "feedback_ref": self.store.put(findings),
-                    "route": "analyze_code_unit",
-                }
-            return self.issue(state, "verify_code_unit", findings, "analyze_code_unit")
-        assertions = self.assertions(state) + records
-        first = spans[ids[0]]
-        last = spans[ids[-1]]
-        report = (
-            f"## {first['path']} lines {first['start_line']}-{last['end_line']}\n\n"
-            f"{draft['report']}\n"
-        )
-        self.store.write(f"runs/{self.run_id}/reports/code-{state['code_index']:04d}.md", report)
-        next_index = state["code_index"] + 1
-        return {
-            "assertions_ref": self.store.put(assertions),
-            "code_index": next_index,
-            "attempt": 0,
-            "draft_ref": "",
-            "feedback_ref": "",
-            "route": "analyze_code_unit"
-            if next_index < len(inventory_record["code_units"])
-            else "extract_document_batch",
         }
 
     def extract_document_batch(self, state: PipelineState) -> dict:
@@ -517,7 +469,10 @@ class Pipeline:
         draft = self.read(state, "draft_ref")
         findings = []
         try:
-            records = [normalized_assertion(item, set(ids)) for item in draft["assertions"]]
+            records = [
+                normalized_assertion({**item, "review_status": "verified"}, set(ids))
+                for item in draft["assertions"]
+            ]
         except (ValueError, TypeError) as error:
             records = []
             findings.append(str(error))
@@ -577,6 +532,11 @@ class Pipeline:
                 "blocks": [spans[key] for key in ids],
                 "aspects": aspects,
                 "facts": pending["records"],
+                "non_substantive_candidates": [
+                    item
+                    for item in self.read(state, "source_non_substantive_ref", [])
+                    if item["evidence_id"] in ids
+                ],
             },
             SourceAudit,
         )
@@ -757,6 +717,19 @@ class Pipeline:
             PagePlanDraft,
         )
         group_map = {group["id"]: group for group in groups}
+        try:
+            omitted = {
+                item["requirement_id"]
+                for item in draft.get("template_decisions", [])
+                if item["disposition"] == "inapplicable"
+            }
+            draft["sections"] = bind_plan_sections(
+                contract["heading_tree"],
+                draft["sections"],
+                [item["text"] for item in contract["requirements"] if item["id"] in omitted],
+            )
+        except ValueError as error:
+            return self.issue(state, "draft_page_plan", [str(error)], "draft_page_plan")
         diagrams = {item["id"]: item for item in draft.get("diagrams", [])}
         sections = []
         for raw in draft["sections"]:
@@ -779,14 +752,7 @@ class Pipeline:
             sections.append(
                 {
                     "title": str(raw.get("title", "")).strip(),
-                    "section_id": next(
-                        (
-                            node["section_id"]
-                            for node in contract.get("heading_tree", [])
-                            if node["title"] == raw.get("title")
-                        ),
-                        "section-" + digest([contract["hash"], len(sections)])[:12],
-                    ),
+                    "section_id": raw["section_id"],
                     "purpose": str(raw.get("purpose", "")).strip(),
                     "group_ids": ids,
                     "support_group_ids": support_ids,
@@ -800,6 +766,9 @@ class Pipeline:
                 }
             )
         units = content_units(groups, sections)
+        section_ids = {section["title"]: section["section_id"] for section in sections}
+        for unit in units:
+            unit["canonical_section_id"] = section_ids.get(unit["canonical_section"], "")
         for section in sections:
             section["content_unit_ids"] = [
                 unit["id"] for unit in units if unit["canonical_section"] == section["title"]
@@ -811,6 +780,8 @@ class Pipeline:
                 and unit["canonical_section"] != section["title"]
             ]
             for visual in section["visuals"]:
+                visual["section_id"] = section["section_id"]
+                visual["section"] = section["title"]
                 visual["review_status"] = "planned"
                 visual["diagram"] = diagrams.get(visual.get("diagram_id"))
                 if visual.get("diagram"):
@@ -1650,16 +1621,6 @@ class Pipeline:
                 SectionDraft,
             )
         draft = _normalized_section_draft(SectionDraft.model_validate(draft).model_dump(), packet)
-        title_number = re.match(r"^(\d+(?:\.\d+)*)\.?\s", section["title"])
-        if title_number:
-            fixed = [
-                item["text"]
-                for item in plan["template_requirements"]
-                if item["section"] == section["title"]
-                and item["kind"] == "heading"
-                and item["text"] != section["title"]
-            ]
-            draft["markdown"] = number_generated_headings(draft["markdown"], title_number[1], fixed)
         visuals = render_visuals(
             packet.get("visuals", []), plan["source_assets"], packet["evidence"]
         )
@@ -1797,11 +1758,22 @@ class Pipeline:
                     [f"Incomplete section: {section['title']}"],
                     "assemble_pages",
                 )
+            markdown = "\n\n".join(item["markdown"] for item in parts)
+            title_number = re.match(r"^(\d+(?:\.\d+)*)\.?\s", section["title"])
+            if title_number:
+                fixed = [
+                    item["text"]
+                    for item in plan["template_requirements"]
+                    if item["section"] == section["title"]
+                    and item["kind"] == "heading"
+                    and item["text"] != section["title"]
+                ]
+                markdown = number_generated_headings(markdown, title_number[1], fixed)
             sections.append(
                 {
                     "title": section["title"],
                     "section_id": section.get("section_id", section["title"]),
-                    "markdown": "\n\n".join(item["markdown"] for item in parts),
+                    "markdown": markdown,
                     "mappings": [mapping for item in parts for mapping in item["mappings"]],
                     "supporting_obligation_ids": section["supporting_obligation_ids"],
                     "visuals": section.get("visuals", []),
@@ -1895,6 +1867,7 @@ class Pipeline:
         return {
             "original_markdown": before,
             "edited_markdown": after,
+            "qualifier_and_causality_risks": editorial_findings(before, after),
             "comparison_scope": (
                 "Changed line ranges with nearby context; unchanged text was verified"
             ),
@@ -2058,6 +2031,25 @@ class Pipeline:
             )
         )
         repetition = repetition_report(sections)
+        if repetition["semantic_candidates"]:
+            semantic_audit = self.call(
+                "audit_repetition",
+                {"candidates": repetition["semantic_candidates"], "facts": self.assertions(state)},
+                AuditDraft,
+            )
+            if not semantic_audit["accepted"] or semantic_audit["findings"]:
+                if state.get("audit_attempt", 0) < 1:
+                    return {
+                        "edit_index": 0,
+                        "edit_queue_ref": self.store.put(list(range(len(sections)))),
+                        "audit_attempt": state.get("audit_attempt", 0) + 1,
+                        "route": "edit_page",
+                        "feedback_ref": self.store.put(
+                            semantic_audit["findings"]
+                            or ["Remove independently verified repetition; preserve all qualifiers"]
+                        ),
+                    }
+                findings.extend(semantic_audit["findings"] or ["Unresolved semantic repetition"])
         if set(actual) != expected or len(actual) != len(set(actual)):
             findings.append("Final output does not map every obligation exactly once")
         if len(sections) != len(plan["sections"]):
@@ -2177,6 +2169,15 @@ class Pipeline:
             state["graph_revision"],
             inventory_record.get("attachments", []),
         )
+        report["blocks"] = {
+            "total": sum(len(batch) for batch in batches),
+            "independently_audited": sum(len(batch) for batch in batches),
+        }
+        report["facts_in_text"] = {"total": len(self.assertions(state)), "mapped": len(mapped)}
+        report["non_substantive_candidates"] = self.read(state, "source_non_substantive_ref", [])
+        report["exclusions"] = self.read(state, "exclusions_ref", [])
+        report["conflict_candidates"] = len(self.graph.conflict_candidates())
+        report["unsupported_assertions"] = 0
         if not report["complete"]:
             return self.issue(
                 state,

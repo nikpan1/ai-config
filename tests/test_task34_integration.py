@@ -148,3 +148,33 @@ def test_missing_source_qualifier_blocks_autopilot_before_planning(tmp_path):
     assert result["status"] == "incomplete"
     assert "draft_plan" not in model.calls
     assert store.get(result["exclusions_ref"]) == []
+
+
+def test_csv_attachment_reaches_published_text_with_native_locator(tmp_path):
+    docs = tmp_path / "docs"
+    docs.mkdir()
+    (docs / "rules.md").write_text("Review follows the attached limits.\n", encoding="utf-8")
+    (docs / "limits.csv").write_text("Role,Limit\nReviewer,10 days\n", encoding="utf-8")
+    template = tmp_path / "template.md"
+    template.write_text("## Rules\n", encoding="utf-8")
+    store = ArtifactStore(tmp_path / "runtime")
+    model = FixtureModel()
+    with closing(
+        sqlite3.connect(store.root / "checkpoints.sqlite", check_same_thread=False)
+    ) as connection:
+        graph = Pipeline(store, model, "attachments").build(SqliteSaver(connection))
+        state = graph.invoke(
+            {
+                "docs": str(docs),
+                "template": str(template),
+                "run_id": "attachments",
+                "mode": "autopilot",
+            },
+            {"configurable": {"thread_id": "attachments"}},
+        )
+    assert state["status"] == "complete"
+    bundle = store.root / "runs/attachments/candidates" / state["candidate_ref"]
+    assert "10 days" in (bundle / "documentation/index.md").read_text("utf-8")
+    evidence = "\n".join(path.read_text("utf-8") for path in (bundle / "evidence").glob("*.md"))
+    assert "table_cell" in evidence
+    assert len(list((bundle / "attachments").glob("*.csv"))) == 1

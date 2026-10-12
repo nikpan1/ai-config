@@ -71,3 +71,63 @@ uv run ruff check src tests evaluation
 ```
 
 The quick investment fixture and its citation cases are in `data/test_data_2_quick/` and `data/test_data_2_reference/`. The full corpus is in `data/test_data_2/`. Java and Angular files currently use generic text analysis, and ticket filtering is not implemented. The HTML mirrors verify locators only. Passing offline tests does not establish semantic completeness or browser highlighting against live Confluence.
+# Evidence authoring and code analysis
+
+Code analysis can use `gemini`, `codex_sdk`, or `auggie_sdk` through
+`DOCGEN_CODE_ANALYSIS_BACKEND` and `DOCGEN_CODE_ANALYSIS_MODEL` in `.env`.
+The CLI also accepts global `--code-backend` and `--code-model` options:
+
+```powershell
+uv run docgen --code-backend gemini --code-model gemini-3.8-flash run --docs data/docs --code data/code --thread-id example
+```
+
+Use the same effective configuration when resuming a thread. Changing the model,
+tool limits, source revision, prompts, or implementation invalidates runtime
+compatibility and requires a new run. Documentation extraction, planning,
+authoring, editing, and independent audits always use `gemini-3.8-flash`.
+The SDK exception is restricted to read-only code analysis. Native Codex uses
+the verified isolation boundary; Auggie reports `unsupported` where its host
+cannot establish equivalent isolation. Neither backend silently falls back.
+Provider execution also requires an authorized shared accounting allowance.
+
+The authoring workflow checkpoints each model action, tool execution, result
+verification, new-fact audit, and graph revision publication separately. Tools
+search frozen original sources, the revision-bound knowledge graph, and code;
+read exact evidence and attachments; build restricted Mermaid diagrams; and
+independently check proposed content. Gemini automatic function execution is
+disabled. Full serialized protocol messages, including opaque thinking
+signatures, are retained for restart. Tool turns, elapsed time and result bytes
+are bounded by `DOCGEN_AUTHORING_TURN_LIMIT`,
+`DOCGEN_AUTHORING_TIMEOUT_SECONDS`, and `DOCGEN_AUTHORING_RESULT_LIMIT`.
+
+Completeness is checked independently at source inventory, source-aspect
+discovery, and final reader passages. Using every graph fact does not establish
+complete extraction. Missing qualifiers or unresolved required attachments stop
+autopilot with `incomplete`; manual mode requests LangGraph review. Failed
+extraction is never automatically relabeled as harmless boilerplate. Inspect
+`source-coverage.json`, `unresolved.json`, graph revisions, and stage artifacts
+alongside the final candidate audit.
+
+Place explicitly supplied local TXT/MD, text PDF, DOCX, CSV, or XLSX attachments
+under the selected documentation directory. Their frozen hashes, parser
+versions, native page/paragraph/table/cell coordinates, formulas, available
+cached values, and extraction limitations enter the source register. Published
+evidence pages retain native locators and link to deduplicated frozen files.
+Scans, image-only knowledge, encrypted or corrupt documents, and unfaithfully
+readable complex content remain unresolved. No OCR, image interpretation,
+macro execution, or arbitrary URL fetching is performed. For required image or
+unsupported attachment knowledge, supply a source-attributed transcription
+identifying the original attachment and reviewer, then start a new snapshot/run;
+approving an issue alone does not create missing evidence.
+
+Template headings are parsed as Markdown, preserving fixed wording and numbers.
+Generated headings inherit numbering, dynamic heading slots have stable IDs,
+and renumbered local links follow their headings. Fixed numbers are never
+silently shifted; conflicts are rejected. Editing retains exact fact mappings
+and source quotes, audits changes to qualifiers and causal explanations, and
+checks candidate repetition in prose and tables before removing it.
+
+The shared historical Gemini ledger is already above the authorized PLN 200
+development allowance. The implementation was exercised with offline fixtures;
+new paid validation requires an explicit budget change. Live SDK/Gemini
+compatibility and human readability acceptance remain separate acceptance steps.
