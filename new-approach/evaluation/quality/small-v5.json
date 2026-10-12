@@ -1,0 +1,300 @@
+{
+  "run_id": "quality-small-v5",
+  "status": "ready_for_review",
+  "stages": {
+    "snapshot_inputs": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.013787400006549433,
+      "retries": 0,
+      "repairs": 0
+    },
+    "inventory_sources": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.009408099998836406,
+      "retries": 0,
+      "repairs": 0
+    },
+    "extract_document": {
+      "paid_calls": 2,
+      "cache_hits": 0,
+      "input_tokens": 2611,
+      "output_tokens": 3275,
+      "response_seconds": 23.21329169999808,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "extract_document_batch": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 23.244931400004134,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_document": {
+      "paid_calls": 2,
+      "cache_hits": 0,
+      "input_tokens": 4282,
+      "output_tokens": 1792,
+      "response_seconds": 16.988923700002488,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_document_batch": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 17.023247500001162,
+      "retries": 0,
+      "repairs": 0
+    },
+    "link_graph_batch": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.006313699996098876,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_graph_batch": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.0005987999975332059,
+      "retries": 0,
+      "repairs": 0
+    },
+    "finalize_graph": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.025315899998531677,
+      "retries": 0,
+      "repairs": 0
+    },
+    "compile_template": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.0006864999959361739,
+      "retries": 0,
+      "repairs": 0
+    },
+    "draft_plan": {
+      "paid_calls": 1,
+      "cache_hits": 0,
+      "input_tokens": 4037,
+      "output_tokens": 6487,
+      "response_seconds": 38.841080000005604,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "draft_page_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 38.86750600000232,
+      "retries": 0,
+      "repairs": 0
+    },
+    "retrieve_plan_evidence": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.07712729999911971,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_plan": {
+      "paid_calls": 1,
+      "cache_hits": 0,
+      "input_tokens": 6756,
+      "output_tokens": 1905,
+      "response_seconds": 12.402226499994867,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "validate_page_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 12.472720899997512,
+      "retries": 0,
+      "repairs": 0
+    },
+    "review_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.006997600001341198,
+      "retries": 0,
+      "repairs": 0
+    },
+    "retrieve_section_evidence": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.05412979999528034,
+      "retries": 0,
+      "repairs": 0
+    },
+    "write_section": {
+      "paid_calls": 5,
+      "cache_hits": 0,
+      "input_tokens": 16271,
+      "output_tokens": 12200,
+      "response_seconds": 72.88595150000765,
+      "node_seconds": 73.02117510000971,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_section": {
+      "paid_calls": 5,
+      "cache_hits": 0,
+      "input_tokens": 13184,
+      "output_tokens": 5696,
+      "response_seconds": 37.81482510000933,
+      "node_seconds": 37.95368620000227,
+      "retries": 0,
+      "repairs": 1
+    },
+    "assemble_pages": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.026325300001190044,
+      "retries": 0,
+      "repairs": 0
+    },
+    "edit_page": {
+      "paid_calls": 3,
+      "cache_hits": 0,
+      "input_tokens": 6533,
+      "output_tokens": 19791,
+      "response_seconds": 99.13413329999457,
+      "node_seconds": 99.18554470000527,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_edited_page": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 4.099358600004052,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_page": {
+      "paid_calls": 1,
+      "cache_hits": 0,
+      "input_tokens": 1622,
+      "output_tokens": 498,
+      "response_seconds": 4.048089300005813,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "audit_documentation": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.028192600002512336,
+      "retries": 0,
+      "repairs": 0
+    },
+    "export_candidate": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.09342910000123084,
+      "retries": 0,
+      "repairs": 0
+    }
+  },
+  "paid_calls": 20,
+  "charged_pln": 0.9201381084,
+  "reserved_pln": 0,
+  "active_node_seconds": 306.2104825000206,
+  "human_reader_scores": "Unmeasured",
+  "candidate": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\new-approach\\.docgen\\runs\\quality-small-v5\\candidates\\37a33ffd99e6cb5feb7d9eccae3f455b06547f5749b3593177c9d3e94f904433",
+  "candidate_hash": "37a33ffd99e6cb5feb7d9eccae3f455b06547f5749b3593177c9d3e94f904433",
+  "reader_words": 458,
+  "markdown_characters": 4171,
+  "images": 1,
+  "diagrams": 1,
+  "audit": {
+    "plan_hash": "981021a99b95c4a39332cd03744ccfea67c7140dbb7174523e782459dde6362f",
+    "graph_revision": "062a9fed11278302b9258853efca8719b181b8a75bb00a931c09354b0e188c5f",
+    "obligation_count": 12,
+    "mapped_count": 12,
+    "section_count": 4,
+    "findings": [],
+    "quality": {
+      "reader_words": 439,
+      "duplicate_paragraphs": [],
+      "redundant_explanations": "Requires reader assessment; not inferred from word count"
+    },
+    "template_decisions": [],
+    "visual_count": 2
+  },
+  "invocation_seconds": 306.37364140000136,
+  "interrupts": [
+    {
+      "kind": "release",
+      "candidate_hash": "37a33ffd99e6cb5feb7d9eccae3f455b06547f5749b3593177c9d3e94f904433",
+      "path": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\new-approach\\.docgen\\runs\\quality-small-v5\\candidates\\37a33ffd99e6cb5feb7d9eccae3f455b06547f5749b3593177c9d3e94f904433\\documentation\\index.md",
+      "error": ""
+    }
+  ],
+  "configuration": {
+    "model": "gemini-3.8-flash",
+    "output_tokens": 32768,
+    "request_tokens": 400000,
+    "timeout_seconds": 120,
+    "cache_mode": "durable",
+    "budget_pln": 1000.0
+  },
+  "portable_copy_verified": true
+}

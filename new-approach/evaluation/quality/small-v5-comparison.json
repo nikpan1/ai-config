@@ -1,0 +1,63 @@
+{
+  "baseline": {
+    "candidate_hash": "8ab042966d4841f9ea65434745a126cf3be612001920045304698dff4bd8c478",
+    "title": "Order Review Documentation Plan",
+    "whole_page_words": 569,
+    "section_quality": {
+      "reader_words": 557,
+      "duplicate_paragraphs": [],
+      "redundant_explanations": "Requires reader assessment; not inferred from word count"
+    },
+    "mapped_obligations": 13,
+    "presentation_placements": 0,
+    "shared_placements": 0,
+    "final_offsets_verified": false,
+    "images": 0,
+    "diagrams": 0,
+    "template_decisions": [],
+    "manifest_verified": true
+  },
+  "revised": {
+    "candidate_hash": "49c2970cee90fa6566596343d5afbff260974d2fc1fe86dfe5ef4d203fdec975",
+    "title": "Order Review and Approval Service",
+    "whole_page_words": 458,
+    "section_quality": {
+      "reader_words": 436,
+      "duplicate_paragraphs": [],
+      "redundant_explanations": "Requires reader assessment; not inferred from word count"
+    },
+    "mapped_obligations": 12,
+    "presentation_placements": 10,
+    "shared_placements": 1,
+    "final_offsets_verified": true,
+    "images": 1,
+    "diagrams": 1,
+    "template_decisions": [],
+    "manifest_verified": true
+  },
+  "section_word_change_percent": -21.72,
+  "source_links": {
+    "baseline": 0,
+    "revised": 0,
+    "missing": [],
+    "added": []
+  },
+  "human_reader_scores": null,
+  "factual_fidelity": "All ten annotated passages and six reader questions reviewed in small-reader-review-final.json. All material facts, scopes, qualifiers and uncertainties retained.",
+  "paid_call_change_percent": -23.08,
+  "ledger_charge_change_percent": 23.1,
+  "wall_time_change_percent": -11.36,
+  "writing_metrics_run": "quality-small-v5",
+  "export_revision": {
+    "run_id": "quality-small-export-v2",
+    "paid_calls": 1,
+    "charged_pln": 0.047210801399999995,
+    "invocation_seconds": 10.620068600001105
+  },
+  "evaluation_path_totals": {
+    "paid_calls": 21,
+    "charged_pln": 0.9673489098,
+    "sum_of_invocation_seconds": 316.99371000000247
+  },
+  "timing_note": "Writing run uses the same fixture, template, model, limits and cache mode as baseline, but overlaps furniture-quality-v8. The final export revision is separately measured; their summed durations are not one continuous isolated benchmark."
+}

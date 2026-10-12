@@ -1,0 +1,834 @@
+{
+  "method": "Read-only shared-ledger accounting, including failed and interrupted requests. Uncertain charges retain their full reservation; known tokens are a lower bound when requests_without_token_usage is nonzero.",
+  "selected_prefixes": [
+    "furniture-quality-",
+    "quality-small-"
+  ],
+  "total": {
+    "requests": 230,
+    "statuses": {
+      "settled": 219,
+      "uncertain": 10,
+      "reserved": 1
+    },
+    "charged_pln": 54.264064606199995,
+    "reserved_pln": 1.50120135,
+    "known_input_tokens": 3270992,
+    "known_output_tokens": 906410,
+    "requests_without_token_usage": 10
+  },
+  "runs": {
+    "furniture-quality-v1": {
+      "requests": 75,
+      "statuses": {
+        "settled": 73,
+        "uncertain": 2
+      },
+      "charged_pln": 10.5923710692,
+      "reserved_pln": 0,
+      "known_input_tokens": 507221,
+      "known_output_tokens": 220838,
+      "requests_without_token_usage": 2,
+      "stages": {
+        "draft_plan": {
+          "requests": 3,
+          "statuses": {
+            "settled": 1,
+            "uncertain": 2
+          },
+          "charged_pln": 6.4498272219,
+          "reserved_pln": 0,
+          "known_input_tokens": 104469,
+          "known_output_tokens": 19093,
+          "requests_without_token_usage": 2
+        },
+        "extract_document": {
+          "requests": 36,
+          "statuses": {
+            "settled": 36
+          },
+          "charged_pln": 2.701135215,
+          "reserved_pln": 0,
+          "known_input_tokens": 161280,
+          "known_output_tokens": 151814,
+          "requests_without_token_usage": 0
+        },
+        "verify_document": {
+          "requests": 36,
+          "statuses": {
+            "settled": 36
+          },
+          "charged_pln": 1.4414086323,
+          "reserved_pln": 0,
+          "known_input_tokens": 241472,
+          "known_output_tokens": 49931,
+          "requests_without_token_usage": 0
+        }
+      }
+    },
+    "furniture-quality-v2": {
+      "requests": 1,
+      "statuses": {
+        "uncertain": 1
+      },
+      "charged_pln": 2.9341398609000002,
+      "reserved_pln": 0,
+      "known_input_tokens": 104767,
+      "known_output_tokens": 32750,
+      "requests_without_token_usage": 0,
+      "stages": {
+        "draft_plan": {
+          "requests": 1,
+          "statuses": {
+            "uncertain": 1
+          },
+          "charged_pln": 2.9341398609000002,
+          "reserved_pln": 0,
+          "known_input_tokens": 104767,
+          "known_output_tokens": 32750,
+          "requests_without_token_usage": 0
+        }
+      }
+    },
+    "furniture-quality-v3": {
+      "requests": 3,
+      "statuses": {
+        "settled": 2,
+        "uncertain": 1
+      },
+      "charged_pln": 5.41083593565,
+      "reserved_pln": 0,
+      "known_input_tokens": 209690,
+      "known_output_tokens": 28355,
+      "requests_without_token_usage": 1,
+      "stages": {
+        "draft_plan": {
+          "requests": 3,
+          "statuses": {
+            "settled": 2,
+            "uncertain": 1
+          },
+          "charged_pln": 5.41083593565,
+          "reserved_pln": 0,
+          "known_input_tokens": 209690,
+          "known_output_tokens": 28355,
+          "requests_without_token_usage": 1
+        }
+      }
+    },
+    "furniture-quality-v4": {
+      "requests": 4,
+      "statuses": {
+        "settled": 2,
+        "uncertain": 2
+      },
+      "charged_pln": 11.171658696299998,
+      "reserved_pln": 0,
+      "known_input_tokens": 271465,
+      "known_output_tokens": 57244,
+      "requests_without_token_usage": 2,
+      "stages": {
+        "draft_plan": {
+          "requests": 2,
+          "statuses": {
+            "settled": 1,
+            "uncertain": 1
+          },
+          "charged_pln": 5.1538223403,
+          "reserved_pln": 0,
+          "known_input_tokens": 113049,
+          "known_output_tokens": 26835,
+          "requests_without_token_usage": 1
+        },
+        "verify_plan": {
+          "requests": 2,
+          "statuses": {
+            "uncertain": 1,
+            "settled": 1
+          },
+          "charged_pln": 6.017836355999998,
+          "reserved_pln": 0,
+          "known_input_tokens": 158416,
+          "known_output_tokens": 30409,
+          "requests_without_token_usage": 1
+        }
+      }
+    },
+    "furniture-quality-v5": {
+      "requests": 9,
+      "statuses": {
+        "settled": 8,
+        "uncertain": 1
+      },
+      "charged_pln": 5.367177830699999,
+      "reserved_pln": 0,
+      "known_input_tokens": 482740,
+      "known_output_tokens": 51790,
+      "requests_without_token_usage": 1,
+      "stages": {
+        "draft_plan": {
+          "requests": 1,
+          "statuses": {
+            "settled": 1
+          },
+          "charged_pln": 0.6303226032,
+          "reserved_pln": 0,
+          "known_input_tokens": 113243,
+          "known_output_tokens": 20305,
+          "requests_without_token_usage": 0
+        },
+        "verify_plan": {
+          "requests": 2,
+          "statuses": {
+            "settled": 2
+          },
+          "charged_pln": 1.0327590261,
+          "reserved_pln": 0,
+          "known_input_tokens": 315419,
+          "known_output_tokens": 7294,
+          "requests_without_token_usage": 0
+        },
+        "verify_section": {
+          "requests": 2,
+          "statuses": {
+            "settled": 2
+          },
+          "charged_pln": 0.11593148489999999,
+          "reserved_pln": 0,
+          "known_input_tokens": 18521,
+          "known_output_tokens": 4196,
+          "requests_without_token_usage": 0
+        },
+        "write_section": {
+          "requests": 4,
+          "statuses": {
+            "settled": 3,
+            "uncertain": 1
+          },
+          "charged_pln": 3.5881647164999992,
+          "reserved_pln": 0,
+          "known_input_tokens": 35557,
+          "known_output_tokens": 19995,
+          "requests_without_token_usage": 1
+        }
+      }
+    },
+    "furniture-quality-v6": {
+      "requests": 11,
+      "statuses": {
+        "settled": 11
+      },
+      "charged_pln": 1.7661083589,
+      "reserved_pln": 0,
+      "known_input_tokens": 278211,
+      "known_output_tokens": 64710,
+      "requests_without_token_usage": 0,
+      "stages": {
+        "verify_plan": {
+          "requests": 1,
+          "statuses": {
+            "settled": 1
+          },
+          "charged_pln": 0.4881560472,
+          "reserved_pln": 0,
+          "known_input_tokens": 156908,
+          "known_output_tokens": 1884,
+          "requests_without_token_usage": 0
+        },
+        "verify_section": {
+          "requests": 4,
+          "statuses": {
+            "settled": 4
+          },
+          "charged_pln": 0.2324206008,
+          "reserved_pln": 0,
+          "known_input_tokens": 45782,
+          "known_output_tokens": 6682,
+          "requests_without_token_usage": 0
+        },
+        "write_section": {
+          "requests": 6,
+          "statuses": {
+            "settled": 6
+          },
+          "charged_pln": 1.0455317109,
+          "reserved_pln": 0,
+          "known_input_tokens": 75521,
+          "known_output_tokens": 56144,
+          "requests_without_token_usage": 0
+        }
+      }
+    },
+    "furniture-quality-v7": {
+      "requests": 25,
+      "statuses": {
+        "settled": 24,
+        "uncertain": 1
+      },
+      "charged_pln": 9.1383746508,
+      "reserved_pln": 0,
+      "known_input_tokens": 918994,
+      "known_output_tokens": 222063,
+      "requests_without_token_usage": 1,
+      "stages": {
+        "draft_plan": {
+          "requests": 2,
+          "statuses": {
+            "settled": 2
+          },
+          "charged_pln": 1.4970279222,
+          "reserved_pln": 0,
+          "known_input_tokens": 227273,
+          "known_output_tokens": 56561,
+          "requests_without_token_usage": 0
+        },
+        "verify_plan": {
+          "requests": 3,
+          "statuses": {
+            "settled": 3
+          },
+          "charged_pln": 1.6009850150999998,
+          "reserved_pln": 0,
+          "known_input_tokens": 475814,
+          "known_output_tokens": 13937,
+          "requests_without_token_usage": 0
+        },
+        "verify_section": {
+          "requests": 8,
+          "statuses": {
+            "settled": 8
+          },
+          "charged_pln": 0.4915546614,
+          "reserved_pln": 0,
+          "known_input_tokens": 85236,
+          "known_output_tokens": 16450,
+          "requests_without_token_usage": 0
+        },
+        "write_section": {
+          "requests": 12,
+          "statuses": {
+            "settled": 11,
+            "uncertain": 1
+          },
+          "charged_pln": 5.548807052099999,
+          "reserved_pln": 0,
+          "known_input_tokens": 130671,
+          "known_output_tokens": 135115,
+          "requests_without_token_usage": 1
+        }
+      }
+    },
+    "furniture-quality-v8": {
+      "requests": 11,
+      "statuses": {
+        "settled": 11
+      },
+      "charged_pln": 1.3796524664999998,
+      "reserved_pln": 0,
+      "known_input_tokens": 274875,
+      "known_output_tokens": 39042,
+      "requests_without_token_usage": 0,
+      "stages": {
+        "verify_plan": {
+          "requests": 1,
+          "statuses": {
+            "settled": 1
+          },
+          "charged_pln": 0.5339199429,
+          "reserved_pln": 0,
+          "known_input_tokens": 157296,
+          "known_output_tokens": 4925,
+          "requests_without_token_usage": 0
+        },
+        "verify_section": {
+          "requests": 5,
+          "statuses": {
+            "settled": 5
+          },
+          "charged_pln": 0.28176213959999996,
+          "reserved_pln": 0,
+          "known_input_tokens": 55279,
+          "known_output_tokens": 8145,
+          "requests_without_token_usage": 0
+        },
+        "write_section": {
+          "requests": 5,
+          "statuses": {
+            "settled": 5
+          },
+          "charged_pln": 0.563970384,
+          "reserved_pln": 0,
+          "known_input_tokens": 62300,
+          "known_output_tokens": 25972,
+          "requests_without_token_usage": 0
+        }
+      }
+    },
+    "quality-small-baseline-v1": {
+      "requests": 26,
+      "statuses": {
+        "settled": 26
+      },
+      "charged_pln": 0.7474838112,
+      "reserved_pln": 0,
+      "known_input_tokens": 54523,
+      "known_output_tokens": 40033,
+      "requests_without_token_usage": 0,
+      "stages": {
+        "draft_plan": {
+          "requests": 1,
+          "statuses": {
+            "settled": 1
+          },
+          "charged_pln": 0.0183783438,
+          "reserved_pln": 0,
+          "known_input_tokens": 297,
+          "known_output_tokens": 1193,
+          "requests_without_token_usage": 0
+        },
+        "edit_page": {
+          "requests": 4,
+          "statuses": {
+            "settled": 4
+          },
+          "charged_pln": 0.1615721148,
+          "reserved_pln": 0,
+          "known_input_tokens": 2137,
+          "known_output_tokens": 10583,
+          "requests_without_token_usage": 0
+        },
+        "extract_document": {
+          "requests": 2,
+          "statuses": {
+            "settled": 2
+          },
+          "charged_pln": 0.0593466129,
+          "reserved_pln": 0,
+          "known_input_tokens": 2611,
+          "known_output_tokens": 3522,
+          "requests_without_token_usage": 0
+        },
+        "verify_document": {
+          "requests": 2,
+          "statuses": {
+            "settled": 2
+          },
+          "charged_pln": 0.0381947886,
+          "reserved_pln": 0,
+          "known_input_tokens": 4249,
+          "known_output_tokens": 1753,
+          "requests_without_token_usage": 0
+        },
+        "verify_page": {
+          "requests": 4,
+          "statuses": {
+            "settled": 4
+          },
+          "charged_pln": 0.0746168976,
+          "reserved_pln": 0,
+          "known_input_tokens": 9649,
+          "known_output_tokens": 3155,
+          "requests_without_token_usage": 0
+        },
+        "verify_plan": {
+          "requests": 1,
+          "statuses": {
+            "settled": 1
+          },
+          "charged_pln": 0.0118305819,
+          "reserved_pln": 0,
+          "known_input_tokens": 361,
+          "known_output_tokens": 734,
+          "requests_without_token_usage": 0
+        },
+        "verify_section": {
+          "requests": 6,
+          "statuses": {
+            "settled": 6
+          },
+          "charged_pln": 0.12458943989999999,
+          "reserved_pln": 0,
+          "known_input_tokens": 15766,
+          "known_output_tokens": 5337,
+          "requests_without_token_usage": 0
+        },
+        "write_section": {
+          "requests": 6,
+          "statuses": {
+            "settled": 6
+          },
+          "charged_pln": 0.2589550317,
+          "reserved_pln": 0,
+          "known_input_tokens": 19453,
+          "known_output_tokens": 13756,
+          "requests_without_token_usage": 0
+        }
+      }
+    },
+    "quality-small-v1": {
+      "requests": 5,
+      "statuses": {
+        "settled": 4,
+        "uncertain": 1
+      },
+      "charged_pln": 1.6720682931,
+      "reserved_pln": 0,
+      "known_input_tokens": 7615,
+      "known_output_tokens": 7380,
+      "requests_without_token_usage": 1,
+      "stages": {
+        "draft_plan": {
+          "requests": 1,
+          "statuses": {
+            "uncertain": 1
+          },
+          "charged_pln": 1.5414212196,
+          "reserved_pln": 0,
+          "known_input_tokens": 0,
+          "known_output_tokens": 0,
+          "requests_without_token_usage": 1
+        },
+        "extract_document": {
+          "requests": 2,
+          "statuses": {
+            "settled": 2
+          },
+          "charged_pln": 0.09802859489999999,
+          "reserved_pln": 0,
+          "known_input_tokens": 2611,
+          "known_output_tokens": 6158,
+          "requests_without_token_usage": 0
+        },
+        "verify_document": {
+          "requests": 2,
+          "statuses": {
+            "settled": 2
+          },
+          "charged_pln": 0.0326184786,
+          "reserved_pln": 0,
+          "known_input_tokens": 5004,
+          "known_output_tokens": 1222,
+          "requests_without_token_usage": 0
+        }
+      }
+    },
+    "quality-small-v2": {
+      "requests": 5,
+      "statuses": {
+        "settled": 4,
+        "uncertain": 1
+      },
+      "charged_pln": 1.62072368505,
+      "reserved_pln": 0,
+      "known_input_tokens": 6740,
+      "known_output_tokens": 5161,
+      "requests_without_token_usage": 1,
+      "stages": {
+        "draft_plan": {
+          "requests": 1,
+          "statuses": {
+            "uncertain": 1
+          },
+          "charged_pln": 1.52520736455,
+          "reserved_pln": 0,
+          "known_input_tokens": 0,
+          "known_output_tokens": 0,
+          "requests_without_token_usage": 1
+        },
+        "extract_document": {
+          "requests": 2,
+          "statuses": {
+            "settled": 2
+          },
+          "charged_pln": 0.062090744399999995,
+          "reserved_pln": 0,
+          "known_input_tokens": 2611,
+          "known_output_tokens": 3709,
+          "requests_without_token_usage": 0
+        },
+        "verify_document": {
+          "requests": 2,
+          "statuses": {
+            "settled": 2
+          },
+          "charged_pln": 0.0334255761,
+          "reserved_pln": 0,
+          "known_input_tokens": 4129,
+          "known_output_tokens": 1452,
+          "requests_without_token_usage": 0
+        }
+      }
+    },
+    "quality-small-v3": {
+      "requests": 20,
+      "statuses": {
+        "settled": 20
+      },
+      "charged_pln": 0.8820929997,
+      "reserved_pln": 0,
+      "known_input_tokens": 51518,
+      "known_output_tokens": 49807,
+      "requests_without_token_usage": 0,
+      "stages": {
+        "draft_plan": {
+          "requests": 1,
+          "statuses": {
+            "settled": 1
+          },
+          "charged_pln": 0.1125651546,
+          "reserved_pln": 0,
+          "known_input_tokens": 4309,
+          "known_output_tokens": 6809,
+          "requests_without_token_usage": 0
+        },
+        "edit_page": {
+          "requests": 4,
+          "statuses": {
+            "settled": 4
+          },
+          "charged_pln": 0.1446171975,
+          "reserved_pln": 0,
+          "known_input_tokens": 6900,
+          "known_output_tokens": 8475,
+          "requests_without_token_usage": 0
+        },
+        "extract_document": {
+          "requests": 2,
+          "statuses": {
+            "settled": 2
+          },
+          "charged_pln": 0.055692662399999995,
+          "reserved_pln": 0,
+          "known_input_tokens": 2611,
+          "known_output_tokens": 3273,
+          "requests_without_token_usage": 0
+        },
+        "verify_document": {
+          "requests": 2,
+          "statuses": {
+            "settled": 2
+          },
+          "charged_pln": 0.033880485599999996,
+          "reserved_pln": 0,
+          "known_input_tokens": 4134,
+          "known_output_tokens": 1482,
+          "requests_without_token_usage": 0
+        },
+        "verify_plan": {
+          "requests": 1,
+          "statuses": {
+            "settled": 1
+          },
+          "charged_pln": 0.068119029,
+          "reserved_pln": 0,
+          "known_input_tokens": 7340,
+          "known_output_tokens": 3174,
+          "requests_without_token_usage": 0
+        },
+        "verify_section": {
+          "requests": 5,
+          "statuses": {
+            "settled": 5
+          },
+          "charged_pln": 0.2014192521,
+          "reserved_pln": 0,
+          "known_input_tokens": 11949,
+          "known_output_tokens": 11336,
+          "requests_without_token_usage": 0
+        },
+        "write_section": {
+          "requests": 5,
+          "statuses": {
+            "settled": 5
+          },
+          "charged_pln": 0.2657992185,
+          "reserved_pln": 0,
+          "known_input_tokens": 14275,
+          "known_output_tokens": 15258,
+          "requests_without_token_usage": 0
+        }
+      }
+    },
+    "quality-small-v4": {
+      "requests": 18,
+      "statuses": {
+        "settled": 18
+      },
+      "charged_pln": 0.9829038797999999,
+      "reserved_pln": 0,
+      "known_input_tokens": 55492,
+      "known_output_tokens": 55882,
+      "requests_without_token_usage": 0,
+      "stages": {
+        "draft_plan": {
+          "requests": 1,
+          "statuses": {
+            "settled": 1
+          },
+          "charged_pln": 0.1505721096,
+          "reserved_pln": 0,
+          "known_input_tokens": 4224,
+          "known_output_tokens": 9416,
+          "requests_without_token_usage": 0
+        },
+        "edit_page": {
+          "requests": 4,
+          "statuses": {
+            "settled": 4
+          },
+          "charged_pln": 0.1785739905,
+          "reserved_pln": 0,
+          "known_input_tokens": 7945,
+          "known_output_tokens": 10580,
+          "requests_without_token_usage": 0
+        },
+        "extract_document": {
+          "requests": 2,
+          "statuses": {
+            "settled": 2
+          },
+          "charged_pln": 0.0746227674,
+          "reserved_pln": 0,
+          "known_input_tokens": 2611,
+          "known_output_tokens": 4563,
+          "requests_without_token_usage": 0
+        },
+        "verify_document": {
+          "requests": 2,
+          "statuses": {
+            "settled": 2
+          },
+          "charged_pln": 0.0352980423,
+          "reserved_pln": 0,
+          "known_input_tokens": 4412,
+          "known_output_tokens": 1523,
+          "requests_without_token_usage": 0
+        },
+        "verify_plan": {
+          "requests": 1,
+          "statuses": {
+            "settled": 1
+          },
+          "charged_pln": 0.050808988799999996,
+          "reserved_pln": 0,
+          "known_input_tokens": 7162,
+          "known_output_tokens": 2030,
+          "requests_without_token_usage": 0
+        },
+        "verify_section": {
+          "requests": 4,
+          "statuses": {
+            "settled": 4
+          },
+          "charged_pln": 0.1609968744,
+          "reserved_pln": 0,
+          "known_input_tokens": 13196,
+          "known_output_tokens": 8332,
+          "requests_without_token_usage": 0
+        },
+        "write_section": {
+          "requests": 4,
+          "statuses": {
+            "settled": 4
+          },
+          "charged_pln": 0.3320311068,
+          "reserved_pln": 0,
+          "known_input_tokens": 15942,
+          "known_output_tokens": 19438,
+          "requests_without_token_usage": 0
+        }
+      }
+    },
+    "quality-small-v5": {
+      "requests": 17,
+      "statuses": {
+        "settled": 16,
+        "reserved": 1
+      },
+      "charged_pln": 0.5984730683999999,
+      "reserved_pln": 1.50120135,
+      "known_input_tokens": 47141,
+      "known_output_tokens": 31355,
+      "requests_without_token_usage": 1,
+      "stages": {
+        "draft_plan": {
+          "requests": 1,
+          "statuses": {
+            "settled": 1
+          },
+          "charged_pln": 0.1070416728,
+          "reserved_pln": 0,
+          "known_input_tokens": 4037,
+          "known_output_tokens": 6487,
+          "requests_without_token_usage": 0
+        },
+        "edit_page": {
+          "requests": 1,
+          "statuses": {
+            "reserved": 1
+          },
+          "charged_pln": 0.0,
+          "reserved_pln": 1.50120135,
+          "known_input_tokens": 0,
+          "known_output_tokens": 0,
+          "requests_without_token_usage": 1
+        },
+        "extract_document": {
+          "requests": 2,
+          "statuses": {
+            "settled": 2
+          },
+          "charged_pln": 0.05572201139999999,
+          "reserved_pln": 0,
+          "known_input_tokens": 2611,
+          "known_output_tokens": 3275,
+          "requests_without_token_usage": 0
+        },
+        "verify_document": {
+          "requests": 2,
+          "statuses": {
+            "settled": 2
+          },
+          "charged_pln": 0.038863945799999994,
+          "reserved_pln": 0,
+          "known_input_tokens": 4282,
+          "known_output_tokens": 1792,
+          "requests_without_token_usage": 0
+        },
+        "verify_plan": {
+          "requests": 1,
+          "statuses": {
+            "settled": 1
+          },
+          "charged_pln": 0.0477831069,
+          "reserved_pln": 0,
+          "known_input_tokens": 6756,
+          "known_output_tokens": 1905,
+          "requests_without_token_usage": 0
+        },
+        "verify_section": {
+          "requests": 5,
+          "statuses": {
+            "settled": 5
+          },
+          "charged_pln": 0.12227967359999999,
+          "reserved_pln": 0,
+          "known_input_tokens": 13184,
+          "known_output_tokens": 5696,
+          "requests_without_token_usage": 0
+        },
+        "write_section": {
+          "requests": 5,
+          "statuses": {
+            "settled": 5
+          },
+          "charged_pln": 0.2267826579,
+          "reserved_pln": 0,
+          "known_input_tokens": 16271,
+          "known_output_tokens": 12200,
+          "requests_without_token_usage": 0
+        }
+      }
+    }
+  }
+}

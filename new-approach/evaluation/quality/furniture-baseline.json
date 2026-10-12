@@ -1,0 +1,15 @@
+{
+  "candidate_hash": "e439237ddf6192a53bd9b99b8ba14edf760d91d33351d67cf875607483c3022f",
+  "frozen_path": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\new-approach\\.docgen\\quality-baselines\\furniture-v5",
+  "manifest_hash": "e44fd0aebec4a70b9d97319cdc598010cd68ddd2748b84ed848b955dbc620944",
+  "markdown_characters": 463272,
+  "quality": {
+    "reader_words": 15591,
+    "duplicate_paragraphs": [],
+    "redundant_explanations": "Requires reader assessment; not inferred from word count"
+  },
+  "paid_calls": 316,
+  "charged_pln": 25.7086,
+  "like_for_like_wall_seconds": null,
+  "human_reader_scores": null
+}

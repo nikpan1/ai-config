@@ -1,0 +1,620 @@
+{
+  "method": "Agent review of all 24 preregistered source qualifications in the frozen baseline; not independent human acceptance.",
+  "candidate_hash": "e439237ddf6192a53bd9b99b8ba14edf760d91d33351d67cf875607483c3022f",
+  "checks": [
+    {
+      "source": "checkout-and-fulfilment.md",
+      "lines": [
+        18,
+        20
+      ],
+      "story_id": "CHECKOUTANDFULFILMENT-03-1",
+      "qualification": "Availability inferred from a postal area remains provisional until the complete address is checked.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D11"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Processes or Flows",
+          "passage": "Across checkout basket review, custom options confirmation, and delivery options checks, the handoff keeps the decision date, conditions, and open questions together [Legacy D5] [Legacy D6] [Legacy D7] [Legacy D8] [Legacy D9] [Legacy D10] [Legacy D11] [Legacy D12]."
+        },
+        {
+          "section": "Processes or Flows",
+          "passage": "During delivery options checking, address entry indicates whether standard delivery, room-of-choice delivery, or installation may be available for the region, and the delivery summary identifies access details needed later, such as floor, lift, and parking information [Legacy D11] [Legacy D12]."
+        },
+        {
+          "section": "Processes or Flows",
+          "passage": "Throughout the delivery options checking flow, the current delivery address choice and its next action remain visible, and the flow explains how this choice affects the summary and which review remains open [Legacy D11] [Legacy D12]."
+        },
+        {
+          "section": "Processes or Flows",
+          "passage": "When availability is inferred from a postal area, delivery availability remains provisional until the complete address is checked [Legacy D11] [Legacy D12]."
+        },
+        {
+          "section": "Processes or Flows",
+          "passage": "When home shoppers compare options for a first purchase (CHECKOUTANDFULFILMENT-03-1), the delivery check flow provides short explanations, a visible summary, and a clear path back to the previous choice, keeping the chosen option and its stated uncertainty together in the customer-facing record [Legacy D11]. For delivery options implementation, regional logistics owns coverage, service operations owns access questions, and test acceptance compares two addresses with different service availability [Legacy D11] [Legacy D12]."
+        }
+      ]
+    },
+    {
+      "source": "checkout-and-fulfilment.md",
+      "lines": [
+        27,
+        29
+      ],
+      "story_id": "CHECKOUTANDFULFILMENT-06-1",
+      "qualification": "A provisional design cannot trigger a nonrefundable deposit without explicit review of the applicable terms.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D20"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Processes or Flows",
+          "passage": "The payment summary separates the deposit due now from the remaining balance, states when the balance becomes due, and gives a clear route to full custom-order terms [Legacy D20] [Legacy D21]."
+        },
+        {
+          "section": "Processes or Flows",
+          "passage": "Finance and legal owners approve deposit language, order operations maintain status transitions, and acceptance verifies identical amounts across the payment step, confirmation, and order record [Legacy D20] [Legacy D21]. A provisional design cannot trigger a nonrefundable deposit without explicit review of the applicable terms [Legacy D20] [Legacy D21]."
+        }
+      ]
+    },
+    {
+      "source": "checkout-and-fulfilment.md",
+      "lines": [
+        30,
+        32
+      ],
+      "story_id": "CHECKOUTANDFULFILMENT-07-1",
+      "qualification": "A declined or interrupted payment must not produce a false paid-order confirmation.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D23"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Processes or Flows",
+          "passage": "\nCheckout displays available payment methods with any meaningful eligibility conditions prior to the final step [Legacy D23] [Legacy D24] [Legacy D25]."
+        },
+        {
+          "section": "Processes or Flows",
+          "passage": "The order confirmation lists purchased items, selected options, service choices, delivery expectation, and what happens next [Legacy D26] [Legacy D27] [Legacy D28]. When an item is a made-to-order kitchen, it receives a named design version or reviewed specification reference [Legacy D26] [Legacy D27] [Legacy D28]. For returning customer paths, the saved record preserves the prior version while asking the customer to accept material changes [Legacy D22] [Legacy D25] [Legacy D28]. In an interior designer journey, the handoff distinguishes a designer suggestion from a customer-approved decision [Legacy D24]. If payment is declined or interrupted, a declined or interrupted payment must not produce a false paid-order confirmation [Legacy D23] [Legacy D24] [Legacy D25]."
+        }
+      ]
+    },
+    {
+      "source": "checkout-and-fulfilment.md",
+      "lines": [
+        39,
+        41
+      ],
+      "story_id": "CHECKOUTANDFULFILMENT-10-1",
+      "qualification": "A request submission is not treated as an approved order amendment.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D32"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Processes or Flows",
+          "passage": "When comparing options for a first purchase, customers can submit a request for an order change to see whether production timing may still permit it; this request records the desired change, expected price or schedule impact, and the decision before it takes effect [Legacy D32]. A request submission is not treated as an approved order amendment [Legacy D32]. Within this change workflow, order support owns triage while manufacturing partners confirm feasibility, and the customer-facing record maintains the chosen option together with its stated uncertainty [Legacy D32]. The visual mockup layout groups the main decision, a current-state summary, and the next action, allowing change request controls to update the summary immediately while exposing limitations directly next to the affected choice [Legacy D32]."
+        }
+      ]
+    },
+    {
+      "source": "checkout-and-fulfilment.md",
+      "lines": [
+        42,
+        44
+      ],
+      "story_id": "CHECKOUTANDFULFILMENT-11-1",
+      "qualification": "A partial arrival does not mark the entire order as complete.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D35"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Data, States, and Business Rules",
+          "passage": "When comparing options for a first purchase within CHECKOUTANDFULFILMENT-11-1, the order view groups items by expected delivery wave, explains why a split is proposed, and allows seeing installation dependencies before agreeing to partial delivery [Legacy D35]. In this flow, logistics owns wave planning and service operations reviews installation sequencing, and customer-facing records keep the chosen option and stated uncertainty together [Legacy D35]. Furthermore, under CHECKOUTANDFULFILMENT-11-1, a partial arrival does not mark the entire order as complete [Legacy D35]."
+        }
+      ]
+    },
+    {
+      "source": "checkout-and-fulfilment.md",
+      "lines": [
+        69,
+        71
+      ],
+      "story_id": "CHECKOUTANDFULFILMENT-20-1",
+      "qualification": "Closing a logistics task does not automatically close an unresolved customer support case.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D62"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Data, States, and Business Rules",
+          "passage": "For home shoppers comparing options for a first purchase during order completion review, the first-time journey uses short explanations, a visible summary, and a clear path back to the previous choice, while the customer-facing record keeps the chosen option and its stated uncertainty together [Legacy D62]. In addition, the completion view checks delivered items, installation outcome if purchased, and any unresolved after-sales issue, allowing the customer to acknowledge completion while still reporting a new issue through the normal route [Legacy D62] [Legacy D63] [Legacy D64]. Closing a logistics task does not automatically close an unresolved customer support case [Legacy D62] [Legacy D63] [Legacy D64]. Fulfilment and service management agree on closure responsibility, and a mixed order with an open damage case remains visibly incomplete in the appropriate context [Legacy D62] [Legacy D63] [Legacy D64]."
+        },
+        {
+          "section": "Data, States, and Business Rules",
+          "passage": "\nThe order review visual groups the main decision, a current-state summary, and the next action, with completion review controls updating the summary immediately and exposing any limitation next to the affected choice [Legacy D62]."
+        }
+      ]
+    },
+    {
+      "source": "kitchen-3d-planning.md",
+      "lines": [
+        18,
+        20
+      ],
+      "story_id": "KITCHEN3DPLANNING-03-1",
+      "qualification": "A cabinet cannot be silently resized to make it fit a wall; any suggested substitution needs customer acceptance.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D75"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "In the 3D planner, customers can add, move, duplicate, and remove base and wall cabinets while seeing their current dimensions, and the planner groups placements into coherent runs while displaying gaps, overlaps, and unsupported combinations [Legacy D75] [Legacy D76] [Legacy D77]. When a cabinet does not fit a wall, it cannot be silently resized, and any suggested substitution requires customer acceptance [Legacy D75] [Legacy D76] [Legacy D77]. Catalog operations supply orderable cabinet ranges while the design team owns placement guidance, and acceptance compares saved layouts against item lists and visible wall measurements [Legacy D75] [Legacy D76] [Legacy D77]."
+        }
+      ]
+    },
+    {
+      "source": "kitchen-3d-planning.md",
+      "lines": [
+        39,
+        41
+      ],
+      "story_id": "KITCHEN3DPLANNING-10-1",
+      "qualification": "Restoring a version does not imply its old price or availability is still valid.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D96"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "\nThe first-time journey provides short explanations, a visible summary, and a clear path back to the previous choice [Legacy D90] [Legacy D93] [Legacy D96]. When comparing options for a first purchase, a home shopper wants to preview kitchen lighting options to make a confident choice without a specialist present [Legacy D90]."
+        },
+        {
+          "section": "Processes or Flows",
+          "passage": "\nWhen comparing options for a first purchase, a home shopper wants to recover an earlier kitchen idea to make a confident choice without a specialist present [Legacy D96]. When preparing a proposal for a client, an interior designer wants to inspect the kitchen from useful viewpoints to explain tradeoffs and preserve client decisions [Legacy D94]. When revisiting a saved project after several weeks, a returning customer wants to inspect the kitchen from useful viewpoints to see what changed before committing [Legacy D95]."
+        },
+        {
+          "section": "Processes or Flows",
+          "passage": "The visual mockup for the 3D kitchen planner groups the main decision, current-state summary, and next action, while undo and versions controls update the summary immediately and expose limitations next to the affected choice [Legacy D96]. Within the planner, undo and named design versions with timestamps and short customer notes are supported, allowing customers to compare item lists and estimates before restoring a prior version [Legacy D96]. Restoring a design version does not imply that its old price or availability remains valid [Legacy D96]. Operationally, account operations define version retention, pricing operations recheck restored estimates, and a version review confirms both design restoration and a fresh commercial status [Legacy D96]."
+        }
+      ]
+    },
+    {
+      "source": "kitchen-3d-planning.md",
+      "lines": [
+        42,
+        44
+      ],
+      "story_id": "KITCHEN3DPLANNING-11-1",
+      "qualification": "An unresolved warning follows the design into consultation and cannot disappear from a purchase summary.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D99"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Processes or Flows",
+          "passage": "When comparing options for a first purchase as a home shopper, the planner flags overlapping cabinets, blocked openings, and insufficient clearance in plain language near affected items without auto-changing the plan, and retains unresolved collision warnings into consultation and purchase summaries, with a reviewer checking exceptions for unusual room shapes [Legacy D99]."
+        }
+      ]
+    },
+    {
+      "source": "kitchen-3d-planning.md",
+      "lines": [
+        45,
+        47
+      ],
+      "story_id": "KITCHEN3DPLANNING-12-1",
+      "qualification": "A visually fitting 3D model cannot by itself certify installation feasibility.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D102"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Processes or Flows",
+          "passage": "When comparing options for a first purchase as a home shopper, the confidence summary groups customer measurements, catalog dimensions, appliance placeholders, and professional checks to distinguish plausible concepts from plans approved for ordering, while provisional dimensions remain labelled through share, quote, and order handoff, noting that a visually fitting 3D model cannot by itself certify installation feasibility [Legacy D102]."
+        }
+      ]
+    },
+    {
+      "source": "kitchen-3d-planning.md",
+      "lines": [
+        48,
+        50
+      ],
+      "story_id": "KITCHEN3DPLANNING-13-1",
+      "qualification": "A consultant edit never silently replaces the customer's saved version.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D105"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Processes or Flows",
+          "passage": "During collaborative review for a first purchase comparison, the share view displays the active design, unanswered questions, and an itemized summary for consultant annotations [Legacy D105]. Consultant edits are presented strictly as proposals that the customer can apply, and a consultant edit never silently replaces the customer's saved version [Legacy D105]."
+        }
+      ]
+    },
+    {
+      "source": "kitchen-3d-planning.md",
+      "lines": [
+        69,
+        71
+      ],
+      "story_id": "KITCHEN3DPLANNING-20-1",
+      "qualification": "A concept with unresolved critical fit warnings cannot be presented as fully order-ready.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D126"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Integrations and Dependencies",
+          "passage": "For home shoppers comparing first-purchase options in KITCHEN3DPLANNING-20-1, the handoff summarizes selected products, measurements, assumptions, price status, and required checks in a single view, enabling the customer to request a review or proceed only when the commercial path is clear, except that a concept with unresolved critical fit warnings cannot be presented as fully order-ready [Legacy D126]. Within this home shopper path, sales and installation teams agree on review ownership and response sequence, while customer-facing records keep the chosen option and stated uncertainty together, a handoff check verifies that no warning, uncertainty, or excluded item is lost, and controls update the summary immediately while exposing limitations next to affected choices [Legacy D126]."
+        }
+      ]
+    },
+    {
+      "source": "merchant-and-service-operations.md",
+      "lines": [
+        18,
+        20
+      ],
+      "story_id": "MERCHANTANDSERVICEOPERATIONS-03-1",
+      "qualification": "An approved future price does not alter an already accepted order without the applicable agreement.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D139"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Integrations and Dependencies",
+          "passage": "For returning customers revisiting saved projects, assortment publication identifies changed prices, assortment, or timing beside previous choices, the saved record preserves prior versions while requiring acceptance of material changes, category management owns proposals with commercial leadership approval, and unapproved finishes cannot appear in customer customization even if sample images exist [Legacy D135]. Furthermore, for home shoppers comparing options for a first purchase, the first-time journey provides short explanations, a visible summary, and a clear path back to the previous choice, while keeping the chosen option and stated uncertainty together [Legacy D136] [Legacy D139] [Legacy D142]."
+        },
+        {
+          "section": "Integrations and Dependencies",
+          "passage": "A price proposal shows old and new values, affected ranges, the effective date, and the reason visible to internal reviewers, while customer estimates record the price book version used and refresh upon reopening a saved design [Legacy D139] [Legacy D140] [Legacy D141]."
+        },
+        {
+          "section": "Integrations and Dependencies",
+          "passage": "An approved future price does not alter an already accepted order without an applicable agreement [Legacy D139] [Legacy D140] [Legacy D141]."
+        },
+        {
+          "section": "Integrations and Dependencies",
+          "passage": "\nCommercial operations prepares prices and finance approves publication, while reviews reconcile newly configured items with the active approved price book [Legacy D139] [Legacy D140] [Legacy D141]."
+        },
+        {
+          "section": "Integrations and Dependencies",
+          "passage": "\nAcross operations workflows, the handoff keeps the decision date, conditions, and open questions together, while keeping the current governance choice and next actions visible [Legacy D136] [Legacy D137] [Legacy D138] [Legacy D139] [Legacy D140] [Legacy D141] [Legacy D142] [Legacy D143] [Legacy D144]."
+        }
+      ]
+    },
+    {
+      "source": "merchant-and-service-operations.md",
+      "lines": [
+        27,
+        29
+      ],
+      "story_id": "MERCHANTANDSERVICEOPERATIONS-06-1",
+      "qualification": "A low-confidence supplier update cannot become an exact promised date.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D148"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Integrations and Dependencies",
+          "passage": "\nWhen comparing options for a first purchase, the first-time home shopper journey uses short explanations, a visible summary, and a clear path back to the previous choice, keeping the chosen option and its stated uncertainty together in the customer-facing record [Legacy D145] [Legacy D148] [Legacy D151]."
+        },
+        {
+          "section": "Integrations and Dependencies",
+          "passage": "Supplier updates record the affected product group, expected period, confidence, and reason, while customer pages display an approved lead-time range appropriate to the current configuration and region, with the exception that a low-confidence supplier update cannot become an exact promised date [Legacy D148] [Legacy D149] [Legacy D150]. Handoffs across operations workflows keep the decision date, conditions, and open questions together [Legacy D145] [Legacy D146] [Legacy D147] [Legacy D148] [Legacy D149] [Legacy D150] [Legacy D151] [Legacy D152] [Legacy D153]."
+        },
+        {
+          "section": "Integrations and Dependencies",
+          "passage": "\nSupply planning owns lead-time estimates and customer operations approves external wording, with acceptance verifying one standard item and one custom finish after a lead-time change [Legacy D148] [Legacy D149] [Legacy D150]."
+        }
+      ]
+    },
+    {
+      "source": "merchant-and-service-operations.md",
+      "lines": [
+        33,
+        35
+      ],
+      "story_id": "MERCHANTANDSERVICEOPERATIONS-08-1",
+      "qualification": "A design with unaddressed fit warnings cannot be marked approved merely because a reviewer opened it.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D154"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Integrations and Dependencies",
+          "passage": "A design review queue groups requested reviews by urgency, warning type, and customer appointment while retaining each design version [Legacy D154] [Legacy D155] [Legacy D156]."
+        },
+        {
+          "section": "Integrations and Dependencies",
+          "passage": "During kitchen design reviews across customer and professional journeys, reviewers see measurements, assumptions, item list, and questions in one context [Legacy D154] [Legacy D155] [Legacy D156]. Furthermore, a design with unaddressed fit warnings cannot be marked approved merely because a reviewer opened it [Legacy D154] [Legacy D155] [Legacy D156]."
+        },
+        {
+          "section": "Roles, Access, and Operational Controls",
+          "passage": "For customer kitchen design reviews, consultation management assigns reviewers and defines approval criteria [Legacy D154] [Legacy D155] [Legacy D156]. Acceptance checks that a reviewed design has an attributable decision and rationale, covering persona-specific paths and the stated exception [Legacy D154] [Legacy D155] [Legacy D156]."
+        },
+        {
+          "section": "Roles, Access, and Operational Controls",
+          "passage": "For the first-time home shopper journey, the customer-facing record keeps the chosen option and its stated uncertainty together [Legacy D154] [Legacy D157] [Legacy D160]."
+        },
+        {
+          "section": "Roles, Access, and Operational Controls",
+          "passage": "* **First-Time Shoppers**: During design review queue navigation, professional room surveys, and custom quote preparation, the first-time journey uses short explanations, a visible summary, and a clear path back to the previous choice [Legacy D154] [Legacy D157] [Legacy D160].\n* **Interior Designers**: For interior designers preparing proposals across design review, room survey recording, and custom kitchen quoting, the professional journey permits a concise comparison view and records the reason a proposed option was chosen [Legacy D155] [Legacy D158] [Legacy D161]. Across design review, room survey, and quote handoffs in the interior designer workflow, the handoff distinguishes a designer suggestion from a customer-approved decision [Legacy D155] [Legacy D158] [Legacy D161].\n* **Returning Clients**: When revisiting saved projects across design review queues, room surveys, and quote preparations, the return journey identifies changed prices, assortment, or timing beside the previously saved choice [Legacy D156] [Legacy D159] [Legacy D162]."
+        },
+        {
+          "section": "Roles, Access, and Operational Controls",
+          "passage": "Across workflows, the handoff keeps the decision date, conditions, and open questions together [Legacy D154] [Legacy D155] [Legacy D156] [Legacy D157] [Legacy D158] [Legacy D159] [Legacy D160] [Legacy D161] [Legacy D162]."
+        }
+      ]
+    },
+    {
+      "source": "merchant-and-service-operations.md",
+      "lines": [
+        42,
+        44
+      ],
+      "story_id": "MERCHANTANDSERVICEOPERATIONS-11-1",
+      "qualification": "A draft quote or customer note cannot be mistaken for a confirmed production instruction.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D163"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Roles, Access, and Operational Controls",
+          "passage": "For order fulfilment transfers, the handoff includes confirmed specifications, design version, customer choices, promised timing, and outstanding supplier actions, ensuring all recipient teams see the same authoritative order summary and a designated owner for the next action [Legacy D163] [Legacy D164] [Legacy D165]."
+        },
+        {
+          "section": "Roles, Access, and Operational Controls",
+          "passage": "During the order handoff flow, a draft quote or customer note cannot be mistaken for a confirmed production instruction [Legacy D163] [Legacy D164] [Legacy D165]."
+        },
+        {
+          "section": "Roles, Access, and Operational Controls",
+          "passage": "In order handoff implementation, order operations owns the handoff while manufacturing coordination acknowledges acceptance; the handoff retains the decision date, conditions, and open questions together, and acceptance verifies that a production reviewer can identify the exact approved specification [Legacy D163] [Legacy D164] [Legacy D165]."
+        },
+        {
+          "section": "Roles, Access, and Operational Controls",
+          "passage": "* **First-Time Home Shoppers**: For first-time home shoppers, the customer-facing record keeps the chosen option and stated uncertainty together, providing short explanations, a visible summary, and a clear path back to the previous choice [Legacy D163].\n* **Interior Designer Proposals**: For interior designers preparing client proposals, the professional journey permits a concise comparison view, records the choice reason, and distinguishes designer suggestions from customer-approved decisions [Legacy D164].\n* **Returning Customers**: For returning customers revisiting saved projects, the journey identifies changed prices, assortment, or timing beside previously saved choices, preserving the prior record while requiring acceptance of material changes [Legacy D165]."
+        }
+      ]
+    },
+    {
+      "source": "merchant-and-service-operations.md",
+      "lines": [
+        66,
+        68
+      ],
+      "story_id": "MERCHANTANDSERVICEOPERATIONS-19-1",
+      "qualification": "A user who can draft a discount is not thereby authorized to approve it.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D187"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Roles, Access, and Operational Controls",
+          "passage": "Staff roles separate editing, approval, customer support, finance execution, and read-only review [Legacy D187] [Legacy D188] [Legacy D189]. When an action requires another person's approval, the interface explains that requirement [Legacy D187] [Legacy D188] [Legacy D189]. In addition, a user who can draft a discount is not authorized to approve it [Legacy D187] [Legacy D188] [Legacy D189]. Business owners assign roles and periodic access reviews check continued need [Legacy D187] [Legacy D188] [Legacy D189]."
+        },
+        {
+          "section": "Roles, Access, and Operational Controls",
+          "passage": "Operational workflows enforce distinct role boundaries across catalog editing, commercial changes, and customer support. Acceptance verification tests a draft, approval, and refund action under representative roles [Legacy D187] [Legacy D188] [Legacy D189]."
+        },
+        {
+          "section": "Roles, Access, and Operational Controls",
+          "passage": "When a home shopper is comparing options for a first purchase, system guidance and support feedback enable support staff to flag confusing product text, planner warnings, and missing after-sales guidance with linked examples, while content owners view the customer impact and proposed correction prior to publication [Legacy D190]. In addition, for a first-time home shopper, the customer-facing record keeps the chosen option and its stated uncertainty together, using short explanations, a visible summary, and a clear path back to the previous choice [Legacy D181] [Legacy D184] [Legacy D187]."
+        }
+      ]
+    },
+    {
+      "source": "merchant-and-service-operations.md",
+      "lines": [
+        69,
+        71
+      ],
+      "story_id": "MERCHANTANDSERVICEOPERATIONS-20-1",
+      "qualification": "A support suggestion is not published as product fact without specialist review.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D190"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Roles, Access, and Operational Controls",
+          "passage": "When a home shopper is comparing options for a first purchase, system guidance and support feedback enable support staff to flag confusing product text, planner warnings, and missing after-sales guidance with linked examples, while content owners view the customer impact and proposed correction prior to publication [Legacy D190]. In addition, for a first-time home shopper, the customer-facing record keeps the chosen option and its stated uncertainty together, using short explanations, a visible summary, and a clear path back to the previous choice [Legacy D181] [Legacy D184] [Legacy D187]."
+        },
+        {
+          "section": "Roles, Access, and Operational Controls",
+          "passage": "\nIn the operations review mockup for first-time shoppers, the visual layout groups the main decision, current-state summary, and next action, while knowledge feedback controls update the summary immediately and expose limitations next to the affected choice [Legacy D190]. Across service operations, a support suggestion cannot be published as product fact without specialist review [Legacy D190] [Legacy D191] [Legacy D192]."
+        }
+      ]
+    },
+    {
+      "source": "shopping-and-discovery.md",
+      "lines": [
+        18,
+        20
+      ],
+      "story_id": "SHOPPINGANDDISCOVERY-03-1",
+      "qualification": "A product with missing dimensions is not shown as an exact match and is clearly marked for manual confirmation.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D203"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "### Dimension Filtering and Precision\nWidth, height, and depth filters distinguish external furniture dimensions from required clearance around doors and drawers, and the filter summary states the unit and whether the measurement belongs to the base item or the current configuration [Legacy D203] [Legacy D204] [Legacy D205]. When a product has missing dimensions, it is not shown as an exact match and is clearly marked for manual confirmation [Legacy D203] [Legacy D204] [Legacy D205]."
+        },
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "Catalog owners maintain approved measurement values and the measurement method for each range, and acceptance sampling compares the visible filter result with the published product measurement sheet [Legacy D203] [Legacy D204] [Legacy D205]. Dimension filtering accommodates specific persona journeys:\n- When a home shopper compares options for a first purchase, the dimension filtering journey provides short explanations, a visible summary, and a clear path back to the previous choice, while the customer-facing record keeps the chosen option and stated uncertainty together [Legacy D203].\n- When an interior designer prepares a proposal for a client and filters by usable dimensions, the professional journey permits a concise comparison view, records the reason a proposed option was chosen, and the handoff distinguishes a designer suggestion from a customer-approved decision [Legacy D204].\n- When a returning customer revisits a saved project after several weeks and filters by usable dimensions, the return journey identifies changed prices, assortment, or timing beside the previously saved choice, and the saved record preserves the prior version while asking the customer to accept material changes [Legacy D205]."
+        }
+      ]
+    },
+    {
+      "source": "shopping-and-discovery.md",
+      "lines": [
+        33,
+        35
+      ],
+      "story_id": "SHOPPINGANDDISCOVERY-08-1",
+      "qualification": "A provisional supplier estimate cannot be rendered as a guaranteed delivery date.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D218"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "Across user interface flows, the active choice and its next action remain visible, and the flow explains how the choice impacts the summary as well as which review remains open [Legacy D210] [Legacy D211] [Legacy D212] [Legacy D213] [Legacy D214] [Legacy D215] [Legacy D216] [Legacy D217]. On the product page, the interface separates items ready to dispatch, made to order items, and items requiring a supplier confirmation, phrasing availability as an estimate that changes visibly when a selected option affects it [Legacy D218] [Legacy D219] [Legacy D220]."
+        },
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "\nThe first-time journey uses short explanations, a visible summary, and a clear path back to the previous choice [Legacy D218] [Legacy D221] [Legacy D224]. For availability before customization, supply planning supplies lead-time bands and the customer team approves customer-facing wording [Legacy D218] [Legacy D219] [Legacy D220]. Additionally, a provisional supplier estimate cannot be rendered as a guaranteed delivery date [Legacy D218] [Legacy D219] [Legacy D220]. Acceptance checks a standard configuration and a slower custom finish against current lead-time rules [Legacy D218] [Legacy D219] [Legacy D220]."
+        },
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "### Product Configuration and Saved Choices\nThe customer-facing record keeps the chosen option and its stated uncertainty together [Legacy D218] [Legacy D221] [Legacy D224]. Customer account owners define retention and consent wording while merchandising supplies replacement guidance [Legacy D224] [Legacy D225]. A return journey verifies change notices and the ability to remove an outdated item [Legacy D224] [Legacy D225]."
+        },
+        {
+          "section": "Processes or Flows",
+          "passage": "Across journeys, the handoff consistently keeps the decision date, conditions, and open questions together [Legacy D218] [Legacy D219] [Legacy D220] [Legacy D221] [Legacy D222] [Legacy D223] [Legacy D224] [Legacy D225]."
+        }
+      ]
+    },
+    {
+      "source": "shopping-and-discovery.md",
+      "lines": [
+        39,
+        41
+      ],
+      "story_id": "SHOPPINGANDDISCOVERY-10-1",
+      "qualification": "A retired finish is not silently exchanged for another; the customer receives a clear replacement decision.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D224"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "\nThe first-time journey uses short explanations, a visible summary, and a clear path back to the previous choice [Legacy D218] [Legacy D221] [Legacy D224]. For availability before customization, supply planning supplies lead-time bands and the customer team approves customer-facing wording [Legacy D218] [Legacy D219] [Legacy D220]. Additionally, a provisional supplier estimate cannot be rendered as a guaranteed delivery date [Legacy D218] [Legacy D219] [Legacy D220]. Acceptance checks a standard configuration and a slower custom finish against current lead-time rules [Legacy D218] [Legacy D219] [Legacy D220]."
+        },
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "Across sessions, a saved list retains product identity, selected options, intended room, and the price estimate seen when saved, and shows on return which estimates or available choices have changed since the prior visit [Legacy D224] [Legacy D225]. Furthermore, a retired finish is not silently exchanged for another, and the customer receives a clear replacement decision [Legacy D224] [Legacy D225]."
+        },
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "### Product Configuration and Saved Choices\nThe customer-facing record keeps the chosen option and its stated uncertainty together [Legacy D218] [Legacy D221] [Legacy D224]. Customer account owners define retention and consent wording while merchandising supplies replacement guidance [Legacy D224] [Legacy D225]. A return journey verifies change notices and the ability to remove an outdated item [Legacy D224] [Legacy D225]."
+        },
+        {
+          "section": "Processes or Flows",
+          "passage": "In the catalog comparison mockup, visual layouts group the main decision, a current-state summary, and the next action, while saved products controls update the summary immediately and expose limitations directly next to affected choices [Legacy D224]."
+        },
+        {
+          "section": "Processes or Flows",
+          "passage": "Across journeys, the handoff consistently keeps the decision date, conditions, and open questions together [Legacy D218] [Legacy D219] [Legacy D220] [Legacy D221] [Legacy D222] [Legacy D223] [Legacy D224] [Legacy D225]."
+        }
+      ]
+    },
+    {
+      "source": "shopping-and-discovery.md",
+      "lines": [
+        54,
+        56
+      ],
+      "story_id": "SHOPPINGANDDISCOVERY-15-1",
+      "qualification": "An unconfirmed room measurement remains marked as approximate in the consultant's view.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D239"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Data, States, and Business Rules",
+          "passage": "\nA consultation request carries the shortlist, approximate room dimensions, budget band, and the question the shopper wants answered [Legacy D239] [Legacy D240] [Legacy D241]. The consultation request form explains what information is optional and what the consultant will use before the appointment [Legacy D239] [Legacy D240] [Legacy D241]. Furthermore, an unconfirmed room measurement remains marked as approximate in the consultant's view [Legacy D239] [Legacy D240] [Legacy D241]. For operational handoffs, the consultation team sets appointment capacity and service level wording, while customer support handles rebooking, and a handoff check verifies that the consultant sees the same shortlist and question [Legacy D239] [Legacy D240] [Legacy D241]."
+        }
+      ]
+    },
+    {
+      "source": "shopping-and-discovery.md",
+      "lines": [
+        63,
+        65
+      ],
+      "story_id": "SHOPPINGANDDISCOVERY-18-1",
+      "qualification": "A manually entered dimension is labelled customer supplied until checked during consultation or survey.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D248"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Data, States, and Business Rules",
+          "passage": "For home shoppers comparing options for a first purchase, the room measurement guide details required wall, ceiling, opening, and clearance measurements, provides a printable checklist, flags measurements requiring professional verification before finalizing orders, labels manual entries as customer supplied until checked during consultation or survey, and ensures every input field includes a unit, explanation, and visible uncertainty state [Legacy D248]."
+        }
+      ]
+    },
+    {
+      "source": "shopping-and-discovery.md",
+      "lines": [
+        69,
+        71
+      ],
+      "story_id": "SHOPPINGANDDISCOVERY-20-1",
+      "qualification": "A shared link does not expose private address or payment details.",
+      "assessment": "Preserved: agent reviewed the cited passages and confirmed the selected source qualification.",
+      "labels": [
+        "D254"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Limitations, Exceptions, and Open Questions",
+          "passage": "When managing ongoing configurations and project records, the handoff keeps the decision date, conditions, and open questions together [Legacy D252] [Legacy D253] [Legacy D254] [Legacy D255] [Legacy D256]."
+        },
+        {
+          "section": "Limitations, Exceptions, and Open Questions",
+          "passage": "For story SHOPPINGANDDISCOVERY-20-1, when comparing options for a first purchase, a home shopper wants the system to share a furniture shortlist with another decision maker so that they can make a confident choice without a specialist present [Legacy D254]. The first-time journey uses short explanations, a visible summary, and a clear path back to the previous choice [Legacy D254]."
+        },
+        {
+          "section": "Limitations, Exceptions, and Open Questions",
+          "passage": "A share view presents selected items, chosen options, notes, and the time of the last price estimate [Legacy D254] [Legacy D255] [Legacy D256]. The recipient can review the share view without changing the owner's choices unless the owner explicitly enables collaboration [Legacy D254] [Legacy D255] [Legacy D256]. The current shareable shortlist choice and its next action remain visible, and the flow explains how this choice affects the summary and which review remains open [Legacy D254] [Legacy D255] [Legacy D256]."
+        },
+        {
+          "section": "Limitations, Exceptions, and Open Questions",
+          "passage": "According to the catalog comparison mockup note, the visual groups the main decision, a current-state summary, and the next action; shareable shortlist controls update the summary immediately and expose limitations next to the affected choice [Legacy D254]."
+        },
+        {
+          "section": "Limitations, Exceptions, and Open Questions",
+          "passage": "A shared link does not expose private address or payment details [Legacy D254] [Legacy D255] [Legacy D256]. Account and privacy owners approve link lifetime and edit permissions [Legacy D254] [Legacy D255] [Legacy D256]. A recipient test checks readable choices and the absence of private customer information [Legacy D254] [Legacy D255] [Legacy D256]."
+        },
+        {
+          "section": "Limitations, Exceptions, and Open Questions",
+          "passage": "The customer-facing record keeps the chosen option and its stated uncertainty together [Legacy D254]. Acceptance for SHOPPINGANDDISCOVERY-20-1 includes the home shopper path and the stated exception [Legacy D254]."
+        }
+      ]
+    }
+  ],
+  "passed": 24,
+  "human_reader_scores": null
+}

@@ -27,6 +27,8 @@ for run_id, stage, reserved, charged, status, usage_json, pricing_json in rows:
     usage = json.loads(usage_json)
     pricing = json.loads(pricing_json)
     token_usage = usage.get("usage", usage)
+    if not isinstance(token_usage, dict):
+        token_usage = {}
     input_tokens = token_usage.get("input_tokens", token_usage.get("prompt_token_count", 0))
     output_tokens = token_usage.get("output_tokens", token_usage.get("candidates_token_count", 0))
     input_tokens = input_tokens or 0

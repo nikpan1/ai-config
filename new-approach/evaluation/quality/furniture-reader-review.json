@@ -1,0 +1,246 @@
+{
+  "method": "Agent source review; representative qualifications selected before the revised candidate was generated. This does not establish independent human acceptance.",
+  "checks": [
+    {
+      "source": "checkout-and-fulfilment.md",
+      "lines": [
+        18,
+        20
+      ],
+      "story_id": "CHECKOUTANDFULFILMENT-03-1",
+      "qualification": "Availability inferred from a postal area remains provisional until the complete address is checked.",
+      "assessment": null
+    },
+    {
+      "source": "checkout-and-fulfilment.md",
+      "lines": [
+        27,
+        29
+      ],
+      "story_id": "CHECKOUTANDFULFILMENT-06-1",
+      "qualification": "A provisional design cannot trigger a nonrefundable deposit without explicit review of the applicable terms.",
+      "assessment": null
+    },
+    {
+      "source": "checkout-and-fulfilment.md",
+      "lines": [
+        30,
+        32
+      ],
+      "story_id": "CHECKOUTANDFULFILMENT-07-1",
+      "qualification": "A declined or interrupted payment must not produce a false paid-order confirmation.",
+      "assessment": null
+    },
+    {
+      "source": "checkout-and-fulfilment.md",
+      "lines": [
+        39,
+        41
+      ],
+      "story_id": "CHECKOUTANDFULFILMENT-10-1",
+      "qualification": "A request submission is not treated as an approved order amendment.",
+      "assessment": null
+    },
+    {
+      "source": "checkout-and-fulfilment.md",
+      "lines": [
+        42,
+        44
+      ],
+      "story_id": "CHECKOUTANDFULFILMENT-11-1",
+      "qualification": "A partial arrival does not mark the entire order as complete.",
+      "assessment": null
+    },
+    {
+      "source": "checkout-and-fulfilment.md",
+      "lines": [
+        69,
+        71
+      ],
+      "story_id": "CHECKOUTANDFULFILMENT-20-1",
+      "qualification": "Closing a logistics task does not automatically close an unresolved customer support case.",
+      "assessment": null
+    },
+    {
+      "source": "kitchen-3d-planning.md",
+      "lines": [
+        18,
+        20
+      ],
+      "story_id": "KITCHEN3DPLANNING-03-1",
+      "qualification": "A cabinet cannot be silently resized to make it fit a wall; any suggested substitution needs customer acceptance.",
+      "assessment": null
+    },
+    {
+      "source": "kitchen-3d-planning.md",
+      "lines": [
+        39,
+        41
+      ],
+      "story_id": "KITCHEN3DPLANNING-10-1",
+      "qualification": "Restoring a version does not imply its old price or availability is still valid.",
+      "assessment": null
+    },
+    {
+      "source": "kitchen-3d-planning.md",
+      "lines": [
+        42,
+        44
+      ],
+      "story_id": "KITCHEN3DPLANNING-11-1",
+      "qualification": "An unresolved warning follows the design into consultation and cannot disappear from a purchase summary.",
+      "assessment": null
+    },
+    {
+      "source": "kitchen-3d-planning.md",
+      "lines": [
+        45,
+        47
+      ],
+      "story_id": "KITCHEN3DPLANNING-12-1",
+      "qualification": "A visually fitting 3D model cannot by itself certify installation feasibility.",
+      "assessment": null
+    },
+    {
+      "source": "kitchen-3d-planning.md",
+      "lines": [
+        48,
+        50
+      ],
+      "story_id": "KITCHEN3DPLANNING-13-1",
+      "qualification": "A consultant edit never silently replaces the customer's saved version.",
+      "assessment": null
+    },
+    {
+      "source": "kitchen-3d-planning.md",
+      "lines": [
+        69,
+        71
+      ],
+      "story_id": "KITCHEN3DPLANNING-20-1",
+      "qualification": "A concept with unresolved critical fit warnings cannot be presented as fully order-ready.",
+      "assessment": null
+    },
+    {
+      "source": "merchant-and-service-operations.md",
+      "lines": [
+        18,
+        20
+      ],
+      "story_id": "MERCHANTANDSERVICEOPERATIONS-03-1",
+      "qualification": "An approved future price does not alter an already accepted order without the applicable agreement.",
+      "assessment": null
+    },
+    {
+      "source": "merchant-and-service-operations.md",
+      "lines": [
+        27,
+        29
+      ],
+      "story_id": "MERCHANTANDSERVICEOPERATIONS-06-1",
+      "qualification": "A low-confidence supplier update cannot become an exact promised date.",
+      "assessment": null
+    },
+    {
+      "source": "merchant-and-service-operations.md",
+      "lines": [
+        33,
+        35
+      ],
+      "story_id": "MERCHANTANDSERVICEOPERATIONS-08-1",
+      "qualification": "A design with unaddressed fit warnings cannot be marked approved merely because a reviewer opened it.",
+      "assessment": null
+    },
+    {
+      "source": "merchant-and-service-operations.md",
+      "lines": [
+        42,
+        44
+      ],
+      "story_id": "MERCHANTANDSERVICEOPERATIONS-11-1",
+      "qualification": "A draft quote or customer note cannot be mistaken for a confirmed production instruction.",
+      "assessment": null
+    },
+    {
+      "source": "merchant-and-service-operations.md",
+      "lines": [
+        66,
+        68
+      ],
+      "story_id": "MERCHANTANDSERVICEOPERATIONS-19-1",
+      "qualification": "A user who can draft a discount is not thereby authorized to approve it.",
+      "assessment": null
+    },
+    {
+      "source": "merchant-and-service-operations.md",
+      "lines": [
+        69,
+        71
+      ],
+      "story_id": "MERCHANTANDSERVICEOPERATIONS-20-1",
+      "qualification": "A support suggestion is not published as product fact without specialist review.",
+      "assessment": null
+    },
+    {
+      "source": "shopping-and-discovery.md",
+      "lines": [
+        18,
+        20
+      ],
+      "story_id": "SHOPPINGANDDISCOVERY-03-1",
+      "qualification": "A product with missing dimensions is not shown as an exact match and is clearly marked for manual confirmation.",
+      "assessment": null
+    },
+    {
+      "source": "shopping-and-discovery.md",
+      "lines": [
+        33,
+        35
+      ],
+      "story_id": "SHOPPINGANDDISCOVERY-08-1",
+      "qualification": "A provisional supplier estimate cannot be rendered as a guaranteed delivery date.",
+      "assessment": null
+    },
+    {
+      "source": "shopping-and-discovery.md",
+      "lines": [
+        39,
+        41
+      ],
+      "story_id": "SHOPPINGANDDISCOVERY-10-1",
+      "qualification": "A retired finish is not silently exchanged for another; the customer receives a clear replacement decision.",
+      "assessment": null
+    },
+    {
+      "source": "shopping-and-discovery.md",
+      "lines": [
+        54,
+        56
+      ],
+      "story_id": "SHOPPINGANDDISCOVERY-15-1",
+      "qualification": "An unconfirmed room measurement remains marked as approximate in the consultant's view.",
+      "assessment": null
+    },
+    {
+      "source": "shopping-and-discovery.md",
+      "lines": [
+        63,
+        65
+      ],
+      "story_id": "SHOPPINGANDDISCOVERY-18-1",
+      "qualification": "A manually entered dimension is labelled customer supplied until checked during consultation or survey.",
+      "assessment": null
+    },
+    {
+      "source": "shopping-and-discovery.md",
+      "lines": [
+        69,
+        71
+      ],
+      "story_id": "SHOPPINGANDDISCOVERY-20-1",
+      "qualification": "A shared link does not expose private address or payment details.",
+      "assessment": null
+    }
+  ],
+  "human_reader_scores": null
+}

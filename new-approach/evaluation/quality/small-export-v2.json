@@ -1,0 +1,115 @@
+{
+  "run_id": "quality-small-export-v2",
+  "status": "ready_for_review",
+  "stages": {
+    "verify_plan": {
+      "paid_calls": 1,
+      "cache_hits": 0,
+      "input_tokens": 6756,
+      "output_tokens": 1866,
+      "response_seconds": 10.33528560000559,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "validate_page_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 10.410673500002304,
+      "retries": 0,
+      "repairs": 0
+    },
+    "review_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.007222799998999108,
+      "retries": 0,
+      "repairs": 0
+    },
+    "accepted_writing_reuse": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "audit_documentation": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.029129399998055305,
+      "retries": 0,
+      "repairs": 0
+    },
+    "export_candidate": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.09672439999849303,
+      "retries": 0,
+      "repairs": 0
+    }
+  },
+  "paid_calls": 1,
+  "charged_pln": 0.047210801399999995,
+  "reserved_pln": 0,
+  "active_node_seconds": 10.543750099997851,
+  "human_reader_scores": "Unmeasured",
+  "candidate": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\new-approach\\.docgen\\runs\\quality-small-export-v2\\candidates\\49c2970cee90fa6566596343d5afbff260974d2fc1fe86dfe5ef4d203fdec975",
+  "candidate_hash": "49c2970cee90fa6566596343d5afbff260974d2fc1fe86dfe5ef4d203fdec975",
+  "reader_words": 458,
+  "markdown_characters": 4173,
+  "images": 1,
+  "diagrams": 1,
+  "audit": {
+    "plan_hash": "981021a99b95c4a39332cd03744ccfea67c7140dbb7174523e782459dde6362f",
+    "graph_revision": "062a9fed11278302b9258853efca8719b181b8a75bb00a931c09354b0e188c5f",
+    "obligation_count": 12,
+    "mapped_count": 12,
+    "section_count": 4,
+    "findings": [],
+    "quality": {
+      "reader_words": 439,
+      "duplicate_paragraphs": [],
+      "redundant_explanations": "Requires reader assessment; not inferred from word count"
+    },
+    "template_decisions": [],
+    "visual_count": 2
+  },
+  "invocation_seconds": 10.620068600001105,
+  "writing_run": "quality-small-v5",
+  "reuse_provenance": {
+    "from_thread": "quality-small-v5",
+    "to_thread": "quality-small-export-v2",
+    "reason": "Deterministic normalization of section-title links during export",
+    "plan_hash": "981021a99b95c4a39332cd03744ccfea67c7140dbb7174523e782459dde6362f",
+    "source_revision": "231f93a3dd9986b7d2e44ec0e4cea12c57fab5a06ae8ee5d69ea5253476c2ec6",
+    "graph_revision": "062a9fed11278302b9258853efca8719b181b8a75bb00a931c09354b0e188c5f",
+    "accepted_edited_ref": "d88cc2d6a74ddb6aa745116f4b352a44a9dfafe74cb94d230745c51b5a26f57d",
+    "old_runtime": "02289aeaa8031e18e6ba24a26bae8365b54cf4e365f5b22790bea08f3149402e",
+    "new_runtime": "de21b0e4ffdf146304e61b643d64fd9b1758941732c56dc156c7cf761990bc90",
+    "review": "Fresh source-plan audit and normal interrupt/Command plan approval. Audited writing reused only after exact plan equality; final documentation audit and export rerun."
+  },
+  "interrupts": [
+    {
+      "kind": "release",
+      "candidate_hash": "49c2970cee90fa6566596343d5afbff260974d2fc1fe86dfe5ef4d203fdec975",
+      "path": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\new-approach\\.docgen\\runs\\quality-small-export-v2\\candidates\\49c2970cee90fa6566596343d5afbff260974d2fc1fe86dfe5ef4d203fdec975\\documentation\\index.md",
+      "error": ""
+    }
+  ],
+  "portable_copy_verified": true
+}

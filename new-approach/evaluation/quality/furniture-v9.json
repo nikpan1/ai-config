@@ -1,0 +1,145 @@
+{
+  "run_id": "furniture-quality-v9",
+  "status": "awaiting_issue_review",
+  "stages": {
+    "verify_plan": {
+      "paid_calls": 1,
+      "cache_hits": 0,
+      "input_tokens": 157296,
+      "output_tokens": 3285,
+      "response_seconds": 19.647039700001187,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "validate_page_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 21.63374269999622,
+      "retries": 0,
+      "repairs": 0
+    },
+    "review_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.010354300000471994,
+      "retries": 0,
+      "repairs": 0
+    },
+    "accepted_writing_reuse": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "retrieve_section_evidence": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 13.474924899994221,
+      "retries": 0,
+      "repairs": 0
+    },
+    "write_section": {
+      "paid_calls": 51,
+      "cache_hits": 0,
+      "input_tokens": 462442,
+      "output_tokens": 294671,
+      "response_seconds": 1496.2761412000036,
+      "node_seconds": 1525.5098532000266,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_section": {
+      "paid_calls": 50,
+      "cache_hits": 0,
+      "input_tokens": 403715,
+      "output_tokens": 83860,
+      "response_seconds": 490.16551679997065,
+      "node_seconds": 518.4745965000111,
+      "retries": 0,
+      "repairs": 4
+    },
+    "assemble_pages": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 1.7642160000032163,
+      "retries": 0,
+      "repairs": 0
+    },
+    "edit_page": {
+      "paid_calls": 6,
+      "cache_hits": 0,
+      "input_tokens": 211563,
+      "output_tokens": 71759,
+      "response_seconds": 387.58388849999756,
+      "node_seconds": 387.7833890000111,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_edited_page": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 25.348008299995854,
+      "retries": 0,
+      "repairs": 2
+    },
+    "verify_page": {
+      "paid_calls": 1,
+      "cache_hits": 0,
+      "input_tokens": 11722,
+      "output_tokens": 4363,
+      "response_seconds": 24.533671699995466,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    }
+  },
+  "paid_calls": 109,
+  "charged_pln": 13.478352156,
+  "reserved_pln": 0,
+  "active_node_seconds": 2493.9990849000387,
+  "human_reader_scores": "Unmeasured",
+  "invocation_seconds": 1542.3985620000021,
+  "interrupts": [
+    {
+      "kind": "issue",
+      "issue": {
+        "findings": [
+          "Missing template heading: Key data in Data, States, and Business Rules",
+          "Missing template heading: State lifecycle in Data, States, and Business Rules",
+          "Missing template heading: Rules that affect multiple features in Data, States, and Business Rules"
+        ],
+        "revision": "1cd313eca8523346d1f9e39f8a6ed8f324d1bb0b2a10c6a0992a8487cdb4efbb",
+        "stage": "verify_edited_page"
+      },
+      "error": ""
+    }
+  ],
+  "configuration": {
+    "model": "gemini-3.8-flash",
+    "output_tokens": 65536,
+    "request_tokens": 600000,
+    "timeout_seconds": 600,
+    "cache_mode": "durable",
+    "budget_pln": 1000.0
+  }
+}

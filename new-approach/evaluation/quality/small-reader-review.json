@@ -1,0 +1,32 @@
+{
+  "reviewer": "Codex, automated development assessment",
+  "human_acceptance": false,
+  "baseline_run": "quality-small-baseline-v1",
+  "revised_run": "quality-small-v3",
+  "annotation_results": [
+    {"source_lines": "3", "preserved": true, "location": "Summary", "support": "D2", "finding": "Active-account condition and both roles retained."},
+    {"source_lines": "5", "preserved": true, "location": "Rules and Capabilities", "support": "D3", "finding": "PLN 500 per order, Polish shoppers, and specialist approval above the threshold retained."},
+    {"source_lines": "7", "preserved": true, "location": "Rules and Capabilities", "support": "D4", "finding": "EUR 500 per order, Irish merchants, and specialist approval above the threshold remain distinct."},
+    {"source_lines": "9", "preserved": true, "location": "Limitations", "support": "D5", "finding": "30-day drafts, legal-hold extension, and unknown post-hold deletion date retained. Both roles refers to the roles identified in Summary."},
+    {"source_lines": "11", "preserved": true, "location": "Process", "support": "D6", "finding": "Review service, delivery validation, Submitted/Validated/Needs correction states and return to submitter retained."},
+    {"source_lines": "13", "preserved": true, "location": "Process", "support": "D7", "finding": "Supplying missing details, returning to Submitted and repeated validation retained."},
+    {"source_lines": "15", "preserved": true, "location": "Process", "support": "D8", "finding": "Within-limit approval, above-limit manual review, specialist-only manual approval and undocumented rejection retained."},
+    {"source_lines": "17", "preserved": true, "location": "Process", "support": "D9", "finding": "Approved identifier handoff from Review to Fulfilment, Queued status and absent delivery guarantee retained."},
+    {"source_lines": "19", "preserved": true, "location": "Limitations", "support": "D10", "finding": "Role, decision, time, specialist inspection and unknown history retention retained."},
+    {"source_lines": "21-27", "preserved": true, "location": "Rules and Capabilities", "support": "D11, D12, D13, D14", "finding": "Delivery-check purpose, source-provided alternative text, merchant applicability and illustrative-only boundary retained; duplicate asset bytes yield one image."}
+  ],
+  "redundant_explanations": {
+    "baseline": 9,
+    "revised": 0,
+    "method": "Count later full treatments of active-account eligibility, the Polish shopper threshold and the Irish merchant threshold. Each is repeated across four baseline sections (three excess explanations per rule). The revised callout briefly repeats eligibility as required by the template, and the process references generic threshold routing locally; these are useful local references and are excluded by the preregistered rubric.",
+    "reduction_percent": 100
+  },
+  "visual_review": {
+    "source_image": "One approved source illustration with unchanged bytes and verbatim alternative text; no pixel interpretation performed.",
+    "diagram": "Six states and seven supported transitions, including incomplete-data correction, resubmission, within-limit approval, above-limit manual review, specialist approval and fulfilment handoff.",
+    "unknown_paths": "No manual rejection transition or delivery-time guarantee was invented.",
+    "text_alternative": "Description and adjacent process prose explain the flow without a Mermaid renderer."
+  },
+  "human_reader_scores": {"structure": null, "clarity": null, "findability": null, "visual_usefulness": null},
+  "measurement_limits": "This is an agent assessment of the annotated fixture, not independent human scoring or proof of semantic perfection on larger corpora. Word counts exclude URL syntax and citation labels but still count Mermaid source words."
+}

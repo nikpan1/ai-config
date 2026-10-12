@@ -346,6 +346,9 @@ def make_obligation(row, inputs):
     }
     if kind == "claim" and record["review_status"] == "ineligible":
         eligibility, reason = "audit_only", "Ineligible according to phase 1 authority decisions"
+    rule_keys = {str(key).casefold().replace("_", "-") for key in record.get("rule_keys", [])}
+    if kind == "claim" and rule_keys and rule_keys <= {"metadata", "source-metadata"}:
+        eligibility, reason = "audit_only", "Source metadata is preserved in provenance"
     if kind == "entity":
         constraints["canonical_entity_id"] = context["canonical_entity_id"]
     if kind == "relationship":

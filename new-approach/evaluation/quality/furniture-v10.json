@@ -1,0 +1,131 @@
+{
+  "run_id": "furniture-quality-v10",
+  "status": "awaiting_issue_review",
+  "stages": {
+    "verify_plan": {
+      "paid_calls": 1,
+      "cache_hits": 0,
+      "input_tokens": 157296,
+      "output_tokens": 3437,
+      "response_seconds": 25.32157189999998,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "validate_page_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 27.307991000001493,
+      "retries": 0,
+      "repairs": 0
+    },
+    "review_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.010701799998059869,
+      "retries": 0,
+      "repairs": 0
+    },
+    "accepted_writing_reuse": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_edited_page": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.32945029999973485,
+      "retries": 0,
+      "repairs": 1
+    },
+    "edit_page": {
+      "paid_calls": 1,
+      "cache_hits": 0,
+      "input_tokens": 37873,
+      "output_tokens": 18669,
+      "response_seconds": 105.51971960000083,
+      "node_seconds": 105.54889019999973,
+      "retries": 0,
+      "repairs": 0
+    }
+  },
+  "paid_calls": 2,
+  "charged_pln": 0.8971959950999999,
+  "reserved_pln": 0,
+  "active_node_seconds": 133.19703329999902,
+  "human_reader_scores": "Unmeasured",
+  "invocation_seconds": 133.30185789999814,
+  "writing_run": "furniture-quality-v9",
+  "reuse_provenance": {
+    "from_thread": "furniture-quality-v9",
+    "to_thread": "furniture-quality-v10",
+    "reason": "Validate the same normalized heading levels used by export and reject unsafe SVG XML independently of encoding; preserve all accepted source facts",
+    "revalidated_assets": [
+      {
+        "path": "assets/checkout-and-fulfilment.svg",
+        "hash": "74979e4c6ede474867eb9072694a5976ffc08abbb6053a1f48e6b2b42a75744b",
+        "format": "svg",
+        "width": 800,
+        "height": 380
+      },
+      {
+        "path": "assets/kitchen-3d-planning.svg",
+        "hash": "b59a1cb39d667a3c04950f1c8d205b33f5bfc830cd6fc5d188d33770c6810810",
+        "format": "svg",
+        "width": 800,
+        "height": 380
+      },
+      {
+        "path": "assets/merchant-and-service-operations.svg",
+        "hash": "5dc94e0d5adc18140d78e525e112a0a0aaf7304cc713e9373667da3100485b7d",
+        "format": "svg",
+        "width": 800,
+        "height": 380
+      },
+      {
+        "path": "assets/shopping-and-discovery.svg",
+        "hash": "5a9002b666616144097f7456e2e77bb1d49b7454b4e5e013e3f84972553cc9f1",
+        "format": "svg",
+        "width": 800,
+        "height": 380
+      }
+    ],
+    "plan_hash": "792515067c831939be79786d5fdb062b1e716866406ede6d5f53179dfad7c36d",
+    "source_revision": "bafafccf5e6a837aff2afe12ff9e51a8ac75886f145a85fb4a993f3665cfb45b",
+    "graph_revision": "00566f1d67145d4303c343cc3e691d8994947b7321b2a7c3269e107591264378",
+    "accepted_edited_ref": "a1ae8de263d1d3441fd3d255bee45a23ca1cbc378463d7650e631bc28c971a3d",
+    "accepted_written_ref": "32396599c9e2aac21ebbdf8c1f63ad78fdb507d28cecd91d39f9b360b249a76b",
+    "pending_editorial_draft_ref": "306ccaefd563b186e1cdaccd341373cbf52405d675ad5868e1fbee4fa915a55c",
+    "accepted_writing_units": 72,
+    "old_runtime": "0d86f0cd61869afc1938b0c742236a868fcb6e2837662d811c2bb2e301ca8582",
+    "new_runtime": "7d65d2849f9bc78c5b4ca118ea8b7e8a9a214ca0a667f573d94b7d2b1b0bf75e",
+    "review": "Fresh source-plan audit and normal interrupt/Command plan approval. Accepted writing reused only after exact plan equality. All remaining source checks, final documentation audit and export still run."
+  },
+  "interrupts": [
+    {
+      "kind": "issue",
+      "issue": {
+        "findings": [
+          "Editorial changes exceed the bounded audit: change fewer passages and keep all other passages verbatim; at most 12 changed obligations and 45000 source characters are permitted"
+        ],
+        "revision": "a06343eff84dcd41307028bcc49ddd2b3f4135d69eefe97bdb072bc75f567599",
+        "stage": "verify_edited_page"
+      },
+      "error": ""
+    }
+  ]
+}

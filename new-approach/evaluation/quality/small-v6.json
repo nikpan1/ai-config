@@ -1,0 +1,300 @@
+{
+  "run_id": "quality-small-v6",
+  "status": "ready_for_review",
+  "stages": {
+    "snapshot_inputs": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.013339100005396176,
+      "retries": 0,
+      "repairs": 0
+    },
+    "inventory_sources": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.009566500004439149,
+      "retries": 0,
+      "repairs": 0
+    },
+    "extract_document": {
+      "paid_calls": 2,
+      "cache_hits": 0,
+      "input_tokens": 2611,
+      "output_tokens": 2953,
+      "response_seconds": 16.258044799993513,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "extract_document_batch": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 16.287289599997166,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_document": {
+      "paid_calls": 2,
+      "cache_hits": 0,
+      "input_tokens": 4508,
+      "output_tokens": 1487,
+      "response_seconds": 8.119034399998782,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_document_batch": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 8.153585100000782,
+      "retries": 0,
+      "repairs": 0
+    },
+    "link_graph_batch": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.006631399999605492,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_graph_batch": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.0006050999945728108,
+      "retries": 0,
+      "repairs": 0
+    },
+    "finalize_graph": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.025764099998923484,
+      "retries": 0,
+      "repairs": 0
+    },
+    "compile_template": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.0008140999998431653,
+      "retries": 0,
+      "repairs": 0
+    },
+    "draft_plan": {
+      "paid_calls": 2,
+      "cache_hits": 0,
+      "input_tokens": 9227,
+      "output_tokens": 11929,
+      "response_seconds": 55.37679480000952,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "draft_page_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 55.432663100000354,
+      "retries": 0,
+      "repairs": 0
+    },
+    "retrieve_plan_evidence": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.1829586000094423,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_plan": {
+      "paid_calls": 2,
+      "cache_hits": 0,
+      "input_tokens": 14562,
+      "output_tokens": 2931,
+      "response_seconds": 15.488331599997764,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "validate_page_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 15.619922499994573,
+      "retries": 0,
+      "repairs": 1
+    },
+    "review_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.0066767000025720336,
+      "retries": 0,
+      "repairs": 0
+    },
+    "retrieve_section_evidence": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.07117089999519521,
+      "retries": 0,
+      "repairs": 0
+    },
+    "write_section": {
+      "paid_calls": 4,
+      "cache_hits": 0,
+      "input_tokens": 16278,
+      "output_tokens": 13595,
+      "response_seconds": 66.96887829999469,
+      "node_seconds": 67.1042657999933,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_section": {
+      "paid_calls": 4,
+      "cache_hits": 0,
+      "input_tokens": 13561,
+      "output_tokens": 5507,
+      "response_seconds": 28.819751900009578,
+      "node_seconds": 28.959470599998895,
+      "retries": 0,
+      "repairs": 0
+    },
+    "assemble_pages": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.03609770000184653,
+      "retries": 0,
+      "repairs": 0
+    },
+    "edit_page": {
+      "paid_calls": 3,
+      "cache_hits": 0,
+      "input_tokens": 6793,
+      "output_tokens": 13433,
+      "response_seconds": 69.57598159999907,
+      "node_seconds": 69.62846649999847,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_edited_page": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 2.342076199995063,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_page": {
+      "paid_calls": 1,
+      "cache_hits": 0,
+      "input_tokens": 490,
+      "output_tokens": 181,
+      "response_seconds": 2.280255199999374,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "audit_documentation": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.03147499999613501,
+      "retries": 0,
+      "repairs": 0
+    },
+    "export_candidate": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.09507819999998901,
+      "retries": 0,
+      "repairs": 0
+    }
+  },
+  "paid_calls": 20,
+  "charged_pln": 0.962970039,
+  "reserved_pln": 0,
+  "active_node_seconds": 264.00791679998656,
+  "human_reader_scores": "Unmeasured",
+  "candidate": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\new-approach\\.docgen\\runs\\quality-small-v6\\candidates\\c702a0ee2bab5c9a12f95d1d3a55cfe76d012350160991121678cd589c79d06c",
+  "candidate_hash": "c702a0ee2bab5c9a12f95d1d3a55cfe76d012350160991121678cd589c79d06c",
+  "reader_words": 485,
+  "markdown_characters": 4558,
+  "images": 1,
+  "diagrams": 1,
+  "audit": {
+    "plan_hash": "f982b4fd27542f5ba38756cb4cd3908dcb3201809b199e9a83c244fca5471535",
+    "graph_revision": "7fbf72c455b4bfc6bb710862565b0cec6151e026c6bcbad6f4c066143d76eb3a",
+    "obligation_count": 16,
+    "mapped_count": 16,
+    "section_count": 4,
+    "findings": [],
+    "quality": {
+      "reader_words": 464,
+      "duplicate_paragraphs": [],
+      "redundant_explanations": "Requires reader assessment; not inferred from word count"
+    },
+    "template_decisions": [],
+    "visual_count": 2
+  },
+  "invocation_seconds": 264.18333359999815,
+  "interrupts": [
+    {
+      "kind": "release",
+      "candidate_hash": "c702a0ee2bab5c9a12f95d1d3a55cfe76d012350160991121678cd589c79d06c",
+      "path": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\new-approach\\.docgen\\runs\\quality-small-v6\\candidates\\c702a0ee2bab5c9a12f95d1d3a55cfe76d012350160991121678cd589c79d06c\\documentation\\index.md",
+      "error": ""
+    }
+  ],
+  "configuration": {
+    "model": "gemini-3.8-flash",
+    "output_tokens": 32768,
+    "request_tokens": 400000,
+    "timeout_seconds": 120,
+    "cache_mode": "durable",
+    "budget_pln": 1000.0
+  },
+  "portable_copy_verified": true
+}

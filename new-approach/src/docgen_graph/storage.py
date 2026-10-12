@@ -21,7 +21,12 @@ def atomic_write(path: Path, content: bytes) -> None:
         temporary.flush()
         os.fsync(temporary.fileno())
         name = temporary.name
-    os.replace(name, path)
+    source = Path(name).resolve()
+    target = path.resolve()
+    if os.name == "nt":
+        os.replace("\\\\?\\" + str(source), "\\\\?\\" + str(target))
+    else:
+        os.replace(source, target)
 
 
 class ArtifactStore:

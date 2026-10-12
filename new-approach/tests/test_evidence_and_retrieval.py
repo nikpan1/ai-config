@@ -141,7 +141,7 @@ def test_supporting_summary_does_not_require_every_context_assertion(tmp_path):
     store = ArtifactStore(tmp_path / "runtime")
     pipeline = Pipeline(store, None, "summary-audit")
     section = {"title": "Executive Summary", "obligation_ids": []}
-    pipeline._approved_plan = lambda state: {"sections": [section]}
+    pipeline._approved_plan = lambda state: {"sections": [section], "source_assets": []}
     pipeline._units = lambda section: [["support-a", "support-b"]]
     observed = {}
 
@@ -156,7 +156,7 @@ def test_supporting_summary_does_not_require_every_context_assertion(tmp_path):
         "packet_ref": store.put(
             {
                 "assertions": [{"id": "support-a"}, {"id": "support-b"}],
-                "evidence": [{"label": "D1"}],
+                "evidence": [{"id": "e1", "label": "D1"}],
             }
         ),
         "draft_ref": store.put({"markdown": "A cited summary [Legacy D1].", "mappings": []}),

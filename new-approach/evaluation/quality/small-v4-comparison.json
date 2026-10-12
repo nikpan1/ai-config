@@ -1,0 +1,51 @@
+{
+  "baseline": {
+    "candidate_hash": "8ab042966d4841f9ea65434745a126cf3be612001920045304698dff4bd8c478",
+    "title": "Order Review Documentation Plan",
+    "whole_page_words": 569,
+    "section_quality": {
+      "reader_words": 557,
+      "duplicate_paragraphs": [],
+      "redundant_explanations": "Requires reader assessment; not inferred from word count"
+    },
+    "mapped_obligations": 13,
+    "presentation_placements": 0,
+    "shared_placements": 0,
+    "final_offsets_verified": false,
+    "images": 0,
+    "diagrams": 0,
+    "template_decisions": [],
+    "manifest_verified": true
+  },
+  "revised": {
+    "candidate_hash": "b7b385910956841b361f2dff346618b5db858315bf6919e31f52003fa0de74ad",
+    "title": "Order Review and Approval Service",
+    "whole_page_words": 442,
+    "section_quality": {
+      "reader_words": 420,
+      "duplicate_paragraphs": [],
+      "redundant_explanations": "Requires reader assessment; not inferred from word count"
+    },
+    "mapped_obligations": 14,
+    "presentation_placements": 9,
+    "shared_placements": 4,
+    "final_offsets_verified": true,
+    "images": 1,
+    "diagrams": 1,
+    "template_decisions": [],
+    "manifest_verified": true
+  },
+  "section_word_change_percent": -24.6,
+  "source_links": {
+    "baseline": 0,
+    "revised": 0,
+    "missing": [],
+    "added": []
+  },
+  "human_reader_scores": null,
+  "factual_fidelity": "All ten annotated passages reviewed in small-reader-review-final.json; all material facts, qualifiers and uncertainties retained.",
+  "paid_call_change_percent": -30.77,
+  "ledger_charge_change_percent": 31.5,
+  "wall_time_change_percent": 7.62,
+  "timing_note": "Same fixture, template, model, limits and cache mode; final revised run overlapped the furniture evaluation. This is not an isolated timing benchmark."
+}

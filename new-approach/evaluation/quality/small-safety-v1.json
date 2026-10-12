@@ -1,0 +1,134 @@
+{
+  "run_id": "quality-small-safety-v1",
+  "status": "ready_for_review",
+  "stages": {
+    "verify_plan": {
+      "paid_calls": 1,
+      "cache_hits": 0,
+      "input_tokens": 7261,
+      "output_tokens": 2671,
+      "response_seconds": 14.140157399997406,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "validate_page_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 14.227986099998816,
+      "retries": 0,
+      "repairs": 0
+    },
+    "review_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.006823300005635247,
+      "retries": 0,
+      "repairs": 0
+    },
+    "accepted_writing_reuse": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "audit_documentation": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.03520429999480257,
+      "retries": 0,
+      "repairs": 0
+    },
+    "export_candidate": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.09593039999890607,
+      "retries": 0,
+      "repairs": 0
+    }
+  },
+  "paid_calls": 1,
+  "charged_pln": 0.0605058984,
+  "reserved_pln": 0,
+  "active_node_seconds": 14.36594409999816,
+  "human_reader_scores": "Unmeasured",
+  "candidate": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\new-approach\\.docgen\\runs\\quality-small-safety-v1\\candidates\\c702a0ee2bab5c9a12f95d1d3a55cfe76d012350160991121678cd589c79d06c",
+  "candidate_hash": "c702a0ee2bab5c9a12f95d1d3a55cfe76d012350160991121678cd589c79d06c",
+  "reader_words": 485,
+  "markdown_characters": 4558,
+  "images": 1,
+  "diagrams": 1,
+  "audit": {
+    "plan_hash": "f982b4fd27542f5ba38756cb4cd3908dcb3201809b199e9a83c244fca5471535",
+    "graph_revision": "7fbf72c455b4bfc6bb710862565b0cec6151e026c6bcbad6f4c066143d76eb3a",
+    "obligation_count": 16,
+    "mapped_count": 16,
+    "section_count": 4,
+    "findings": [],
+    "quality": {
+      "reader_words": 464,
+      "duplicate_paragraphs": [],
+      "redundant_explanations": "Requires reader assessment; not inferred from word count"
+    },
+    "template_decisions": [],
+    "visual_count": 2
+  },
+  "invocation_seconds": 14.446256700000959,
+  "writing_run": "quality-small-v6",
+  "reuse_provenance": {
+    "from_thread": "quality-small-v6",
+    "to_thread": "quality-small-safety-v1",
+    "reason": "Revalidate frozen SVG assets with encoding-independent XML safety checks and validate template headings at exported levels; accepted prose and mappings are unchanged",
+    "revalidated_assets": [
+      {
+        "path": "assets/review-copy.svg",
+        "hash": "b55d5080e90f8b5ef1d8b0785b74c6c129083d3515e25edfd5c77cef97301d7c",
+        "format": "svg",
+        "width": 360,
+        "height": 160
+      },
+      {
+        "path": "assets/review.svg",
+        "hash": "b55d5080e90f8b5ef1d8b0785b74c6c129083d3515e25edfd5c77cef97301d7c",
+        "format": "svg",
+        "width": 360,
+        "height": 160
+      }
+    ],
+    "plan_hash": "f982b4fd27542f5ba38756cb4cd3908dcb3201809b199e9a83c244fca5471535",
+    "source_revision": "c59b0263c10f664e447749bd8ad6a1732984caf1b9af43a0b0040824215f941a",
+    "graph_revision": "7fbf72c455b4bfc6bb710862565b0cec6151e026c6bcbad6f4c066143d76eb3a",
+    "accepted_edited_ref": "0cf8bef9d5ae85d21eacb84437287746fb4d6994f1db7916533d4093bed57c60",
+    "accepted_written_ref": "f3099331fd9edb3c2ad06a17f7fa70362b769f979812a0b443358530bff91a74",
+    "pending_editorial_draft_ref": null,
+    "accepted_writing_units": 4,
+    "old_runtime": "0d86f0cd61869afc1938b0c742236a868fcb6e2837662d811c2bb2e301ca8582",
+    "new_runtime": "7d65d2849f9bc78c5b4ca118ea8b7e8a9a214ca0a667f573d94b7d2b1b0bf75e",
+    "review": "Fresh source-plan audit and normal interrupt/Command plan approval. Accepted writing reused only after exact plan equality. All remaining source checks, final documentation audit and export still run."
+  },
+  "interrupts": [
+    {
+      "kind": "release",
+      "candidate_hash": "c702a0ee2bab5c9a12f95d1d3a55cfe76d012350160991121678cd589c79d06c",
+      "path": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\new-approach\\.docgen\\runs\\quality-small-safety-v1\\candidates\\c702a0ee2bab5c9a12f95d1d3a55cfe76d012350160991121678cd589c79d06c\\documentation\\index.md",
+      "error": ""
+    }
+  ],
+  "portable_copy_verified": true
+}

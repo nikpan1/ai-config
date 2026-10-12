@@ -1,4 +1,5 @@
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from langgraph.types import Command
@@ -7,7 +8,7 @@ from planning_fixtures import PlanningFixtureModel, knowledge_fixture, planning_
 from docgen.model import ModelFailure, TruncatedOutput
 from docgen.planning_contracts import AuditFinding, DocumentationBrief
 from docgen.planning_helpers import validate_dag, validate_paths
-from docgen.planning_inputs import resolve_reference
+from docgen.planning_inputs import make_obligation, resolve_reference
 from docgen.planning_validation import validate_plan
 from docgen.storage import digest, read_json, write_json
 from docgen.workflow import persistent_graph
@@ -138,6 +139,30 @@ def test_ineligible_claim_requires_authority_and_remains_audit_only(tmp_path, se
     assert result["status"] == "ready_for_generation"
     assert rejected["eligibility"] == "audit_only"
     assert rejected["decision_refs"] == [decision["issue_id"]]
+
+
+@pytest.mark.parametrize("rule_key", ["METADATA", "metadata", "source-metadata"])
+def test_source_metadata_remains_in_provenance_without_becoming_a_feature(rule_key):
+    record = {
+        "id": "source-metadata",
+        "review_status": "verified",
+        "rule_keys": [rule_key],
+        "statement": "The source has an original URL and revision.",
+        "evidence": [{"block_id": "front-matter", "excerpt": "source_url: local-html"}],
+    }
+    row = {
+        "id": record["id"],
+        "kind": "claim",
+        "record": record,
+        "context": {"decision_refs": []},
+    }
+    inputs = SimpleNamespace(brief=DocumentationBrief(), records_ref="fixture-records")
+
+    obligation = make_obligation(row, inputs)
+
+    assert obligation.eligibility == "audit_only"
+    assert [item.model_dump() for item in obligation.evidence] == record["evidence"]
+    assert obligation.reason == "Source metadata is preserved in provenance"
 
 
 def test_inherited_keep_distinct_decision_cannot_be_erased(tmp_path, settings, store):

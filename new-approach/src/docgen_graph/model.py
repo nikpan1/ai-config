@@ -31,6 +31,32 @@ def implementation_signature() -> str:
     )
 
 
+def response_schema(schema) -> dict | None:
+    if schema is None:
+        return None
+    original = schema.model_json_schema()
+    definitions = original.get("$defs", {})
+
+    def simplify(node):
+        if "$ref" in node:
+            return simplify(definitions[node["$ref"].rsplit("/", 1)[-1]])
+        result = {key: node[key] for key in ("type", "enum") if key in node}
+        if "properties" in node:
+            result["properties"] = {
+                key: simplify(value)
+                for key, value in node["properties"].items()
+                if key != "schema_version"
+            }
+            result["required"] = list(result["properties"])
+        if "items" in node:
+            result["items"] = simplify(node["items"])
+        if "anyOf" in node:
+            result["anyOf"] = [simplify(value) for value in node["anyOf"]]
+        return result
+
+    return simplify(original)
+
+
 class GeminiModel:
     def __init__(self, settings: Settings, store: ArtifactStore, run_id: str):
         self.settings = settings
@@ -46,6 +72,7 @@ class GeminiModel:
                 payload,
                 self.settings.output_tokens,
                 implementation_signature(),
+                schema.model_json_schema() if schema else None,
             ]
         )
         cache_path = self.store.root / "cache" / f"{signature}.json"
@@ -90,7 +117,7 @@ class GeminiModel:
                     config=types.GenerateContentConfig(
                         system_instruction=prompt,
                         response_mime_type="application/json",
-                        response_json_schema=schema.model_json_schema() if schema else None,
+                        response_json_schema=response_schema(schema),
                         max_output_tokens=self.settings.output_tokens,
                     ),
                 )
@@ -102,6 +129,7 @@ class GeminiModel:
                     "provider_error",
                     error_type=type(error).__name__,
                     seconds=time.monotonic() - started,
+                    attempt=attempt + 1,
                 )
                 retryable = isinstance(error, errors.APIError) and error.code in {
                     429,
@@ -166,6 +194,7 @@ class GeminiModel:
                 key=signature,
                 usage=counts,
                 seconds=time.monotonic() - started,
+                attempt=attempt + 1,
             )
             return result
         raise RuntimeError("Gemini attempts exhausted")

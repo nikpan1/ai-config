@@ -1,6 +1,6 @@
 import html
 import re
-from urllib.parse import quote, urlsplit, urlunsplit
+from urllib.parse import quote, unquote, urlsplit, urlunsplit
 
 CITATION_GROUP = re.compile(
     r"\[(Code|Legacy) ((?:(?:Code|Legacy) )?[CD]\d+)(?:,\s*(?:(?:Code|Legacy) )?[CD]\d+)*\]"
@@ -13,6 +13,35 @@ def citation_labels(markdown: str) -> list[str]:
         for match in CITATION_GROUP.finditer(markdown)
         for label in re.findall(r"[CD]\d+", match.group())
     ]
+
+
+def normalize_citation_syntax(markdown: str) -> str:
+    pattern = (
+        CITATION_GROUP.pattern
+        + r"|```[\s\S]*?```|`[^`\n]*`|(?P<bare>\b(?:Legacy|Code)\s+[CD]\d+\b)"
+    )
+    return re.sub(
+        pattern,
+        lambda match: f"[{match['bare']}]" if match["bare"] else match.group(),
+        markdown,
+    )
+
+
+def normalize_section_links(markdown: str, section_targets: dict[str, str]) -> str:
+    targets = {title.casefold(): href for title, href in section_targets.items()}
+    pattern = (
+        r"```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]*`|"
+        r"(?<!!)\[(?P<label>[^\]\n]+)\]\((?P<target>[^)\n]+)\)"
+    )
+
+    def replace(match: re.Match) -> str:
+        if match["target"] is None:
+            return match.group()
+        target = unquote(match["target"].strip().strip("<>")).removeprefix("#")
+        href = targets.get(target.casefold())
+        return f"[{match['label']}]({href})" if href else match.group()
+
+    return re.sub(pattern, replace, markdown)
 
 
 def link_citations(markdown: str, direct_links: dict[str, str]) -> str:
@@ -38,7 +67,7 @@ def source_url_from_markdown(markdown: str) -> str | None:
             break
         key, separator, value = line.partition(":")
         if separator and key.strip() == "source_url":
-            candidate = value.strip().strip('"\'')
+            candidate = value.strip().strip("\"'")
             parsed = urlsplit(candidate)
             if (
                 parsed.scheme in {"http", "https"}

@@ -18,6 +18,8 @@ class Settings:
     output_tokens: int
     request_tokens: int
     timeout_seconds: int
+    asset_max_bytes: int = 10000000
+    asset_max_pixels: int = 20000000
 
     @classmethod
     def load(cls, env_file: Path | None = None) -> "Settings":
@@ -33,6 +35,10 @@ class Settings:
         budget_pln = float(values.get("DOCGEN_BUDGET_PLN") or 200)
         if budget_pln <= 0:
             raise ValueError("DOCGEN_BUDGET_PLN must be positive")
+        asset_max_bytes = int(values.get("DOCGEN_ASSET_MAX_BYTES") or 10000000)
+        asset_max_pixels = int(values.get("DOCGEN_ASSET_MAX_PIXELS") or 20000000)
+        if min(asset_max_bytes, asset_max_pixels) <= 0:
+            raise ValueError("Asset byte and pixel limits must be positive")
         return cls(
             env_file=selected,
             workspace=path("DOCGEN_WORKSPACE", ".docgen"),
@@ -45,4 +51,6 @@ class Settings:
             output_tokens=int(values.get("DOCGEN_OUTPUT_TOKENS") or 8192),
             request_tokens=int(values.get("DOCGEN_REQUEST_TOKENS") or 100000),
             timeout_seconds=int(values.get("DOCGEN_TIMEOUT_SECONDS") or 120),
+            asset_max_bytes=asset_max_bytes,
+            asset_max_pixels=asset_max_pixels,
         )

@@ -1,9 +1,16 @@
+import json
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 from docgen_graph.ingestion import document_spans, inventory, snapshot_inputs
-from docgen_graph.source_links import source_url_from_markdown, text_fragment_url
+from docgen_graph.source_links import (
+    citation_labels,
+    normalize_citation_syntax,
+    normalize_section_links,
+    source_url_from_markdown,
+    text_fragment_url,
+)
 from docgen_graph.storage import ArtifactStore
 from docgen_graph.workflow import Pipeline
 
@@ -15,6 +22,42 @@ class VisibleText(HTMLParser):
 
     def handle_data(self, data):
         self.parts.append(data)
+
+
+def test_bare_citations_become_links_without_corrupting_groups_or_code():
+    markdown = (
+        "| Evidence | Legacy D2, Code C3 |\n"
+        "Already grouped [Legacy D4, Legacy D5, D6].\n"
+        "Already linked [Legacy D7](https://example.com/source).\n"
+        "Literal `Legacy D8`.\n```text\nLegacy D9\n```\n"
+        "Unknown Legacy D999."
+    )
+    normalized = normalize_citation_syntax(markdown)
+    assert "| [Legacy D2], [Code C3] |" in normalized
+    assert "[Legacy D4, Legacy D5, D6]" in normalized
+    assert "[Legacy D7](https://example.com/source)" in normalized
+    assert "`Legacy D8`" in normalized and "```text\nLegacy D9\n```" in normalized
+    assert set(citation_labels(normalized)) == {"D2", "C3", "D4", "D5", "D6", "D7", "D999"}
+    assert normalize_citation_syntax(normalized) == normalized
+
+
+def test_section_title_links_become_portable_anchors_without_changing_sources_or_code():
+    markdown = (
+        "[Limits](Rules and Capabilities) and [Eligibility](Rules%20and%20Capabilities).\n"
+        "[Known](#rules-and-capabilities), [Source](https://example.com/rules).\n"
+        "![Layout](Rules and Capabilities)\n"
+        "`[Literal](Rules and Capabilities)`\n"
+        "```mermaid\nA[Literal](Rules and Capabilities)\n```"
+    )
+    normalized = normalize_section_links(
+        markdown, {"Rules and Capabilities": "#rules-and-capabilities"}
+    )
+    assert "[Limits](#rules-and-capabilities)" in normalized
+    assert "[Eligibility](#rules-and-capabilities)" in normalized
+    assert "[Source](https://example.com/rules)" in normalized
+    assert "![Layout](Rules and Capabilities)" in normalized
+    assert "`[Literal](Rules and Capabilities)`" in normalized
+    assert "```mermaid\nA[Literal](Rules and Capabilities)\n```" in normalized
 
 
 def test_every_synthetic_story_has_a_matching_html_text_fragment():
@@ -93,13 +136,32 @@ def test_candidate_export_links_legacy_evidence_to_original_html(tmp_path, monke
             },
         ]
     )
-    monkeypatch.setattr(pipeline, "_approved_plan", lambda state: {"title": "Kitchen guidance"})
+    monkeypatch.setattr(
+        pipeline,
+        "_approved_plan",
+        lambda state: {
+            "title": "Kitchen guidance",
+            "sections": [],
+            "source_assets": [],
+            "template_requirements": [],
+            "template_decisions": [],
+            "content_units": [],
+            "asset_decisions": [],
+        },
+    )
+    passage = "A room starts with measurements. [Details](Room setup) [Legacy D1, D2]"
     edited_ref = store.put(
         [
             {
                 "title": "Room setup",
-                "markdown": "## Room setup\n\nA room starts with measurements. [Legacy D1, D2]",
-                "mappings": [{"citation_ids": ["D1", "D2"]}],
+                "markdown": "## Room setup\n\n" + passage,
+                "mappings": [
+                    {
+                        "citation_ids": ["D1", "D2"],
+                        "passage": passage,
+                    }
+                ],
+                "placements": [{"id": "room-placement", "passage": passage}],
             }
         ]
     )
@@ -115,7 +177,12 @@ def test_candidate_export_links_legacy_evidence_to_original_html(tmp_path, monke
     markdown = (candidate / "documentation" / "index.md").read_text("utf-8")
     assert markdown.count("http://127.0.0.1:8765/kitchen-3d-planning.html#:~:text=") == 2
     assert "[Legacy D1, D2]" not in markdown
+    assert "[Details](#room-setup)" in markdown
     assert markdown.count("## Room setup") == 1
+    audit = json.loads((candidate / "audit.json").read_text("utf-8"))
+    placement = audit["placements"][0]
+    assert markdown[placement["start"] : placement["end"]] == placement["passage"]
+    assert placement["passage"] == audit["mappings"][0]["passage"]
     assert (candidate / "evidence" / "D1.md").exists()
     assert (candidate / "evidence" / "D2.md").exists()
 

@@ -1,0 +1,31 @@
+{
+  "source": "docs/approval.md",
+  "facts": [
+    {"lines": [3, 3], "expected": "Both shoppers and merchants need active accounts to submit."},
+    {"lines": [5, 5], "expected": "Polish shoppers have a PLN 500 per-order self-service limit, with specialist approval above it."},
+    {"lines": [7, 7], "expected": "Irish merchants have a EUR 500 per-order self-service limit, with specialist approval above it."},
+    {"lines": [9, 9], "expected": "Both roles retain drafts for 30 days; legal holds extend this, with post-hold deletion time unknown."},
+    {"lines": [11, 11], "expected": "The Review service validates delivery details on submission; complete goes to Validated, incomplete goes to Needs correction and back to the submitter."},
+    {"lines": [13, 13], "expected": "Corrected resubmissions return to Submitted and repeat validation."},
+    {"lines": [15, 15], "expected": "Validated orders within their applicable limit become Approved; larger orders go to Manual review, where only specialists approve. Manual rejection is undocumented."},
+    {"lines": [17, 17], "expected": "Review hands the approved order identifier to Fulfilment after approval; Fulfilment records Queued. There is no stated delivery-time guarantee."},
+    {"lines": [19, 19], "expected": "Every approval records role, decision and time; specialists inspect the history; its retention is unspecified."},
+    {"lines": [21, 27], "expected": "The illustrative review panel supports checking delivery details before submission, applies to merchants too, and proves no additional behavior."}
+  ],
+  "reader_questions": [
+    "What differs between the two 500 limits, and what happens above each?",
+    "When can a draft remain after 30 days, and when is it then deleted?",
+    "What happens to incomplete delivery details, including after correction?",
+    "Who can approve manual review and what is known about rejection?",
+    "What passes to Fulfilment and does approval guarantee delivery timing?",
+    "What is recorded for approval, who sees it, and how long is it retained?"
+  ],
+  "rubric": {
+    "redundant_explanation": "A second substantial explanation of the same scoped rule with no new qualification or local reader need; brief navigation or scoped comparisons do not count.",
+    "structure": "1: unordered list; 3: headings but mixed ownership; 5: clear canonical homes and short navigation.",
+    "clarity": "1: misleading merged scopes; 3: correct but repetitive; 5: compact shared explanations with explicit variants.",
+    "findability": "1: questions cannot be answered; 3: facts scattered; 5: questions answered with qualifications in one logical place.",
+    "visual_usefulness": "1: misleading or broken; 3: relevant but incomplete; 5: portable illustration and faithful branch diagram with text alternatives.",
+    "human_scoring": "Pending independent human reader; agent assessment does not establish human acceptance."
+  }
+}

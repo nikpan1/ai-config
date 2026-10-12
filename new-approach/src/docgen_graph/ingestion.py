@@ -4,6 +4,12 @@ import re
 import subprocess
 from pathlib import Path
 
+from docgen_graph.assets import (
+    ASSET_SUFFIXES,
+    attach_asset_evidence,
+    freeze_asset,
+    resolve_asset_references,
+)
 from docgen_graph.storage import ArtifactStore, digest
 
 SKIP_NAMES = {
@@ -38,6 +44,8 @@ SECRET_NAMES = {".env", "id_rsa", "credentials.json", "secrets.json"}
 
 
 def selected_files(root: Path, kind: str) -> tuple[list[Path], list[dict]]:
+    if root.is_symlink():
+        raise ValueError("Selected root cannot be a symlink")
     root = root.resolve()
     if not root.exists():
         raise ValueError(f"Input does not exist: {root}")
@@ -79,7 +87,7 @@ def selected_files(root: Path, kind: str) -> tuple[list[Path], list[dict]]:
         if any(part in SKIP_NAMES for part in relative.parts) or secret:
             excluded.append({"path": str(relative), "reason": "excluded directory or secret"})
             continue
-        if kind == "docs" and path.suffix.lower() != ".md":
+        if kind == "docs" and path.suffix.lower() not in {".md", *ASSET_SUFFIXES}:
             excluded.append({"path": str(relative), "reason": "unsupported document or asset"})
             continue
         if kind == "code" and path.suffix.lower() not in CODE_SUFFIXES:
@@ -116,17 +124,33 @@ def git_revision(root: Path) -> dict:
 
 
 def snapshot_inputs(
-    store: ArtifactStore, docs: Path, code: Path | None, template: Path, brief: str
+    store: ArtifactStore,
+    docs: Path,
+    code: Path | None,
+    template: Path,
+    brief: str,
+    asset_max_bytes: int = 10000000,
+    asset_max_pixels: int = 20000000,
 ) -> dict:
     files = []
+    assets = []
     exclusions = []
     sources = (("docs", docs), ("code", code)) if code else (("docs", docs),)
     for kind, root in sources:
+        if root.is_symlink():
+            raise ValueError("Selected root cannot be a symlink")
         root = root.resolve()
         selected, skipped = selected_files(root, kind)
         exclusions.extend({"kind": kind, **item} for item in skipped)
         for path in selected:
             relative = path.relative_to(root) if root.is_dir() else Path(path.name)
+            if kind == "docs" and path.suffix.lower() in ASSET_SUFFIXES:
+                assets.append(
+                    freeze_asset(
+                        store, path, relative.as_posix(), asset_max_bytes, asset_max_pixels
+                    )
+                )
+                continue
             before = path.stat()
             content = path.read_bytes()
             after = path.stat()
@@ -157,16 +181,19 @@ def snapshot_inputs(
         raise ValueError("No readable code remains after selection")
     template_bytes = template.resolve().read_bytes()
     template_bytes.decode("utf-8")
+    assets = resolve_asset_references(store, files, assets, docs.resolve())
     return {
         "schema": 1,
         "files": files,
+        "assets": assets,
+        "asset_limits": {"maximum_bytes": asset_max_bytes, "maximum_pixels": asset_max_pixels},
         "exclusions": exclusions,
         "roots": {"docs": str(docs.resolve()), "code": str(code.resolve()) if code else None},
         "code_revision": git_revision(code) if code else None,
         "template_hash": store.put_bytes(template_bytes),
         "template_path": str(template.resolve()),
         "brief": brief,
-        "revision": digest([files, exclusions, store.put_bytes(template_bytes), brief]),
+        "revision": digest([files, assets, exclusions, store.put_bytes(template_bytes), brief]),
     }
 
 
@@ -367,5 +394,6 @@ def inventory(store: ArtifactStore, snapshot: dict) -> dict:
         "analysis": analysis,
         "code_units": code_units,
         "document_batches": document_batches,
+        "assets": attach_asset_evidence(snapshot.get("assets", []), spans),
         "revision": digest([snapshot["revision"], [s["id"] for s in spans], analysis]),
     }

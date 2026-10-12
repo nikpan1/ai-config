@@ -1,0 +1,50 @@
+{
+  "baseline": {
+    "candidate_hash": "8ab042966d4841f9ea65434745a126cf3be612001920045304698dff4bd8c478",
+    "title": "Order Review Documentation Plan",
+    "whole_page_words": 569,
+    "section_quality": {
+      "reader_words": 557,
+      "duplicate_paragraphs": [],
+      "redundant_explanations": "Requires reader assessment; not inferred from word count"
+    },
+    "mapped_obligations": 13,
+    "presentation_placements": 0,
+    "shared_placements": 0,
+    "final_offsets_verified": false,
+    "images": 0,
+    "diagrams": 0,
+    "template_decisions": [],
+    "manifest_verified": true
+  },
+  "revised": {
+    "candidate_hash": "a583599ec5b3d51528e2ac3cb31b600bb79ed51985736744d98b8384cb788fad",
+    "title": "Order Review and Fulfilment System",
+    "whole_page_words": 438,
+    "section_quality": {
+      "reader_words": 416,
+      "duplicate_paragraphs": [],
+      "redundant_explanations": "Requires reader assessment; not inferred from word count"
+    },
+    "mapped_obligations": 12,
+    "presentation_placements": 10,
+    "shared_placements": 1,
+    "final_offsets_verified": true,
+    "images": 1,
+    "diagrams": 1,
+    "template_decisions": [],
+    "manifest_verified": true
+  },
+  "section_word_change_percent": -25.31,
+  "source_links": {
+    "baseline": 0,
+    "revised": 0,
+    "missing": [],
+    "added": []
+  },
+  "human_reader_scores": null,
+  "factual_fidelity": "Requires annotated source review; counts alone do not establish it",
+  "paid_call_change_percent": -23.08,
+  "ledger_charge_change_percent": 18.01,
+  "wall_time_change_percent": 10.34
+}

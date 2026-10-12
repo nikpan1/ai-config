@@ -34,7 +34,9 @@ class FixtureModel:
             return {
                 "assertions": [
                     {
-                        "statement": block["text"],
+                        "statement": re.sub(r"!\[([^]]+)\]\([^)]+\)", r"\1", block["text"]).lstrip(
+                            "# "
+                        ),
                         "subject": "return_value",
                         "predicate": "describes",
                         "evidence_ids": [block["id"]],
@@ -78,7 +80,7 @@ class FixtureModel:
                         {
                             "obligation_id": item["id"],
                             "citation_ids": [label],
-                            "passage": item["statement"],
+                            "passage": lines[-1],
                         }
                     )
             return {"markdown": "\n\n".join(lines), "mappings": mappings}

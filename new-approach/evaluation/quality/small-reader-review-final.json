@@ -1,0 +1,138 @@
+{
+  "reviewer": "Codex, automated development assessment",
+  "human_acceptance": false,
+  "baseline_run": "quality-small-baseline-v1",
+  "revised_run": "quality-small-v6",
+  "annotation_results": [
+    {
+      "source_lines": "3",
+      "preserved": true,
+      "location": "Rules and Capabilities",
+      "support": "D2",
+      "finding": "Active-account condition and both roles retained."
+    },
+    {
+      "source_lines": "5",
+      "preserved": true,
+      "location": "Rules and Capabilities",
+      "support": "D3",
+      "finding": "PLN 500 per order, Polish shoppers, and specialist approval above the threshold retained."
+    },
+    {
+      "source_lines": "7",
+      "preserved": true,
+      "location": "Rules and Capabilities",
+      "support": "D4",
+      "finding": "EUR 500 per order, Irish merchants, and specialist approval above the threshold remain distinct."
+    },
+    {
+      "source_lines": "9",
+      "preserved": true,
+      "location": "Rules and Capabilities; Limitations",
+      "support": "D5",
+      "finding": "Both roles, 30-day drafts and legal-hold extension are retained in Rules and Capabilities. The unknown post-hold deletion date is explicitly labelled in Limitations."
+    },
+    {
+      "source_lines": "11",
+      "preserved": true,
+      "location": "Process",
+      "support": "D6",
+      "finding": "Review service, delivery validation, Submitted/Validated/Needs correction states and return to submitter retained."
+    },
+    {
+      "source_lines": "13",
+      "preserved": true,
+      "location": "Process",
+      "support": "D7",
+      "finding": "Supplying missing details, returning to Submitted and repeated validation retained."
+    },
+    {
+      "source_lines": "15",
+      "preserved": true,
+      "location": "Process; Limitations",
+      "support": "D8",
+      "finding": "Within-limit approval, above-limit manual review and specialist-only manual approval appear in Process. The undocumented rejection path is explicitly recorded in Limitations."
+    },
+    {
+      "source_lines": "17",
+      "preserved": true,
+      "location": "Process; Limitations",
+      "support": "D9",
+      "finding": "Approved identifier handoff from Review to Fulfilment and Queued state appear in Process; Limitations explicitly retains the absence of a delivery-time guarantee."
+    },
+    {
+      "source_lines": "19",
+      "preserved": true,
+      "location": "Rules and Capabilities; Limitations",
+      "support": "D10",
+      "finding": "Role, decision, time and specialist inspection are retained in Rules and Capabilities; unknown approval-history retention is explicitly recorded in Limitations."
+    },
+    {
+      "source_lines": "21-27",
+      "preserved": true,
+      "location": "Rules and Capabilities",
+      "support": "D11, D12, D13, D14",
+      "finding": "Delivery-check purpose, source-provided alternative text, merchant applicability and illustrative-only boundary retained; duplicate asset bytes yield one image."
+    }
+  ],
+  "redundant_explanations": {
+    "baseline": 9,
+    "revised": 0,
+    "method": "Count later full treatments of active-account eligibility, the Polish shopper threshold and the Irish merchant threshold. Each is repeated across four baseline sections (three excess explanations per rule). The final revised document has one detailed treatment of each rule; brief summary navigation and generic process routing are locally useful and excluded by the preregistered rubric.",
+    "reduction_percent": 100
+  },
+  "visual_review": {
+    "source_image": "One approved source illustration with unchanged bytes and verbatim alternative text; no pixel interpretation performed.",
+    "diagram": "Six states and seven supported transitions, including incomplete-data correction, resubmission, within-limit approval, above-limit manual review, specialist approval and fulfilment handoff.",
+    "unknown_paths": "No manual rejection transition or delivery-time guarantee was invented.",
+    "text_alternative": "Description and adjacent process prose explain the flow without a Mermaid renderer."
+  },
+  "human_reader_scores": {
+    "structure": null,
+    "clarity": null,
+    "findability": null,
+    "visual_usefulness": null
+  },
+  "measurement_limits": "Agent assessment of ten annotated passages, not independent human scoring or proof of semantic perfection on larger corpora. Word counts exclude URL syntax and citation labels but include Mermaid source words. The final run overlapped furniture-quality-v9, so its wall time is an observation, not an isolated benchmark.",
+  "candidate_hash": "c702a0ee2bab5c9a12f95d1d3a55cfe76d012350160991121678cd589c79d06c",
+  "reader_question_assessments": [
+    {
+      "question": 1,
+      "answer": "PLN 500 per order applies to shoppers in Poland; EUR 500 per order applies to merchants in Ireland. Orders above either applicable limit require manual specialist approval.",
+      "location": "Rules and Capabilities"
+    },
+    {
+      "question": 2,
+      "answer": "Legal hold extends availability beyond 30 days. The deletion date after the hold ends is unspecified.",
+      "location": "Rules and Capabilities; Limitations"
+    },
+    {
+      "question": 3,
+      "answer": "Incomplete submissions go to Needs correction and return to the submitting role. Resubmission with missing details returns to Submitted and repeats validation.",
+      "location": "Process"
+    },
+    {
+      "question": 4,
+      "answer": "Only a specialist can approve Manual review. A rejection path is not documented.",
+      "location": "Process; Limitations"
+    },
+    {
+      "question": 5,
+      "answer": "Review hands the approved order identifier to Fulfilment, which records Queued. There is no stated delivery-time guarantee.",
+      "location": "Process; Limitations"
+    },
+    {
+      "question": 6,
+      "answer": "The submitting role, decision and time are recorded for every approval; specialists can inspect history; retention is unspecified.",
+      "location": "Rules and Capabilities; Limitations"
+    }
+  ],
+  "rendered_preview": "Complete copied bundle rendered in a local browser. The role table, unchanged source illustration and six-node, seven-edge Mermaid diagram are visible. Heading navigation and text alternatives work; source-qualified unknowns remain in Limitations.",
+  "readability_observations": [
+    "No repeated full treatment of the three preregistered scoped rules.",
+    "The retention rule and legal-hold exception appear together; their unknown post-hold deletion date is in the labelled Limitations list.",
+    "Several unknowns are grouped in Limitations rather than repeated beside each rule, so qualified answers require consulting that section.",
+    "Diagram labels are smaller than body text at page width; the adjacent prose and Limitations preserve the qualifications."
+  ],
+  "writing_run": "quality-small-v6"
+}
