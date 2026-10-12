@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "pages": {
+    "investment-platform/dictionaries": {
+      "source_url": "http://127.0.0.1:8766/01-dictionaries.html",
+      "html_path": "data/test_data_2_html/01-dictionaries.html",
+      "markdown_path": "data/test_data_2/01-dictionaries.md"
+    },
+    "investment-platform/external-services": {
+      "source_url": "http://127.0.0.1:8766/02-external-services.html",
+      "html_path": "data/test_data_2_html/02-external-services.html",
+      "markdown_path": "data/test_data_2/02-external-services.md"
+    },
+    "investment-platform/risk-profiling": {
+      "source_url": "http://127.0.0.1:8766/03-risk-profiling.html",
+      "html_path": "data/test_data_2_html/03-risk-profiling.html",
+      "markdown_path": "data/test_data_2/03-risk-profiling.md"
+    }
+  }
+}

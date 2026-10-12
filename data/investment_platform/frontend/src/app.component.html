@@ -1,0 +1,21 @@
+<main>
+  <h1>Northstar Investment</h1>
+  <p>Synthetic local fixture. Results are not investment advice.</p>
+  <nav><button (click)="view='profile'">Risk profile</button><button (click)="view='history';loadHistory()">History</button><button (click)="view='quotes'">Quotes</button></nav>
+  <p class="error" *ngIf="error">{{ error }}</p>
+  <section *ngIf="view==='profile'">
+    <h2>Questionnaire Q3</h2>
+    <button (click)="start()">Start or reopen draft</button>
+    <p *ngIf="draft">Draft {{ draft.draftId }} · revision {{ draft.revision }}</p>
+    <label>Experience<select [(ngModel)]="answers.experience"><option>NONE</option><option>BEGINNER</option><option>INTERMEDIATE</option><option>ADVANCED</option></select></label>
+    <label>Investment horizon<select [(ngModel)]="answers.horizon"><option>H0</option><option>H1</option><option>H3</option><option>H7</option></select></label>
+    <label>Loss tolerance<select [(ngModel)]="answers.lossTolerance"><option>L0</option><option>L5</option><option>L10</option><option>L20</option></select></label>
+    <label>Liquidity need<select [(ngModel)]="answers.liquidityNeed"><option>IMMEDIATE</option><option>SOON</option><option>FLEXIBLE</option><option>LONG_TERM</option></select></label>
+    <label><input type="checkbox" [(ngModel)]="consent"> I accept profile processing text CP-3</label>
+    <button [disabled]="!draft" (click)="save()">Save answers</button>
+    <button [disabled]="!draft || draft.revision===0 || !consent" (click)="submit()">Submit assessment</button>
+    <div class="result" *ngIf="result"><h3>Accepted band {{ result.band }}</h3><p>Reasons: {{ result.reasonCodes }}</p><p>Rules: {{ result.rulesVersion }} · {{ result.acceptedAt }}</p><p>Provider reference: {{ result.providerAssessmentId }}</p></div>
+  </section>
+  <section *ngIf="view==='history'"><h2>Profile history</h2><div *ngFor="let item of history"><strong>{{ item.band }}</strong> · {{ item.status }} · {{ item.rulesVersion }} · {{ item.acceptedAt }}</div></section>
+  <section *ngIf="view==='quotes'"><h2>Quote context</h2><p>MarketPulse data is unrelated to investor risk profiling.</p><label>Instrument<input [(ngModel)]="quoteInstrument"></label><button (click)="loadQuote()">Load quote</button><p *ngIf="quote">{{ quote.bid }} / {{ quote.ask }} {{ quote.quoteCurrency }} · {{ quote.session }} · {{ quote.asOf }}</p></section>
+</main>

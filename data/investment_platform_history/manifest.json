@@ -1,0 +1,247 @@
+{
+  "bundle_path": "data/investment_platform_history/investment-platform.bundle",
+  "bundle_sha256": "995372cebf595ff5c111149b9e7d24456056ae7c44aea31985b2eee9a691e3ef",
+  "commit_count": 21,
+  "commits": [
+    {
+      "changed_paths": [
+        ".env.example",
+        ".gitattributes",
+        "README.md",
+        "backend/.mvn/wrapper/maven-wrapper.properties",
+        "backend/mvnw",
+        "backend/mvnw.cmd",
+        "backend/pom.xml",
+        "backend/src/main/java/example/fixture/InvestmentApplication.java",
+        "backend/src/main/resources/application.yaml",
+        "compose.yaml"
+      ],
+      "sha": "86b9cfd0aeb6de02b48e96d779b31779d0cadb27",
+      "subject": "TICKET-1000 establish synthetic platform and local configuration",
+      "ticket": "TICKET-1000"
+    },
+    {
+      "changed_paths": [
+        "database/postgres/001_schema.sql"
+      ],
+      "sha": "daa6db6e06b51f72bfce6f4d688ed735a923aae2",
+      "subject": "TICKET-1001 define profile and dictionary persistence",
+      "ticket": "TICKET-1001"
+    },
+    {
+      "changed_paths": [
+        "database/postgres/002_seed.sql"
+      ],
+      "sha": "2daa3070bed89674a031d01eb0441e0692c6d566",
+      "subject": "TICKET-1002 seed synthetic investor and Q3 dictionaries",
+      "ticket": "TICKET-1002"
+    },
+    {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/ProfileDtos.java"
+      ],
+      "sha": "b839de832e29c92de0fdfea193f7cabd617bc699",
+      "subject": "TICKET-2001 define draft and assessment contracts",
+      "ticket": "TICKET-2001"
+    },
+    {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/TradingController.java"
+      ],
+      "sha": "d11c77449a0e1f0f4101da17fb3c1e8d59093bf6",
+      "subject": "TICKET-3001 add quote and reservation provider adapter",
+      "ticket": "TICKET-3001"
+    },
+    {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/ProfileRepository.java"
+      ],
+      "sha": "dff3f7f3667cbea565e55a41fd648804021886a9",
+      "subject": "TICKET-2002 persist versioned drafts and accepted profile history",
+      "ticket": "TICKET-2002"
+    },
+    {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/RiskSignalClient.java"
+      ],
+      "sha": "a5286671f6c7105bb63dbe189af711220c0e9126",
+      "subject": "TICKET-2003 add versioned RiskSignal client",
+      "ticket": "TICKET-2003"
+    },
+    {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/MongoAuditRepository.java"
+      ],
+      "sha": "a8c4a31c45520f568ef881f02e2bd8d71f9014b4",
+      "subject": "TICKET-2004 record questionnaire and provider audits in MongoDB",
+      "ticket": "TICKET-2004"
+    },
+    {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/RiskProfileService.java"
+      ],
+      "sha": "47e442464ea620c0972911f53c17c88a1cc61adb",
+      "subject": "TICKET-2005 validate, submit and recover profile assessments",
+      "ticket": "TICKET-2005"
+    },
+    {
+      "changed_paths": [
+        "mocks/rules-rs-2026-09.json",
+        "mocks/stub.py"
+      ],
+      "sha": "ffa40096ef58aa628f66d5978f79de927991548a",
+      "subject": "TICKET-3002 add deterministic market and provider stubs",
+      "ticket": "TICKET-3002"
+    },
+    {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/ProfileController.java"
+      ],
+      "sha": "f6e0acab8ddd9602d6eabe5a4101f9d2df716c43",
+      "subject": "TICKET-2006 expose profile draft, submission and history endpoints",
+      "ticket": "TICKET-2006"
+    },
+    {
+      "changed_paths": [
+        "database/mongo/init.js"
+      ],
+      "sha": "7b583aef315135c6f4f797dda6dd0c027305ca5b",
+      "subject": "TICKET-1003 index immutable Mongo answer and provider evidence",
+      "ticket": "TICKET-1003"
+    },
+    {
+      "changed_paths": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ],
+      "sha": "c342266e2cbf9a07eb2b78da92654709ad56b99e",
+      "subject": "TICKET-2007 test idempotency, incomplete response and stale version",
+      "ticket": "TICKET-2007"
+    },
+    {
+      "changed_paths": [
+        "frontend/angular.json",
+        "frontend/package-lock.json",
+        "frontend/package.json",
+        "frontend/proxy.conf.json",
+        "frontend/src/index.html",
+        "frontend/src/main.ts",
+        "frontend/src/profile-api.ts",
+        "frontend/src/styles.css",
+        "frontend/tsconfig.json",
+        "frontend/tsconfig.spec.json"
+      ],
+      "sha": "3c233221f1981301cb94c68563bcc27b9893d0f8",
+      "subject": "TICKET-2008 scaffold Angular Q3 questionnaire client",
+      "ticket": "TICKET-2008"
+    },
+    {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/OrderRepository.java",
+        "backend/src/main/java/example/fixture/TradingController.java",
+        "database/postgres/003_orders.sql"
+      ],
+      "sha": "12e4c86394eea8478e419e5700609dbe975844d1",
+      "subject": "TICKET-3003 persist custody reservation and order state",
+      "ticket": "TICKET-3003"
+    },
+    {
+      "changed_paths": [
+        "frontend/src/app.component.html",
+        "frontend/src/app.component.ts"
+      ],
+      "sha": "35bc5fa5adeb9414639589eddd78a2ba22dd1626",
+      "subject": "TICKET-2009 build questionnaire, result and history views",
+      "ticket": "TICKET-2009"
+    },
+    {
+      "changed_paths": [
+        "frontend/src/app.component.html",
+        "frontend/src/app.component.ts",
+        "frontend/src/trading-api.ts"
+      ],
+      "sha": "b25a33d35b0c29cbc121627fedca61d99320eb00",
+      "subject": "TICKET-3004 add quote browsing to shared Angular shell",
+      "ticket": "TICKET-3004"
+    },
+    {
+      "changed_paths": [
+        "frontend/src/profile-api.spec.ts"
+      ],
+      "sha": "57e4671314a7653ebe757ca5fd4b5075dbe79e3d",
+      "subject": "TICKET-2007 verify Angular submission retry contract",
+      "ticket": "TICKET-2007"
+    },
+    {
+      "changed_paths": [
+        "frontend/src/app.component.spec.ts"
+      ],
+      "sha": "2b5cfbf5b9ba6a81250ddb14df403b7d9f47a994",
+      "subject": "TICKET-2010 test accepted result display without trading calls",
+      "ticket": "TICKET-2010"
+    },
+    {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/ProfileRepository.java"
+      ],
+      "sha": "6b6793f45d762d0ae5d17754e32606c8b413004c",
+      "subject": "TICKET-2019 reject legacy free-text loss tolerance at boundary",
+      "ticket": "TICKET-2019"
+    },
+    {
+      "changed_paths": [
+        "README.md"
+      ],
+      "sha": "32aa15ad06c7af25a90fd7d119cbc56d74c89518",
+      "subject": "TICKET-2011 document authoritative stores and history policy",
+      "ticket": "TICKET-2011"
+    }
+  ],
+  "file_sha256": {
+    ".env.example": "2d41484d83a2907a77cc7ecd9c19a725a8601654e879392715b441f092ca6ac9",
+    ".gitattributes": "cf72ba4dc46c984fd58d1eedf5ce2d93a40eda67f6f326b807e0c3a05f5ed502",
+    "README.md": "5679423318c8d8deec4abd1ad8cffab6d767b37c802304d341453239d39d5c91",
+    "backend/.mvn/wrapper/maven-wrapper.properties": "488e1b3f2e641779d4636abf9390845f901e64607261bc3c0b0bfe4fe96e6706",
+    "backend/mvnw": "cae96cef89ebea3531221f4ae17c23cf8edf67d00eae8306d4186ae1bbed4d02",
+    "backend/mvnw.cmd": "4a361e1374a3e5ad6d03e18e9adc0cf181ac5058ac6203b76f0ba3b456b56481",
+    "backend/pom.xml": "e4cbd01b9db9cdecce81acdbda57835c54856ee10264f1686a7e79e822ac3bc5",
+    "backend/src/main/java/example/fixture/InvestmentApplication.java": "f636fd81b7d202fcebe7e1dd762c496044f850d3da521e7b1059fb40469e577e",
+    "backend/src/main/java/example/fixture/MongoAuditRepository.java": "96d3490ddb6c20c6c5844b1eadec719405cb84860b7dc4573ac47eff3f766f3d",
+    "backend/src/main/java/example/fixture/OrderRepository.java": "de4620b3bead8119bd9297e3e845b6ee5fcb5fbd8398492548f935a3bb83b1bc",
+    "backend/src/main/java/example/fixture/ProfileController.java": "2e2f220d84adda8557d62d16f7198f0dd6ec8da3f02075eb9361ed0db81040f4",
+    "backend/src/main/java/example/fixture/ProfileDtos.java": "9e0db28cd74979bbc1c576223964d413f9e13a0840160370a8198cee507dd3a2",
+    "backend/src/main/java/example/fixture/ProfileRepository.java": "89648a4dc7eb60f52679eac03556d5512882f359011cb8472571ad814c9941e1",
+    "backend/src/main/java/example/fixture/RiskProfileService.java": "8116fc5b6e99253d63c1e2a8985613bde60a91f0ac03dc7e370b8f3b57be19a2",
+    "backend/src/main/java/example/fixture/RiskSignalClient.java": "0aee30504c2196f1bbf9f39dd0c3282468214795a84e50cc0ec06ba47f6a092a",
+    "backend/src/main/java/example/fixture/TradingController.java": "18787a0392604a27c781d35a397dcf61974069536f2bd6c621bd3023e48138c1",
+    "backend/src/main/resources/application.yaml": "db138caef39ffaeae04428d65f80f9d6734594c387f9b98722fdd6f9b25eb53e",
+    "backend/src/test/java/example/fixture/RiskProfileServiceTest.java": "402647ec6cc50d1fbce63888ffd801506c6feab28d06d4df4a2a18424b43e81a",
+    "compose.yaml": "ee316f462f18850819d9fb0154a4eab551e716150c2a17ae14c341f623520642",
+    "database/mongo/init.js": "0f662900fa5601b60690f1b16ae4905de4c4b16f6c5929916ee6e43a7f71fcb6",
+    "database/postgres/001_schema.sql": "d84cdbe73ce257806a3c95c369ad16d1cf8e2b29f308ce738be93a2a61b0d519",
+    "database/postgres/002_seed.sql": "76bd9ee7bdef3049013d4bb64356defc558f3398c0a0312f1044399ad115e58a",
+    "database/postgres/003_orders.sql": "a700570ab8c2ab0fe59eb21d87852952868f792fab8d97e84f381fa27f7d4da8",
+    "frontend/angular.json": "a108a1b752c1348b7a1b97f808f539fa082d1d74839e8baa0083e572ba23b576",
+    "frontend/package-lock.json": "09f2f7a2b96d3daa9d5734d81ac287d77a4fc04a16a658c3dd3b77049bf3922b",
+    "frontend/package.json": "3482823981407c067630c098a8f95883d4ae7e4e0ae44cdd1440e3a6389113dd",
+    "frontend/proxy.conf.json": "13ae020cb13b222951a7e0ea747719718f4a2c9f88981f759817a693a3c45082",
+    "frontend/src/app.component.html": "0184b33e4ec8234514d45fcf85bfedec821825f2ace8c0a721fa27ce02d4a48d",
+    "frontend/src/app.component.spec.ts": "b16f053114c8ba6f33d708626e7c963284ddfdac8c82267d6cbffd64ea2da74b",
+    "frontend/src/app.component.ts": "7ace04e047d90d81c73a862d093d03fe71170198c8c5efa147aaa7fa0843593f",
+    "frontend/src/index.html": "6cbc40dbbe4b76433b756053107e7ad5a2ec8786e4f16414f5e299d846b95b5a",
+    "frontend/src/main.ts": "94bacce3906f9fef2086f0210f30c476f7e3d72120b0db88e9fac40fd2a4d542",
+    "frontend/src/profile-api.spec.ts": "bb439d4ede2b18b8ba176212364ac394f9018f5e383100b06a9f185905da9aea",
+    "frontend/src/profile-api.ts": "cde0c6ec05a0a6b449596f90e6fbaed1fe74a40c40814c30a4facc1bb242e98f",
+    "frontend/src/styles.css": "ff55ef490051c3b3ed949c68618959b5778723e5a3a67be202cfc74413b9b80d",
+    "frontend/src/trading-api.ts": "8b82bd240e8b0cac35b15c490ff436ff3dc53788edb3f854a648967ac95e85f2",
+    "frontend/tsconfig.json": "f8ef459e2b2b437dfa95c656c850fc3884e09b31506532e10ffec04fb60a7758",
+    "frontend/tsconfig.spec.json": "888d32ae6ff26d247e3a5facb9e1a14851d85ec6848056f64de0504510f32253",
+    "mocks/rules-rs-2026-09.json": "0e855c59284a8ed4b0bac732a86642491eddf8bb2ca44cb006e2d63ed9f2c8c0",
+    "mocks/stub.py": "85272744d498609757f3d09180a1a6ebb6b86beb453334aab3b4c26fb9a70751"
+  },
+  "fixture_revision": "investment-fixture-v1",
+  "head": "32aa15ad06c7af25a90fd7d119cbc56d74c89518",
+  "packaging_exclusions": [],
+  "ref": "refs/heads/main",
+  "schema_version": 1,
+  "tree": "f8e5ad148043aaa1505cbfb812f7be5f657bed11"
+}

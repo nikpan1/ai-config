@@ -1,0 +1,36 @@
+{
+  "dependency_tickets": [
+    "TICKET-1000",
+    "TICKET-1001"
+  ],
+  "excluded_tickets": [
+    "TICKET-2000",
+    "TICKET-2001",
+    "TICKET-2002",
+    "TICKET-2003",
+    "TICKET-2004",
+    "TICKET-2005",
+    "TICKET-2006",
+    "TICKET-2007",
+    "TICKET-2008",
+    "TICKET-2009",
+    "TICKET-2010",
+    "TICKET-2011",
+    "TICKET-2012",
+    "TICKET-2013",
+    "TICKET-2014",
+    "TICKET-2015",
+    "TICKET-2016",
+    "TICKET-2017",
+    "TICKET-2019"
+  ],
+  "feature": "trading",
+  "fixture_revision": "investment-fixture-v1",
+  "schema_version": 1,
+  "tickets": [
+    "TICKET-3001",
+    "TICKET-3002",
+    "TICKET-3003",
+    "TICKET-3004"
+  ]
+}

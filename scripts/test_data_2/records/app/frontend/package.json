@@ -1,0 +1,27 @@
+{
+  "name": "northstar-investment-fixture",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "ng serve --host 127.0.0.1",
+    "build": "ng build",
+    "test": "ng test --watch=false"
+  },
+  "dependencies": {
+    "@angular/common": "21.2.25",
+    "@angular/compiler": "21.2.25",
+    "@angular/core": "21.2.25",
+    "@angular/forms": "21.2.25",
+    "@angular/platform-browser": "21.2.25",
+    "rxjs": "7.8.2",
+    "zone.js": "0.16.1"
+  },
+  "devDependencies": {
+    "@angular/build": "21.2.25",
+    "@angular/cli": "21.2.25",
+    "@angular/compiler-cli": "21.2.25",
+    "jsdom": "27.0.0",
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
+  }
+}

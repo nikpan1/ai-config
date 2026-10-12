@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "pages": {
+    "investment-platform/quick-risk-profiling": {
+      "source_url": "http://127.0.0.1:8767/risk-profiling.html",
+      "html_path": "data/test_data_2_quick_html/risk-profiling.html",
+      "markdown_path": "data/test_data_2_quick/risk-profiling.md"
+    }
+  }
+}

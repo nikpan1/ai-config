@@ -1,0 +1,9 @@
+body { font: 16px/1.5 Arial, sans-serif; color: #173c38; background: #f3f7f6; margin: 0; }
+main { max-width: 900px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 16px; }
+nav { display: flex; gap: 1rem; margin-bottom: 2rem; }
+button { background: #175947; color: white; padding: .7rem 1rem; border: 0; border-radius: 7px; cursor: pointer; }
+button:disabled { opacity: .45; cursor: default; }
+label { display: block; margin: .8rem 0; }
+select, input { display: block; padding: .5rem; min-width: 18rem; }
+.error { color: #a52035; font-weight: 600; }
+.result { border-left: 5px solid #175947; padding: 1rem; background: #eaf4f0; }

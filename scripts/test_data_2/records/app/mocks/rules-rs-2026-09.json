@@ -1,0 +1,7 @@
+{
+  "version": "RS-2026-09",
+  "base_band": "R2",
+  "cautious_if": {"horizon": "H0", "lossTolerance": "L0", "liquidityNeed": "IMMEDIATE"},
+  "growth_if": {"experience": "ADVANCED", "horizon": "H7", "lossTolerance": "L20", "liquidityNeed": "LONG_TERM"},
+  "reasons": {"H0": "HORIZON_SHORT", "H3": "HORIZON_3", "L5": "LOSS_5", "L20": "LOSS_20", "IMMEDIATE": "LIQUIDITY_IMMEDIATE"}
+}

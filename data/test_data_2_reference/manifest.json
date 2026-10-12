@@ -1,0 +1,121 @@
+{
+  "build_commands": [
+    "python scripts/test_data_2/build_fixture.py",
+    "python scripts/test_data_2/build_history.py",
+    "python scripts/test_data_2/validate_fixture.py"
+  ],
+  "citation_case_count": 72,
+  "expected_fact_count": 65,
+  "file_sha256": {
+    "data/test_data_2/.gitattributes": "cf72ba4dc46c984fd58d1eedf5ce2d93a40eda67f6f326b807e0c3a05f5ed502",
+    "data/test_data_2/01-dictionaries.md": "476ae69e2893f3348e18d9c3950a6801e6afd7f29ffb39a82b13442ba0adfb33",
+    "data/test_data_2/02-external-services.md": "02bf1bb22e2cecb99ccc66d82b835d08c4ef437e0081f9de73cc822aacedcfbd",
+    "data/test_data_2/03-risk-profiling.md": "e67aa352092a7d7901972d98b33052725b1c864f74503e95d8d89de4b5dfbcae",
+    "data/test_data_2/assets/answer-validation.jpg": "940716680abdd4b8e48b9d8eb831c1a7a51a5849357ebcfb6d9e4c48e25de802",
+    "data/test_data_2/assets/assessment-result.jpg": "f3e53d07855ffbec9bc74d87dcd8a81a130d6bc8a5cb6c26479357d89c1f3795",
+    "data/test_data_2/assets/dictionary-admin.jpg": "ae369b2032248afc857e8f5b55eef02e4709d844749af5e6ec9567c31b0e825d",
+    "data/test_data_2/assets/integration-status.jpg": "ffa5f7a2798f91ddd6d0f9d8e0fddbfc9433f981ea7f23f3f46c0501705de563",
+    "data/test_data_2/assets/profile-history.jpg": "6d4c43f59d1d42d5f479de784c13b4ed0caa1b51030170ed889598de49703c71",
+    "data/test_data_2/assets/questionnaire.jpg": "7ff702a0ae3648f2128692b828e4faf53e99aaa9047e7c6cad1eb35ea7dbf3ad",
+    "data/test_data_2_html/.gitattributes": "cf72ba4dc46c984fd58d1eedf5ce2d93a40eda67f6f326b807e0c3a05f5ed502",
+    "data/test_data_2_html/01-dictionaries.html": "bc984d6719e7ca3afb37303692d81bbf48285ea9d16b8c68da9b09412a2aeee5",
+    "data/test_data_2_html/02-external-services.html": "80412682972df3e2b2d41d08848020fde54a7337e30f42f7d6d8c1baddfd2796",
+    "data/test_data_2_html/03-risk-profiling.html": "f66c49496f8e1161329500a58f96f6d431be1f7ed91e9fa682baebfa14dffcfc",
+    "data/test_data_2_html/attachments/8421/answer-validation-screen.jpg": "940716680abdd4b8e48b9d8eb831c1a7a51a5849357ebcfb6d9e4c48e25de802",
+    "data/test_data_2_html/attachments/8421/assessment-result-screen.jpg": "f3e53d07855ffbec9bc74d87dcd8a81a130d6bc8a5cb6c26479357d89c1f3795",
+    "data/test_data_2_html/attachments/8421/dictionary-admin-screen.jpg": "ae369b2032248afc857e8f5b55eef02e4709d844749af5e6ec9567c31b0e825d",
+    "data/test_data_2_html/attachments/8421/integration-status-screen.jpg": "ffa5f7a2798f91ddd6d0f9d8e0fddbfc9433f981ea7f23f3f46c0501705de563",
+    "data/test_data_2_html/attachments/8421/profile-history-screen.jpg": "6d4c43f59d1d42d5f479de784c13b4ed0caa1b51030170ed889598de49703c71",
+    "data/test_data_2_html/attachments/8421/questionnaire-screen.jpg": "7ff702a0ae3648f2128692b828e4faf53e99aaa9047e7c6cad1eb35ea7dbf3ad",
+    "data/test_data_2_html/index.html": "15d94e9a25de3df07af6b7eff6fadc57b1ce1220e1a7f42c3b4c292c96eb914c",
+    "data/test_data_2_quick/.gitattributes": "cf72ba4dc46c984fd58d1eedf5ce2d93a40eda67f6f326b807e0c3a05f5ed502",
+    "data/test_data_2_quick/assets/assessment-result.jpg": "f3e53d07855ffbec9bc74d87dcd8a81a130d6bc8a5cb6c26479357d89c1f3795",
+    "data/test_data_2_quick/assets/questionnaire.jpg": "7ff702a0ae3648f2128692b828e4faf53e99aaa9047e7c6cad1eb35ea7dbf3ad",
+    "data/test_data_2_quick/risk-profiling.md": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+    "data/test_data_2_quick_html/.gitattributes": "cf72ba4dc46c984fd58d1eedf5ce2d93a40eda67f6f326b807e0c3a05f5ed502",
+    "data/test_data_2_quick_html/attachments/8421/assessment-result-screen.jpg": "f3e53d07855ffbec9bc74d87dcd8a81a130d6bc8a5cb6c26479357d89c1f3795",
+    "data/test_data_2_quick_html/attachments/8421/questionnaire-screen.jpg": "7ff702a0ae3648f2128692b828e4faf53e99aaa9047e7c6cad1eb35ea7dbf3ad",
+    "data/test_data_2_quick_html/index.html": "b35dc1d52fe93443baf68d30bc2811ee89ffc037e6a77e32309a80fde4e39234",
+    "data/test_data_2_quick_html/risk-profiling.html": "e91a1df002a766b1cb350f5bf5efe6d2fd6240d0e02cc5caf2809800c08276da",
+    "data/test_data_2_reference/.gitattributes": "a79691a93b46e49ce460c26ef22afcc03d6eca1e63bf2edbc20e96159510f6c9",
+    "data/test_data_2_reference/README.md": "e5c1ff83db279a6247788c31b6344a120bfc9a1049e61733b43fe8408b1138ee",
+    "data/test_data_2_reference/citation-cases.jsonl": "0c05d18944ae2019b9916f8c23bdce1b812d76c2b9cefeae671dc66eae4393ef",
+    "data/test_data_2_reference/discrepancies.jsonl": "cbb43124d899bede774457572048eb49a2b43e97e406e6936f2ce59e40bded38",
+    "data/test_data_2_reference/expected-facts.jsonl": "71df279f59c2d5790046563a1137f116824d0f107cbbbf4631e3d33cda108f2d",
+    "data/test_data_2_reference/scopes/risk-profiling.json": "a545fce80f91bb03c90da9deb6de5a7c60bd6746151b29405a74dd3acf1deb20",
+    "data/test_data_2_reference/scopes/unrelated-trading.json": "f5564588212ef5f1dbd7bbb0fdf7428b0bdda18d8c402cedfaf8408e378f4daa",
+    "data/test_data_2_reference/source-page-map-full.json": "f616dafeab44ba5c40e1aabf7a6a30d227e25564edd4527354e246ffcea45b67",
+    "data/test_data_2_reference/source-page-map-quick.json": "cd12c76b4a3c5f7df1737053e408dcf620f48d90029ba98c90b43f0f58566291",
+    "data/test_data_2_reference/ticket-map.json": "3b7e862f5cecdbaba8e3c83acc0518b27e9d14f2c327e6d230912f3bcdd987f6"
+  },
+  "fixture_revision": "investment-fixture-v1",
+  "history": {
+    "bundle_path": "data/investment_platform_history/investment-platform.bundle",
+    "bundle_sha256": "995372cebf595ff5c111149b9e7d24456056ae7c44aea31985b2eee9a691e3ef",
+    "commit_count": 21,
+    "head": "32aa15ad06c7af25a90fd7d119cbc56d74c89518",
+    "ref": "refs/heads/main",
+    "tree": "f8e5ad148043aaa1505cbfb812f7be5f657bed11"
+  },
+  "intentional_defects": [
+    "D-01",
+    "D-02",
+    "D-03",
+    "D-04",
+    "D-05"
+  ],
+  "pages": [
+    {
+      "characters": 77051,
+      "html_path": "data/test_data_2_html/01-dictionaries.html",
+      "markdown_path": "data/test_data_2/01-dictionaries.md",
+      "records": 60,
+      "slug": "01-dictionaries",
+      "source_id": "investment-platform/dictionaries"
+    },
+    {
+      "characters": 70837,
+      "html_path": "data/test_data_2_html/02-external-services.html",
+      "markdown_path": "data/test_data_2/02-external-services.md",
+      "records": 60,
+      "slug": "02-external-services",
+      "source_id": "investment-platform/external-services"
+    },
+    {
+      "characters": 81144,
+      "html_path": "data/test_data_2_html/03-risk-profiling.html",
+      "markdown_path": "data/test_data_2/03-risk-profiling.md",
+      "records": 60,
+      "slug": "03-risk-profiling",
+      "source_id": "investment-platform/risk-profiling"
+    },
+    {
+      "characters": 3723,
+      "html_path": "data/test_data_2_quick_html/risk-profiling.html",
+      "markdown_path": "data/test_data_2_quick/risk-profiling.md",
+      "records": 11,
+      "slug": "risk-profiling",
+      "source_id": "investment-platform/quick-risk-profiling"
+    }
+  ],
+  "schema_version": 1,
+  "semantic_expectations_human_reviewed": false,
+  "source_url_bases": {
+    "full": "http://127.0.0.1:8766",
+    "quick": "http://127.0.0.1:8767"
+  },
+  "toolchain": {
+    "angular": "21.2.25",
+    "font_path": "C:\\Windows\\Fonts\\arial.ttf",
+    "font_sha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a",
+    "java_target": "17",
+    "jpeg": "quality=90,subsampling=0,baseline,1100x650",
+    "maven_wrapper": "3.9.16",
+    "mongodb": "8.0.17",
+    "node_tested": "24.21.0",
+    "pillow": "12.3.0",
+    "postgresql": "17.7",
+    "python": "3.12.14",
+    "spring_boot": "3.5.16"
+  }
+}

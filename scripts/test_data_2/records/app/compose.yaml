@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres:17.7
+    environment:
+      POSTGRES_DB: investment_fixture
+      POSTGRES_USER: ${POSTGRES_USER:-fixture}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fixture-local-only}
+    ports: ["5434:5432"]
+    volumes:
+      - ./database/postgres:/docker-entrypoint-initdb.d:ro
+  mongo:
+    image: mongo:8.0.17
+    ports: ["27018:27017"]
+    volumes:
+      - ./database/mongo:/docker-entrypoint-initdb.d:ro
+  risk-signal:
+    image: python:3.12.8-slim
+    command: ["python", "/app/stub.py", "RiskSignal", "8080"]
+    volumes: ["./mocks:/app:ro"]
+    ports: ["8091:8080"]
+  market-pulse:
+    image: python:3.12.8-slim
+    command: ["python", "/app/stub.py", "MarketPulse", "8080"]
+    volumes: ["./mocks:/app:ro"]
+    ports: ["8092:8080"]
+  custody-bridge:
+    image: python:3.12.8-slim
+    command: ["python", "/app/stub.py", "CustodyBridge", "8080"]
+    volumes: ["./mocks:/app:ro"]
+    ports: ["8093:8080"]

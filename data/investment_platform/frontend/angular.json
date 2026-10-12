@@ -1,0 +1,20 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "projects": {
+    "investment-fixture": {
+      "projectType": "application",
+      "root": "",
+      "sourceRoot": "src",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {"outputPath": "dist/investment-fixture", "index": "src/index.html", "browser": "src/main.ts", "tsConfig": "tsconfig.json", "styles": ["src/styles.css"]},
+          "configurations": {"development": {}, "production": {}}
+        },
+        "serve": {"builder": "@angular/build:dev-server", "options": {"buildTarget": "investment-fixture:build", "proxyConfig": "proxy.conf.json"}},
+        "test": {"builder": "@angular/build:unit-test", "options": {"tsConfig": "tsconfig.spec.json"}}
+      }
+    }
+  }
+}

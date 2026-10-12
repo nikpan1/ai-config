@@ -1,0 +1,14 @@
+spring:
+  config:
+    import: optional:file:../.env[.properties]
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5434/investment_fixture}
+    username: ${POSTGRES_USER:fixture}
+    password: ${POSTGRES_PASSWORD:fixture-local-only}
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://localhost:27018/investment_fixture}
+fixture:
+  risk-signal-url: ${RISK_SIGNAL_URL:http://localhost:8091}
+  market-pulse-url: ${MARKET_PULSE_URL:http://localhost:8092}
+  custody-bridge-url: ${CUSTODY_BRIDGE_URL:http://localhost:8093}

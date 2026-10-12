@@ -1,0 +1,692 @@
+{
+  "fixture_revision": "investment-fixture-v1",
+  "schema_version": 1,
+  "tickets": {
+    "TICKET-1000": {
+      "changed_paths": [
+        ".env.example",
+        ".gitattributes",
+        "README.md",
+        "backend/.mvn/wrapper/maven-wrapper.properties",
+        "backend/mvnw",
+        "backend/mvnw.cmd",
+        "backend/pom.xml",
+        "backend/src/main/java/example/fixture/InvestmentApplication.java",
+        "backend/src/main/resources/application.yaml",
+        "compose.yaml"
+      ],
+      "commits": [
+        "86b9cfd0aeb6de02b48e96d779b31779d0cadb27"
+      ],
+      "expected_behavior": "establish synthetic platform and local configuration",
+      "prerequisites": [],
+      "scope": "shared",
+      "source_sections": [],
+      "status": "implemented",
+      "tests": []
+    },
+    "TICKET-1001": {
+      "changed_paths": [
+        "database/postgres/001_schema.sql"
+      ],
+      "commits": [
+        "daa6db6e06b51f72bfce6f4d688ed735a923aae2"
+      ],
+      "expected_behavior": "define profile and dictionary persistence",
+      "prerequisites": [],
+      "scope": "shared",
+      "source_sections": [],
+      "status": "implemented",
+      "tests": []
+    },
+    "TICKET-1002": {
+      "changed_paths": [
+        "database/postgres/002_seed.sql"
+      ],
+      "commits": [
+        "2daa3070bed89674a031d01eb0441e0692c6d566"
+      ],
+      "expected_behavior": "seed synthetic investor and Q3 dictionaries",
+      "prerequisites": [],
+      "scope": "shared",
+      "source_sections": [],
+      "status": "implemented",
+      "tests": []
+    },
+    "TICKET-1003": {
+      "changed_paths": [
+        "database/mongo/init.js"
+      ],
+      "commits": [
+        "7b583aef315135c6f4f797dda6dd0c027305ca5b"
+      ],
+      "expected_behavior": "index immutable Mongo answer and provider evidence",
+      "prerequisites": [],
+      "scope": "shared",
+      "source_sections": [],
+      "status": "implemented",
+      "tests": []
+    },
+    "TICKET-2000": {
+      "changed_paths": [],
+      "commits": [
+        "2b5cfbf5b9ba6a81250ddb14df403b7d9f47a994",
+        "32aa15ad06c7af25a90fd7d119cbc56d74c89518",
+        "35bc5fa5adeb9414639589eddd78a2ba22dd1626",
+        "3c233221f1981301cb94c68563bcc27b9893d0f8",
+        "47e442464ea620c0972911f53c17c88a1cc61adb",
+        "57e4671314a7653ebe757ca5fd4b5075dbe79e3d",
+        "6b6793f45d762d0ae5d17754e32606c8b413004c",
+        "a5286671f6c7105bb63dbe189af711220c0e9126",
+        "a8c4a31c45520f568ef881f02e2bd8d71f9014b4",
+        "b839de832e29c92de0fdfea193f7cabd617bc699",
+        "c342266e2cbf9a07eb2b78da92654709ad56b99e",
+        "dff3f7f3667cbea565e55a41fd648804021886a9",
+        "f6e0acab8ddd9602d6eabe5a4101f9d2df716c43"
+      ],
+      "expected_behavior": "Q3 risk-profile journey",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "TICKET-2000"
+      ],
+      "status": "epic",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java",
+        "frontend/src/profile-api.spec.ts"
+      ]
+    },
+    "TICKET-2001": {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/ProfileDtos.java"
+      ],
+      "commits": [
+        "b839de832e29c92de0fdfea193f7cabd617bc699"
+      ],
+      "expected_behavior": "Start a draft",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2001-1",
+        "STORY-2001-2",
+        "STORY-2001-3"
+      ],
+      "status": "implemented",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2002": {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/ProfileRepository.java"
+      ],
+      "commits": [
+        "dff3f7f3667cbea565e55a41fd648804021886a9"
+      ],
+      "expected_behavior": "Choose version",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2002-1",
+        "STORY-2002-2",
+        "STORY-2002-3"
+      ],
+      "status": "implemented",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2003": {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/RiskSignalClient.java"
+      ],
+      "commits": [
+        "a5286671f6c7105bb63dbe189af711220c0e9126"
+      ],
+      "expected_behavior": "Collect answers",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2003-1",
+        "STORY-2003-2",
+        "STORY-2003-3"
+      ],
+      "status": "implemented",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2004": {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/MongoAuditRepository.java"
+      ],
+      "commits": [
+        "a8c4a31c45520f568ef881f02e2bd8d71f9014b4"
+      ],
+      "expected_behavior": "Check capacity",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2004-1",
+        "STORY-2004-2",
+        "STORY-2004-3"
+      ],
+      "status": "implemented",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2005": {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/RiskProfileService.java"
+      ],
+      "commits": [
+        "47e442464ea620c0972911f53c17c88a1cc61adb"
+      ],
+      "expected_behavior": "Record consent",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2005-1",
+        "STORY-2005-2",
+        "STORY-2005-3"
+      ],
+      "status": "implemented",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2006": {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/ProfileController.java"
+      ],
+      "commits": [
+        "f6e0acab8ddd9602d6eabe5a4101f9d2df716c43"
+      ],
+      "expected_behavior": "Save and reopen",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2006-1",
+        "STORY-2006-2",
+        "STORY-2006-3"
+      ],
+      "status": "implemented",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2007": {
+      "changed_paths": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java",
+        "frontend/src/profile-api.spec.ts"
+      ],
+      "commits": [
+        "c342266e2cbf9a07eb2b78da92654709ad56b99e",
+        "57e4671314a7653ebe757ca5fd4b5075dbe79e3d"
+      ],
+      "expected_behavior": "Submit once",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2007-1",
+        "STORY-2007-2",
+        "STORY-2007-3"
+      ],
+      "status": "implemented",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2008": {
+      "changed_paths": [
+        "frontend/angular.json",
+        "frontend/package-lock.json",
+        "frontend/package.json",
+        "frontend/proxy.conf.json",
+        "frontend/src/index.html",
+        "frontend/src/main.ts",
+        "frontend/src/profile-api.ts",
+        "frontend/src/styles.css",
+        "frontend/tsconfig.json",
+        "frontend/tsconfig.spec.json"
+      ],
+      "commits": [
+        "3c233221f1981301cb94c68563bcc27b9893d0f8"
+      ],
+      "expected_behavior": "Obtain proposal",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2008-1",
+        "STORY-2008-2",
+        "STORY-2008-3"
+      ],
+      "status": "implemented",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2009": {
+      "changed_paths": [
+        "frontend/src/app.component.html",
+        "frontend/src/app.component.ts"
+      ],
+      "commits": [
+        "35bc5fa5adeb9414639589eddd78a2ba22dd1626"
+      ],
+      "expected_behavior": "Accept result",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2009-1",
+        "STORY-2009-2",
+        "STORY-2009-3"
+      ],
+      "status": "implemented",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2010": {
+      "changed_paths": [
+        "frontend/src/app.component.spec.ts"
+      ],
+      "commits": [
+        "2b5cfbf5b9ba6a81250ddb14df403b7d9f47a994"
+      ],
+      "expected_behavior": "Explain result",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2010-1",
+        "STORY-2010-2",
+        "STORY-2010-3"
+      ],
+      "status": "implemented",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2011": {
+      "changed_paths": [
+        "README.md"
+      ],
+      "commits": [
+        "32aa15ad06c7af25a90fd7d119cbc56d74c89518"
+      ],
+      "expected_behavior": "Show history",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2011-1",
+        "STORY-2011-2",
+        "STORY-2011-3"
+      ],
+      "status": "implemented",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2012": {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/RiskProfileService.java"
+      ],
+      "commits": [
+        "47e442464ea620c0972911f53c17c88a1cc61adb"
+      ],
+      "expected_behavior": "Recover from timeout",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2012-1",
+        "STORY-2012-2",
+        "STORY-2012-3"
+      ],
+      "status": "implemented",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2013": {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/RiskProfileService.java"
+      ],
+      "commits": [
+        "47e442464ea620c0972911f53c17c88a1cc61adb"
+      ],
+      "expected_behavior": "Expire profile",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2013-1",
+        "STORY-2013-2",
+        "STORY-2013-3"
+      ],
+      "status": "partial",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2014": {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/RiskProfileService.java"
+      ],
+      "commits": [
+        "47e442464ea620c0972911f53c17c88a1cc61adb"
+      ],
+      "expected_behavior": "Reassess",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2014-1",
+        "STORY-2014-2",
+        "STORY-2014-3"
+      ],
+      "status": "implemented",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2015": {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/RiskProfileService.java"
+      ],
+      "commits": [
+        "47e442464ea620c0972911f53c17c88a1cc61adb"
+      ],
+      "expected_behavior": "Reject incomplete input",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2015-1",
+        "STORY-2015-2",
+        "STORY-2015-3"
+      ],
+      "status": "implemented",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2016": {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/RiskProfileService.java"
+      ],
+      "commits": [
+        "47e442464ea620c0972911f53c17c88a1cc61adb"
+      ],
+      "expected_behavior": "Reject stale version",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2016-1",
+        "STORY-2016-2",
+        "STORY-2016-3"
+      ],
+      "status": "implemented",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2017": {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/RiskProfileService.java"
+      ],
+      "commits": [
+        "47e442464ea620c0972911f53c17c88a1cc61adb"
+      ],
+      "expected_behavior": "Handle provider outage",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2017-1",
+        "STORY-2017-2",
+        "STORY-2017-3"
+      ],
+      "status": "implemented",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2018": {
+      "changed_paths": [],
+      "commits": [],
+      "expected_behavior": "Expose integration status",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2018-1",
+        "STORY-2018-2",
+        "STORY-2018-3"
+      ],
+      "status": "planned",
+      "tests": []
+    },
+    "TICKET-2019": {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/ProfileRepository.java"
+      ],
+      "commits": [
+        "6b6793f45d762d0ae5d17754e32606c8b413004c"
+      ],
+      "expected_behavior": "Clarify threshold",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2019-1",
+        "STORY-2019-2",
+        "STORY-2019-3"
+      ],
+      "status": "implemented",
+      "tests": [
+        "backend/src/test/java/example/fixture/RiskProfileServiceTest.java"
+      ]
+    },
+    "TICKET-2020": {
+      "changed_paths": [],
+      "commits": [],
+      "expected_behavior": "Track orphan audits",
+      "prerequisites": [
+        "TICKET-1001",
+        "TICKET-1002",
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [
+        "STORY-2020-1",
+        "STORY-2020-2",
+        "STORY-2020-3"
+      ],
+      "status": "planned",
+      "tests": []
+    },
+    "TICKET-2021": {
+      "changed_paths": [],
+      "commits": [],
+      "expected_behavior": "Future follow-up; no fixture implementation",
+      "prerequisites": [
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [],
+      "status": "planned",
+      "tests": []
+    },
+    "TICKET-2022": {
+      "changed_paths": [],
+      "commits": [],
+      "expected_behavior": "Future follow-up; no fixture implementation",
+      "prerequisites": [
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [],
+      "status": "planned",
+      "tests": []
+    },
+    "TICKET-2023": {
+      "changed_paths": [],
+      "commits": [],
+      "expected_behavior": "Future follow-up; no fixture implementation",
+      "prerequisites": [
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [],
+      "status": "planned",
+      "tests": []
+    },
+    "TICKET-2024": {
+      "changed_paths": [],
+      "commits": [],
+      "expected_behavior": "Future follow-up; no fixture implementation",
+      "prerequisites": [
+        "TICKET-2000"
+      ],
+      "scope": "risk-profiling",
+      "source_sections": [],
+      "status": "planned",
+      "tests": []
+    },
+    "TICKET-3001": {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/TradingController.java"
+      ],
+      "commits": [
+        "d11c77449a0e1f0f4101da17fb3c1e8d59093bf6"
+      ],
+      "expected_behavior": "add quote and reservation provider adapter",
+      "prerequisites": [],
+      "scope": "trading",
+      "source_sections": [],
+      "status": "implemented",
+      "tests": []
+    },
+    "TICKET-3002": {
+      "changed_paths": [
+        "mocks/rules-rs-2026-09.json",
+        "mocks/stub.py"
+      ],
+      "commits": [
+        "ffa40096ef58aa628f66d5978f79de927991548a"
+      ],
+      "expected_behavior": "add deterministic market and provider stubs",
+      "prerequisites": [],
+      "scope": "trading",
+      "source_sections": [],
+      "status": "implemented",
+      "tests": []
+    },
+    "TICKET-3003": {
+      "changed_paths": [
+        "backend/src/main/java/example/fixture/OrderRepository.java",
+        "backend/src/main/java/example/fixture/TradingController.java",
+        "database/postgres/003_orders.sql"
+      ],
+      "commits": [
+        "12e4c86394eea8478e419e5700609dbe975844d1"
+      ],
+      "expected_behavior": "persist custody reservation and order state",
+      "prerequisites": [],
+      "scope": "trading",
+      "source_sections": [],
+      "status": "implemented",
+      "tests": []
+    },
+    "TICKET-3004": {
+      "changed_paths": [
+        "frontend/src/app.component.html",
+        "frontend/src/app.component.ts",
+        "frontend/src/trading-api.ts"
+      ],
+      "commits": [
+        "b25a33d35b0c29cbc121627fedca61d99320eb00"
+      ],
+      "expected_behavior": "add quote browsing to shared Angular shell",
+      "prerequisites": [],
+      "scope": "trading",
+      "source_sections": [],
+      "status": "implemented",
+      "tests": []
+    }
+  }
+}
