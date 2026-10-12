@@ -5,6 +5,7 @@ import sqlite3
 from contextlib import closing
 from datetime import UTC, datetime
 from difflib import SequenceMatcher
+from importlib.metadata import version
 from importlib.resources import files
 from pathlib import Path
 from time import monotonic
@@ -30,6 +31,7 @@ from docgen_graph.contracts import (
 )
 from docgen_graph.documentation_contracts import AspectInventory, SourceAudit
 from docgen_graph.evidence_contracts import (
+    AnalysisProvenance,
     DeltaVerification,
     EvidenceLocator,
     EvidenceQuery,
@@ -94,6 +96,8 @@ class PipelineState(TypedDict, total=False):
     code_scope_ref: str
     code_history_ref: str
     code_provenance_ref: str
+    document_provenance_ref: str
+    document_candidate_provenance_ref: str
     code_candidate_ref: str
     verified_code_ref: str
     classified_code_ref: str
@@ -469,16 +473,29 @@ class Pipeline:
             )
         ids = inventory_record["document_batches"][state["document_index"]]
         spans = self.spans(state)
-        draft = self.call(
-            "extract_document",
-            {
-                "blocks": [spans[key] for key in ids],
-                "feedback": self.read(state, "feedback_ref", []),
-                "previous": self.read(state, "draft_ref") if state.get("attempt") else None,
-            },
-            DocumentExtractionDraft,
+        payload = {
+            "blocks": [spans[key] for key in ids],
+            "feedback": self.read(state, "feedback_ref", []),
+            "previous": self.read(state, "draft_ref") if state.get("attempt") else None,
+        }
+        draft = self.call("extract_document", payload, DocumentExtractionDraft)
+        model_name = getattr(getattr(self.model, "settings", None), "model", "test-double")
+        provenance = AnalysisProvenance(
+            id=digest([model_name, "extract_document.v1", payload, draft]),
+            provider="gemini" if model_name == "gemini-3.8-flash" else "test-double",
+            model=model_name,
+            sdk_version=version("google-genai"),
+            prompt_version="extract_document.v1",
+            input_hash=digest(payload),
+            scope_id=self.read(state, "code_scope_ref", {}).get("scope_id", "full"),
         )
-        return {"draft_ref": self.store.put(draft)}
+        for assertion in draft["assertions"]:
+            assertion["provenance_ids"] = [provenance.id]
+            assertion["review_status"] = "unreviewed"
+        return {
+            "draft_ref": self.store.put(draft),
+            "document_candidate_provenance_ref": self.store.put(provenance.model_dump()),
+        }
 
     def verify_document_batch(self, state: PipelineState) -> dict:
         inventory_record = self.read(state, "inventory_ref")
@@ -572,6 +589,10 @@ class Pipeline:
         next_index = state["document_index"] + 1
         return {
             "assertions_ref": self.store.put(self.assertions(state) + pending["records"]),
+            "document_provenance_ref": self.store.put(
+                self.read(state, "document_provenance_ref", [])
+                + [self.read(state, "document_candidate_provenance_ref")]
+            ),
             "exclusions_ref": self.store.put(
                 self.read(state, "exclusions_ref", []) + pending["excluded"]
             ),
@@ -1344,7 +1365,8 @@ class Pipeline:
                     state["snapshot_ref"],
                     scope_id,
                     coverage=coverage,
-                    provenance=self.read(state, "code_provenance_ref", []),
+                    provenance=self.read(state, "code_provenance_ref", [])
+                    + self.read(state, "document_provenance_ref", []),
                 )
             )
         query = EvidenceQuery(
@@ -1559,6 +1581,7 @@ class Pipeline:
             "code_provenance_ref": self.store.put(
                 [item.model_dump(mode="json") for item in published.packet.provenance]
             ),
+            "document_provenance_ref": "",
             "evidence_revision": result.graph_revision,
             "plan_ref": "",
             "plan_hash": "",

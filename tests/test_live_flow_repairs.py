@@ -101,3 +101,109 @@ def test_sdk_worker_redacts_key_from_provider_diagnostics(monkeypatch, capsys):
     output = capsys.readouterr().out
     assert "sensitive-key" not in output
     assert json.loads(output)["error_message"] == "Rejected token [redacted]"
+
+
+def test_codex_usage_events_distinguish_request_response_and_cache(tmp_path):
+    import json
+
+    from test_code_analysis import Allowance, Transport
+
+    from docgen_graph.code_analysis.backends import SDKCodeBackend
+
+    class MeteredTransport(Transport):
+        def run(self, payload):
+            return {**super().run(payload), "usage": {"input_tokens": 10, "output_tokens": 20}}
+
+    class MeteredAllowance(Allowance):
+        def settle(self, reservation, usage):
+            super().settle(reservation, usage)
+            return 1.25
+
+    settings = SimpleNamespace(
+        code_analysis_backend="codex_sdk",
+        code_analysis_model="explicit-model",
+        code_analysis_turn_limit=1,
+        code_analysis_result_limit=10000,
+        code_analysis_timeout=60,
+        request_tokens=10000,
+    )
+    store = ArtifactStore(tmp_path)
+    transport = MeteredTransport(
+        {
+            "report": "result",
+            "details": [
+                {
+                    "statement": "Consent is required.",
+                    "evidence_ids": ["e1"],
+                }
+            ],
+        }
+    )
+    allowance = MeteredAllowance()
+    backend = SDKCodeBackend(settings, store, "usage", tmp_path, transport, allowance)
+    payload = {"spans": [{"id": "e1", "text": "require consent"}]}
+    assert backend.analyze_unit(payload).status == "ok"
+    assert backend.analyze_unit(payload).status == "ok"
+    events = [
+        json.loads(line) for line in (tmp_path / "runs/usage/events.jsonl").read_text().splitlines()
+    ]
+    assert [item["event"] for item in events] == ["request", "response", "cache_hit"]
+    assert all(item["provider"] == "codex_sdk" for item in events)
+    assert all(item["model"] == "explicit-model" for item in events)
+    assert events[1]["usage"] == {"input_tokens": 10, "output_tokens": 20}
+    assert events[1]["cost_pln"] == 1.25
+    assert len(allowance.settlements) == transport.calls == 1
+
+
+def test_document_provenance_is_assigned_by_the_actual_producer(tmp_path):
+    from test_pipeline_restart import FixtureModel
+
+    from docgen_graph.evidence_service import RevisionEvidenceService
+    from docgen_graph.ingestion import inventory, snapshot_inputs
+
+    class InventedProvenance(FixtureModel):
+        settings = SimpleNamespace(model="gemini-3.8-flash")
+
+        def call(self, stage, payload, schema=None):
+            result = super().call(stage, payload, schema)
+            if stage == "extract_document":
+                for fact in result["assertions"]:
+                    fact["provenance_ids"] = [fact["evidence_ids"][0], "invented-producer"]
+                    fact["review_status"] = "verified"
+            return result
+
+    docs = tmp_path / "docs"
+    docs.mkdir()
+    (docs / "rules.md").write_text("Customer acceptance is required before substitution.\n")
+    template = tmp_path / "template.md"
+    template.write_text("## Rules\n")
+    store = ArtifactStore(tmp_path / "runtime")
+    model = InventedProvenance()
+    pipeline = Pipeline(store, model, "provenance")
+    snapshot = snapshot_inputs(store, docs, None, template, "")
+    source_inventory = inventory(store, snapshot)
+    state = {
+        "snapshot_ref": store.put(snapshot),
+        "inventory_ref": store.put(source_inventory),
+        "document_index": 0,
+    }
+    output = pipeline.extract_document_batch(state)
+    draft = store.get(output["draft_ref"])
+    provenance = store.get(output["document_candidate_provenance_ref"])
+    assert provenance["provider"] == "gemini"
+    assert provenance["model"] == "gemini-3.8-flash"
+    assert provenance["prompt_version"] == "extract_document.v1"
+    assert all(f["provenance_ids"] == [provenance["id"]] for f in draft["assertions"])
+    assert all(f["review_status"] == "unreviewed" for f in draft["assertions"])
+    pipeline.graph.add_evidence(source_inventory["spans"])
+    from docgen_graph.knowledge import normalized_assertion
+
+    allowed = {s["id"] for s in source_inventory["spans"]}
+    pipeline.graph.add_assertions([normalized_assertion(f, allowed) for f in draft["assertions"]])
+    service = RevisionEvidenceService.from_graph(
+        store,
+        pipeline.graph,
+        state["snapshot_ref"],
+        provenance=[provenance],
+    )
+    assert service.packet.facts[0].provenance_ids == [provenance["id"]]
