@@ -207,3 +207,60 @@ def test_document_provenance_is_assigned_by_the_actual_producer(tmp_path):
         provenance=[provenance],
     )
     assert service.packet.facts[0].provenance_ids == [provenance["id"]]
+
+
+def test_classification_cannot_return_semantic_or_temporal_edits():
+    import pytest
+    from pydantic import ValidationError
+
+    from docgen_graph.contracts import CodeFactClassification
+
+    metadata = {
+        "id": "fact-1",
+        "categories": ["PRODUCT_FEATURE"],
+        "classification_reason": "Visible action",
+        "relevance": "essential",
+        "relevance_reason": "Required behavior",
+        "audience_scope": "product readers",
+        "support_status": "direct",
+    }
+    for field, value in [("statement", "Changed meaning"), ("temporal_status", "current_snapshot")]:
+        with pytest.raises(ValidationError, match="Extra inputs"):
+            CodeFactClassification.model_validate({**metadata, field: value})
+
+
+def test_classification_keeps_original_identity_and_temporal_status(tmp_path):
+    from test_code_analysis_stages import OfflineModel, StagePipeline
+
+    from docgen_graph.code_analysis import stages
+    from docgen_graph.ingestion import inventory
+    from docgen_graph.knowledge import normalized_assertion
+
+    pipeline = StagePipeline(tmp_path, OfflineModel())
+    file_hash = pipeline.store.put_bytes(b"if (enabled) approve();\n")
+    snapshot = {
+        "files": [{"kind": "code", "path": "Rule.java", "hash": file_hash}],
+        "revision": "fixture",
+    }
+    source_inventory = inventory(pipeline.store, snapshot)
+    state = {
+        "snapshot_ref": pipeline.store.put(snapshot),
+        "inventory_ref": pipeline.store.put(source_inventory),
+    }
+    state.update(stages.inventory_code_scope(pipeline, state))
+    span_id = source_inventory["spans"][0]["id"]
+    original = normalized_assertion(
+        {
+            "statement": "Approve only when enabled.",
+            "conditions": ["enabled"],
+            "exceptions": ["disabled"],
+            "evidence_ids": [span_id],
+            "temporal_status": "historical",
+        },
+        {span_id},
+    )
+    state["verified_code_ref"] = pipeline.store.put([original])
+    update = stages.classify_code_facts(pipeline, state)
+    classified = pipeline.store.get(update["classified_code_ref"])["details"][0]
+    for name in ["id", "statement", "conditions", "exceptions", "evidence_ids", "temporal_status"]:
+        assert classified[name] == original[name]

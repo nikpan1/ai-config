@@ -65,9 +65,12 @@ class FixtureModel:
                 "report": "Classified code evidence",
                 "details": [
                     {
-                        **fact,
+                        "id": fact["id"],
+                        "audience_scope": "selected audience",
                         "categories": ["IMPLEMENTATION_FEATURE"],
                         "classification_reason": "Implementation behavior",
+                        "relevance": "essential",
+                        "support_status": "direct",
                         "relevance_reason": "Retained implementation detail",
                     }
                     for fact in payload["facts"]

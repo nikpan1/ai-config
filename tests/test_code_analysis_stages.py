@@ -56,13 +56,13 @@ class OfflineModel:
                     "report": "Product rule",
                     "details": [
                         {
-                            **fact,
+                            "id": fact["id"],
+                            "audience_scope": "selected audience",
                             "categories": ["PRODUCT_FEATURE", "PRODUCT_CONFIGURATION"],
                             "classification_reason": "Flag controls product action",
                             "relevance": "essential",
                             "relevance_reason": "Required condition for the selected audience",
                             "support_status": "direct",
-                            "temporal_status": "current_snapshot",
                         }
                         for fact in payload["facts"]
                     ],

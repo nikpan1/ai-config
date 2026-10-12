@@ -4,7 +4,7 @@ from pathlib import Path
 from docgen_graph.code_analysis.backends import backend_for
 from docgen_graph.code_analysis.history import freeze_history
 from docgen_graph.code_analysis.inventory import CodeScope, scope_inventory
-from docgen_graph.contracts import AuditDraft, CodeAnalysisDraft
+from docgen_graph.contracts import AuditDraft, CodeClassificationDraft
 from docgen_graph.knowledge import normalized_assertion
 from docgen_graph.storage import digest
 
@@ -112,6 +112,9 @@ def _payload(pipeline, state):
             if key in {"scope_id", "base_commit", "head_commit"}
         },
         "scope_role": unit["scope_role"],
+        "source_snapshot_role": "historical"
+        if unit["scope_role"] == "history"
+        else "current_snapshot",
         "code_revision": pipeline.read(state, "snapshot_ref").get("code_revision"),
     }
 
@@ -171,7 +174,12 @@ def verify_code_unit(pipeline, state):
             findings or ["Code audit rejected candidates"],
             "analyze_code_unit",
         )
-    return {"verified_code_ref": pipeline.store.put(records), "route": "classify_code_facts"}
+    return {
+        "verified_code_ref": pipeline.store.put(records),
+        "attempt": 0,
+        "feedback_ref": "",
+        "route": "classify_code_facts",
+    }
 
 
 def classify_code_facts(pipeline, state):
@@ -179,8 +187,15 @@ def classify_code_facts(pipeline, state):
     result = pipeline.call(
         "analyze_code_classification",
         {**_payload(pipeline, state), "facts": records},
-        CodeAnalysisDraft,
+        CodeClassificationDraft,
     )
+    by_id = {fact["id"]: fact for fact in records}
+    identifiers = [item["id"] for item in result["details"]]
+    if len(identifiers) != len(set(identifiers)) or set(identifiers) != set(by_id):
+        return _classification_issue(
+            pipeline, state, ["Classification must address each original fact ID exactly once"]
+        )
+    result["details"] = [{**by_id[item["id"]], **item} for item in result["details"]]
     return {
         "classified_code_ref": pipeline.store.put(result),
         "route": "verify_code_classification",
@@ -191,6 +206,8 @@ def verify_code_classification(pipeline, state):
     original = pipeline.read(state, "verified_code_ref")
     draft = pipeline.read(state, "classified_code_ref")
     semantic = (
+        "id",
+        "temporal_status",
         "statement",
         "subject",
         "predicate",
@@ -228,18 +245,23 @@ def verify_code_classification(pipeline, state):
     )
     findings.extend(audit["findings"])
     if findings or not audit["accepted"]:
-        return pipeline.issue(
-            state,
-            "verify_code_classification",
-            findings or ["Classification rejected"],
-            "classify_code_facts",
-        )
+        return _classification_issue(pipeline, state, findings or ["Classification rejected"])
     return {
         "code_classification_verified_ref": pipeline.store.put(
             {"accepted": True, "input_hash": digest(draft)}
         ),
         "route": "publish_code_evidence",
     }
+
+
+def _classification_issue(pipeline, state, findings):
+    if state.get("attempt", 0) < pipeline.repair_limit():
+        return {
+            "attempt": state.get("attempt", 0) + 1,
+            "feedback_ref": pipeline.store.put(findings),
+            "route": "classify_code_facts",
+        }
+    return pipeline.issue(state, "verify_code_classification", findings, "classify_code_facts")
 
 
 def publish_code_evidence(pipeline, state):
