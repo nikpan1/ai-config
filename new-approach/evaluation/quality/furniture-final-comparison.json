@@ -1,0 +1,63 @@
+{
+  "baseline": {
+    "candidate_hash": "e439237ddf6192a53bd9b99b8ba14edf760d91d33351d67cf875607483c3022f",
+    "title": "Modular Furniture and Kitchen Commerce Platform Documentation Plan",
+    "whole_page_words": 15632,
+    "section_quality": {
+      "reader_words": 15591,
+      "duplicate_paragraphs": [],
+      "redundant_explanations": "Requires reader assessment; not inferred from word count"
+    },
+    "mapped_obligations": 457,
+    "presentation_placements": 0,
+    "shared_placements": 0,
+    "final_offsets_verified": false,
+    "images": 0,
+    "diagrams": 0,
+    "template_decisions": [],
+    "manifest_verified": true
+  },
+  "revised": {
+    "candidate_hash": "506e4e1e39750197b099059b275df81f405a34147bd91e29e4e7447e5778dbee",
+    "title": "Modular Kitchen Planning and Commerce System",
+    "whole_page_words": 17399,
+    "section_quality": {
+      "reader_words": 17292,
+      "duplicate_paragraphs": [],
+      "redundant_explanations": "Requires reader assessment; not inferred from word count"
+    },
+    "mapped_obligations": 512,
+    "presentation_placements": 407,
+    "shared_placements": 57,
+    "final_offsets_verified": true,
+    "images": 4,
+    "diagrams": 0,
+    "template_decisions": [
+      {
+        "disposition": "inapplicable",
+        "evidence_ids": [
+          "d2ec98bc9197d7649703",
+          "03f3730bae1de9f9d4c0",
+          "a05453e3289679a8385a",
+          "4b6292810c4882b8faa4",
+          "0240a2fc6c59d0524b24",
+          "5b7f3feff831783c2efc",
+          "9408d81ca968b29d158c"
+        ],
+        "reason": "Source materials document individual capability requirements across user stories rather than sequential step transitions linking basket review, custom option confirmation, delivery checks, scheduling, payments, confirmation, and handoff.",
+        "requirement_id": "aa6e1b9e784f17e4",
+        "schema_version": 1
+      }
+    ],
+    "manifest_verified": true
+  },
+  "section_word_change_percent": 10.91,
+  "source_links": {
+    "baseline": 240,
+    "revised": 240,
+    "missing": [],
+    "added": []
+  },
+  "human_reader_scores": null,
+  "factual_fidelity": "Requires annotated source review; counts alone do not establish it"
+}

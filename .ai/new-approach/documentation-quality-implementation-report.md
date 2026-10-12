@@ -1,6 +1,6 @@
 # Documentation quality implementation and evaluation
 
-Status: implementation and small evaluation complete; full furniture evaluation running.
+Status: implementation and both fixture evaluations complete; candidates await human release review.
 
 ## Delivered behavior
 
@@ -40,7 +40,7 @@ release checks validate manifests and portable local image links.
 
 ## Offline verification
 
-- 78 Python tests pass, including source scopes and exceptions, shared placements, stale editorial
+- 79 Python tests pass, including source scopes and exceptions, shared placements, stale editorial
   mappings, rejected diagram edges, required versus optional template structure, source examples,
   PNG/JPEG/SVG validation, duplicate references, malformed and active SVG, byte/pixel limits,
   missing alternative text, symlinks, path escapes, copied exports and manifest tampering.
@@ -60,6 +60,8 @@ release checks validate manifests and portable local image links.
 - Antecedent context is added for leading references such as "Both roles" and explicit references
   to preceding rules. Self-contained user-story rows do not pull unrelated neighbors merely
   because they contain pronouns. All mandatory evidence remains intact.
+- Blank-line-only editorial changes are excluded from factual change context. Changed claims,
+  table cells and mappings still receive the normal bounded source audit.
 - Restart tests inject failures at plan review, after section verification, before export and at
   release review. Accepted earlier work survives. Changed visual choices invalidate plan approval.
 - Ruff and `git diff --check` pass. Wheel and source-distribution builds succeed.
@@ -121,6 +123,8 @@ After the final parser and heading-validator fixes, `quality-small-safety-v1` re
 assets, renewed source-plan review and exported the exact same candidate hash and reader contents.
 That development-only revalidation used one call, 14.45 seconds and PLN 0.06051; it is separate from
 the fresh generation benchmark above and adds no routine asset-specific stage.
+After the bounded editorial-diff fix, `quality-small-safety-v2` again renewed plan review and
+exported the exact same candidate hash. It used one call, 13.03 seconds and PLN 0.04937.
 
 Reproducible results are in `small-baseline-v1.json`, `small-v6.json`,
 `small-final-comparison.json` and `small-reader-review-final.json` under the evaluation directory.
@@ -138,14 +142,16 @@ assets and 20 source references. `furniture-quality-v1` verified all 28 source b
 512 obligations. Planning exposed oversized evidence groups, now split at scoped fact boundaries.
 It also exposed the need to audit only editorial changes rather than a complete large section.
 The accepted immutable graph is reused across explicitly recorded development revisions, with
-fresh plan approval when the runtime changes. The current evaluation is `furniture-quality-v10`.
+fresh plan approval when the runtime changes. The current evaluation is `furniture-quality-v11`.
 No earlier approval is carried forward. Revision v9 preserves 26 independently verified writing
 units from v8 only after exact plan equality, a fresh source-plan audit and normal interrupt/Command
 approval. It resumes the next unit after fixing an overly broad antecedent-context selection.
 The revision provenance records the immutable accepted-writing reference and both runtime hashes.
 Revision v9 completed all 72 writing units and three edited sections. Revision v10 retains that
 accepted work after fresh plan review and asset revalidation, then checks the pending editorial
-draft under the corrected heading validator. No failed editorial draft is treated as accepted.
+draft under the corrected heading validator. Revision v11 further narrows the factual diff so table
+spacing does not force unchanged evidence into the editorial request. No failed editorial draft is
+treated as accepted. The pending revision received fresh source-plan review and exact approval.
 Intermediate planning exposed an output limit,
 allocation-repair context, redundant audit instructions, grouped-citation checks and template
 metadata leakage; these were corrected and covered by regression checks where applicable.
@@ -154,9 +160,36 @@ citation labels in overview tables. The current revision addresses both before s
 The full-data configuration now allows 65,536 output tokens, a conservative 600,000 request budget
 and a 600-second request timeout. Interrupted and incomplete calls remain conservatively charged.
 The source audit rejected invented transitions between independent feature stories. The final
-plan must use supported transitions or an explicitly reviewed template gap. Final results will be
-added after export. Markdown and template hashes match the baseline; the quality-focused brief
-differs, as recorded in `furniture-input-parity.json`.
+plan records a reviewed inapplicability decision for the requested end-to-end flow because the
+stories do not establish the transitions needed to draw it. Markdown and template hashes match
+the baseline; the quality-focused brief differs, as recorded in `furniture-input-parity.json`.
+
+The final `furniture-quality-v11` candidate
+`506e4e1e39750197b099059b275df81f405a34147bd91e29e4e7447e5778dbee` reached release
+review with 512/512 extracted obligations mapped to 407 exact reader placements, including 57
+shared placements. The copied manifest and all final offsets verify. The revised document retains
+all 240 source links from the baseline, includes all four safe source SVGs, and has no duplicate
+paragraphs. It has 17,292 section words excluding citation syntax, versus 15,591 before: 10.91%
+longer. The full-size fixture therefore does not demonstrate a word-count reduction, even though
+the smaller fixture does. Its absent Mermaid flow is a reviewed source-evidence limitation.
+
+The first full candidate passed the automated source audit, but a separate agent review of 24
+preregistered source qualifications found one partial omission: its cabinet-placement passage
+prohibited silent resizing but omitted customer acceptance for a suggested substitution. A
+`request_changes` decision at the normal LangGraph release interrupt corrected the passage. The
+revised section passed source verification and the whole document passed the final audit and
+export checks. Agent review now confirms all 24/24 selected qualifications, equal to 24/24 in
+the baseline; independent human acceptance remains unmeasured. This finding illustrates why
+mapped obligation counts alone cannot establish complete source fidelity.
+
+The final v11 revision recorded 20 paid calls and PLN 3.13815, including the correction. Those
+numbers cover only that revision, which reused previously verified graph and writing, so they
+cannot be compared as a fresh-generation efficiency result to the 316-call baseline. A reliable
+like-for-like full-size wall-time baseline is absent. The complete selected development evaluation
+ledger records 431 requests and PLN 77.78289 across revisions, including 11 conservatively
+charged uncertain requests; the ledger was never reset. Results and evidence are saved in
+`furniture-v11.json`, `furniture-final-comparison.json`, `furniture-reader-review.json`, and
+`development-accounting.json` under the evaluation directory.
 
 ## Accounting and remaining acceptance evidence
 

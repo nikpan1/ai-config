@@ -1,0 +1,119 @@
+{
+  "run_id": "quality-small-safety-v2",
+  "status": "ready_for_review",
+  "stages": {
+    "verify_plan": {
+      "paid_calls": 1,
+      "cache_hits": 0,
+      "input_tokens": 7261,
+      "output_tokens": 1912,
+      "response_seconds": 12.717471299999943,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "validate_page_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 12.807375800000045,
+      "retries": 0,
+      "repairs": 0
+    },
+    "review_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.007404599999972561,
+      "retries": 0,
+      "repairs": 0
+    },
+    "accepted_writing_reuse": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "audit_documentation": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.033854799999971874,
+      "retries": 0,
+      "repairs": 0
+    },
+    "export_candidate": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.09831520000011551,
+      "retries": 0,
+      "repairs": 0
+    }
+  },
+  "paid_calls": 1,
+  "charged_pln": 0.0493679529,
+  "reserved_pln": 0,
+  "active_node_seconds": 12.946950400000105,
+  "human_reader_scores": "Unmeasured",
+  "candidate": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\new-approach\\.docgen\\runs\\quality-small-safety-v2\\candidates\\c702a0ee2bab5c9a12f95d1d3a55cfe76d012350160991121678cd589c79d06c",
+  "candidate_hash": "c702a0ee2bab5c9a12f95d1d3a55cfe76d012350160991121678cd589c79d06c",
+  "reader_words": 485,
+  "markdown_characters": 4558,
+  "images": 1,
+  "diagrams": 1,
+  "audit": {
+    "plan_hash": "f982b4fd27542f5ba38756cb4cd3908dcb3201809b199e9a83c244fca5471535",
+    "graph_revision": "7fbf72c455b4bfc6bb710862565b0cec6151e026c6bcbad6f4c066143d76eb3a",
+    "obligation_count": 16,
+    "mapped_count": 16,
+    "section_count": 4,
+    "findings": [],
+    "quality": {
+      "reader_words": 464,
+      "duplicate_paragraphs": [],
+      "redundant_explanations": "Requires reader assessment; not inferred from word count"
+    },
+    "template_decisions": [],
+    "visual_count": 2
+  },
+  "invocation_seconds": 13.027147900000045,
+  "writing_run": "quality-small-safety-v1",
+  "reuse_provenance": {
+    "from_thread": "quality-small-safety-v1",
+    "to_thread": "quality-small-safety-v2",
+    "reason": "Recheck the unchanged small document under the final bounded editorial diff runtime",
+    "revalidated_assets": [],
+    "plan_hash": "f982b4fd27542f5ba38756cb4cd3908dcb3201809b199e9a83c244fca5471535",
+    "source_revision": "c59b0263c10f664e447749bd8ad6a1732984caf1b9af43a0b0040824215f941a",
+    "graph_revision": "7fbf72c455b4bfc6bb710862565b0cec6151e026c6bcbad6f4c066143d76eb3a",
+    "accepted_edited_ref": "0cf8bef9d5ae85d21eacb84437287746fb4d6994f1db7916533d4093bed57c60",
+    "accepted_written_ref": "f3099331fd9edb3c2ad06a17f7fa70362b769f979812a0b443358530bff91a74",
+    "pending_editorial_draft_ref": null,
+    "accepted_writing_units": 4,
+    "old_runtime": "7d65d2849f9bc78c5b4ca118ea8b7e8a9a214ca0a667f573d94b7d2b1b0bf75e",
+    "new_runtime": "9ff7fab736ff43b772bcd22cf1e30bd433a48ae2cd0c42ecd78d182c8288235c",
+    "review": "Fresh source-plan audit and normal interrupt/Command plan approval. Accepted writing reused only after exact plan equality. All remaining source checks, final documentation audit and export still run."
+  },
+  "interrupts": [
+    {
+      "kind": "release",
+      "candidate_hash": "c702a0ee2bab5c9a12f95d1d3a55cfe76d012350160991121678cd589c79d06c",
+      "path": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\new-approach\\.docgen\\runs\\quality-small-safety-v2\\candidates\\c702a0ee2bab5c9a12f95d1d3a55cfe76d012350160991121678cd589c79d06c\\documentation\\index.md",
+      "error": ""
+    }
+  ],
+  "portable_copy_verified": true
+}

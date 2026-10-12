@@ -1,5 +1,5 @@
 {
-  "method": "Agent source review; representative qualifications selected before the revised candidate was generated. This does not establish independent human acceptance.",
+  "method": "Agent review of all 24 preregistered source qualifications in the final candidate after a release-review correction; not independent human acceptance.",
   "checks": [
     {
       "source": "checkout-and-fulfilment.md",
@@ -9,7 +9,16 @@
       ],
       "story_id": "CHECKOUTANDFULFILMENT-03-1",
       "qualification": "Availability inferred from a postal area remains provisional until the complete address is checked.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D11"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "When comparing options for a first purchase, address entry reveals whether standard delivery, room-of-choice delivery, or installation may be available regionally and identifies required access information, while regional logistics owns coverage and service operations owns access questions [Legacy D11]. Availability inferred from a postal area remains provisional until the complete address is checked [Legacy D11]."
+        }
+      ]
     },
     {
       "source": "checkout-and-fulfilment.md",
@@ -19,7 +28,16 @@
       ],
       "story_id": "CHECKOUTANDFULFILMENT-06-1",
       "qualification": "A provisional design cannot trigger a nonrefundable deposit without explicit review of the applicable terms.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D20"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "For custom order deposit payments, including when revisited by a returning customer, the payment summary separates the deposit due now from the remaining balance, states when the balance becomes due, and provides a clear route to full custom-order terms [Legacy D20] [Legacy D21] [Legacy D22]. Furthermore, a provisional design cannot trigger a nonrefundable deposit without explicit review of the applicable terms [Legacy D20] [Legacy D21] [Legacy D22]."
+        }
+      ]
     },
     {
       "source": "checkout-and-fulfilment.md",
@@ -29,7 +47,16 @@
       ],
       "story_id": "CHECKOUTANDFULFILMENT-07-1",
       "qualification": "A declined or interrupted payment must not produce a false paid-order confirmation.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D23"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "Checkout displays available payment methods along with any meaningful eligibility conditions before the final step, keeping the final amount, currency, and payment timing visible next to the selected method [Legacy D23] [Legacy D24] [Legacy D25]. A declined or interrupted payment must not produce a false paid-order confirmation [Legacy D23] [Legacy D24] [Legacy D25]. For the professional interior designer journey, the system permits a concise comparison view and records the reason a proposed option was chosen, with handoffs distinguishing a designer suggestion from a customer-approved decision [Legacy D24]. When returning customers revisit payment selection, the system identifies changed prices, assortment, or timing beside the previously saved choice, and the saved record preserves the prior version while asking the customer to accept material changes [Legacy D25]."
+        }
+      ]
     },
     {
       "source": "checkout-and-fulfilment.md",
@@ -39,7 +66,16 @@
       ],
       "story_id": "CHECKOUTANDFULFILMENT-10-1",
       "qualification": "A request submission is not treated as an approved order amendment.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D32"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Data, States, and Business Rules",
+          "passage": "In order modification workflows, a change request submission is not treated as an approved order amendment [Legacy D32] [Legacy D33] [Legacy D34]."
+        }
+      ]
     },
     {
       "source": "checkout-and-fulfilment.md",
@@ -49,7 +85,16 @@
       ],
       "story_id": "CHECKOUTANDFULFILMENT-11-1",
       "qualification": "A partial arrival does not mark the entire order as complete.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D35"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Data, States, and Business Rules",
+          "passage": "For multi-item orders arriving across separate waves, a partial arrival does not mark the entire order as complete [Legacy D35] [Legacy D36] [Legacy D37]."
+        }
+      ]
     },
     {
       "source": "checkout-and-fulfilment.md",
@@ -59,7 +104,16 @@
       ],
       "story_id": "CHECKOUTANDFULFILMENT-20-1",
       "qualification": "Closing a logistics task does not automatically close an unresolved customer support case.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D62"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Data, States, and Business Rules",
+          "passage": "During final completion reviews, closing a logistics task does not automatically close an unresolved customer support case [Legacy D62] [Legacy D63] [Legacy D64]."
+        }
+      ]
     },
     {
       "source": "kitchen-3d-planning.md",
@@ -69,7 +123,16 @@
       ],
       "story_id": "KITCHEN3DPLANNING-03-1",
       "qualification": "A cabinet cannot be silently resized to make it fit a wall; any suggested substitution needs customer acceptance.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D75"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "When a home shopper arranges cabinets on a kitchen wall, the cabinet planner allows adding, moving, duplicating, and removing base and wall cabinets, groups placements into runs while displaying gaps, overlaps, and unsupported combinations, prohibits silent resizing of cabinets to fit a wall, and requires customer acceptance for any suggested cabinet substitution [Legacy D75]."
+        }
+      ]
     },
     {
       "source": "kitchen-3d-planning.md",
@@ -79,7 +142,16 @@
       ],
       "story_id": "KITCHEN3DPLANNING-10-1",
       "qualification": "Restoring a version does not imply its old price or availability is still valid.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D96"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "In the home shopper idea recovery workflow when comparing options for a first purchase, the planner supports undo and named design versions with timestamps and notes, allowing item list and estimate comparisons before restoration, while mockup controls update the summary immediately [Legacy D96]. Restoring a version does not imply its old price or availability is still valid [Legacy D96]."
+        }
+      ]
     },
     {
       "source": "kitchen-3d-planning.md",
@@ -89,7 +161,16 @@
       ],
       "story_id": "KITCHEN3DPLANNING-11-1",
       "qualification": "An unresolved warning follows the design into consultation and cannot disappear from a purchase summary.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D99"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "When a warning is unresolved, the placement conflict warning follows the design into consultation and cannot disappear from a purchase summary or saved plan outputs [Legacy D99] [Legacy D100] [Legacy D101]."
+        }
+      ]
     },
     {
       "source": "kitchen-3d-planning.md",
@@ -99,7 +180,16 @@
       ],
       "story_id": "KITCHEN3DPLANNING-12-1",
       "qualification": "A visually fitting 3D model cannot by itself certify installation feasibility.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D102"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "To establish fit confidence across planning workflows, a confidence summary groups customer measurements, catalog dimensions, appliance placeholders, and professional checks, distinguishing plausible concepts from plans approved for ordering [Legacy D102] [Legacy D103] [Legacy D104]. A visually fitting 3D model cannot by itself certify installation feasibility [Legacy D102] [Legacy D103] [Legacy D104]."
+        }
+      ]
     },
     {
       "source": "kitchen-3d-planning.md",
@@ -109,7 +199,16 @@
       ],
       "story_id": "KITCHEN3DPLANNING-13-1",
       "qualification": "A consultant edit never silently replaces the customer's saved version.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D105"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "When sharing a kitchen design with a consultant during collaborative review, the share view contains the current design, unanswered questions, and an annotatable itemized summary, presenting consultant edits as proposals that the customer chooses whether to apply, ensuring a consultant edit never silently replaces the customer's saved version [Legacy D105]."
+        }
+      ]
     },
     {
       "source": "kitchen-3d-planning.md",
@@ -119,7 +218,16 @@
       ],
       "story_id": "KITCHEN3DPLANNING-20-1",
       "qualification": "A concept with unresolved critical fit warnings cannot be presented as fully order-ready.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D126"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Data, States, and Business Rules",
+          "passage": "When critical fit warnings are unresolved, a kitchen concept cannot be presented as fully order-ready [Legacy D126], [Legacy D127], [Legacy D128]."
+        }
+      ]
     },
     {
       "source": "merchant-and-service-operations.md",
@@ -129,7 +237,16 @@
       ],
       "story_id": "MERCHANTANDSERVICEOPERATIONS-03-1",
       "qualification": "An approved future price does not alter an already accepted order without the applicable agreement.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D139"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Data, States, and Business Rules",
+          "passage": "Pricing lifecycle and maintenance rules govern proposals, estimates, and confirmed orders:\n- A price proposal shows old and new values, affected ranges, effective date, and the reason visible to internal reviewers [Legacy D139], [Legacy D140], [Legacy D141].\n- The customer estimate records the price book version used and refreshes when a saved design is reopened [Legacy D139], [Legacy D140], [Legacy D141].\n- An approved future price does not alter an already accepted order without the applicable agreement [Legacy D139], [Legacy D140], [Legacy D141]."
+        }
+      ]
     },
     {
       "source": "merchant-and-service-operations.md",
@@ -139,7 +256,16 @@
       ],
       "story_id": "MERCHANTANDSERVICEOPERATIONS-06-1",
       "qualification": "A low-confidence supplier update cannot become an exact promised date.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D148"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Data, States, and Business Rules",
+          "passage": "A low-confidence supplier update cannot become an exact promised date [Legacy D148], [Legacy D149], [Legacy D150]."
+        }
+      ]
     },
     {
       "source": "merchant-and-service-operations.md",
@@ -149,7 +275,16 @@
       ],
       "story_id": "MERCHANTANDSERVICEOPERATIONS-08-1",
       "qualification": "A design with unaddressed fit warnings cannot be marked approved merely because a reviewer opened it.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D154"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Data, States, and Business Rules",
+          "passage": "When unaddressed fit warnings exist, a design cannot be marked approved merely because a reviewer opened it [Legacy D154], [Legacy D155], [Legacy D156]."
+        }
+      ]
     },
     {
       "source": "merchant-and-service-operations.md",
@@ -159,7 +294,16 @@
       ],
       "story_id": "MERCHANTANDSERVICEOPERATIONS-11-1",
       "qualification": "A draft quote or customer note cannot be mistaken for a confirmed production instruction.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D163"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Processes or Flows",
+          "passage": "During order fulfilment handoffs, the current order handoff choice and its next action remain visible, the flow explains how this choice affects the summary and which review remains open, and a draft quote or customer note cannot be mistaken for a confirmed production instruction [Legacy D163] [Legacy D164] [Legacy D165]."
+        }
+      ]
     },
     {
       "source": "merchant-and-service-operations.md",
@@ -169,7 +313,16 @@
       ],
       "story_id": "MERCHANTANDSERVICEOPERATIONS-19-1",
       "qualification": "A user who can draft a discount is not thereby authorized to approve it.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D187"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Roles, Access, and Operational Controls",
+          "passage": "Staff access roles segregate editing, approval, customer support, finance execution, and read-only review, with business owners assigning roles and conducting periodic access reviews to verify ongoing access need [Legacy D187] [Legacy D188] [Legacy D189]. Across home shopper journeys [Legacy D187], professional interior designer proposals [Legacy D188], and ongoing project maintenance when revisiting saved projects for returning customers [Legacy D189], operational controls enforce separation of duties when configuring, drafting, and reviewing actions requiring approval: a user authorized to draft a discount is strictly prohibited from approving it [Legacy D187] [Legacy D188] [Legacy D189]."
+        }
+      ]
     },
     {
       "source": "merchant-and-service-operations.md",
@@ -179,7 +332,16 @@
       ],
       "story_id": "MERCHANTANDSERVICEOPERATIONS-20-1",
       "qualification": "A support suggestion is not published as product fact without specialist review.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D190"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Data, States, and Business Rules",
+          "passage": "Support teams can flag confusing product text, planner warnings, and missing after-sales guidance with linked examples, enabling content owners to inspect the customer impact and proposed correction prior to publication [Legacy D190], [Legacy D191], [Legacy D192]. Throughout this process, the selected knowledge feedback choice and its subsequent action remain visible, and the workflow indicates how that selection affects the summary as well as which review remains open [Legacy D190], [Legacy D191], [Legacy D192]. Any support suggestion submitted through this channel must undergo specialist review and cannot be published as product fact without it [Legacy D190], [Legacy D191], [Legacy D192]."
+        }
+      ]
     },
     {
       "source": "shopping-and-discovery.md",
@@ -189,7 +351,16 @@
       ],
       "story_id": "SHOPPINGANDDISCOVERY-03-1",
       "qualification": "A product with missing dimensions is not shown as an exact match and is clearly marked for manual confirmation.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D203"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "Width, height, and depth filters distinguish external furniture dimensions from required clearance around doors and drawers [Legacy D203] [Legacy D204] [Legacy D205]. The filter summary states the unit and whether the measurement belongs to the base item or the current configuration [Legacy D203] [Legacy D204] [Legacy D205]. A product with missing dimensions is not shown as an exact match and is clearly marked for manual confirmation [Legacy D203] [Legacy D204] [Legacy D205]."
+        }
+      ]
     },
     {
       "source": "shopping-and-discovery.md",
@@ -199,7 +370,16 @@
       ],
       "story_id": "SHOPPINGANDDISCOVERY-08-1",
       "qualification": "A provisional supplier estimate cannot be rendered as a guaranteed delivery date.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D218"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "On the product page, the system separates items ready to dispatch, made to order items, and items requiring a supplier confirmation, phrasing availability as an estimate at the point shown that changes visibly when a selected option affects it [Legacy D218]. A provisional supplier estimate cannot be rendered as a guaranteed delivery date [Legacy D218] [Legacy D219] [Legacy D220]."
+        }
+      ]
     },
     {
       "source": "shopping-and-discovery.md",
@@ -209,7 +389,16 @@
       ],
       "story_id": "SHOPPINGANDDISCOVERY-10-1",
       "qualification": "A retired finish is not silently exchanged for another; the customer receives a clear replacement decision.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D224"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "A retired finish is not silently exchanged for another; the customer receives a clear replacement decision [Legacy D224] [Legacy D225]."
+        }
+      ]
     },
     {
       "source": "shopping-and-discovery.md",
@@ -219,7 +408,16 @@
       ],
       "story_id": "SHOPPINGANDDISCOVERY-15-1",
       "qualification": "An unconfirmed room measurement remains marked as approximate in the consultant's view.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D239"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "When a room measurement is unconfirmed, it remains marked as approximate in the consultant's view [Legacy D239] [Legacy D240] [Legacy D241]."
+        }
+      ]
     },
     {
       "source": "shopping-and-discovery.md",
@@ -229,7 +427,16 @@
       ],
       "story_id": "SHOPPINGANDDISCOVERY-18-1",
       "qualification": "A manually entered dimension is labelled customer supplied until checked during consultation or survey.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D248"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "When comparing options for a first purchase, a room guide provides wall, ceiling, opening, and clearance measurement instructions with a printable checklist, tags measurements needing professional verification, and labels manually entered dimensions as customer supplied until checked during consultation or survey [Legacy D248]."
+        }
+      ]
     },
     {
       "source": "shopping-and-discovery.md",
@@ -239,8 +446,18 @@
       ],
       "story_id": "SHOPPINGANDDISCOVERY-20-1",
       "qualification": "A shared link does not expose private address or payment details.",
-      "assessment": null
+      "assessment": "Preserved: agent reviewed the cited passage and confirmed the full selected source qualification.",
+      "labels": [
+        "D254"
+      ],
+      "candidate_passages": [
+        {
+          "section": "Core Features and Functionalities",
+          "passage": "A recipient can review a shared shortlist without modifying the owner's selections unless the owner explicitly enables collaboration [Legacy D254] [Legacy D255] [Legacy D256]. Across these interactions, the active shareable shortlist choice and its next action remain visible [Legacy D254] [Legacy D255] [Legacy D256], and shared links do not expose private customer address or payment details [Legacy D254] [Legacy D255] [Legacy D256]. Interface mockups group the primary decision, a current-state summary, and the next action together, ensuring shortlist controls update the summary immediately while surfacing any limitations beside the affected selection [Legacy D254]."
+        }
+      ]
     }
   ],
-  "human_reader_scores": null
+  "human_reader_scores": null,
+  "candidate_hash": "506e4e1e39750197b099059b275df81f405a34147bd91e29e4e7447e5778dbee"
 }

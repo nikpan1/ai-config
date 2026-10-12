@@ -1,0 +1,166 @@
+{
+  "run_id": "furniture-quality-v11",
+  "status": "ready_for_review",
+  "stages": {
+    "verify_plan": {
+      "paid_calls": 1,
+      "cache_hits": 0,
+      "input_tokens": 157296,
+      "output_tokens": 4905,
+      "response_seconds": 35.11530490000018,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "validate_page_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 37.11600079999994,
+      "retries": 0,
+      "repairs": 0
+    },
+    "review_plan": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.010819999999966967,
+      "retries": 0,
+      "repairs": 0
+    },
+    "accepted_writing_reuse": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_page": {
+      "paid_calls": 6,
+      "cache_hits": 0,
+      "input_tokens": 48682,
+      "output_tokens": 12991,
+      "response_seconds": 87.93721540000001,
+      "node_seconds": 0.0,
+      "retries": 0,
+      "repairs": 0
+    },
+    "verify_edited_page": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 89.57708550000052,
+      "retries": 0,
+      "repairs": 1
+    },
+    "edit_page": {
+      "paid_calls": 13,
+      "cache_hits": 0,
+      "input_tokens": 330669,
+      "output_tokens": 88625,
+      "response_seconds": 526.8643390000007,
+      "node_seconds": 527.3273959,
+      "retries": 0,
+      "repairs": 0
+    },
+    "audit_documentation": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 2.7518099999999777,
+      "retries": 0,
+      "repairs": 0
+    },
+    "export_candidate": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 2.8470918999998958,
+      "retries": 0,
+      "repairs": 0
+    },
+    "review_release": {
+      "paid_calls": 0,
+      "cache_hits": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response_seconds": 0.0,
+      "node_seconds": 0.012149499999850377,
+      "retries": 0,
+      "repairs": 0
+    }
+  },
+  "paid_calls": 20,
+  "charged_pln": 3.1381476947999998,
+  "reserved_pln": 0,
+  "active_node_seconds": 659.6423536000002,
+  "human_reader_scores": "Unmeasured",
+  "candidate": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\new-approach\\.docgen\\runs\\furniture-quality-v11\\candidates\\506e4e1e39750197b099059b275df81f405a34147bd91e29e4e7447e5778dbee",
+  "candidate_hash": "506e4e1e39750197b099059b275df81f405a34147bd91e29e4e7447e5778dbee",
+  "reader_words": 17399,
+  "markdown_characters": 548434,
+  "images": 4,
+  "diagrams": 0,
+  "audit": {
+    "plan_hash": "792515067c831939be79786d5fdb062b1e716866406ede6d5f53179dfad7c36d",
+    "graph_revision": "00566f1d67145d4303c343cc3e691d8994947b7321b2a7c3269e107591264378",
+    "obligation_count": 512,
+    "mapped_count": 512,
+    "section_count": 8,
+    "findings": [],
+    "quality": {
+      "reader_words": 17292,
+      "duplicate_paragraphs": [],
+      "redundant_explanations": "Requires reader assessment; not inferred from word count"
+    },
+    "template_decisions": [
+      {
+        "disposition": "inapplicable",
+        "evidence_ids": [
+          "d2ec98bc9197d7649703",
+          "03f3730bae1de9f9d4c0",
+          "a05453e3289679a8385a",
+          "4b6292810c4882b8faa4",
+          "0240a2fc6c59d0524b24",
+          "5b7f3feff831783c2efc",
+          "9408d81ca968b29d158c"
+        ],
+        "reason": "Source materials document individual capability requirements across user stories rather than sequential step transitions linking basket review, custom option confirmation, delivery checks, scheduling, payments, confirmation, and handoff.",
+        "requirement_id": "aa6e1b9e784f17e4",
+        "schema_version": 1
+      }
+    ],
+    "visual_count": 4
+  },
+  "invocation_seconds": 0.010483199999725912,
+  "interrupts": [
+    {
+      "kind": "release",
+      "candidate_hash": "506e4e1e39750197b099059b275df81f405a34147bd91e29e4e7447e5778dbee",
+      "path": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\new-approach\\.docgen\\runs\\furniture-quality-v11\\candidates\\506e4e1e39750197b099059b275df81f405a34147bd91e29e4e7447e5778dbee\\documentation\\index.md",
+      "error": ""
+    }
+  ],
+  "configuration": {
+    "model": "gemini-3.8-flash",
+    "output_tokens": 65536,
+    "request_tokens": 600000,
+    "timeout_seconds": 600,
+    "cache_mode": "durable",
+    "budget_pln": 1000.0
+  },
+  "portable_copy_verified": true
+}
