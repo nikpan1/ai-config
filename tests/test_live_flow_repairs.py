@@ -264,3 +264,88 @@ def test_classification_keeps_original_identity_and_temporal_status(tmp_path):
     classified = pipeline.store.get(update["classified_code_ref"])["details"][0]
     for name in ["id", "statement", "conditions", "exceptions", "evidence_ids", "temporal_status"]:
         assert classified[name] == original[name]
+
+
+class FinalAuditModel:
+    def __init__(self, findings=None):
+        self.payload = None
+        self.findings = findings or []
+
+    def call(self, stage, payload, schema):
+        assert stage == "audit_source_to_document"
+        self.payload = payload
+        return {
+            "decisions": [
+                {
+                    "aspect_id": "a1",
+                    "fact_ids": ["f1"],
+                    "status": "represented",
+                    "reason": "Preserved",
+                }
+            ],
+            "findings": self.findings,
+        }
+
+
+def final_audit_fixture(tmp_path, model):
+    store = ArtifactStore(tmp_path)
+    pipeline = Pipeline(store, model, "final-audit")
+    blocks = {
+        "D1": {"id": "e1", "text": "Consent is required."},
+        "D2": {"id": "e2", "text": "Both systems share a correlation ID."},
+        "C1": {"id": "e3", "text": "checkConsent();"},
+    }
+    pipeline.graph = SimpleNamespace(evidence=lambda key: blocks[key])
+    passage = (
+        "Consent is required [Legacy D1]; code checks it [Code C1]. "
+        "Systems share an ID [Legacy D2]."
+    )
+    mappings = [
+        {"obligation_id": key, "passage": passage, "citation_ids": [citation]}
+        for key, citation in [("f1", "D1"), ("f2", "D2"), ("f3", "C1")]
+    ]
+    mappings.append({"obligation_id": "f4", "passage": "Other paragraph", "citation_ids": ["D4"]})
+    facts = [{"id": f"f{i}", "evidence_ids": [f"e{i}"]} for i in range(1, 5)]
+    state = {
+        "inventory_ref": store.put(
+            {
+                "document_batches": [["e1", "meta"]],
+                "spans": list(blocks.values()) + [{"id": "meta", "text": "source_id: sample"}],
+            }
+        ),
+        "assertions_ref": store.put(facts),
+        "source_aspects_ref": store.put([{"id": "a1", "evidence_id": "e1"}]),
+        "source_non_substantive_ref": store.put([{"evidence_id": "meta", "reason": "Metadata"}]),
+        "edited_ref": store.put([{"title": "Rules", "mappings": mappings}]),
+        "snapshot_ref": "snapshot",
+        "plan_hash": "plan",
+        "mode": "autopilot",
+    }
+    return pipeline, state
+
+
+def test_final_source_audit_includes_shared_paragraph_support(tmp_path):
+    model = FinalAuditModel()
+    pipeline, state = final_audit_fixture(tmp_path, model)
+    result = pipeline.audit_source_to_document(state)
+    assert result["source_audit_index"] == 1
+    assert model.payload["aspects"] == [{"id": "a1", "evidence_id": "e1"}]
+    assert {item["text"] for item in model.payload["blocks"]} == {
+        "Consent is required.",
+        "source_id: sample",
+    }
+    assert {item["id"] for item in model.payload["facts"]} == {"f1"}
+    assert {item["id"] for item in model.payload["supporting_facts"]} == {"f2", "f3"}
+    assert {item["id"] for item in model.payload["supporting_blocks"]} == {"e2", "e3"}
+    assert len(model.payload["final_passages"][0]["mappings"]) == 3
+    assert model.payload["non_substantive_candidates"] == [
+        {"evidence_id": "meta", "reason": "Metadata"}
+    ]
+
+
+def test_final_source_audit_still_blocks_real_omissions(tmp_path):
+    model = FinalAuditModel(["Mandatory consent qualifier is missing"])
+    pipeline, state = final_audit_fixture(tmp_path, model)
+    result = pipeline.audit_source_to_document(state)
+    assert result["route"] == "resolve_issues_automatically"
+    assert pipeline.store.get(result["issue_ref"])["findings"] == model.findings

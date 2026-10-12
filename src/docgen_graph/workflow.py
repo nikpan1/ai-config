@@ -2177,15 +2177,37 @@ class Pipeline:
             packet_aspects = [item for item in aspects if item["evidence_id"] in ids]
             facts = [item for item in self.assertions(state) if ids & set(item["evidence_ids"])]
             fact_ids = {item["id"] for item in facts}
-            passages = [
-                {
-                    "section_id": section.get("section_id", section["title"]),
-                    "mappings": [
-                        item for item in section["mappings"] if item["obligation_id"] in fact_ids
-                    ],
+            passages = []
+            for section in sections:
+                selected = {
+                    item["passage"]
+                    for item in section["mappings"]
+                    if item["obligation_id"] in fact_ids
                 }
-                for section in sections
-            ]
+                passages.append(
+                    {
+                        "section_id": section.get("section_id", section["title"]),
+                        "mappings": [
+                            item for item in section["mappings"] if item["passage"] in selected
+                        ],
+                    }
+                )
+            supporting_ids = {
+                item["obligation_id"]
+                for section in passages
+                for item in section["mappings"]
+            } - fact_ids
+            citation_ids = {
+                citation
+                for section in passages
+                for item in section["mappings"]
+                for citation in item["citation_ids"]
+            }
+            supporting_blocks = {
+                block["id"]: block
+                for citation in sorted(citation_ids)
+                if (block := self.graph.evidence(citation))["id"] not in ids
+            }
             audit = self.call(
                 "audit_source_to_document",
                 {
@@ -2193,6 +2215,15 @@ class Pipeline:
                     "aspects": packet_aspects,
                     "facts": facts,
                     "final_passages": passages,
+                    "supporting_facts": [
+                        item for item in self.assertions(state) if item["id"] in supporting_ids
+                    ],
+                    "supporting_blocks": list(supporting_blocks.values()),
+                    "non_substantive_candidates": [
+                        item
+                        for item in self.read(state, "source_non_substantive_ref", [])
+                        if item["evidence_id"] in ids
+                    ],
                 },
                 SourceAudit,
             )
