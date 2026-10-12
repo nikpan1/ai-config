@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "status": "not_found",
+  "facts": [],
+  "evidence": [],
+  "relations": [],
+  "conflicts": [],
+  "provenance": [],
+  "coverage": [],
+  "next_cursor": null,
+  "truncated": false,
+  "warnings": [],
+  "usage_ref": null,
+  "graph_revision": null
+}

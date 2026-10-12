@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "status": "unavailable",
+  "facts": [],
+  "evidence": [],
+  "relations": [],
+  "conflicts": [],
+  "provenance": [],
+  "coverage": [],
+  "next_cursor": null,
+  "truncated": false,
+  "warnings": [
+    "Backend unavailable"
+  ],
+  "usage_ref": null,
+  "graph_revision": null
+}

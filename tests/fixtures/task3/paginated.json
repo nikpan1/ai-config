@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "status": "ok",
+  "facts": [
+    {
+      "schema_version": 1,
+      "id": "f1",
+      "statement": "Risk review requires approval when the score exceeds 5.",
+      "evidence_ids": [
+        "e1"
+      ],
+      "subject": "unspecified",
+      "predicate": "describes",
+      "scope": "selected sources",
+      "modality": "descriptive",
+      "conditions": [
+        "score exceeds 5"
+      ],
+      "exceptions": [],
+      "source_role": "source",
+      "categories": [
+        "PRODUCT_FEATURE"
+      ],
+      "classification_reason": "Approval behavior",
+      "relevance": "unknown",
+      "relevance_reason": "Not assessed",
+      "audience_scope": "selected audience",
+      "support_status": "direct",
+      "temporal_status": "current_snapshot",
+      "provenance_ids": [],
+      "review_status": "unreviewed"
+    },
+    {
+      "schema_version": 1,
+      "id": "f2",
+      "statement": "Legacy guidance says the threshold is 6.",
+      "evidence_ids": [
+        "e2"
+      ],
+      "subject": "unspecified",
+      "predicate": "describes",
+      "scope": "selected sources",
+      "modality": "descriptive",
+      "conditions": [
+        "score exceeds 6"
+      ],
+      "exceptions": [],
+      "source_role": "source",
+      "categories": [
+        "UNKNOWN"
+      ],
+      "classification_reason": "Not classified",
+      "relevance": "unknown",
+      "relevance_reason": "Not assessed",
+      "audience_scope": "selected audience",
+      "support_status": "unresolved",
+      "temporal_status": "unknown",
+      "provenance_ids": [],
+      "review_status": "unreviewed"
+    }
+  ],
+  "evidence": [
+    {
+      "schema_version": 1,
+      "id": "e1",
+      "source_kind": "code",
+      "snapshot_id": "fixture-snapshot",
+      "path": "source.txt",
+      "content_hash": "d1cc7c3590771736c47609a1a3517a75ac1c9e89b8811b433d59601e08cb9434",
+      "locator": {
+        "schema_version": 1,
+        "kind": "lines",
+        "start": 1,
+        "end": 1,
+        "page": null,
+        "table": null,
+        "cell": null,
+        "sheet": null,
+        "range": null,
+        "hunk": null,
+        "side": null
+      },
+      "source_role": "implementation",
+      "text": "Risk review requires approval when the score exceeds 5.",
+      "parent_ids": []
+    },
+    {
+      "schema_version": 1,
+      "id": "e2",
+      "source_kind": "document",
+      "snapshot_id": "fixture-snapshot",
+      "path": "source.txt",
+      "content_hash": "d1cc7c3590771736c47609a1a3517a75ac1c9e89b8811b433d59601e08cb9434",
+      "locator": {
+        "schema_version": 1,
+        "kind": "lines",
+        "start": 2,
+        "end": 2,
+        "page": null,
+        "table": null,
+        "cell": null,
+        "sheet": null,
+        "range": null,
+        "hunk": null,
+        "side": null
+      },
+      "source_role": "legacy_document",
+      "text": "Legacy guidance says the threshold is 6.",
+      "parent_ids": []
+    }
+  ],
+  "relations": [],
+  "conflicts": [
+    {
+      "source_id": "f1",
+      "target_id": "f2",
+      "status": "unresolved",
+      "evidence_ids": [
+        "e1",
+        "e2"
+      ]
+    }
+  ],
+  "provenance": [],
+  "coverage": [
+    {
+      "schema_version": 1,
+      "id": "c1",
+      "evidence_ids": [
+        "e1"
+      ],
+      "unit_locator": {
+        "schema_version": 1,
+        "kind": "lines",
+        "start": 1,
+        "end": 1,
+        "page": null,
+        "table": null,
+        "cell": null,
+        "sheet": null,
+        "range": null,
+        "hunk": null,
+        "side": null
+      },
+      "aspect": "Approval threshold and required action",
+      "disposition": "unresolved",
+      "fact_ids": [],
+      "duplicate_of": null,
+      "reason": "",
+      "decision_ref": null
+    }
+  ],
+  "next_cursor": "fixture:1",
+  "truncated": true,
+  "warnings": [],
+  "usage_ref": null,
+  "graph_revision": null
+}
