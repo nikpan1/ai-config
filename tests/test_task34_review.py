@@ -134,7 +134,12 @@ def test_provider_allowance_shares_prior_gemini_charges(tmp_path):
 
 
 def test_code_relation_uses_context_evidence_and_validated_endpoints():
-    payload = {"spans": [{"id": "e1"}], "context": [{"id": "e2"}]}
+    payload = {
+        "spans": [{"id": "e1"}],
+        "context": [{"id": "e2"}],
+        "code_revision": {"commit": "current-commit"},
+        "history": {"base_commit": "base-commit", "head_commit": "head-commit"},
+    }
     raw = {
         "report": "Verified later",
         "details": [
@@ -154,6 +159,9 @@ def test_code_relation_uses_context_evidence_and_validated_endpoints():
     packet = candidate_packet(raw, payload, "codex_sdk", "explicit-model")
     assert packet.relations[0].source_id == packet.facts[1].id
     assert packet.relations[0].evidence_ids == ["e2"]
+    assert packet.provenance[0].commit == "current-commit"
+    assert packet.provenance[0].base_commit == "base-commit"
+    assert packet.provenance[0].head_commit == "head-commit"
     raw["relations"][0]["target_fact_index"] = 8
     with pytest.raises(ValueError, match="unknown candidate fact"):
         candidate_packet(raw, payload, "codex_sdk", "explicit-model")

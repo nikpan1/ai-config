@@ -35,6 +35,9 @@ def candidate_packet(raw, payload, provider, model, sdk_version="", session_id="
         prompt_version="analyze_code.v1",
         input_hash=digest(payload),
         scope_id=payload.get("scope_id", "full"),
+        commit=payload.get("code_revision", {}).get("commit"),
+        base_commit=payload.get("history", {}).get("base_commit"),
+        head_commit=payload.get("history", {}).get("head_commit"),
     )
     allowed = {span["id"] for span in payload["spans"] + payload.get("context", [])}
     facts = [
@@ -199,9 +202,7 @@ class SDKCodeBackend:
             )
             return EvidenceResult(
                 status="unavailable",
-                warnings=[
-                    f"{self.provider} failed: {type(error).__name__}; reservation charged"
-                ],
+                warnings=[f"{self.provider} failed: {type(error).__name__}; reservation charged"],
                 usage_ref=reservation,
             )
 
