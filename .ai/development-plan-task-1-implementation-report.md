@@ -20,7 +20,7 @@ Date: 2026-10-12
 | `uv sync --locked --no-dev` and `uv sync --locked --group dev` | Succeeded in a clean root virtual environment. |
 | `uv run --locked --no-dev docgen --help` | Root command loaded successfully. |
 | `python -m evaluation.citation_cases` | 72 cases; 72 expected behaviors; zero forbidden fragments. |
-| `python -m pytest tests -q --basetemp=.docgen/pytest-task1-complete -o cache_dir=.docgen/pytest-cache` | 89 passed in 134.13 seconds. |
+| `python -m pytest tests -q --basetemp=.docgen/pytest-task1-final3 -o cache_dir=.docgen/pytest-cache` | 91 passed in 138.75 seconds. |
 | `python -m ruff check src tests evaluation` | Passed. |
 | `python -m ruff format --check src tests evaluation` | Passed. |
 | `docgen migrate --from-workspace new-approach/.docgen` | Dry-run verified 8,484 files, content object hashes, and candidate manifests; zero collisions in the separate import destination. No copy was performed. |
@@ -30,7 +30,7 @@ For the 72-case fixture, the generated selector is 19 encoded bytes at the media
 
 ## Inspectable examples
 
-- Manual stage artifact: `.docgen/graph/runs/task1-artifact-sample/step1/revisions/r0001/result.md`. Its JSON and manifest are alongside it. The run is intentionally paused at `review_stage`; no Gemini request occurred.
+- Manual stage artifact: `.docgen/graph/runs/task1-artifact-final/step1/revisions/r0001/result.md`. Its JSON and manifest are alongside it. The run is intentionally paused at `review_stage`; no Gemini request occurred.
 - Candidate bundle shape is tested under `step22/candidates/<candidate_hash>/`, including evidence, image assets, source index, audit, and manifest.
 - Automatic exclusion example in `tests/test_modes_and_artifacts.py`: an uncovered `rules.md` line is first accounted for in a corrected extraction draft, then, after independent verification remains unresolved, receives a source range, reason, and decision reference in `exclusions.json` and `exclusions.md`. This is a model-double test, not an actual decision to omit fixture content.
 - Historical artifacts remain in `new-approach/.docgen/`; `docgen migrate` can copy them to `.docgen/graph/imported-legacy/` after verification. Existing historical checkpoints are inspectable but incompatible with the new graph signature and cannot be resumed as current runs.
@@ -40,5 +40,5 @@ For the 72-case fixture, the generated selector is 19 encoded bytes at the media
 - Browser highlighting over HTTP remains unverified. A local server was started, but the available in-app browser returned a connection timeout. The citation checks prove deterministic source and supplied-HTML text matching, not browser selection or authenticated Confluence rendering.
 - The current selector supports exact text, bounded prefix/suffix context, and a `start,end` range for a unique long support quote. It does not prove global minimality with an independent exhaustive oracle. Shortest length is measured over candidates supported by this implementation.
 - No live quick or full documentation run was made because the historical ledger exceeds the authorized ceiling. Structural fixture results do not establish full information coverage, reader quality, or semantic correctness of the authored expected-fact oracle; that oracle is marked as not human reviewed.
-- Automatic issue resolution is implemented for document coverage repair/exclusion. Other unresolved validation issues end `incomplete`. It does not yet provide general Gemini-guided, dependency-minimal repairs for every content issue. A failed document batch can exclude the batch rather than the smallest possible unsupported proposition.
+- Automatic issue resolution is implemented for document coverage repair/exclusion. A batch whose failed proposition cannot be isolated, or a run left with no verified content, ends `incomplete`. It does not yet provide general Gemini-guided, dependency-minimal repairs for every content issue.
 - Tests cover restart at representative manual, autopilot, receipt, and exclusion points; they do not exercise every stage interruption or a crash in the interval between artifact write and checkpoint commit.

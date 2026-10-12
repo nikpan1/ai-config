@@ -2543,7 +2543,7 @@ class Pipeline:
             destination = (
                 "extract_document_batch"
                 if next_index < len(inventory_record["document_batches"])
-                else ("link_graph_batch" if self.assertions(state) else "finalize_graph")
+                else ("link_graph_batch" if self.assertions(state) else END)
             )
             result = {
                 "exclusions_ref": self.store.put(all_exclusions),
@@ -2553,7 +2553,7 @@ class Pipeline:
                 "attempt": 0,
                 "automatic_issue_attempts": 0,
                 "route": destination,
-                "status": "running",
+                "status": "incomplete" if destination == END else "running",
             }
             self.stages.record(
                 "resolve_issues_automatically", state, {"decision_ref": ref, **result}

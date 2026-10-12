@@ -16,7 +16,7 @@ def main() -> None:
     settings = replace(Settings.load(), api_key=key)
     if not key:
         raise ValueError("GEMINI_API_KEY is missing from repository .env")
-    model = GeminiModel(settings, ArtifactStore(settings.workspace), "new-approach-live-smoke")
+    model = GeminiModel(settings, ArtifactStore(settings.workspace), "docgen-live-smoke")
     response = model.call(
         "analyze_code",
         {

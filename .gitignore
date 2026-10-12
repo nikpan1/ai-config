@@ -10,3 +10,4 @@ __pycache__/
 .docgen/
 build/
 dist/
+.idea/

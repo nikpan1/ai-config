@@ -32,7 +32,7 @@ def main() -> None:
         if item.is_file()
     }
     run_id = (
-        "new-approach-live-plan-"
+        "docgen-live-plan-"
         + digest(
             [
                 implementation_signature(),

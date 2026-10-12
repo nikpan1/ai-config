@@ -6,7 +6,7 @@
 
 ```powershell
 uv sync --locked
-Copy-Item .env.example .env
+if (-not (Test-Path -LiteralPath .env)) { Copy-Item .env.example .env }
 ```
 
 Keep an existing `.env` if you already have one. Set `GEMINI_API_KEY` there. All model requests use `gemini-3.8-flash`; a different `GEMINI_MODEL` is rejected. The cumulative development budget ledger stays at `.docgen/budget.sqlite`, with pricing at `.docgen/pricing.json`. The active pipeline defaults to `.docgen/graph/`, separate from historical root checkpoints. An existing `.env` can be selected with `docgen --env-file path/to/file ...`.
@@ -32,18 +32,36 @@ Use `uv run docgen history --thread-id ID`, `uv run docgen inspect-evidence --th
 
 Each citation is checked against its frozen Markdown source and, when configured, a supplied local HTML export. Set `DOCGEN_SOURCE_PAGE_MAP` in `.env` to a JSON file mapping source IDs or original URLs to local HTML paths relative to the map file. Those HTML bytes are frozen for navigation verification only; they are never ingested as product facts. Without a map, the citation audit reports `markdown_projection_only`. If a reliable selector cannot be made, the reader links to a portable local evidence record and shows the original page separately. Production Confluence highlighting remains unverified unless a browser can open the authenticated original page.
 
-## Historical workspace migration
+## Repository layout
 
-Existing `new-approach/.docgen/` output remains in place. Inspect and verify it before copying:
+The repository root is the only application project. Run installation, CLI commands, tests, and builds here; neither an `old-approach/` nor a `new-approach/` application directory is needed.
+
+| Path | Contents |
+| --- | --- |
+| `src/docgen_graph/` | Active pipeline and versioned prompts. |
+| `tests/` and `evaluation/` | Tests, fixtures, and evaluation tools. |
+| `pyproject.toml` and `uv.lock` | Shared package configuration and pinned dependencies. |
+| `.env` and `.venv/` | Ignored local configuration and the root Python environment. |
+| `data/` | Source inputs and templates. |
+| `.docgen/graph/` | Active run artifacts and checkpoints. |
+| `.docgen/graph/imported-legacy/` | Preserved historical output from the former nested project. |
+
+The former `new-approach/.docgen/` contents have been copied into `.docgen/graph/imported-legacy/` and verified before removing the nested directory. The former nested `.env` is preserved at `.docgen/root-consolidation/new-approach.env`; it is an archival copy with historical relative paths, not the active configuration. Root `.env`, budget accounting, and existing checkpoints remain intact. Migration manifests are under `.docgen/root-consolidation/`.
+
+## Importing another historical workspace
+
+To import output from a separate historical checkout, inspect and verify its workspace before copying:
 
 ```powershell
-uv run docgen migrate --from-workspace new-approach/.docgen
-uv run docgen migrate --from-workspace new-approach/.docgen --copy
+uv run docgen migrate --from-workspace path/to/historical-workspace
+uv run docgen migrate --from-workspace path/to/historical-workspace --copy
 ```
 
 The first command is a dry run. Both commands verify content object hashes and candidate manifests; copy refuses different files already at the destination. Copies go to `.docgen/graph/imported-legacy/`, preserving the active checkpoint database separately. Historical checkpoints remain inspectable, but their old graph schema and runtime signature are incompatible with the root pipeline. Start a new thread from selected inputs for new execution. Neither command changes `.env` or the shared budget ledger.
 
 The former `old-approach` executable, `docgen-graph` command, and phase-specific scripts are retired. Historical evaluation results are kept in `.ai/legacy-evaluation/`; historical utilities are non-executable records in `.ai/historical-utilities/`. Repository history retains the old source.
+
+Historical plans and reports may retain their original command names and paths. They describe earlier runs; the root project and commands above are the current entry points.
 
 ## Development checks
 

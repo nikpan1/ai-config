@@ -143,7 +143,7 @@ def test_autopilot_accounts_for_unverified_document_batch(tmp_path):
     repair = pipeline.resolve_issues_automatically(state)
     assert repair["route"] == "verify_document_batch"
     excluded = pipeline.resolve_issues_automatically({**state, **repair})
-    assert excluded["route"] == "finalize_graph"
+    assert excluded["status"] == "incomplete"
     records = store.get(excluded["exclusions_ref"])
     assert records[0]["path"] == "rules.md"
     assert records[0]["decision_ref"]
