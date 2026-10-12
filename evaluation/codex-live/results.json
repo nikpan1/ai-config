@@ -130,11 +130,236 @@
       "measured_pln": 1.3981472279999998,
       "conservative_uncertain_pln": 0,
       "outstanding_reservations_pln": 0
+    },
+    {
+      "run_id": "codex-risk-live-20261012-f",
+      "status": "generating",
+      "error": {
+        "type": "ValueError",
+        "message": "Model request exceeds configured context budget"
+      },
+      "next": [
+        "plan_authoring_action"
+      ],
+      "checkpoint_id": "1f1c67ab-d83c-6fe3-808d-40cbd29761bc",
+      "model_requests": 37,
+      "cache_hits": 0,
+      "completed_nodes": 71,
+      "assertions_count": 35,
+      "source_aspects_count": 36,
+      "issue": null,
+      "checkpoint_forks": [],
+      "measured_pln": 3.6587627577,
+      "conservative_uncertain_pln": 0,
+      "outstanding_reservations_pln": 0
+    },
+    {
+      "run_id": "codex-risk-live-20261012-g",
+      "status": "incomplete",
+      "error": null,
+      "next": [],
+      "checkpoint_id": "1f1c67af-adf8-6dcb-800f-611584d99e47",
+      "model_requests": 0,
+      "cache_hits": 2,
+      "completed_nodes": 7,
+      "assertions_count": 0,
+      "source_aspects_count": 36,
+      "issue": {
+        "findings": [
+          "Provider allowance is missing, stale, or incompatible"
+        ],
+        "revision": "85a57d67b2742ea4683ddbece955136ebfc1c51a6dfb28c4f7fdf3744c6f1a16",
+        "stage": "analyze_code_unit"
+      },
+      "checkpoint_forks": [],
+      "measured_pln": 0,
+      "conservative_uncertain_pln": 0,
+      "outstanding_reservations_pln": 0
+    },
+    {
+      "run_id": "codex-risk-live-20261012-h",
+      "status": "incomplete",
+      "error": null,
+      "next": [],
+      "checkpoint_id": "1f1c67d6-a602-6bc8-80ef-859f497a012a",
+      "model_requests": 50,
+      "cache_hits": 11,
+      "completed_nodes": 123,
+      "assertions_count": 35,
+      "source_aspects_count": 36,
+      "issue": {
+        "findings": [
+          "The final passages contain new external assertions citing [Code C9] regarding method implementation details (start, save, submit, validateCodes, and claimKey) not present in the legacy source.",
+          "The final passages include additional assertions citing [Legacy D21] stating that 'Q3 consent is required' and 'RiskSignal and the platform share a correlation ID', which were not part of the quick source aspect inventory.",
+          "The legacy source evidence notes ('The visible rule is test evidence; the image is only a screen illustration') and metadata frontmatter were not included in the aspect inventory."
+        ],
+        "revision": "2d6b9bf603b4faadae738d3b0517d1cdedea289f7000d2d1e2c3e8fa01783796",
+        "stage": "audit_source_to_document"
+      },
+      "checkpoint_forks": [
+        {
+          "actor_type": "agent",
+          "event": "checkpoint_fork",
+          "feedback": "Agent review: the mandatory facts and their frozen original evidence are already supplied in required_evidence, and successful source/code reads are present in this history. Search queries use textual matching; an empty broad query is not a missing mandatory fact. Identify a concrete uncovered required fact before any further tool call. If none remains, return the readiness statement now so the writer can proceed with all supplied obligations and independent verification. Preserve uncertainty; do not infer absence or rationale.",
+          "preserved_turns": 7,
+          "source_checkpoint": "1f1c67c5-bd7c-6988-80b1-0678167cea4c",
+          "stage": "agent_review",
+          "target_checkpoint": "1f1c67c9-43f1-6a65-80b2-af0601309deb",
+          "time": 1791837379.0647054
+        }
+      ],
+      "measured_pln": 4.7264157882,
+      "conservative_uncertain_pln": 0,
+      "outstanding_reservations_pln": 0
+    },
+    {
+      "run_id": "codex-risk-live-20261012-i",
+      "status": "complete_with_exclusions",
+      "error": null,
+      "next": [],
+      "checkpoint_id": "1f1c67e6-9cdc-688d-800d-bddaa5f4caf6",
+      "model_requests": 2,
+      "cache_hits": 0,
+      "completed_nodes": 8,
+      "assertions_count": 35,
+      "source_aspects_count": 36,
+      "issue": null,
+      "checkpoint_forks": [],
+      "candidate_hash": "8bb760b326054ba08243726a5ff334dbc6b354c722b47e25377153c8eec079c6",
+      "candidate_directory": ".docgen/codex-live-validation/runs/codex-risk-live-20261012-i/step22/candidates/8bb760b326054ba08243726a5ff334dbc6b354c722b47e25377153c8eec079c6",
+      "source_coverage": {
+        "snapshot_id": "34f520cb7607a5e1b8cce7d2384396bd6eb63014ea15ae83f1083b64ee482657",
+        "graph_revision": "ab5a22258c505ce8cf97d0bedb5ac0568a656a2d4ad71250017fbad4826518e8",
+        "aspects": {
+          "total": 36,
+          "represented": 36
+        },
+        "qualifiers": {
+          "total": 20,
+          "represented": 20
+        },
+        "blocks": {
+          "total": 22,
+          "independently_audited": 22
+        },
+        "unresolved_attachments": [],
+        "complete": true,
+        "facts_in_text": {
+          "total": 35,
+          "mapped": 35
+        },
+        "non_substantive_candidates": [
+          {
+            "decision": "Inventory candidate; independently checked against source",
+            "evidence_id": "71611e288df78a785644"
+          },
+          {
+            "decision": "Inventory candidate; independently checked against source",
+            "evidence_id": "b07338ec278b85cb73f8"
+          },
+          {
+            "decision": "Inventory candidate; independently checked against source",
+            "evidence_id": "f1192e63d8ea7839b463"
+          },
+          {
+            "decision": "Inventory candidate; independently checked against source",
+            "evidence_id": "b01a303b7039e20033bc"
+          },
+          {
+            "decision": "Inventory candidate; independently checked against source",
+            "evidence_id": "a40e5be9ab13b94cf856"
+          }
+        ],
+        "exclusions": [
+          {
+            "evidence_id": "71611e288df78a785644",
+            "reason": "Frontmatter metadata containing source URLs, revisions, and system IDs without substantive business requirements.",
+            "schema_version": 1
+          },
+          {
+            "evidence_id": "b07338ec278b85cb73f8",
+            "reason": "Structural Markdown section heading.",
+            "schema_version": 1
+          },
+          {
+            "evidence_id": "f1192e63d8ea7839b463",
+            "reason": "Structural Markdown table header row.",
+            "schema_version": 1
+          },
+          {
+            "evidence_id": "b01a303b7039e20033bc",
+            "reason": "Structural Markdown table delimiter row.",
+            "schema_version": 1
+          },
+          {
+            "evidence_id": "a40e5be9ab13b94cf856",
+            "reason": "Structural section header with no substantive standalone assertions.",
+            "schema_version": 1
+          }
+        ],
+        "conflict_candidates": 0,
+        "unsupported_assertions": 0
+      },
+      "continuation": {
+        "actor_type": "agent",
+        "kind": "final_audit_export_continuation",
+        "source_run": "codex-risk-live-20261012-h",
+        "source_checkpoint": "1f1c67d5-7c74-649f-80ec-5aff242ea8c0",
+        "source_commit": "4486588",
+        "source_runtime_signature": "ec9b9a786c7520fd4e96b02742b1016e38bb68283b91419125ea39e345c12718",
+        "target_run": "codex-risk-live-20261012-i",
+        "target_commit": "c5b9d2c9a4f6882794fa4df738201ccf74611251",
+        "target_runtime_signature": "984930440cb74c2bc15c0553c89ad4b0554599193cbfce45ec5fd17424c11501",
+        "reviewed_change_ref": "19dd8ad875d07018b38cb3c0f74aa153b00b8aec052a0465416795931a75a7fe",
+        "imported_refs": {
+          "source_aspects_ref": "407922594b82b25aa049895a2dc66fc32455408540faf7c8ee7299871ca73b22",
+          "source_decisions_ref": "2ec7d0d5acc7357f3d757cb2ca35c67a17d63336cf26fae9b72eb5c363220382",
+          "source_non_substantive_ref": "770d720450632b12dbcf1d59af3593514523b97fe2cd27100a3b0fa7feb72392",
+          "pending_document_ref": "94f55f238cbe083ac2a0d61212cbd072ba8bd6fb9806c63737858c3b0a87a653",
+          "authoring_ref": "65a02a5d0534d740795206beb3e5905f715a6b53cbbe0c1130f476ddf7b22b3a",
+          "authoring_result_ref": "5e05823882ce24c0177d349a55bf69cc74555b619e135ba5f8c4f4943114c354",
+          "authoring_context_ref": "86ecbcb0805672d3c217b1d75031f655599a21f878d3c1ea43ba129d0aec708a",
+          "code_scope_ref": "bde88201fac6f45fbc123feaffc00b2d41f4ae26ac7b92f1a78b083d3d8938da",
+          "code_history_ref": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+          "code_provenance_ref": "f0714bba62c9c83996a50a26d9dda80be702385663603f47359e20aec849d35c",
+          "document_provenance_ref": "cb3171fb724bdf8a40fed0e34267e8e99d1cf966ff3d1a3a76e258e35e976faa",
+          "document_candidate_provenance_ref": "dfd8bf3fcbae782646395e1a049ecb4143dc325d1d0217081ec9b50e91d86ffd",
+          "code_candidate_ref": "c69db9996a0a8e13492d1ed2efa6d066bacebd3d18e11b872c68bd16bc708dfe",
+          "verified_code_ref": "985545c7affe076b14e101863dfa0d9fa29a3e2c59310de728000ee933884039",
+          "classified_code_ref": "591150b8c686cb51dd915573a2e3cba6306643acd64cb4a77d6dc3ec0bc68a27",
+          "code_classification_verified_ref": "f4bd9c586575e467c14f1b10b7ffaad2ccd290b4774fa7189360d522d46c12a9",
+          "code_relations_ref": "158e809a2c6ab1aa8249868e35647242a678a66bed9849fa73559adcb56a3717",
+          "snapshot_ref": "34f520cb7607a5e1b8cce7d2384396bd6eb63014ea15ae83f1083b64ee482657",
+          "inventory_ref": "ceed8156f0cfc9a2248e5051fe193515bddd418df07d5dd9335f7d2228edba40",
+          "draft_ref": "de959b6ddd37c3950c9aac46bbdc641c60fa82208adc0b23cad508c52fa71cec",
+          "assertions_ref": "43121fd846f23c78528b9bd0434d5a250ed6df4f7a4d56c9e407a066d690bdc5",
+          "exclusions_ref": "481317b2397a5255f63d81b9ae792403d02034960ea0ff7cd046916712b93340",
+          "template_ref": "d9dab108eaa3a0cfd4e49034f1a383bf6be93f9f55086bdf49032cc0a253b3b4",
+          "plan_ref": "0fbee6a67c78cc93aec69fa7dc88334a26a79a1fa320b71d0245aabfe3562e31",
+          "plan_packets_ref": "57d189a069eda92ba3d6160173f21d356a74e3404a589c46072e1dc5ba447c1a",
+          "approval_ref": "12c644ce6f6b947abe419dd8bc5777ee94d2d2446e01cbf2091ac281928ca953",
+          "packet_ref": "6613e54e0dda99e390afd73845ffe9776c4fe12d0e66599da76da71e78faf6e1",
+          "written_ref": "f1d7f21681336f964ff4e0f2ec1c6a7e5518f7db9f92f947ab27956e4783285b",
+          "assembled_ref": "8f144f9be7ec679b35153ad32a94d7bc218908fd7f1ad0655693cada2db96d07",
+          "edited_ref": "3d3b96f8f842ee3c4ed18d306f562744e99fe94a21e3bc2d6484f42ed75073c3",
+          "edit_queue_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "graph_logical_hash": "4d15a4fbedb3d8cd50eb53c0b6f2f202502fa2ee3f3e3f4e192a204b46b27d88",
+        "revalidated_upstream_workflow_ast": true,
+        "resume_at": "audit_documentation",
+        "rationale": "Correct final audit batch context; preserve verified source, writing and editing artifacts and repeat final mapping, coverage, independent source audits and bundle checks."
+      },
+      "measured_pln": 0.2641762188,
+      "conservative_uncertain_pln": 0,
+      "outstanding_reservations_pln": 0
     }
   ],
   "totals": {
-    "measured_pln": 5.6156239638,
+    "measured_pln": 14.2649787285,
     "conservative_uncertain_pln": 20.49686242805,
     "outstanding_reservations_pln": 0
-  }
+  },
+  "final_status": "complete_with_exclusions",
+  "artifact_producer": "codex-risk-live-20261012-h",
+  "final_audit_export_continuation": "codex-risk-live-20261012-i"
 }

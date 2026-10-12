@@ -1,59 +1,68 @@
 # Codex live-flow validation
 
-Date: 2026-10-12. The requested Codex integration was exercised against real model endpoints. No documentation release was produced: the final run ended `incomplete` at the independent code-classification audit. All attempts, successful analysis, failures, graph artifacts and checkpoints remain available for inspection.
+Date: 2026-10-12. The requested documentation is finished. Generation run `codex-risk-live-20261012-h` produced the verified document; explicit continuation `codex-risk-live-20261012-i` repeated final checks under the corrected audit contract and exported the release. Its status is `complete_with_exclusions`: the five exclusions are frontmatter and structural Markdown headings/table syntax, not business rules.
 
-## Inputs and configuration
+## Finished artifacts
+
+- [Documentation](../../.docgen/codex-live-validation/runs/codex-risk-live-20261012-i/step22/candidates/8bb760b326054ba08243726a5ff334dbc6b354c722b47e25377153c8eec079c6/documentation/index.md)
+- [Coverage report](../../.docgen/codex-live-validation/runs/codex-risk-live-20261012-i/source-coverage.json)
+- [Continuation lineage](../../.docgen/codex-live-validation/runs/codex-risk-live-20261012-i/continuation.json)
+- [Structured results and accounting](results.json)
+
+Candidate hash: `8bb760b326054ba08243726a5ff334dbc6b354c722b47e25377153c8eec079c6`. Final checkpoint: `1f1c67e6-9cdc-688d-800d-bddaa5f4caf6`. Release approval is explicitly attributed to **Autopilot policy v2**, not a human reviewer. The coordinator records a separate independent reader review.
+
+The final source audit represents **36/36 source aspects**, **20/20 qualifiers**, and **35/35 facts**, and independently checks **22/22 original document blocks**. No unresolved attachment or unsupported assertion was reported. Both original illustrations, a verified Mermaid diagram, and local evidence files are included. All four numbered template sections are retained, with the title “Risk Profiling”. Bundle integrity and image-link checks passed.
+
+Original localhost source URLs remain in some citations. The immutable bundle also contains `evidence/D3.md` through the cited document ranges and `evidence/C9.md`, so the original evidence remains available without a server. In particular, `D13.md`–`D16.md` preserve QF08–QF11, TICKET-2008/2014/2013/2020, current/planned status, uncertainties and the shared table evidence note verbatim, even where those identifiers are absent from the narrative. The code evidence is bounded to the inspected file.
+
+## Inputs and models
 
 - Documentation: `data/test_data_2_quick`, including its two source illustrations.
-- Code: `data/investment_platform`, restricted to `backend/src/main/java/example/fixture/RiskProfileService.java`. Other implementation files were not analyzed.
-- Template: `evaluation/codex-live/template.md`, with four numbered sections.
-- Code analysis: `openai-codex==0.162.1` and its matching CLI runtime, explicitly configured `gpt-6-astra` using the existing API credential. The runtime used an isolated home, empty workspace, frozen source context, denied writes and disabled execution/discovery tools. No desktop authentication files were copied.
-- Extraction, classification, independent audits and authoring: `gemini-3.8-flash`.
-- Gemini output was increased from 8,192 to 16,384 tokens after an observed classification truncation. New immutable run revisions were used when implementation or configuration changed.
-- Runtime workspace: `.docgen/codex-live-validation`; shared accounting: `.docgen/budget.sqlite`. Existing ledger rows were preserved. No Auggie run was attempted.
+- Code: `data/investment_platform`, restricted to `backend/src/main/java/example/fixture/RiskProfileService.java`. No claim is made about inspection of other implementation files.
+- Template: `evaluation/codex-live/template.md`.
+- Code analysis: actual `openai-codex==0.162.1` with matching CLI runtime and explicit `gpt-6-astra`. The isolated runtime receives frozen source context, denies writes, and disables execution/discovery tools. Credentials are not copied into the workspace or report.
+- Extraction, classification, planning, writing, editing and independent audits: `gemini-3.8-flash`. No model substitution or Auggie run occurred.
+- Final local request allowance: 500,000 conservative UTF-8 bytes plus configured output accounting; output bound: 16,384 tokens. The provider reservation was adjusted to PLN 50 for conservative headroom and settled using actual returned usage.
+- Runtime workspace: `.docgen/codex-live-validation`; shared accounting: `.docgen/budget.sqlite`. Existing ledger records were preserved.
 
-## Observed outcomes
+## Attempts and corrections
 
-| Run | Outcome |
+| Run | Observed result |
 | --- | --- |
-| `codex-risk-live-20261012-a` | Source inventory rejected a quote that omitted the original Markdown emphasis markers. This exposed missing bounded repair in that stage. |
-| `codex-risk-live-20261012-b` | Codex reached the API; HTTP 400 rejected the raw Pydantic output schema because strict objects require `additionalProperties: false`. |
-| `codex-risk-probe-20261012` | Actual Codex analysis succeeded after schema correction: 13 candidate facts, 7 evidence-backed relations, retained SDK/model/session/request provenance. |
-| `codex-risk-live-20261012-c` | Actual Codex analysis produced 12 facts and 8 relations; independent Gemini code verification passed. Gemini classification then exhausted its configured output token bound. |
-| `codex-risk-live-20261012-d` | Reused the validated Codex cache. All code stages and document-source audits passed, including one repair of a missing table qualifier. Built a graph containing 35 assertions and 35 source aspects. The first authoring tool exposed document extraction provenance invented by the model; immutable evidence publication correctly rejected those unknown IDs. |
-| `codex-risk-live-20261012-e` | Actual Codex analysis produced 12 facts and 6 relations and passed independent code verification. Classification completed within the larger output bound. Its independent audit rejected changed temporal status and missing original fact identities; autopilot ended `incomplete` without bypassing the gate. |
+| `a` | Source inventory rejected a quote that removed original Markdown emphasis. Added bounded exact-quote repair. |
+| `b` | Codex API rejected a non-strict JSON schema before generation. Added recursive strict object schemas. |
+| `probe` | Actual Codex analysis returned 13 facts and 7 relations with provider/model/session/request provenance. |
+| `c` | Code verification passed; classification exceeded the original 8,192 output-token bound. |
+| `d` | Code and document audits passed; evidence publication rejected model-invented document provenance. Moved document provenance assignment into the application. |
+| `e` | Classification audit exposed a fact-ID schema mismatch and inconsistent interpretation of snapshot temporal status. Classification now returns metadata only; the application preserves immutable fact IDs and semantics. |
+| `f` | Reached verified writing; accumulated agent evidence exceeded the original local request-size allowance before an API request. |
+| `g` | The larger allowance required matching provider reservation headroom. Preflight stopped without a model call. |
+| `h` | Produced all four verified and edited sections. One optional-search loop was recovered through a recorded checkpoint fork. The final batch auditor then incorrectly treated valid code/other-batch claims as unsupported because their context was omitted from its payload. |
+| `i` | Explicit final-audit/export continuation: both corrected independent batch audits, deterministic final checks, export integrity and policy release passed. |
 
-The final audit reported that facts labeled `historical` by the code producer were changed to `current_snapshot`, and that classification omitted original fact IDs. The latter also exposes a contract mismatch: the classification draft schema does not retain an `id` field, while the auditor expected it. The ID finding is an audit/schema mismatch and does not by itself establish semantic information loss. The temporal interpretation of an ordinary frozen current-code snapshot also needs clarification between the producer and classifier. These are recorded follow-up findings, not accepted documentation content.
+The earlier missing-ID finding was a classification schema/auditor mismatch, not proof of semantic loss. The temporal disagreement was addressed separately by defining current frozen code as `current_snapshot` and making temporal fields immutable during classification.
 
-The deepest completed graph is run `d`. The latest run with the provenance correction is `e`. Successful stages across different runs must not be combined into a claim of a successful end-to-end release. Human readability review and final source-to-document acceptance were not reached.
+The final audit now receives all mappings sharing a selected paragraph, the other cited facts and original evidence supporting that paragraph, full reader text for deduplicated shared notes, and explicit non-substantive inventory candidates. Coverage decisions remain restricted to the current batch's original aspect/fact identities. Missing qualifiers, unsupported rationale and any real audit finding still block release.
 
-## Corrections implemented and verified
+Ten focused live-flow regression tests cover exact quotes, schema strictness, redaction, accounting/provenance, immutable classification, complete audit context and blocking genuine omissions. The focused suite plus restart test passed 11 tests; the coordinator verified the combined repository suite separately.
 
-- Strict Codex output schemas recursively prohibit additional object properties and require declared fields, including nested fact and relation definitions.
-- SDK request, response and cache events retain provider/model identity, elapsed time, usage, actual session/request IDs and accounting references. Diagnostics redact the configured credential.
-- Source inventory can repair invalid quotes with the original blocks, the rejected draft and concrete validation feedback, within the existing repair bound. Exact original-text matching remains mandatory.
-- Document analysis provenance is assigned by the application from the actual producer, prompt version and input hash. Model-supplied provenance IDs and review claims are replaced before verification; accepted provenance survives downstream evidence publication.
-- A reusable live runner and repository-relative nonsecret configuration were saved alongside this report.
+## Checkpoint continuity
 
-Six focused regressions cover exact-quote repair and exhaustion, strict nested SDK schemas, secret redaction, usage/cache events and invented document provenance. The related restart/integration subset passed 11 tests. The coordinator performs the combined repository validation.
+Run `h` exhausted its eight-turn optional search allowance after successful evidence reads. A recorded agent review forked checkpoint `1f1c67c5-bd7c-6988-80b1-0678167cea4c` to `1f1c67c9-43f1-6a65-80b2-af0601309deb`, appending explicit readiness feedback while preserving seven already-used turns. Gemini declared readiness on the remaining eighth turn. The turn bound was not reset, and writing/evidence audits were not skipped.
 
-## Accounting
+The final audit fix changed runtime identity, so run `h` was not silently rewritten. [continue_final_audit.py](continue_final_audit.py) imported checkpoint `1f1c67d5-7c74-649f-80ec-5aff242ea8c0` into a new run. It verified content-addressed state artifacts, source bytes, SQLite integrity and the copied graph's logical contents. It also checked that the upstream workflow AST was unchanged outside the final-audit method and that the only source-code changes were that method and its prompt. `continuation.json` records both runtime signatures, source/target commits, imported hashes and `actor_type=agent`. Run `h` remains the artifact producer; run `i` contains final validation/export history rather than fabricated upstream stages.
 
-Usage-priced completed requests total **PLN 5.615624** for this validation. This is a calculation from returned token usage and the verified pricing configuration, not an invoice.
+## Accounting and reproduction
 
-A separate **PLN 20.496862** remains conservatively recorded as uncertain: PLN 20 for the rejected Codex schema request and PLN 0.496862 for the truncated Gemini classification. These reserved amounts are not measured provider charges. No outstanding reservation remains for these evaluation run IDs, and no historical ledger row was edited to make the totals look smaller.
+Usage-priced completed calls across every listed attempt total **PLN 14.264979**. This is computed from returned usage and verified pricing, not a provider invoice. Separately, **PLN 20.496862** remains conservatively marked uncertain from the original rejected Codex schema request and truncated Gemini response; these reservation amounts are not measured charges. No outstanding reservation remains, and no historical ledger row was changed.
 
-Current pricing was checked against [OpenAI model pricing](https://developers.openai.com/api/docs/models/gpt-6-astra) and [Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing). The local verified USD/PLN rate was dated 2026-10-08. Structured run totals and exact audit findings are in [results.json](results.json).
+Pricing was verified against [OpenAI model pricing](https://developers.openai.com/api/docs/models/gpt-6-astra) and [Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing), with the local verified USD/PLN rate dated 2026-10-08. Refresh dated pricing before a future run.
 
-## Inspection and reproduction
-
-Each run directory under `.docgen/codex-live-validation/runs/<run-id>` contains `live-result.json`, events and stage artifacts. The shared workspace contains content-addressed source bytes and `checkpoints.sqlite`; exact checkpoint IDs are retained in each `live-result.json` and in `results.json`. The runtime files remain at the primary repository root, independently of the temporary implementation worktree.
-
-From the repository root, use the existing nonsecret `.docgen/codex-live-settings/run.json` or adapt [configuration.example.json](configuration.example.json). Its paths now target the primary repository. The scope and provider-pricing files are stored under `.docgen/codex-live-settings`; refresh their dated pricing before a future run. Credentials are read from the repository `.env` and are not included in these artifacts.
+For a new full run from the primary repository, use the existing nonsecret `.docgen/codex-live-settings/run.json` or adapt [configuration.example.json](configuration.example.json). Credentials are read from `.env`. Runtime artifacts remain in the primary repository independently of the temporary implementation checkout.
 
 ```powershell
 $env:PYTHONPATH = 'src'
 .venv/Scripts/python.exe evaluation/codex-live/run.py --env-file .env --configuration .docgen/codex-live-settings/run.json --thread-id codex-risk-live-new
 ```
 
-Use a new thread ID after a source, implementation or configuration change. Existing interrupted checkpoints belong to their recorded runtime signature and remain available for historical inspection.
+Use a new thread ID after implementation, source or configuration changes. The restricted historical continuation utility deliberately rejects unrelated upstream changes; ordinary future runs should start with a new thread rather than alter old runtime signatures.

@@ -8,7 +8,7 @@
     "code_analysis_result_limit": 100000,
     "code_scope_file": ".docgen/codex-live-settings/scope.json",
     "code_provider_allowance_file": ".docgen/codex-live-settings/provider.json",
-    "request_tokens": 100000,
+    "request_tokens": 500000,
     "output_tokens": 16384,
     "timeout_seconds": 180
   },
