@@ -25,6 +25,11 @@ def parser() -> argparse.ArgumentParser:
     command.add_argument("--code-backend", choices=("gemini", "codex_sdk", "auggie_sdk"))
     command.add_argument("--code-model")
     subcommands = command.add_subparsers(dest="command", required=True)
+    inspect = subcommands.add_parser("inspect-run")
+    inspect.add_argument("--workspace", type=Path, default=Path(".docgen/graph"))
+    inspect.add_argument("--thread-id", required=True)
+    inspect.add_argument("--output", type=Path, required=True)
+    inspect.add_argument("--ledger", type=Path)
     run = subcommands.add_parser("run")
     run.add_argument("--docs", type=Path, required=True)
     run.add_argument("--code", type=Path)
@@ -180,6 +185,15 @@ def _drive(graph, config: dict, initial, decision: dict | None, interactive: boo
 
 def _main() -> int:
     args = parser().parse_args()
+    if args.command == "inspect-run":
+        from docgen_graph.inspection.export import export_run
+
+        print(
+            json.dumps(
+                export_run(args.workspace, args.thread_id, args.output, args.ledger), indent=2
+            )
+        )
+        return 0
     settings = Settings.load(args.env_file)
     if args.code_backend or args.code_model:
         backend = args.code_backend or settings.code_analysis_backend

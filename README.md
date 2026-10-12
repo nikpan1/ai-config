@@ -131,3 +131,25 @@ checks candidate repetition in prose and tables before removing it.
 The implementation was initially exercised with offline fixtures. Live
 SDK/Gemini compatibility and human readability acceptance remain separate
 acceptance steps. Usage accounting persists across offline and live evaluations.
+# Offline graph and run inspection
+
+Export a recorded run without credentials, a model call, or a running pipeline:
+
+```powershell
+docgen inspect-run --workspace .docgen/graph --thread-id my-run --output .docgen/inspection/my-run
+docgen inspect-run --workspace .docgen/graph --thread-id my-run --output .docgen/inspection/my-run --ledger .docgen/budget.sqlite
+```
+
+Open the resulting `index.html` directly in a browser. It is a self-contained captured view;
+move it freely and re-export to refresh. `inspection.json` contains the complete portable dataset.
+Graph displays stored directed edges, complete searchable tables, metadata, evidence, and recorded
+frozen revisions. Run exposes all stage items and revisions, revision comparisons, ordered events,
+checkpoint headers, pending writes, and selected-run ledger records. Content follows artifacts and
+candidate passages back to their facts and evidence. Quality separates recorded source coverage,
+graph utilization, and integrity diagnostics; missing audits never imply complete coverage.
+
+Filters and drawing pages show explicit counts. Table pagination does not truncate the export.
+Source Markdown, HTML, and Mermaid are inert text. Binary checkpoint objects are not executed.
+Input files and databases are not modified; unsafe references are rejected and credential fields
+are redacted. The export still contains project source and documentation, so keep it private.
+
