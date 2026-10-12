@@ -26,7 +26,7 @@ Targeted command:
 .venv/Scripts/python.exe -m pytest tests/test_inspection.py --basetemp .docgen/inspect-tests6 -q
 ```
 
-Result: 17 tests passed. Fixtures cover 203 nodes, parallel edges, a self-link, a dangling endpoint, JSON-looking original source text, multiple stage revisions, pending/skipped stages, malformed JSONL, missing/corrupt artifacts, malicious candidate paths, an actual symlink escape, credential redaction, script-ending source strings, CSP hashes, non-ASCII paths, checkpoint bytes, ledger scoping, Unicode passage offsets, revision-bound utilization, and malformed audit structures. A WAL fixture confirms uncheckpointed rows remain visible while every input file's bytes and modification timestamp remain unchanged. The CLI test rejects any attempted settings/model/pipeline initialization.
+Result: 18 tests passed. Fixtures cover 203 nodes, parallel edges, a self-link, a dangling endpoint, JSON-looking original source text, multiple stage revisions, pending/skipped stages, malformed JSONL, missing/corrupt artifacts, malicious candidate paths, an actual symlink escape, credential redaction, script-ending source strings, CSP hashes, non-ASCII paths, checkpoint bytes, ledger scoping, Unicode passage offsets, revision-bound utilization, and malformed audit structures. A token-boundary regression preserves run names containing `risk-` while removing actual standalone `sk-` keys. A WAL fixture confirms uncheckpointed rows remain visible while every input file's bytes and modification timestamp remain unchanged. The CLI test rejects any attempted settings/model/pipeline initialization.
 
 The coordinating agent ran the integrated suite before the final malformed-audit regression: 165 tests passed. Ruff and `node --check src/docgen_graph/inspection/viewer.js` passed. `uv build --offline --cache-dir .docgen/uv-cache` produced the source distribution and wheel; the wheel contains the reader, exporter, quality module, and all three viewer assets. A one-off Prettier invocation formatted static sources without adding project dependencies.
 
@@ -47,6 +47,8 @@ docgen inspect-run --workspace .docgen/codex-live-validation --thread-id codex-r
 This captured current and frozen graphs of 218 nodes / 237 edges each, 25 stage revisions, 56 events, 72 reachable objects, and 15 ledger rows. The run stopped after graph construction; the inspector does not imply that documentation completed. Newer live-run exports can use the same command with their run ID.
 
 The coordinating agent checked the exported application in a browser using an isolated local preview: graph filtering, node/evidence selection, frozen graph selection, fact-to-passage-to-fact traversal, verified passage offsets, 67 stage inventory/revision records, revision comparison, and quality denominators. No browser errors were reported. Direct `file://` navigation is unavailable in the browser automation environment; it was not bypassed. Self-contained payload and CSP tests confirm the HTML does not fetch its companion JSON or any external resource.
+
+An independently moved copy of the actual-run HTML, without its companion JSON, also rendered successfully through the permitted local preview. Its graph pages exposed all 218 nodes as 75, 75, and 68 records, disabled Next on the last page, and reset correctly. Assertion plus code-origin filtering returned 12 matching/drawn nodes. Source/evidence lookup, graph counts, and clean UI encoding were checked on that copy.
 
 ## Explicit limitations
 

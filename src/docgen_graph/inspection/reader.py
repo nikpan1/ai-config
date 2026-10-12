@@ -29,10 +29,12 @@ SECRET_KEY = re.compile(
     re.I,
 )
 SECRET_TEXT = re.compile(
-    r"(?i)(?:bearer\s+[a-z0-9._~+/=-]+|sk-[a-z0-9_-]{12,}|"
-    r"AIza[a-z0-9_-]{25,}|(?:api[_-]?key|password|access[_-]?token|"
+    r"(?i)(?:(?<![a-z0-9_-])bearer\s+[a-z0-9._~+/=-]+|"
+    r"(?<![a-z0-9_-])sk-[a-z0-9_-]{12,}|"
+    r"(?<![a-z0-9_-])AIza[a-z0-9_-]{25,}|(?:api[_-]?key|password|access[_-]?token|"
     r"client[_-]?secret)\s*[:=]\s*[\"']?[^\s,;\"']+|"
-    r"gh[pousr]_[a-z0-9]{20,}|github_pat_[a-z0-9_]{20,}|"
+    r"(?<![a-z0-9_-])gh[pousr]_[a-z0-9]{20,}|"
+    r"(?<![a-z0-9_-])github_pat_[a-z0-9_]{20,}|"
     r"-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----)"
 )
 FORBIDDEN = {".env", "auth.json", "credentials.json", "config.toml"}

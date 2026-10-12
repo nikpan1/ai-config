@@ -10,7 +10,7 @@ import pytest
 
 from docgen_graph.inspection import export_run
 from docgen_graph.inspection.quality import quality_data
-from docgen_graph.inspection.reader import RunReader, safe_sql_value
+from docgen_graph.inspection.reader import RunReader, redact, safe_sql_value
 from docgen_graph.stages import StageArtifacts
 from docgen_graph.storage import ArtifactStore, digest
 
@@ -400,3 +400,12 @@ def test_malformed_candidate_shape_preserved_with_diagnostic(recorded):
     assert data["candidates"][0]["files"]["audit.json"]["value"]["placements"] == "invalid"
     assert not data["quality"]["passages"]
     assert any("malformed rows" in item["message"] for item in data["diagnostics"])
+
+
+def test_redaction_preserves_risk_run_identity_and_removes_standalone_key():
+    value = "codex-risk-live-20261012-d /run/risk-source-20261012 sk-live12345678901234567890"
+    counts = {"fields": 0, "strings": 0}
+    assert redact(value, counts) == (
+        "codex-risk-live-20261012-d /run/risk-source-20261012 [REDACTED]"
+    )
+    assert counts["strings"] == 1
