@@ -413,6 +413,7 @@ class RunReader:
             "source-coverage.json",
             "audit.json",
             "release.json",
+            "live-result.json",
             "decisions.md",
             "exclusions.md",
         ):

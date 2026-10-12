@@ -97,7 +97,8 @@ function provenanceRecords(value, source, result) {
     if (value.id && value.provider && value.model) {
       result.set(value.id, { ...value, source_artifact: source });
     }
-    for (const item of Object.values(value)) provenanceRecords(item, source, result);
+    for (const item of Object.values(value))
+      provenanceRecords(item, source, result);
   }
 }
 const provenanceIndex = new Map();
@@ -122,7 +123,8 @@ function allRows() {
       .filter((row) => ids.includes(row.id));
     for (const id of ids) {
       const record = provenanceIndex.get(id);
-      if (record && !provenance.some((item) => item.id === id)) provenance.push(record);
+      if (record && !provenance.some((item) => item.id === id))
+        provenance.push(record);
     }
     const origin = (item) =>
       item?.source_kind ||
@@ -688,7 +690,15 @@ function drawGraph() {
 function runControls() {
   select(
     "Recorded source",
-    ["stages", "events", "checkpoints", "writes", "charges", "run manifest"],
+    [
+      "stages",
+      "events",
+      "checkpoints",
+      "writes",
+      "charges",
+      "run manifest",
+      "run result",
+    ],
     state.runSource || "stages",
     (value) => {
       state.runSource = value;
@@ -769,7 +779,9 @@ function stageDetail(row) {
         } else if (ref.kind === "ledger_reference") {
           details("Recorded usage reference", {
             reference: ref,
-            charges: (D.costs.charges || []).filter((item) => item.id === ref.target),
+            charges: (D.costs.charges || []).filter(
+              (item) => item.id === ref.target,
+            ),
           });
         } else selectArtifact(ref.target);
       },
@@ -784,15 +796,47 @@ function stageDetail(row) {
   ))
     raw(event, $("detail"), `Event ${event.line}  |  ${event.record.event}`);
 }
+function runOutcome(parent) {
+  const record = D.run_files["live-result.json"];
+  if (!record) return;
+  const value = record.value;
+  const card = el("div", undefined, parent, "card");
+  el("h3", "Recorded execution result", card);
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    message(`Last recorded state: ${value.status || "Not recorded"}`, card);
+    if (value.error) {
+      message(`Execution error: ${compact(value.error)}`, card, "warning");
+      message(
+        "The recorded state is not a successful completion result.",
+        card,
+      );
+    }
+    message(
+      `Next recorded nodes: ${compact(value.next ?? "Not recorded")}`,
+      card,
+    );
+    message(
+      `Recorded interrupts: ${compact(value.interrupts ?? "Not recorded")}`,
+      card,
+    );
+  } else
+    message("Structured execution result is unavailable.", card, "warning");
+  raw(record, card, "live-result.json: complete recorded state and error");
+}
 function runBody() {
   const source = state.runSource || "stages";
   let rows = [];
   if (source === "stages") rows = D.stages;
   else if (source === "events") rows = D.events;
   else if (source === "run manifest") rows = [D.run_manifest];
+  else if (source === "run result")
+    rows = D.run_files["live-result.json"]
+      ? [D.run_files["live-result.json"]]
+      : [];
   else rows = D.checkpoints[source] || D.costs[source] || [];
   $("summary").textContent =
     `${rows.length} recorded ${source}  |  Step numbers are historical identifiers, not execution order. Event line order is preserved. Checkpoints have no inferred stage binding.`;
+  runOutcome($("visual"));
   if (source === "charges") {
     const charges = D.costs.charges || [],
       sum = (status, column) =>
@@ -1023,11 +1067,14 @@ function qualityRecords() {
     value,
   }));
   for (const [name, record] of Object.entries(D.run_files))
-    if (/coverage|audit|graph-manifest|exclusion/.test(name))
+    if (/coverage|audit|graph-manifest|exclusion|live-result/.test(name))
       rows.push({
         id: name,
         source: name,
-        kind: "Recorded quality report",
+        kind:
+          name === "live-result.json"
+            ? "Recorded execution result"
+            : "Recorded quality report",
         value: record.value,
       });
   for (const stage of D.stages) {
@@ -1060,6 +1107,7 @@ function qualityBody() {
   const rows = qualityRecords();
   $("summary").textContent =
     `${rows.length} recorded reports and diagnostics. Each source retains its own denominator and result. Using every discovered graph fact does not establish complete source discovery.`;
+  runOutcome($("visual"));
   const files = D.run_files,
     coverage = files["source-coverage.json"]?.value;
   const card = el("div", undefined, $("visual"), "card");

@@ -409,3 +409,33 @@ def test_redaction_preserves_risk_run_identity_and_removes_standalone_key():
         "codex-risk-live-20261012-d /run/risk-source-20261012 [REDACTED]"
     )
     assert counts["strings"] == 1
+
+
+def test_live_result_failure_is_visible_redacted_and_follows_declared_state_refs(recorded):
+    workspace, _ = recorded
+    store = ArtifactStore(workspace)
+    reference = store.put({"issue": "Provenance mismatch in persisted state"})
+    result = {
+        "run_id": "example",
+        "status": "graph_ready",
+        "next": ["execute_authoring_tool"],
+        "error": {"type": "ValueError", "message": "Unknown provenance", "api_key": "SENSITIVE"},
+        "interrupts": [{"kind": "review"}],
+        "state": {"issue_ref": reference},
+    }
+    store.write("runs/example/live-result.json", json.dumps(result))
+    store.write("runs/example/unrelated.json", '{"private":"UNRELATED_SENTINEL"}')
+    before = file_state(workspace)
+    data = RunReader(workspace, "example").read()
+    exported = data["run_files"]["live-result.json"]["value"]
+    assert exported["error"] == {
+        "type": "ValueError",
+        "message": "Unknown provenance",
+        "api_key": "[REDACTED]",
+    }
+    assert exported["status"] == "graph_ready"
+    assert exported["next"] == ["execute_authoring_tool"]
+    assert exported["interrupts"] == [{"kind": "review"}]
+    assert reference in data["artifacts"]
+    assert "UNRELATED_SENTINEL" not in json.dumps(data)
+    assert file_state(workspace) == before

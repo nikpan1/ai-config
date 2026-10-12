@@ -50,6 +50,8 @@ The coordinating agent checked the exported application in a browser using an is
 
 An independently moved copy of the actual-run HTML, without its companion JSON, also rendered successfully through the permitted local preview. Its graph pages exposed all 218 nodes as 75, 75, and 68 records, disabled Next on the last page, and reset correctly. Assertion plus code-origin filtering returned 12 matching/drawn nodes. Source/evidence lookup, graph counts, and clean UI encoding were checked on that copy.
 
+Final debug refinement: the reader includes the known `runs/<run>/live-result.json` outcome artifact. Run and Quality display its last state, next nodes, interrupts, and recorded execution error prominently, including failures that were never appended to the event log. The full payload remains redacted and inspectable; only declared references are followed. A focused regression verifies failure preservation, secret redaction, reference resolution, unchanged inputs, and exclusion of unrelated neighboring files. This brings the inspector suite to 19 passing tests.
+
 ## Explicit limitations
 
 - Checkpoint binary serialization is deliberately not deserialized. Full immutable stage state is available separately.
