@@ -1,0 +1,140 @@
+{
+  "date": "2026-10-12",
+  "code_provider": "codex_sdk",
+  "code_model": "gpt-6-astra",
+  "sdk_version": "0.162.1",
+  "document_model": "gemini-3.8-flash",
+  "runs": [
+    {
+      "run_id": "codex-risk-live-20261012-a",
+      "status": "incomplete",
+      "error": null,
+      "next": [],
+      "checkpoint_id": "1f1c6742-bc79-6fc9-800b-e17d262f4932",
+      "model_requests": 2,
+      "cache_hits": 0,
+      "completed_nodes": 5,
+      "measured_pln": 0.0657857835,
+      "conservative_uncertain_pln": 0,
+      "outstanding_reservations_pln": 0,
+      "assertions_count": 0,
+      "source_aspects_count": 18,
+      "issue": {
+        "findings": [
+          "Aspect quote does not resolve: b50c141e498f0fa530f7"
+        ],
+        "revision": "3058c9235d316d8ff7e169fec7ffaf8e14929356ac0338cfda9b325884f52d34",
+        "stage": "inventory_source_aspects"
+      }
+    },
+    {
+      "run_id": "codex-risk-live-20261012-b",
+      "status": "incomplete",
+      "error": null,
+      "next": [],
+      "checkpoint_id": "1f1c6748-12b1-6cc0-800f-02bf2fac93dc",
+      "model_requests": 3,
+      "cache_hits": 0,
+      "completed_nodes": 7,
+      "measured_pln": 0.0957158937,
+      "conservative_uncertain_pln": 20.0,
+      "outstanding_reservations_pln": 0,
+      "assertions_count": 0,
+      "source_aspects_count": 36,
+      "issue": {
+        "findings": [
+          "codex_sdk failed: ValueError; reservation charged"
+        ],
+        "revision": "6e6bc68e01e1d4372194c5de008945d706a4d3643971faa95a93b987ba8bfa5f",
+        "stage": "analyze_code_unit"
+      }
+    },
+    {
+      "run_id": "codex-risk-live-20261012-c",
+      "status": "running",
+      "error": {
+        "type": "ValueError",
+        "message": "Incomplete or truncated Gemini response"
+      },
+      "next": [
+        "classify_code_facts"
+      ],
+      "checkpoint_id": "1f1c6752-8d7e-6b89-8010-8e392259cb8a",
+      "model_requests": 5,
+      "cache_hits": 0,
+      "completed_nodes": 8,
+      "measured_pln": 1.4473293039,
+      "conservative_uncertain_pln": 0.49686242805,
+      "outstanding_reservations_pln": 0,
+      "code_candidate_facts": 12,
+      "code_candidate_relations": 8,
+      "assertions_count": 0,
+      "source_aspects_count": 36
+    },
+    {
+      "run_id": "codex-risk-live-20261012-d",
+      "status": "graph_ready",
+      "error": {
+        "type": "ValueError",
+        "message": "Fact references unknown evidence or provenance"
+      },
+      "next": [
+        "execute_authoring_tool"
+      ],
+      "checkpoint_id": "1f1c6762-16df-6897-8032-359b49225d05",
+      "model_requests": 15,
+      "cache_hits": 1,
+      "completed_nodes": 25,
+      "measured_pln": 0.9342696519,
+      "conservative_uncertain_pln": 0,
+      "outstanding_reservations_pln": 0,
+      "code_candidate_facts": 12,
+      "code_candidate_relations": 8,
+      "assertions_count": 35,
+      "source_aspects_count": 35
+    },
+    {
+      "run_id": "codex-risk-live-20261012-e",
+      "status": "incomplete",
+      "error": null,
+      "next": [],
+      "checkpoint_id": "1f1c676f-f321-6724-8015-9f8285726fcb",
+      "model_requests": 6,
+      "cache_hits": 0,
+      "completed_nodes": 10,
+      "measured_pln": 1.6743761028000002,
+      "conservative_uncertain_pln": 0,
+      "outstanding_reservations_pln": 0,
+      "code_candidate_facts": 12,
+      "code_candidate_relations": 6,
+      "assertions_count": 0,
+      "source_aspects_count": 37,
+      "issue": {
+        "findings": [
+          "Historical code called current: all facts originally marked with temporal_status 'historical' were updated to 'current_snapshot' in classified details.",
+          "Fact identity preservation failure: unique fact IDs from the original record were dropped in classified details."
+        ],
+        "revision": "020d9176ac5ec44653b656050364358860d9e81edee04aa2831d9c1f120ff135",
+        "stage": "verify_code_classification"
+      }
+    },
+    {
+      "run_id": "codex-risk-probe-20261012",
+      "status": "adapter probe",
+      "error": null,
+      "next": [],
+      "checkpoint_id": null,
+      "model_requests": 1,
+      "cache_hits": 0,
+      "completed_nodes": 0,
+      "measured_pln": 1.3981472279999998,
+      "conservative_uncertain_pln": 0,
+      "outstanding_reservations_pln": 0
+    }
+  ],
+  "totals": {
+    "measured_pln": 5.6156239638,
+    "conservative_uncertain_pln": 20.49686242805,
+    "outstanding_reservations_pln": 0
+  }
+}

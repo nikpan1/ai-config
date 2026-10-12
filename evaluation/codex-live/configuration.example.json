@@ -1,0 +1,19 @@
+{
+  "settings": {
+    "workspace": ".docgen/codex-live-validation",
+    "code_analysis_backend": "codex_sdk",
+    "code_analysis_model": "gpt-6-astra",
+    "code_analysis_timeout": 240,
+    "code_analysis_turn_limit": 1,
+    "code_analysis_result_limit": 100000,
+    "code_scope_file": ".docgen/codex-live-settings/scope.json",
+    "code_provider_allowance_file": ".docgen/codex-live-settings/provider.json",
+    "request_tokens": 100000,
+    "output_tokens": 16384,
+    "timeout_seconds": 180
+  },
+  "docs": "data/test_data_2_quick",
+  "code": "data/investment_platform",
+  "template": "evaluation/codex-live/template.md",
+  "brief": "Document the risk profiling journey for product and engineering readers. Preserve every material source condition, exception, numeric boundary and uncertainty. Code scope is RiskProfileService.java; do not claim inspection of other implementation files. Use numbered sections, weave supported purpose into behavior, and retain evidence."
+}
