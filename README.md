@@ -1,28 +1,55 @@
 # doc-gen
 
-This repository contains two independent approaches to generating documentation.
+`docgen` builds source-backed Markdown documentation from a selected Markdown corpus and template. The active LangGraph package is in `src/docgen_graph/`. Each processing node has a persistent SQLite checkpoint and a numbered, readable artifact folder under its run.
 
-| Directory | Purpose |
-| --- | --- |
-| [old-approach](old-approach/README.md) | The existing three-phase implementation, its tests, evaluation results, scripts, and dependency lockfile. |
-| [new-approach](new-approach/README.md) | The new implementation location. Currently a planning scaffold; no new pipeline has been implemented. |
-| [data](data/) | Shared source inputs and templates used by both approaches. |
-| [.ai/new-approach](.ai/new-approach/development-plan.md) | The independent development plan: code analysis and legacy documentation, graph retrieval, template-based planning, explicit plan approval, and source-backed writing. |
-
-Historical plans and implementation reports remain in `.ai/`; research remains in `research/`. The existing revitalization proposal is separate from the new approach.
-
-## Running the existing implementation
-
-Run from the repository root so the existing `.env`, `.docgen` workspace, checkpoints, pricing, and cumulative spending ledger keep their original paths:
+## Setup
 
 ```powershell
-uv sync --project old-approach --python 3.13
-uv run --project old-approach docgen status --thread-id THREAD_ID
-uv run --project old-approach docgen run data/legacy-insurance --thread-id NEW_THREAD_ID
+uv sync --locked
+Copy-Item .env.example .env
 ```
 
-Follow [the existing implementation guide](old-approach/README.md) for configuration, review, and generation. Keep an existing root `.env`; for first-time setup only, copy `old-approach/.env.example` to `.env`. The root `.venv` is a retained local environment from before the move; `uv` manages the relocated project's environment separately.
+Keep an existing `.env` if you already have one. Set `GEMINI_API_KEY` there. All model requests use `gemini-3.8-flash`; a different `GEMINI_MODEL` is rejected. The cumulative development budget ledger stays at `.docgen/budget.sqlite`, with pricing at `.docgen/pricing.json`. The active pipeline defaults to `.docgen/graph/`, separate from historical root checkpoints. An existing `.env` can be selected with `docgen --env-file path/to/file ...`.
 
-Both approaches read inputs and templates from the repository-root `data/` directory. Keep generated artifacts and runtime state separate from these shared inputs.
+Before live model calls, inspect `uv run docgen budget`. Paid development evaluations share the authorized PLN 200 ceiling, including retries. The application requires current pricing and currency conversion before reserving a request. Offline tests and model doubles make no Gemini requests.
 
-Local runtime artifacts remain at the root to preserve historical references. No checkpoints or spending records were migrated or reset. Both approaches must respect the same cumulative PLN 200 Gemini development allowance; the new approach does not receive another allowance.
+## Run
+
+```powershell
+uv run docgen run --mode manual --docs data/test_data_2_quick --template data/template.md --thread-id risk-manual-001
+uv run docgen run --mode autopilot --docs data/test_data_2_quick --template data/template.md --thread-id risk-auto-001
+uv run docgen resume --thread-id risk-manual-001
+uv run docgen status --thread-id risk-manual-001 --json
+```
+
+`run` defaults to `manual`; explicit modes make automation safer to audit. `manual` pauses after each executed stage artifact, then at the plan and release gates. The CLI prompts for an action, reviewer and rationale, binding decisions to the exact artifact revision. EOF or a noninteractive terminal leaves a checkpointed pending review. `resume --decisions decision.json` accepts one structured decision for automation or testing. `autopilot` uses attributed policy decisions at plan and release, bounded repairs, and explicit content exclusions when it can continue safely. If essential content cannot be verified, it ends `incomplete` with its artifacts preserved.
+
+Runs, including repeated item revisions, are under `.docgen/graph/runs/<thread-id>/step1/` through `step27/`. `run-manifest.json` maps node names to step folders. `step22/candidates/<hash>/` is a portable candidate bundle with relative evidence and asset links. `exclusions.md` and `exclusions.json` account for omitted content. Exit codes are 0 for a completed release, 10 for pending manual review, 11 for technical or configuration blocking, 12 for rejection, and 13 for incomplete content.
+
+Use `uv run docgen history --thread-id ID`, `uv run docgen inspect-evidence --thread-id ID --citation D1`, and `uv run docgen budget` for inspection. Resume always uses the stored mode. Changing inputs, policy or runtime implementation requires a new thread ID; incompatible checkpoints are not silently resumed.
+
+## Source links
+
+Each citation is checked against its frozen Markdown source and, when configured, a supplied local HTML export. Set `DOCGEN_SOURCE_PAGE_MAP` in `.env` to a JSON file mapping source IDs or original URLs to local HTML paths relative to the map file. Those HTML bytes are frozen for navigation verification only; they are never ingested as product facts. Without a map, the citation audit reports `markdown_projection_only`. If a reliable selector cannot be made, the reader links to a portable local evidence record and shows the original page separately. Production Confluence highlighting remains unverified unless a browser can open the authenticated original page.
+
+## Historical workspace migration
+
+Existing `new-approach/.docgen/` output remains in place. Inspect and verify it before copying:
+
+```powershell
+uv run docgen migrate --from-workspace new-approach/.docgen
+uv run docgen migrate --from-workspace new-approach/.docgen --copy
+```
+
+The first command is a dry run. Both commands verify content object hashes and candidate manifests; copy refuses different files already at the destination. Copies go to `.docgen/graph/imported-legacy/`, preserving the active checkpoint database separately. Historical checkpoints remain inspectable, but their old graph schema and runtime signature are incompatible with the root pipeline. Start a new thread from selected inputs for new execution. Neither command changes `.env` or the shared budget ledger.
+
+The former `old-approach` executable, `docgen-graph` command, and phase-specific scripts are retired. Historical evaluation results are kept in `.ai/legacy-evaluation/`; historical utilities are non-executable records in `.ai/historical-utilities/`. Repository history retains the old source.
+
+## Development checks
+
+```powershell
+uv run pytest tests
+uv run ruff check src tests evaluation
+```
+
+The quick investment fixture and its citation cases are in `data/test_data_2_quick/` and `data/test_data_2_reference/`. The full corpus is in `data/test_data_2/`. Java and Angular files currently use generic text analysis, and ticket filtering is not implemented. The HTML mirrors verify locators only. Passing offline tests does not establish semantic completeness or browser highlighting against live Confluence.
