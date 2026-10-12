@@ -316,7 +316,9 @@ def final_audit_fixture(tmp_path, model):
         "assertions_ref": store.put(facts),
         "source_aspects_ref": store.put([{"id": "a1", "evidence_id": "e1"}]),
         "source_non_substantive_ref": store.put([{"evidence_id": "meta", "reason": "Metadata"}]),
-        "edited_ref": store.put([{"title": "Rules", "mappings": mappings}]),
+        "edited_ref": store.put(
+            [{"title": "Rules", "markdown": "Shared source note.", "mappings": mappings}]
+        ),
         "snapshot_ref": "snapshot",
         "plan_hash": "plan",
         "mode": "autopilot",
@@ -330,6 +332,9 @@ def test_final_source_audit_includes_shared_paragraph_support(tmp_path):
     result = pipeline.audit_source_to_document(state)
     assert result["source_audit_index"] == 1
     assert model.payload["aspects"] == [{"id": "a1", "evidence_id": "e1"}]
+    assert model.payload["document_context"] == [
+        {"title": "Rules", "markdown": "Shared source note."}
+    ]
     assert {item["text"] for item in model.payload["blocks"]} == {
         "Consent is required.",
         "source_id: sample",

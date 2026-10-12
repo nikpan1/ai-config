@@ -2215,6 +2215,10 @@ class Pipeline:
                     "aspects": packet_aspects,
                     "facts": facts,
                     "final_passages": passages,
+                    "document_context": [
+                        {"title": section["title"], "markdown": section["markdown"]}
+                        for section in sections
+                    ],
                     "supporting_facts": [
                         item for item in self.assertions(state) if item["id"] in supporting_ids
                     ],
