@@ -1,6 +1,7 @@
 import copy
 import json
 import sqlite3
+import subprocess
 from datetime import date
 from types import SimpleNamespace
 
@@ -131,6 +132,41 @@ def test_provider_allowance_shares_prior_gemini_charges(tmp_path):
         allowance.reserve("codex_sdk", "explicit-model", "request")
     assert allowance.ledger.summary()["charged_pln"] == 199
     assert allowance.ledger.summary()["limit_pln"] == 200
+
+
+def test_native_codex_timeout_closes_worker_without_inheriting_secrets(tmp_path, monkeypatch):
+    from docgen_graph.code_analysis import native_codex
+
+    captured, stopped = {}, []
+
+    class Process:
+        def __init__(self, args, **kwargs):
+            captured.update(args=args, **kwargs)
+
+        def communicate(self, request, timeout):
+            captured["request"] = json.loads(request)
+            raise subprocess.TimeoutExpired("worker", timeout)
+
+    monkeypatch.setenv("UNRELATED_SECRET", "must-not-inherit")
+    monkeypatch.setenv("OPENAI_API_KEY", "must-not-inherit")
+    monkeypatch.setattr(native_codex, "version", lambda name: PINNED_CODEX_VERSION)
+    monkeypatch.setattr(native_codex.subprocess, "Popen", Process)
+    monkeypatch.setattr(native_codex, "stop_process_tree", stopped.append)
+    settings = SimpleNamespace(
+        code_analysis_api_key="isolated-key",
+        code_analysis_model="explicit-model",
+        code_analysis_timeout=1,
+        code_analysis_result_limit=10000,
+    )
+    transport = native_codex.NativeCodexTransport(settings, tmp_path / "snapshot")
+    with pytest.raises(TimeoutError, match="deadline"):
+        transport.run({"spans": []})
+    assert stopped == [transport.process]
+    assert "UNRELATED_SECRET" not in captured["env"]
+    assert "OPENAI_API_KEY" not in captured["env"]
+    assert "isolated-key" not in " ".join(captured["args"])
+    assert captured["request"]["api_key"] == "isolated-key"
+    assert list(captured["cwd"].iterdir()) == [captured["cwd"] / ".snapshot"]
 
 
 def test_code_relation_uses_context_evidence_and_validated_endpoints():
