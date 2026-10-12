@@ -45,6 +45,8 @@ Ticket scopes use `tickets`, `dependency_tickets` and `ticket_paths` containing 
 
 The producer/configuration/retrieval/adapter/restart suites plus coordinator transport review tests passed offline: 40 tests after the final supporting-context regression. Ruff passed for the owned implementation and tests. The coordinator runs the combined full suite after merging task IV.
 
+Final integrated validation passed 143/143 tests at the repository root. Two subsequently added Mermaid-tool regressions also pass, bringing the verified distinct cases to 145; all 12 coordinator review tests passed after that correction. Ruff passed across the implementation and tests, and the final wheel built successfully. Candidate provenance now binds current/base/head commit identifiers when available, while snapshots without Git metadata remain supported.
+
 No paid Gemini, Codex or Auggie analysis call was made. The existing shared ledger already exceeds the authorized PLN 200 budget; it was neither reset nor increased. Live provider trials and semantic acceptance against the full frozen human-reviewed reference set are not claimed. The Java/TypeScript text index and explicit import matching are bounded static discovery mechanisms; unresolved dynamic behavior remains a coverage issue for the independent audit.
 
 ## Revalidated primary references

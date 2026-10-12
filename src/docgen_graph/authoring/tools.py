@@ -114,8 +114,12 @@ class AuthoringTools:
             if name == "build_mermaid":
                 findings = validate_diagram(arguments, {item.id for item in evidence.evidence})
                 content = diagram_source(arguments) if not findings else ""
+                required_elements = diagram_element_ids(
+                    [{"id": arguments["id"], "diagram": arguments}]
+                )
             else:
                 findings, content = [], arguments["content"]
+                required_elements = set()
             audit = self.model.call(
                 "verify_tool_content",
                 {
@@ -125,15 +129,17 @@ class AuthoringTools:
                         item.model_dump(mode="json") for item in evidence.evidence
                     ],
                     "deterministic_findings": findings,
+                    "required_diagram_element_ids": sorted(required_elements),
                 },
                 AuditDraft,
             )
             if not audit.get("accepted"):
                 findings.append("Independent entailment audit rejected content")
             findings.extend(audit.get("findings", []))
-            if name == "build_mermaid" and set(
-                audit.get("covered_diagram_element_ids", [])
-            ) != diagram_element_ids([{"diagram": arguments}]):
+            if (
+                name == "build_mermaid"
+                and set(audit.get("covered_diagram_element_ids", [])) != required_elements
+            ):
                 findings.append("Independent audit did not verify every diagram element")
             result = {
                 "status": "unresolved" if findings else "ok",

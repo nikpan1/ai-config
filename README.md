@@ -70,8 +70,9 @@ uv run pytest tests
 uv run ruff check src tests evaluation
 ```
 
-The quick investment fixture and its citation cases are in `data/test_data_2_quick/` and `data/test_data_2_reference/`. The full corpus is in `data/test_data_2/`. Java and Angular files currently use generic text analysis, and ticket filtering is not implemented. The HTML mirrors verify locators only. Passing offline tests does not establish semantic completeness or browser highlighting against live Confluence.
-# Evidence authoring and code analysis
+The quick investment fixture and its citation cases are in `data/test_data_2_quick/` and `data/test_data_2_reference/`. The full corpus is in `data/test_data_2/`. Java and Angular use a bounded text index with entry-point discovery; feature and ticket scopes require explicit path mappings. The HTML mirrors verify locators only. Passing offline tests does not establish semantic completeness or browser highlighting against live Confluence.
+
+## Evidence authoring and code analysis
 
 Code analysis can use `gemini`, `codex_sdk`, or `auggie_sdk` through
 `DOCGEN_CODE_ANALYSIS_BACKEND` and `DOCGEN_CODE_ANALYSIS_MODEL` in `.env`.

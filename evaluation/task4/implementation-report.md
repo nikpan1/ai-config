@@ -13,7 +13,7 @@ fixture or oracle was relabeled as human reviewed.
 | Exact evidence after rewriting | Substantially present | Existing mappings, source quotes, placement offsets and bundle checks retained; new knowledge requires separately audited immutable revision and invalidates plan/release approval |
 | All graph nodes used but original details absent | Confirmed design gap; no specific last-run ID supplied | Independent original-source aspect inventory, source-to-fact audit, and final source-to-passage audit; missing-condition integration test blocks before planning despite a fact for every source block |
 | Agentic authoring | Missing explicit function loop | Real Gemini function declarations with automatic execution disabled; persistent plan/execute/verify nodes during planning and section preparation, bounded turns/time/bytes and repeat detection |
-| Mermaid tools | Renderer and semantic checks already existed | Executable diagram tool invokes restricted renderer and independent evidence audit requiring every node/edge ID; endpoints alone do not justify an edge |
+| Mermaid tools | Renderer and semantic checks already existed | Executable diagram tool builds validated Mermaid source with an independent audit requiring every node/edge ID; the existing publication renderer handles output; endpoints alone do not justify an edge |
 | Attachments | Static image handling existed; general text absent | Local TXT/MD, PDF, DOCX, CSV, XLSX parsers and source registers integrated with Task III snapshot/graph; native citation coordinates and frozen resource export |
 | Template numbering | Flat heading requirement model | Markdown heading tree, stable structural IDs, repeated dynamic slots, fixed-number conflicts, nested generated numbers and local anchor updates |
 | Working title “Plan” | Exact offending run unavailable; narrow validator reproduced | Explicit template title preferred; generic documentation/working/Polish plan titles repaired while Pricing Plan and Disaster Recovery Plan remain valid |
@@ -52,8 +52,9 @@ without cached values, and attachment content reaching the publication bundle.
 The integration tests inject crashes before tool execution, after execution
 before verification, and before final source auditing. Reopening the persistent
 graph resumes the saved protocol and completes the exact evidence-mapped
-fixture. Root's independent review tests also cover SDK thought-signature
-roundtrip and code-provider isolation/accounting boundaries.
+fixture. Protocol and coordinator review tests also cover SDK thought-signature
+roundtrip, code-provider isolation/accounting boundaries, and a Mermaid tool
+request that must reject an edge omitted from the independent audit.
 
 Completed offline checkpoints: 116/119 tests before the final optional-heading
 fix and LF fixture normalization; the three failures were that heading decision
@@ -63,6 +64,15 @@ integration suite passed 19/19. The parent integration run records final suite
 totals after all producer and reviewer changes. Long Windows temporary paths
 caused four earlier visual-bundle failures; rerunning under a short repository
 temporary path passed those unchanged regressions.
+
+Final root integration validation: the complete suite passed 143/143 tests
+(`pytest -q --basetemp=.docgen/final34`). A subsequent direct Mermaid tool
+regression exposed and corrected a missing diagram ID; both new cases pass,
+including rejection when the edge is absent from the independent audit. All
+12 coordinator review tests then passed. This verifies 145 distinct current
+test cases across the full run and the focused follow-up. Ruff passed across
+`src` and `tests`; the final wheel built successfully and CLI help exposes both
+provider-selection flags. The shared ledger was reread and remained unchanged.
 
 No paid model call was made. Existing ledger figures were PLN 445.4719064244
 charged plus PLN 1.62453494619 reserved against PLN 200 authorization. Accounting
