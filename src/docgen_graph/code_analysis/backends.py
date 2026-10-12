@@ -1,6 +1,7 @@
 import json
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
+from time import monotonic
 from typing import Protocol
 
 from docgen_graph.contracts import CodeAnalysisDraft
@@ -150,6 +151,14 @@ class SDKCodeBackend:
         if cache.is_file():
             stored = json.loads(cache.read_text("utf-8"))
             packet = self.store.get(stored["result_ref"])
+            self.store.event(
+                self.run_id,
+                "analyze_code",
+                "cache_hit",
+                key=key,
+                provider=self.provider,
+                model=self.model,
+            )
             return EvidenceResult.model_validate(packet)
         if self.allowance is None:
             return EvidenceResult(
@@ -169,6 +178,17 @@ class SDKCodeBackend:
             return EvidenceResult(
                 status="budget_blocked", warnings=["Shared provider budget is exhausted"]
             )
+        started = monotonic()
+        self.store.event(
+            self.run_id,
+            "analyze_code",
+            "request",
+            key=key,
+            reservation=reservation,
+            provider=self.provider,
+            model=self.model,
+            attempt=1,
+        )
         try:
             response = self.transport.run(payload)
             if len(json.dumps(response).encode()) > self.settings.code_analysis_result_limit:
@@ -183,7 +203,22 @@ class SDKCodeBackend:
                 response.get("request_id", ""),
             )
             packet.usage_ref = reservation
-            self.allowance.settle(reservation, response.get("usage"))
+            cost = self.allowance.settle(reservation, response.get("usage"))
+            self.store.event(
+                self.run_id,
+                "analyze_code",
+                "response",
+                key=key,
+                provider=self.provider,
+                model=self.model,
+                reservation=reservation,
+                usage=response.get("usage"),
+                cost_pln=cost,
+                seconds=monotonic() - started,
+                session_id=response.get("session_id"),
+                request_id=response.get("request_id"),
+                attempt=1,
+            )
             self.store.write(
                 f"code-cache/{key}.json",
                 json.dumps({"result_ref": self.store.put(packet.model_dump())}),
@@ -199,6 +234,11 @@ class SDKCodeBackend:
                 provider=self.provider,
                 request_id=key,
                 error_type=type(error).__name__,
+                reason=str(error)[:2200].replace(
+                    getattr(self.settings, "code_analysis_api_key", "") or "\0", "[redacted]"
+                ),
+                model=self.model,
+                seconds=monotonic() - started,
             )
             return EvidenceResult(
                 status="unavailable",

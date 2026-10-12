@@ -6,6 +6,21 @@ from docgen_graph.code_analysis.native_codex import restricted_config, validate_
 from docgen_graph.contracts import CodeAnalysisDraft
 
 
+def output_schema():
+    def strict(node):
+        if isinstance(node, list):
+            return [strict(value) for value in node]
+        if not isinstance(node, dict):
+            return node
+        result = {key: strict(value) for key, value in node.items() if key != "default"}
+        if result.get("type") == "object":
+            result["additionalProperties"] = False
+            result["required"] = list(result.get("properties", {}))
+        return result
+
+    return strict(CodeAnalysisDraft.model_json_schema())
+
+
 def run(request):
     from openai_codex import ApprovalMode, Codex
     from openai_codex.generated.v2_all import ConfigReadResponse
@@ -30,7 +45,7 @@ def run(request):
         )
         result = thread.run(
             json.dumps(request["payload"], ensure_ascii=False),
-            output_schema=CodeAnalysisDraft.model_json_schema(),
+            output_schema=output_schema(),
         )
         if result.status.value != "completed" or not result.final_response:
             raise ValueError("Codex analysis did not complete")
@@ -49,10 +64,19 @@ def run(request):
 
 
 def main():
+    request = {}
     try:
-        result = run(json.load(sys.stdin))
+        request = json.load(sys.stdin)
+        result = run(request)
     except Exception as error:
-        result = {"status": "unavailable", "error_type": type(error).__name__}
+        message = str(error)
+        if request.get("api_key"):
+            message = message.replace(request["api_key"], "[redacted]")
+        result = {
+            "status": "unavailable",
+            "error_type": type(error).__name__,
+            "error_message": message[:2000],
+        }
     print(json.dumps(result, ensure_ascii=False))
 
 

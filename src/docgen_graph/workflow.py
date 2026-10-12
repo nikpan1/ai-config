@@ -410,16 +410,34 @@ class Pipeline:
             }
         spans = self.spans(state)
         blocks = [spans[key] for key in batches[index]]
-        draft = self.call("inventory_aspects", {"blocks": blocks}, AspectInventory)
+        draft = self.call(
+            "inventory_aspects",
+            {
+                "blocks": blocks,
+                "feedback": self.read(state, "feedback_ref", []),
+                "previous": self.read(state, "draft_ref") if state.get("attempt") else None,
+            },
+            AspectInventory,
+        )
         aspects, findings = validate_aspect_inventory(draft["aspects"], spans)
         covered = {item["evidence_id"] for item in aspects} | set(draft["non_substantive"])
         if covered != set(batches[index]):
             findings.append("Independent aspect inventory does not account for every source block")
         if findings:
+            if state.get("attempt", 0) < self.repair_limit():
+                return {
+                    "attempt": state.get("attempt", 0) + 1,
+                    "feedback_ref": self.store.put(findings),
+                    "draft_ref": self.store.put(draft),
+                    "route": "inventory_source_aspects",
+                }
             return self.issue(
                 state, "inventory_source_aspects", findings, "inventory_source_aspects"
             )
         return {
+            "attempt": 0,
+            "feedback_ref": "",
+            "draft_ref": "",
             "source_aspects_ref": self.store.put(
                 self.read(state, "source_aspects_ref", []) + aspects
             ),

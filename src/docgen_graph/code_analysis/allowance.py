@@ -80,3 +80,4 @@ class ProviderAllowance:
                 "usage": usage if valid else None,
             },
         )
+        return cost if valid else self.reservation

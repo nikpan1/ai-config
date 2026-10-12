@@ -165,7 +165,10 @@ class NativeCodexTransport:
         response = json.loads(output)
         if response.get("status") != "ok":
             raise ValueError(
-                "Codex configuration or analysis failed: " + response.get("error_type", "unknown")
+                "Codex configuration or analysis failed: "
+                + response.get("error_type", "unknown")
+                + ": "
+                + response.get("error_message", "No diagnostic supplied")
             )
         return response
 
