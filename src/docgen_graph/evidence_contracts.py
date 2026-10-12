@@ -1,6 +1,7 @@
+from pathlib import PurePosixPath
 from typing import Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class EvidenceRecord(BaseModel):
@@ -8,6 +9,7 @@ class EvidenceRecord(BaseModel):
 
 
 class EvidenceLocator(EvidenceRecord):
+    model_config = ConfigDict(extra="forbid")
     kind: Literal[
         "lines", "characters", "page", "paragraph", "table_cell", "sheet_range", "diff_hunk"
     ]
@@ -63,6 +65,16 @@ class EvidenceRef(EvidenceRecord):
     source_role: str
     text: str = ""
     parent_ids: list[str] = []
+    parser_version: str | None = None
+    commit: str | None = None
+    temporal_status: Literal["current_snapshot", "historical", "planned", "unknown"] = "unknown"
+
+    @model_validator(mode="after")
+    def relative_path(self):
+        path = PurePosixPath(self.path.replace("\\", "/"))
+        if path.is_absolute() or ".." in path.parts or ":" in self.path:
+            raise ValueError("Evidence path must be relative to its frozen snapshot")
+        return self
 
 
 class AnalysisProvenance(EvidenceRecord):

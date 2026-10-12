@@ -1,3 +1,4 @@
+import math
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -13,7 +14,7 @@ class Settings:
     budget_ledger: Path
     budget_pln: float
     pricing_file: Path
-    api_key: str
+    api_key: str = field(repr=False)
     model: str
     output_tokens: int
     request_tokens: int
@@ -47,7 +48,7 @@ class Settings:
         if model != "gemini-3.8-flash":
             raise ValueError("GEMINI_MODEL must be gemini-3.8-flash")
         configured_budget_pln = float(values.get("DOCGEN_BUDGET_PLN") or 200)
-        if configured_budget_pln <= 0:
+        if not math.isfinite(configured_budget_pln) or configured_budget_pln <= 0:
             raise ValueError("DOCGEN_BUDGET_PLN must be positive")
         budget_pln = min(configured_budget_pln, 200.0)
         asset_max_bytes = int(values.get("DOCGEN_ASSET_MAX_BYTES") or 10000000)
@@ -70,6 +71,11 @@ class Settings:
         code_result = int(values.get("DOCGEN_CODE_ANALYSIS_RESULT_LIMIT") or 100000)
         if min(code_timeout, code_turns, code_result) <= 0 or code_turns > 50:
             raise ValueError("Code analysis limits must be positive and turns at most 50")
+        authoring_turns = int(values.get("DOCGEN_AUTHORING_TURN_LIMIT", 8))
+        authoring_timeout = int(values.get("DOCGEN_AUTHORING_TIMEOUT_SECONDS", 300))
+        authoring_result = int(values.get("DOCGEN_AUTHORING_RESULT_LIMIT", 60000))
+        if min(authoring_turns, authoring_timeout, authoring_result) <= 0 or authoring_turns > 50:
+            raise ValueError("Authoring limits must be positive and turns at most 50")
         return cls(
             env_file=selected,
             workspace=path("DOCGEN_WORKSPACE", ".docgen/graph"),
@@ -101,7 +107,7 @@ class Settings:
             else None,
             auggie_api_key=str(values.get("AUGGIE_API_KEY") or ""),
             code_analysis_api_key=str(values.get("OPENAI_API_KEY") or ""),
-            authoring_turn_limit=int(values.get("DOCGEN_AUTHORING_TURN_LIMIT") or 8),
-            authoring_timeout_seconds=int(values.get("DOCGEN_AUTHORING_TIMEOUT_SECONDS") or 300),
-            authoring_result_limit=int(values.get("DOCGEN_AUTHORING_RESULT_LIMIT") or 60000),
+            authoring_turn_limit=authoring_turns,
+            authoring_timeout_seconds=authoring_timeout,
+            authoring_result_limit=authoring_result,
         )

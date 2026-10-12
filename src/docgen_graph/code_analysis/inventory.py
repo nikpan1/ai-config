@@ -3,7 +3,7 @@ from fnmatch import fnmatch
 from pathlib import PurePosixPath
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from docgen_graph.storage import digest
 
@@ -21,6 +21,18 @@ class CodeScope(BaseModel):
     head_commit: str | None = None
     patch_paths: list[str] = []
     context_chars: int = Field(default=24000, ge=1000, le=100000)
+
+    @model_validator(mode="before")
+    @classmethod
+    def infer_declared_scope(cls, value):
+        if isinstance(value, dict) and "mode" not in value:
+            if value.get("tickets"):
+                return {**value, "mode": "tickets"}
+            if value.get("paths"):
+                return {**value, "mode": "paths"}
+            if value.get("feature"):
+                return {**value, "mode": "feature"}
+        return value
 
     @property
     def id(self):

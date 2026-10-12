@@ -4,7 +4,9 @@ import pytest
 
 from docgen_graph.evidence_contracts import (
     DeltaVerification,
+    EvidenceLocator,
     EvidenceQuery,
+    EvidenceRelation,
     EvidenceResult,
     KnowledgeDelta,
 )
@@ -72,3 +74,48 @@ def test_revision_service_rejects_foreign_bytes_and_publishes_idempotent_delta(t
     delta.facts[0].statement = "Forged after audit"
     with pytest.raises(ValueError, match="exact bytes"):
         service.apply_verified_delta(query, delta)
+
+
+@pytest.mark.parametrize(
+    "locator",
+    [
+        {"kind": "sheet_range", "range": "A1"},
+        {"kind": "table_cell", "cell": "A1"},
+        {"kind": "diff_hunk", "hunk": "@@ -1 +1 @@"},
+        {"kind": "lines", "start": 0, "end": 1},
+        {"kind": "lines", "start": 2, "end": 1},
+        {"kind": "page", "page": 1, "invented_location": "anything"},
+    ],
+)
+def test_ambiguous_or_forged_locators_rejected(locator):
+    with pytest.raises(ValueError):
+        EvidenceLocator.model_validate(locator)
+
+
+def test_mandatory_conflict_closure_paginates_and_unknown_ids_explicit():
+    root = Path(__file__).parent / "fixtures/task3"
+    packet = EvidenceResult.model_validate_json((root / "complete.json").read_text())
+    packet.relations = [
+        EvidenceRelation(
+            type="CONTRADICTS",
+            source_id="f1",
+            target_id="f2",
+            method="audit",
+            evidence_ids=["e1", "e2"],
+        )
+    ]
+    service = FixtureEvidenceService(packet, "fixture-snapshot", "r1")
+    query = EvidenceQuery(
+        snapshot_id="fixture-snapshot",
+        graph_revision="r1",
+        scope_id="full",
+        query="unmatched",
+        mandatory_ids=["f1"],
+        limit=1,
+    )
+    first = service.search_graph(query)
+    assert first.truncated
+    second = service.search_graph(query.model_copy(update={"cursor": first.next_cursor}))
+    assert second.facts[0].id == "f2"
+    missing = service.search_graph(query.model_copy(update={"mandatory_ids": ["f1", "unknown"]}))
+    assert missing.status == "not_found" and missing.warnings

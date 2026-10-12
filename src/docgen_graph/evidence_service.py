@@ -172,6 +172,9 @@ class RevisionEvidenceService(FixtureEvidenceService):
                     "locator": ref.locator.model_dump(),
                     "snapshot_id": ref.snapshot_id,
                     "parent_ids": ref.parent_ids,
+                    "parser_version": ref.parser_version,
+                    "commit": ref.commit,
+                    "temporal_status": ref.temporal_status,
                 }
             )
         graph.add_evidence(spans)
@@ -259,6 +262,10 @@ class RevisionEvidenceService(FixtureEvidenceService):
                     or {"kind": "lines", "start": ref["start_line"], "end": ref["end_line"]}
                 ),
                 text=ref["text"],
+                parent_ids=ref.get("parent_ids", []),
+                parser_version=ref.get("parser_version"),
+                commit=ref.get("commit"),
+                temporal_status=ref.get("temporal_status", "unknown"),
             )
             for ref in refs
         ]
@@ -303,6 +310,8 @@ class RevisionEvidenceService(FixtureEvidenceService):
             if (ref.path, ref.content_hash) not in manifest:
                 raise ValueError("Evidence path and hash are not in the frozen snapshot")
             content = store.get_bytes(ref.content_hash)
+            if set(ref.parent_ids) - evidence.keys():
+                raise ValueError("Evidence references an unknown parent")
             locator = ref.locator
             if ref.source_kind == "attachment":
                 from docgen_graph.attachments import extract_attachment
@@ -341,6 +350,8 @@ class RevisionEvidenceService(FixtureEvidenceService):
             if set(relation.evidence_ids) - evidence.keys():
                 raise ValueError("Relation lacks its own evidence")
         coverage_ids = {item.id for item in packet.coverage}
+        if len(coverage_ids) != len(packet.coverage) or len(provenance) != len(packet.provenance):
+            raise ValueError("Duplicate coverage or provenance identities")
         for item in packet.coverage:
             if set(item.evidence_ids) - evidence.keys() or set(item.fact_ids) - facts.keys():
                 raise ValueError("Coverage references unknown records")

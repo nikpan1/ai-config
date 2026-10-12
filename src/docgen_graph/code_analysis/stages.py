@@ -62,6 +62,7 @@ def inventory_code_scope(pipeline, state):
             for span in spans:
                 span["role"] = "change_history"
                 span["temporal_status"] = "historical"
+                span["commit"] = file.get("commit")
                 record["units"].append(
                     {
                         "id": digest([scope.id, span["id"]]),
@@ -111,6 +112,7 @@ def _payload(pipeline, state):
             if key in {"scope_id", "base_commit", "head_commit"}
         },
         "scope_role": unit["scope_role"],
+        "code_revision": pipeline.read(state, "snapshot_ref").get("code_revision"),
     }
 
 
@@ -144,8 +146,9 @@ def verify_code_unit(pipeline, state):
     payload = _payload(pipeline, state)
     draft = pipeline.read(state, "draft_ref")
     ids = {s["id"] for s in payload["spans"]}
+    allowed = ids | {s["id"] for s in payload.get("context", [])}
     try:
-        records = [normalized_assertion(raw, ids) for raw in draft["details"]]
+        records = [normalized_assertion(raw, allowed) for raw in draft["details"]]
     except ValueError as error:
         return pipeline.issue(state, "verify_code_unit", [str(error)], "analyze_code_unit")
     missing = ids - {eid for record in records for eid in record["evidence_ids"]}
@@ -245,7 +248,7 @@ def publish_code_evidence(pipeline, state):
     if not audit["accepted"] or audit["input_hash"] != digest(draft):
         raise ValueError("Classification changed after verification")
     payload = _payload(pipeline, state)
-    allowed = {s["id"] for s in payload["spans"]}
+    allowed = {s["id"] for s in payload["spans"] + payload.get("context", [])}
     records = [
         normalized_assertion({**raw, "review_status": "verified"}, allowed)
         for raw in draft["details"]

@@ -1,3 +1,5 @@
 Audit the proposed code report and details against original frozen source. Return JSON with keys accepted (boolean), findings (list of specific missing, unsupported, overstated, or misqualified details), and missing_evidence_ids (list). Treat code comments and tests as distinct from implementation. A valid evidence ID alone is not proof of support. No Markdown fences.
 
 Audit each material aspect and qualifier, not merely evidence ID coverage. Verify numeric boundary operators, ordered steps, conditions, exceptions, configuration defaults and overrides, GUI versus server checks, and historical versus current/planned state. Incomplete context must remain explicit uncertainty. Reject unsupported explanations of why behavior exists.
+
+Independently verify every proposed relation against its own evidence and both endpoints. Endpoint existence does not prove transitions or causality. Reject unsupported edges. Context may support a primary fact but must not substitute for analyzing any required primary source unit.
