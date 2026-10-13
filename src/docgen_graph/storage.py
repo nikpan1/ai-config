@@ -14,6 +14,21 @@ def digest(value: object) -> str:
     return hashlib.sha256(value if isinstance(value, bytes) else encode(value)).hexdigest()
 
 
+def windows_extended_path(path: Path) -> str:
+    value = str(path)
+    if value.startswith("\\\\?\\"):
+        return value
+    if value.startswith("\\\\"):
+        return "\\\\?\\UNC\\" + value[2:]
+    return "\\\\?\\" + value
+
+
+def within_directory(path: Path, root: Path) -> bool:
+    if os.name == "nt":
+        return Path(windows_extended_path(path)).is_relative_to(Path(windows_extended_path(root)))
+    return path.is_relative_to(root)
+
+
 def atomic_write(path: Path, content: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with NamedTemporaryFile(dir=path.parent, delete=False) as temporary:
@@ -24,7 +39,7 @@ def atomic_write(path: Path, content: bytes) -> None:
     source = Path(name).resolve()
     target = path.resolve()
     if os.name == "nt":
-        os.replace("\\\\?\\" + str(source), "\\\\?\\" + str(target))
+        os.replace(windows_extended_path(source), windows_extended_path(target))
     else:
         os.replace(source, target)
 
@@ -55,14 +70,14 @@ class ArtifactStore:
 
     def write(self, relative: str, content: str | bytes) -> Path:
         path = (self.root / relative).resolve()
-        if not path.is_relative_to(self.root):
+        if not within_directory(path, self.root):
             raise ValueError("Artifact path leaves workspace")
         atomic_write(path, content.encode() if isinstance(content, str) else content)
         return path
 
     def event(self, run_id: str, stage: str, event: str, **fields) -> None:
         path = (self.root / "runs" / run_id / "events.jsonl").resolve()
-        if not path.is_relative_to(self.root):
+        if not within_directory(path, self.root):
             raise ValueError("Event path leaves workspace")
         path.parent.mkdir(parents=True, exist_ok=True)
         entry = {"time": time.time(), "stage": stage, "event": event, **fields}

@@ -1,0 +1,31 @@
+{
+  "purpose": "Declared before live generation; these expectations are review criteria, not a semantic pass based on keyword matching.",
+  "scope": "Synthetic equipment-library documents, distinct from the risk-profiling development corpus.",
+  "checks": [
+    "Borrowing normally requires both active membership and no unpaid overdue charge.",
+    "Staff exception waives only the charge requirement, not membership and not the recorded charge.",
+    "Collection requires the linked identity check; failure does not establish fraud.",
+    "Reservation hold expires 48 hours after confirmation; indefinite history retention is not invented.",
+    "One unavailable item does not cancel other reservations and must not be substituted automatically.",
+    "Evening collection remains an unapproved proposal, not available service.",
+    "Extension request alone does not change the original due date.",
+    "Name mismatch requires review, not automatic acceptance or permanent rejection.",
+    "Delegated collector needs both authorization and their own unexpired document.",
+    "Document image is not stored; check outcome and reviewer reference are retained.",
+    "Identity-service timeout permits one retry but does not extend the reservation hold.",
+    "Incomplete check cannot authorize collection; complete result is not by itself sufficient.",
+    "One seven-day extension requires absence of a conflicting subsequent reservation.",
+    "Rejected extension leaves original due date unchanged.",
+    "Missing accessory follow-up and damage maintenance review are independent.",
+    "Two-location return pilot applies to tools, not automatically to audio equipment.",
+    "Both conflicting unclaimed-property periods are retained without invented precedence."
+  ],
+  "mechanical_requirements": [
+    "No planned section is silently dropped by the pipeline.",
+    "No internal paragraph index is presented as a customer-facing section number.",
+    "No raw auditor explanation or AI-production disclaimer is appended to customer prose.",
+    "Every final citation resolves to an exact excerpt and frozen source context.",
+    "Repair and audit records use actual stable paragraph IDs.",
+    "Unsupported generated claims are repaired or replaced by relevant exact source text; original draft is preserved for inspection."
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "review_kind": "independent_read_only_source_comparison",
+  "review_date": "2026-10-13",
+  "candidate": ".docgen/business-risk-20261013/runs/business-risk-20261013/output/documentation.md",
+  "baseline": ".docgen/source-first-verified-20261013/runs/source-first-verified-20261013/output/documentation.md",
+  "sources_inspected": [
+    "data/test_data_2_quick/risk-profiling.md",
+    "data/test_data_2_quick/assets/questionnaire.jpg",
+    "data/test_data_2_quick/assets/assessment-result.jpg"
+  ],
+  "method": "Read both full exported documents and the original Markdown; visually inspect both original images; inspect the candidate report and paragraph verification records. This is a qualitative review of one synthetic example, not a statistical estimate of accuracy or recall.",
+  "candidate_audit": {
+    "accepted": true,
+    "coverage_estimate": 0.98,
+    "independent_conclusion": "The acceptance misses material unsupported claims. Its coverage estimate must not be treated as measured factual accuracy."
+  },
+  "improvements": [
+    "QF06 is restored to the document body: RiskSignal exclusivity and the explicit exclusion of MarketPulse and CustodyBridge. The baseline body omitted it and mentioned the omission in diagnostics.",
+    "No withheld-paragraph identifiers, audit explanations, standalone Uncertainty blocks or AI-generation commentary appear in the business document body.",
+    "All eleven numbered source rule topics are represented, including exact horizon/loss boundaries, retired experience value, version cutoff, consent exclusion, idempotency, original expiry after failed reassessment and planned rather than implemented reconciliation.",
+    "The observed values in the two screen illustrations agree with the inspected pixels. They are described as illustrative synthetic examples.",
+    "Footnotes are compact and repeated citations are deduplicated; they point to specific excerpts rather than the whole source window. Full provenance remains in verification records."
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "kind": "invented_trigger_and_scope",
+      "paragraph_ids": ["paragraph-ba55c805e86663cd", "paragraph-dc49b673c049e595"],
+      "sections": ["4. End-to-End Process Overview", "5.4 Detailed Assessment Processing, Recovery & Lifecycle Rules"],
+      "candidate_claims": [
+        "If an evaluation response is incomplete, the system retries once and keeps the draft recoverable.",
+        "network interruptions or evaluation faults allow the platform to retry once"
+      ],
+      "source": "Retry once.",
+      "assessment": "The source never specifies the retry trigger, network failures, evaluation faults or incomplete-response retries. The candidate invents concrete operational conditions. This defect also occurred in the baseline and has not been resolved by the new audit."
+    },
+    {
+      "severity": "high",
+      "kind": "generalized_recovery_condition",
+      "paragraph_ids": ["paragraph-ba55c805e86663cd", "paragraph-7d73303b35f9addd", "paragraph-0f08be55713784b7"],
+      "source": "An incomplete RiskSignal response cannot become an accepted profile. | A missing reason code keeps the draft recoverable.",
+      "assessment": "The source gives two separate implications. Several candidate passages state that every incomplete response leaves the draft recoverable, treating a missing reason code merely as an example. That broader recovery guarantee is not established. Correcting or resending answers is also added without source support."
+    },
+    {
+      "severity": "medium",
+      "kind": "unsupported_timing_and_execution_guarantees",
+      "paragraph_ids": ["paragraph-b52b35b2019aaaae", "paragraph-ba55c805e86663cd", "paragraph-7d73303b35f9addd"],
+      "source": "A complete Q3 submission uses one stable idempotency key. | A duplicate with the same answers returns the stored result.",
+      "assessment": "Immediately returning the result adds a timing guarantee. Without re-scoring and rather than recalculating risk add internal execution guarantees. Returning a stored result does not establish these stronger claims."
+    },
+    {
+      "severity": "medium",
+      "kind": "claim_citation_mismatch",
+      "paragraph_ids": ["paragraph-599e7166568d40ee", "paragraph-ba55c805e86663cd", "paragraph-b47f5d4ecf6840e3", "paragraph-8c2976cf88948c89"],
+      "assessment": "The executive paragraph cites only the instruction to review profiles while also asserting automated calibrated evaluation and system-enforced review. The long process paragraph's citations omit the source passages for its idempotency, retry and recovery claims. The image table captions introduce D-104 and P-204 while citing generic authored image captions without those identifiers. A valid exact quote is not sufficient paragraph-level support."
+    },
+    {
+      "severity": "medium",
+      "kind": "broken_inline_image_references",
+      "paragraph_ids": ["paragraph-b47f5d4ecf6840e3", "paragraph-8c2976cf88948c89"],
+      "missing_paths": ["assets/questionnaire.jpg", "assets/assessment-result.jpg"],
+      "assessment": "The model inserted image Markdown despite the structured image contract. These relative paths do not exist under the exported output directory; hashed image paths rendered separately do exist. The document therefore contains two broken inline illustrations and repeated valid illustrations. This needs a general pipeline contract check or safe source-asset resolution, not editing this historical output."
+    },
+    {
+      "severity": "low",
+      "kind": "readability_and_template_overreach",
+      "sections": ["5.1 Client Implementation Prerequisites & Deliverables", "4. End-to-End Process Overview"],
+      "assessment": "The prerequisites section repeats Q3 twice consecutively and contains business validation rules rather than evidenced implementation prerequisites. Rules recur across multiple sections. The long numbered process paragraph and HTML-wrapped diagram make citations harder to associate with individual claims. Compact citations improve readability, but prose remains more repetitive and assertive than needed."
+    }
+  ],
+  "omissions": {
+    "material_numbered_rule_topic_missing": false,
+    "qualification": "Presence of all eleven topics is not proof that every clause has been preserved accurately. The candidate changes some logical scope and adds unsupported statements. No information-retention percentage is claimed."
+  },
+  "overall": "Pipeline mechanics and source navigation in the exported document improved; the earlier wholesale deletion and diagnostic leakage are absent here. Semantic fidelity is still insufficient for an unreviewed business deliverable because the final accepted audit misses invented operational conditions and stronger guarantees. The small synthetic fixture cannot establish performance on larger or unrelated documents."
+}

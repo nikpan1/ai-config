@@ -33,6 +33,7 @@ class Settings:
     run_timeout_seconds: int = 1200
     minimum_coverage: float = 0.9
     source_first: bool = True
+    graph_assisted_retrieval: bool = False
     finalization_reserve_seconds: int = 180
 
     @classmethod
@@ -79,6 +80,9 @@ class Settings:
         source_first = str(values.get("DOCGEN_SOURCE_FIRST") or "true").lower()
         if source_first not in {"true", "false", "1", "0"}:
             raise ValueError("DOCGEN_SOURCE_FIRST must be true or false")
+        graph_assisted = str(values.get("DOCGEN_GRAPH_ASSISTED_RETRIEVAL") or "false").lower()
+        if graph_assisted not in {"true", "false", "1", "0"}:
+            raise ValueError("DOCGEN_GRAPH_ASSISTED_RETRIEVAL must be true or false")
         finalization_reserve = int(values.get("DOCGEN_FINALIZATION_RESERVE_SECONDS") or 180)
         if finalization_reserve < 1:
             raise ValueError("DOCGEN_FINALIZATION_RESERVE_SECONDS must be positive")
@@ -116,5 +120,6 @@ class Settings:
             run_timeout_seconds=run_timeout,
             minimum_coverage=minimum_coverage,
             source_first=source_first in {"true", "1"},
+            graph_assisted_retrieval=graph_assisted in {"true", "1"},
             finalization_reserve_seconds=finalization_reserve,
         )

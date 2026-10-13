@@ -1,0 +1,126 @@
+{
+  "run_id": "business-library-20261013",
+  "review_type": "independent source-to-output semantic review after completion",
+  "reviewer": "source_navigation subagent",
+  "scope": "Three engineered equipment-library acceptance documents. These are neither blind production data nor a statistically representative corpus.",
+  "inputs": [
+    "evaluation/fixtures/business-output/borrowing.md",
+    "evaluation/fixtures/business-output/identity.md",
+    "evaluation/fixtures/business-output/returns.md"
+  ],
+  "output_root": ".docgen/business-library-20261013/runs/business-library-20261013/output",
+  "assessment": "The output preserves the declared substantive cases and all planned sections, with clean business prose and working exact-source links. It is not semantically error-free: unsupported strengthening, misplaced conditions and irrelevant citation support survived an accepted model audit. No percentage of overall information accuracy is inferred.",
+  "declared_criteria": [
+    {"check": 1, "result": "pass", "location": "3.1 and 5.3", "reason": "Both normal prerequisites retained; staff exception separately stated."},
+    {"check": 2, "result": "pass", "location": "3.1 and 5.3", "reason": "Membership remains mandatory and the recorded charge survives the waiver."},
+    {"check": 3, "result": "pass", "location": "3.2 and 5.4", "reason": "Successful identity check is necessary and failed checks do not establish fraud."},
+    {"check": 4, "result": "qualified", "location": "3.1 and 5.3", "reason": "48-hour expiry and unspecified history retention retained, but 5.3 additionally invents an availability guarantee; see finding F1."},
+    {"check": 5, "result": "pass", "location": "3.1", "reason": "Other items stay reserved; user chooses wait/removal; no automatic substitution."},
+    {"check": 6, "result": "pass", "location": "1", "reason": "Evening service remains an unapproved proposal and unavailable."},
+    {"check": 7, "result": "pass", "location": "3.3", "reason": "Original due date remains until approval."},
+    {"check": 8, "result": "pass", "location": "3.2 and 5.4", "reason": "Mismatch review is neither automatic approval nor permanent rejection."},
+    {"check": 9, "result": "pass", "location": "3.2 and 4.2", "reason": "Recorded authorization and delegate's own unexpired document are both required."},
+    {"check": 10, "result": "pass", "location": "3.2 and 5.4", "reason": "Outcome/reviewer reference retained; no identity-document image storage."},
+    {"check": 11, "result": "qualified", "location": "4.2 and 5.4", "reason": "Timeout-only single retry and unchanged deadline retained; 5.4 adds an unspecified staff actor, and 'exactly one' can read as obligatory rather than an allowed retry."},
+    {"check": 12, "result": "pass", "location": "5.4", "reason": "Incomplete result cannot authorize; complete result alone is insufficient."},
+    {"check": 13, "result": "qualified", "location": "3.3, 4.1 and 5.5", "reason": "One seven-day extension and approval condition retained in detailed sections, but overview moves the conflict check to request eligibility; see F3."},
+    {"check": 14, "result": "pass", "location": "5.5", "reason": "Rejected extension leaves original due date unchanged."},
+    {"check": 15, "result": "pass", "location": "3.3, 4.2 and 5.5", "reason": "Missing accessories and damage have independent outcomes, including complete but damaged items."},
+    {"check": 16, "result": "pass", "location": "3.3 and 5.5", "reason": "Two return locations apply to tools; no audio-equipment inference."},
+    {"check": 17, "result": "pass", "location": "5.5", "reason": "30 and 45 days after notice coexist with no invented winner."}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "material_semantic_strengthening",
+      "paragraph_id": "paragraph-e49e15c9c8a45a2d",
+      "section": "5.3",
+      "output_quote": "Item reservations guarantee availability for 48 hours following confirmation",
+      "source_quote": "Reservations hold an available item for 48 hours after the confirmation time.",
+      "source": "borrowing.md:9",
+      "citation_path": "evidence/quote-0d9ab4bf6c1e408bf970d683d0c7a2fa23a52ef812879c21d6b8024290bc5699.md",
+      "reason": "A hold on an available item does not establish a guarantee. The same source separately allows an unavailable item in a reservation.",
+      "audit_detected": false
+    },
+    {
+      "id": "F2",
+      "severity": "unsupported_configuration_claim",
+      "paragraph_id": "paragraph-89887c834141e232",
+      "section": "5.1",
+      "output_quote": "fixed policies rather than client-configurable settings",
+      "source_quotes": ["Reservations hold an available item for 48 hours after the confirmation time.", "A resident can request one extension of seven days."],
+      "sources": ["borrowing.md:9", "returns.md:5"],
+      "citation_paths": ["evidence/quote-8fad0c4aafd82ff9b6336061eeb9e132e063bc9db9bd90b27f014f67d3a373a3.md", "evidence/quote-71e2632d877b6f03720bfd445f448f41fef7207189cf4d51efe02bb04d50b8e1.md"],
+      "reason": "Specified business values do not establish whether an implementation exposes client configuration. The paragraph correctly admits missing configuration information immediately afterward, contradicting its initial certainty.",
+      "audit_detected": false
+    },
+    {
+      "id": "F3",
+      "severity": "condition_attached_to_wrong_action",
+      "paragraph_id": "paragraph-c6169f1af798ba1a",
+      "section": "4.1",
+      "output_quote": "may request a 7-day extension if no conflicting holds exist",
+      "source_quote": "A resident can request one extension of seven days. Approval requires that no subsequent reservation conflicts with the extended period.",
+      "source": "returns.md:5",
+      "citation_path": "evidence/quote-73b19398ce09becfd2b0aa2db91508547dac427d9ef9de9fd8b6d0c916f08df7.md",
+      "reason": "The source constrains approval, not the right to submit a request. The detailed sections correctly attach the condition to approval, leaving an internal inconsistency.",
+      "audit_detected": false
+    },
+    {
+      "id": "F4",
+      "severity": "irrelevant_citation_support",
+      "paragraph_id": "paragraph-9ba6d6dab2830070",
+      "section": "5.2",
+      "output_quote": "No user interface mockups, screen layouts, or visual assets are provided in the source documentation.",
+      "source_quote": "# Community equipment library\n\nThis is synthetic acceptance-test documentation for a fictional equipment library.",
+      "source": "borrowing.md:1-3",
+      "citation_path": "evidence/quote-68948f8b033428efdf816782611494de6608ce45336b4e182c398e5e42707b95.md",
+      "reason": "The absence statement agrees with the supplied files, but the cited title and test notice do not establish it. A corpus/inventory absence observation needs explicit provenance, not an unrelated quote.",
+      "audit_detected": false
+    },
+    {
+      "id": "F5",
+      "severity": "incomplete_claim_citation_mapping",
+      "paragraph_id": "paragraph-59a114c04450bceb",
+      "section": "1",
+      "output_quote": "identity verification upon collection, seven-day loan extension reviews, and multi-point return inspections",
+      "citation_paths": ["evidence/quote-5d47038ec4f178dd413fa3cf398dda112240b2efb8e366a58a8d6074f885c6b9.md", "evidence/quote-fb301dbc4d193c861fce461ffb0a72bf39c5de63d23b59de69f494e4fc6375d3.md"],
+      "reason": "Most summary concepts are described elsewhere in the originals, but this paragraph cites only local projects and the evening-service proposal. A citation on a paragraph currently does not establish support for every factual clause.",
+      "audit_detected": false
+    }
+  ],
+  "mechanical_verification": {
+    "planned_sections": 12,
+    "exported_sections": 12,
+    "generated_paragraphs": 13,
+    "exported_paragraphs": 13,
+    "missing_planned_section_ids": [],
+    "missing_generated_paragraph_ids": [],
+    "withheld_paragraphs": [],
+    "citation_uses": 38,
+    "unique_quote_files": 31,
+    "all_quotes_independently_found_in_frozen_graph_evidence": true,
+    "all_citation_targets_exist": true,
+    "exported_originals_equal_input_bytes": true,
+    "raw_auditor_explanations_in_business_prose": false,
+    "ai_production_disclaimers_in_business_prose": false,
+    "phantom_internal_paragraph_numbers_in_business_prose": false,
+    "audit_targets": "No findings or repairs in this run, so valid repair targeting is not exercised here."
+  },
+  "readability": {
+    "assessment": "Clear headings, concise paragraphs, useful lists, footnotes and no audit mechanics. Readability is improved over operational-diagnostic prose.",
+    "limitations": ["Repeated overviews and detailed rules make a very small corpus unnecessarily long.", "The input template creates an empty UI directory topic and an unsupported configuration assertion; its absence of domain evidence should not pressure generation to invent content."]
+  },
+  "audit_assessment": {
+    "pipeline_accepted": true,
+    "pipeline_coverage_estimate": 0.98,
+    "independent_conclusion": "The audit missed material semantic errors. Its estimate must not be reported as independently measured accuracy or information preservation."
+  },
+  "smallest_generic_pipeline_improvements": [
+    "Writer and auditor should check that every factual clause has an attached quote that supports that clause, not merely an existing citation on the paragraph.",
+    "Preserve which action a condition constrains, the direction of implication, modality, actor and scope. Do not strengthen permissions into obligations, holds into guarantees, or silence about configurability into a negative configuration claim.",
+    "Treat corpus-level absence observations as inventory-derived metadata with explicit provenance. Never attach a title or unrelated excerpt as purported proof of absence.",
+    "For template sections without source support, express the unsupported scope minimally and accurately, or identify the empty plan section before writing; do not infer domain behavior to fill the template.",
+    "Keep these checks inside the existing writer and audit requests rather than adding another unbounded audit loop."
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "run_id": "business-final-library-20261013",
+  "reviewer": "source_navigation subagent",
+  "review_type": "independent comparison of original sources, initial generated draft and final documentation after completion",
+  "scope": "Three engineered equipment-library acceptance documents. This is not blind production evaluation. Prompt changes followed the initial evaluation, so the final run is an iteration on known cases.",
+  "output_root": ".docgen/business-final-library-20261013/runs/business-final-library-20261013/output",
+  "assessment": "All declared topics remain represented, all generated paragraphs and planned sections survive, and source links work. Several initial problems are absent and empty template sections no longer induce unsupported content. However, a material necessary-to-sufficient inference persists in a new location and was missed by the accepted model audit. The result is not suitable for claiming fully correct or 100-percent grounded content.",
+  "initial_finding_comparison": [
+    {"initial_id": "F1", "result": "not_observed_in_final", "reason": "Availability guarantee removed; final prose describes a hold on available inventory."},
+    {"initial_id": "F2", "result": "not_observed_in_final", "reason": "Unsupported fixed-versus-configurable claim removed; unsupported configuration template section is not planned."},
+    {"initial_id": "F3", "result": "partly_improved", "reason": "Request eligibility is no longer explicitly constrained by conflict absence. Detailed rules preserve approval requirements, but an overview still uses potentially sufficient-sounding extension wording; see R2."},
+    {"initial_id": "F4", "result": "not_observed_in_final", "reason": "Empty UI directory and its irrelevant absence citation are not generated."},
+    {"initial_id": "F5", "result": "improved", "reason": "Summary and functional-overview paragraphs now cite more appropriate source passages for their included subject areas. This is a reviewed improvement, not a guarantee that every clause is entailed."}
+  ],
+  "declared_criteria": [
+    {"check": 1, "result": "pass", "location": "1 and 5.3", "reason": "Both normal borrowing prerequisites retained."},
+    {"check": 2, "result": "pass", "location": "1 and 5.3", "reason": "Staff waiver leaves active membership mandatory and debt recorded."},
+    {"check": 3, "result": "qualified", "location": "3, 4 and 5.4", "reason": "Identity requirement and no-fraud implication are preserved, but process overview incorrectly treats successful verification as authorization; R1."},
+    {"check": 4, "result": "pass", "location": "2, 4 and 5.3", "reason": "48-hour deadline, expiry and unspecified history-retention duration preserved without an availability guarantee."},
+    {"check": 5, "result": "pass", "location": "3 and 5.3", "reason": "Remaining items stay reserved; resident chooses removal or waiting; automatic substitution prohibited."},
+    {"check": 6, "result": "pass", "location": "1", "reason": "Evening collection remains planned, unapproved and unavailable."},
+    {"check": 7, "result": "pass", "location": "4 and 5.5", "reason": "Request does not change due date before approval."},
+    {"check": 8, "result": "pass", "location": "5.4", "reason": "Name mismatch requires review; review is not automatic approval or permanent rejection."},
+    {"check": 9, "result": "pass", "location": "2 and 5.4", "reason": "Recorded authorization and delegate's own unexpired document both retained."},
+    {"check": 10, "result": "pass", "location": "2 and 5.4", "reason": "Only outcome/reviewer reference stored; no document images."},
+    {"check": 11, "result": "pass", "location": "5.4", "reason": "Timeout-specific single permitted retry, unchanged hold deadline and undefined other retry behavior preserved."},
+    {"check": 12, "result": "qualified", "location": "4 and 5.4", "reason": "Detailed section preserves incomplete-result prohibition and insufficient complete result, but overview authorizes handover on successful verification; R1."},
+    {"check": 13, "result": "qualified", "location": "3 and 5.5", "reason": "One seven-day extension and approval conflict requirement preserved in detail; overview wording risks sufficiency inference; R2."},
+    {"check": 14, "result": "pass", "location": "5.5", "reason": "Rejected extension leaves original due date unchanged."},
+    {"check": 15, "result": "pass", "location": "3, 4 and 5.5", "reason": "Accessory completeness and damage remain independent outcomes."},
+    {"check": 16, "result": "pass", "location": "5.5", "reason": "Dual-desk pilot limited to tools; audio-equipment locations not inferred."},
+    {"check": 17, "result": "pass", "location": "5.5", "reason": "Both 30 and 45 days after notice remain visible without precedence."}
+  ],
+  "remaining_findings": [
+    {
+      "id": "R1",
+      "severity": "material_necessary_to_sufficient_inference",
+      "paragraph_id": "p-402",
+      "section": "4. End-to-End Process Overview",
+      "output_quote": "a successful identity verification authorizes item handover",
+      "source_quote": "A successful check is required before releasing a reserved item.",
+      "source": "borrowing.md:7",
+      "citation_path": "evidence/quote-cd912fad8474aa4842e034c86253503857834c68c3bc9069812431e1c4224a8c.md",
+      "additional_source": "identity.md:13",
+      "additional_source_quote": "A complete result alone does not establish that every collection requirement has been met.",
+      "reason": "Being required before release does not imply that passing the check authorizes release. Detailed section 5.4 correctly preserves the remaining-requirements limitation, creating an internal inconsistency.",
+      "audit_detected": false
+    },
+    {
+      "id": "R2",
+      "severity": "ambiguous_sufficiency_in_overview",
+      "paragraph_id": "p-302",
+      "section": "3. Core Functionalities & Feature Breakdown",
+      "output_quote": "Loan management allows a single seven-day extension provided no downstream reservation conflicts exist",
+      "source_quote": "A resident can request one extension of seven days. Approval requires that no subsequent reservation conflicts with the extended period.",
+      "source": "returns.md:5",
+      "citation_path": "evidence/quote-73b19398ce09becfd2b0aa2db91508547dac427d9ef9de9fd8b6d0c916f08df7.md",
+      "reason": "This summary can be read as granting an extension whenever no conflict exists, while the original only states a necessary approval condition. Detailed section 5.5 retains approval; the summary should preserve that distinction. This finding has lower certainty than R1 because 'provided' can introduce a necessary condition in context.",
+      "audit_detected": false
+    },
+    {
+      "id": "R3",
+      "severity": "minor_actor_ambiguity",
+      "paragraph_id": "p-602",
+      "section": "5.4 Identity Verification and Delegation Rules",
+      "output_quote": "When identity verification is performed by a delegated collector",
+      "source_quote": "A delegated collector needs a recorded authorization from the reservation holder. The delegated collector must also present their own unexpired identity document.",
+      "source": "identity.md:7",
+      "citation_path": "evidence/quote-2514d5fcee82a15bc459c5a7fb020132af548b04de9a0976bb1521c453c9f7cb.md",
+      "reason": "The delegate undergoes the check and presents credentials; the source does not assign the delegate the responsibility for performing verification. The rest of the paragraph describes the requirements correctly.",
+      "audit_detected": false
+    }
+  ],
+  "mechanical_verification": {
+    "planned_sections": 7,
+    "initial_generated_sections": 7,
+    "exported_sections": 7,
+    "initial_generated_paragraphs": 15,
+    "exported_paragraphs": 15,
+    "missing_planned_section_ids": [],
+    "missing_initial_paragraph_ids": [],
+    "withheld_paragraphs": [],
+    "citation_uses": 39,
+    "unique_quote_files": 30,
+    "all_quotes_independently_found_in_frozen_graph_evidence": true,
+    "all_actual_citation_targets_exist": true,
+    "exported_originals_equal_input_bytes": true,
+    "raw_auditor_explanations_in_business_prose": false,
+    "ai_production_disclaimers_in_business_prose": false,
+    "phantom_internal_paragraph_numbers_in_business_prose": false,
+    "targeted_repairs": 0,
+    "repair_targeting_exercised": false,
+    "plan_source_binding_findings": [],
+    "plan_fallback_bindings": []
+  },
+  "readability": {
+    "assessment": "Business-facing prose is readable, includes meaningful footnotes and explicit unresolved domain conflict, and no longer includes artificial UI/configuration filler or operational audit commentary.",
+    "remaining_limitations": ["Rules are repeated across overviews and detailed sections, introducing opportunities for semantic drift.", "Section numbering jumps from 4 to 5.3 because unsupported template subsections are omitted. This is a presentation issue, not lost planned content."]
+  },
+  "audit_assessment": {
+    "accepted": true,
+    "model_coverage_estimate": 1.0,
+    "independent_conclusion": "The estimate is not measured accuracy. A clear semantic overclaim survived both generation and audit, so the final content still requires review for high-confidence business use."
+  },
+  "evaluation_limits": [
+    "No real large corpus was evaluated here.",
+    "All 17 predeclared aspects are represented, but representation is not proof that every repeated statement preserves meaning.",
+    "One final generation cannot distinguish stable improvement from sampling variation.",
+    "This review did not modify pipeline code, prompts or any run artifact."
+  ]
+}

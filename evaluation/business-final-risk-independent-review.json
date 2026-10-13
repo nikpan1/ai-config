@@ -1,0 +1,78 @@
+{
+  "review_kind": "independent_read_only_source_comparison",
+  "review_date": "2026-10-13",
+  "candidate": ".docgen/business-final-risk-20261013/runs/business-final-risk-20261013/output/documentation.md",
+  "prior_review": "evaluation/business-risk-independent-review.json",
+  "mechanical_checks": "evaluation/business-final-risk-mechanical-checks.json",
+  "sources_inspected": [
+    "data/test_data_2_quick/risk-profiling.md",
+    "data/test_data_2_quick/assets/questionnaire.jpg",
+    "data/test_data_2_quick/assets/assessment-result.jpg"
+  ],
+  "method": "Read the final business document and report against the original Markdown and previously inspected image pixels. Compare stable IDs from the initial draft stage against exported verification records, planned section IDs against nonempty final sections, citation records and actual exported image/excerpt paths. No runtime or output modifications.",
+  "mechanical_summary": {
+    "planned_sections": 8,
+    "final_nonempty_planned_sections": 8,
+    "initial_paragraph_ids": 16,
+    "final_paragraph_ids": 16,
+    "missing_initial_paragraph_ids": [],
+    "citation_occurrences": 63,
+    "exact_quote_match_failures": 0,
+    "unique_excerpt_links": 24,
+    "missing_excerpt_targets": 0,
+    "rendered_image_references": 3,
+    "unique_image_assets": 2,
+    "missing_image_targets": 0,
+    "qualification": "ID retention demonstrates that paragraphs were not silently dropped. It does not prove that every supported clause survived a repair. Exact quote matches and existing links do not prove semantic entailment."
+  },
+  "improvements_confirmed": [
+    "All eleven numbered source rule topics are represented; QF06 provider exclusivity and explicit unrelated-provider exclusions remain in business text.",
+    "All eight planned sections and sixteen initial paragraph identities survive the pipeline, including six paragraphs repaired automatically.",
+    "The repaired process overview separates rejection of incomplete provider responses from draft recoverability when a reason code is missing. Invented network-failure retry triggers are absent.",
+    "The repaired implementation section no longer invents configuration duties, missing-configuration consequences or Q3 exclusivity; it presents sourced business rules.",
+    "Business text contains no withheld-paragraph identifiers, model-audit explanations or standalone AI-generation/uncertainty appendices.",
+    "Both inline source-image paths resolve to existing exported hashed assets; the same illustration is not appended twice in its section.",
+    "Compact excerpt citations and detailed verification records are both present."
+  ],
+  "residual_findings": [
+    {
+      "severity": "medium",
+      "kind": "unsupported_internal_execution_guarantee",
+      "paragraph_ids": ["paragraph-673643377d825437", "paragraph-11b5c2e7360d5d9f"],
+      "claims": ["to prevent duplicate evaluations", "without re-evaluating"],
+      "source": "A complete Q3 submission uses one stable idempotency key. | A duplicate with the same answers returns the stored result.",
+      "assessment": "The source defines the returned result, not every internal computation or provider-call behavior. The stronger no-re-evaluation guarantee remains despite the accepted final audit."
+    },
+    {
+      "severity": "medium",
+      "kind": "invented_success_and_scope_guarantees",
+      "paragraph_ids": ["paragraph-d3b2ee7bf4beb3fa"],
+      "claim": "The primary operational objective is to ensure that complete and valid questionnaire submissions receive a reliable risk profile assessment ... The bounded scope is strictly limited to questionnaire capture, validation, and scoring integration",
+      "assessment": "The cited passages cover expiry, provider exclusivity and the absence of calls for incomplete drafts. They do not guarantee reliable successful assessment for every complete valid submission. Strictly limiting scope to those activities is also unsupported when the source explicitly discusses recovery, expiry, reassessment and audit handling."
+    },
+    {
+      "severity": "medium",
+      "kind": "image_claim_excerpt_is_insufficient",
+      "paragraph_ids": ["paragraph-02821a129196c049"],
+      "assessment": "The questionnaire values Beginner, 3-7 years, 5% and Flexible match the inspected image and full image description. However, the selected image citation excerpt only lists the field names, not these values. The generated prose is visually supported but its precise cited excerpt is insufficient; readers must open the broader context or actual image."
+    },
+    {
+      "severity": "low",
+      "kind": "residual_ambiguous_recovery_link",
+      "paragraph_ids": ["paragraph-11b5c2e7360d5d9f"],
+      "claim": "a missing reason code keeps the draft recoverable for retry",
+      "assessment": "The source states recoverability and separately says Retry once without specifying a trigger. The wording still associates the recovery case with retry. Later repaired sections preserve the original separate statements more faithfully."
+    },
+    {
+      "severity": "low",
+      "kind": "business_readability",
+      "assessment": "Validation and lifecycle rules repeat across the executive summary, feature breakdown, process narrative and detailed sections. The prerequisites heading still overstates the business-rule content beneath it. The HTML-wrapped process diagram and long multi-claim list paragraphs make individual citation support less obvious. These are presentation and editorial limitations, not missing whole paragraphs."
+    }
+  ],
+  "audit_reliability": {
+    "accepted": true,
+    "model_coverage_estimate": 0.98,
+    "independent_assessment": "The final audit repaired several substantive errors but still accepted unsupported claims. The 0.98 value is the model's coverage judgment, not a measured accuracy percentage."
+  },
+  "overall": "The final run demonstrates the intended pipeline fixes for silent paragraph loss, diagnostic leakage and broken image paths. Source-backed business content is more complete and some logical overreach was repaired. Remaining unsupported guarantees and incomplete claim-level citation support prevent claiming fully verified business documentation. Results from this small synthetic corpus do not establish general accuracy on diverse real documents."
+}

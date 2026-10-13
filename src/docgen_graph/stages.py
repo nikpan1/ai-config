@@ -46,6 +46,7 @@ STEPS = (
     "write_source_document",
     "audit_source_document",
     "finalize_source_document",
+    "repair_source_document",
 )
 STEP_NUMBERS = {
     "snapshot_inputs": 1,
@@ -90,6 +91,7 @@ STEP_NUMBERS = {
     "write_source_document": 46,
     "audit_source_document": 47,
     "finalize_source_document": 48,
+    "repair_source_document": 49,
 }
 REPEATED = {
     "propose_semantic_graph": "semantic_index",

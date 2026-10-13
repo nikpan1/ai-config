@@ -1,0 +1,27 @@
+{
+  "planned_sections": 8,
+  "final_nonempty_sections": 8,
+  "missing_planned_section_ids": [],
+  "initial_paragraphs": 16,
+  "final_paragraphs": 16,
+  "missing_initial_paragraph_ids": [],
+  "citation_occurrences": 63,
+  "exact_quote_failures": 0,
+  "rendered_image_references": 3,
+  "unique_image_targets": 2,
+  "missing_image_targets": [],
+  "unique_excerpt_links": 24,
+  "missing_excerpt_targets": [],
+  "image_reference_resolutions": [
+    {
+      "reference": "assets/questionnaire.jpg",
+      "image_hash": "7ff702a0ae3648f2128692b828e4faf53e99aaa9047e7c6cad1eb35ea7dbf3ad",
+      "outcome": "resolved"
+    },
+    {
+      "reference": "assets/assessment-result.jpg",
+      "image_hash": "f3e53d07855ffbec9bc74d87dcd8a81a130d6bc8a5cb6c26479357d89c1f3795",
+      "outcome": "resolved"
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "evaluation_type": "controlled_deterministic_source_selection",
+  "limitations": [
+    "Synthetic fixtures and hand-constructed edges are not held-out real-world data.",
+    "Measures source retrieval only, not generated content quality or semantic entailment.",
+    "An anchored but semantically wrong edge can displace a relevant original source.",
+    "Small corpora use the same complete original context in both variants."
+  ],
+  "cases": [
+    {
+      "case": {
+        "name": "library_cross_document_exception",
+        "query": "Borrowing",
+        "texts": [
+          "Borrowing requires active membership.",
+          "Borrowing statistics are refreshed every evening.",
+          "Invited readers do not need membership."
+        ],
+        "required": [
+          "s0",
+          "s2"
+        ],
+        "target": 2
+      },
+      "source_only": {
+        "selected_evidence_ids": [
+          "s0",
+          "s1"
+        ],
+        "required_evidence_recall": 0.5,
+        "complete_required_context": false,
+        "characters": 400
+      },
+      "graph_assisted": {
+        "selected_evidence_ids": [
+          "s0",
+          "s2"
+        ],
+        "required_evidence_recall": 1.0,
+        "complete_required_context": true,
+        "characters": 400
+      }
+    },
+    {
+      "case": {
+        "name": "warehouse_independent_outcomes",
+        "query": "Shipment",
+        "texts": [
+          "Shipment is blocked when the address is incomplete.",
+          "Shipment notifications are translated into French.",
+          "Missing customs data retains draft status; it does not imply an address fault."
+        ],
+        "required": [
+          "s0",
+          "s2"
+        ],
+        "target": 2
+      },
+      "source_only": {
+        "selected_evidence_ids": [
+          "s0",
+          "s1"
+        ],
+        "required_evidence_recall": 0.5,
+        "complete_required_context": false,
+        "characters": 400
+      },
+      "graph_assisted": {
+        "selected_evidence_ids": [
+          "s0",
+          "s2"
+        ],
+        "required_evidence_recall": 1.0,
+        "complete_required_context": true,
+        "characters": 400
+      }
+    },
+    {
+      "case": {
+        "name": "conflicting_retention_versions",
+        "query": "Retention",
+        "texts": [
+          "Retention policy alpha says 30 days.",
+          "Retention dashboard refreshes hourly.",
+          "Policy beta says 45 days. Neither policy supersedes the other explicitly."
+        ],
+        "required": [
+          "s0",
+          "s2"
+        ],
+        "target": 2
+      },
+      "source_only": {
+        "selected_evidence_ids": [
+          "s0",
+          "s1"
+        ],
+        "required_evidence_recall": 0.5,
+        "complete_required_context": false,
+        "characters": 400
+      },
+      "graph_assisted": {
+        "selected_evidence_ids": [
+          "s0",
+          "s2"
+        ],
+        "required_evidence_recall": 1.0,
+        "complete_required_context": true,
+        "characters": 400
+      }
+    },
+    {
+      "case": {
+        "name": "incorrect_but_quoted_edge_can_hurt",
+        "query": "Rental",
+        "texts": [
+          "Rental requires a deposit.",
+          "Rental deposit is waived for annual subscribers.",
+          "Office stationery requests are reviewed weekly."
+        ],
+        "required": [
+          "s0",
+          "s1"
+        ],
+        "target": 2
+      },
+      "source_only": {
+        "selected_evidence_ids": [
+          "s0",
+          "s1"
+        ],
+        "required_evidence_recall": 1.0,
+        "complete_required_context": true,
+        "characters": 400
+      },
+      "graph_assisted": {
+        "selected_evidence_ids": [
+          "s0",
+          "s2"
+        ],
+        "required_evidence_recall": 0.5,
+        "complete_required_context": false,
+        "characters": 400
+      }
+    },
+    {
+      "case": {
+        "name": "invalid_quote_falls_back",
+        "query": "Warranty",
+        "texts": [
+          "Warranty lasts two years.",
+          "Warranty does not cover water damage.",
+          "Contact details are listed in the appendix."
+        ],
+        "required": [
+          "s0",
+          "s1"
+        ],
+        "target": 2,
+        "invalid_quote": true
+      },
+      "source_only": {
+        "selected_evidence_ids": [
+          "s0",
+          "s1"
+        ],
+        "required_evidence_recall": 1.0,
+        "complete_required_context": true,
+        "characters": 400
+      },
+      "graph_assisted": {
+        "selected_evidence_ids": [
+          "s0",
+          "s1"
+        ],
+        "required_evidence_recall": 1.0,
+        "complete_required_context": true,
+        "characters": 400
+      }
+    },
+    {
+      "case": {
+        "name": "small_corpus_unchanged",
+        "query": "Access",
+        "texts": [
+          "Access requires approval.",
+          "Guests follow a separate approval procedure.",
+          "Emergency responders are exempt."
+        ],
+        "required": [
+          "s0",
+          "s1",
+          "s2"
+        ],
+        "target": 2,
+        "budget": 600
+      },
+      "source_only": {
+        "selected_evidence_ids": [
+          "s0",
+          "s1",
+          "s2"
+        ],
+        "required_evidence_recall": 1.0,
+        "complete_required_context": true,
+        "characters": 600
+      },
+      "graph_assisted": {
+        "selected_evidence_ids": [
+          "s0",
+          "s1",
+          "s2"
+        ],
+        "required_evidence_recall": 1.0,
+        "complete_required_context": true,
+        "characters": 600
+      }
+    }
+  ]
+}

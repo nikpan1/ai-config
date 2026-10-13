@@ -70,6 +70,8 @@ class SourceModel:
                 "coverage_estimate": 1,
                 "coverage_explanation": "Controlled fixture only",
             }
+        if stage == "source_document_repair":
+            return {"repairs": []}
         raise AssertionError(stage)
 
 
@@ -142,7 +144,7 @@ def test_deadline_reserve_bypasses_graph_and_still_writes(tmp_path):
     assert model.calls == ["source_document", "audit_source_document"]
 
 
-def test_unsupported_paragraph_is_quarantined_not_published(tmp_path):
+def test_unsupported_paragraph_preserves_source_in_original_section(tmp_path):
     findings = [
         {
             "section_index": 0,
@@ -155,11 +157,13 @@ def test_unsupported_paragraph_is_quarantined_not_published(tmp_path):
     store, result = execute(tmp_path, model, run_inputs(tmp_path))
     assert result["status"] == "degraded_source_bundle"
     document = store.get(result["candidate_ref"])
-    assert document["sections"][0]["title"] == "Preserved source extracts"
-    assert document["sections"][0]["paragraphs"][0]["uncertainty"]
+    assert document["sections"][0]["title"] == "Behavior"
+    assert "Temporary guests are exempt" in document["sections"][0]["paragraphs"][0]["text"]
+    assert model.calls.count("source_document_repair") == 1
+    assert model.calls.count("audit_source_document") == 2
     report = json.loads((store.root / "runs/source-run/output/report.json").read_text("utf-8"))
-    assert report["semantic_audit_matches_exported_content"] is False
-    assert report["exported_coverage_estimate"] is None
+    assert report["paragraph_repairs"][0]["outcome"] == "source_extract_fallback"
+    assert report["withheld_paragraphs"] == []
 
 
 def test_exact_quote_mismatch_is_not_accepted_as_source_support():
@@ -289,8 +293,8 @@ def test_partial_completion_retains_accepted_sections_when_later_draft_is_invali
     }
     result = pipeline.finalize_source_document(state)
     cleaned = store.get(result["candidate_ref"])
-    assert cleaned["sections"][0] == section
-    assert cleaned["sections"][1]["paragraphs"] == []
+    assert cleaned["sections"][0]["paragraphs"][0]["text"] == section["paragraphs"][0]["text"]
+    assert cleaned["sections"][1]["paragraphs"][0]["text"] == span["text"]
     assert result["status"] == "complete_with_limitations"
 
 
@@ -309,7 +313,7 @@ def test_final_audit_sees_only_candidate_with_valid_exact_citations(tmp_path):
             if stage == "audit_source_document":
                 self.audited_document = payload["document"]
                 assert not citation_findings(payload["document"], payload["sources"]["evidence"])
-                assert len(payload["document"]["sections"][0]["paragraphs"]) == 1
+                assert len(payload["document"]["sections"][0]["paragraphs"]) == 2
             return response
 
     model = InvalidCitationModel(tmp_path / ".env")
@@ -318,7 +322,8 @@ def test_final_audit_sees_only_candidate_with_valid_exact_citations(tmp_path):
     report = json.loads((store.root / "runs/source-run/output/report.json").read_text("utf-8"))
     assert report["semantic_audit_matches_exported_content"] is True
     assert report["exported_coverage_estimate"] == 1
-    assert report["withheld_paragraphs"] == ["Withheld paragraph 1.2"]
+    assert report["withheld_paragraphs"] == []
+    assert report["paragraph_repairs"][0]["outcome"] == "source_extract_fallback"
     assert store.get(result["candidate_ref"])["sections"] == model.audited_document["sections"]
 
 

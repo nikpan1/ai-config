@@ -278,6 +278,7 @@ function selectNode(id) {
       const value = row.semantic?.[key] ?? row.assertion?.[key] ?? row.evidence?.[key];
       if (value !== undefined) message(`${key}: ${compact(value)}`, summary);
     }
+    if (row.semantic) message("Interpretation status is assigned by the model. Exact quotation matching verifies source location, not the meaning of the interpretation.", summary);
     for (const p of row.provenance || [])
       message(
         `${p.provider} / ${p.model}  |  ${p.verifier || p.review_status || "review status not recorded"}`,
@@ -307,7 +308,7 @@ function selectNode(id) {
     for (const relation of g.tables.semantic_edges || []) {
       if (relation.source_id === edge.source_id && relation.target_id === edge.target_id && relation.type === edge.type) {
         if (relation.payload?.description) el("p", relation.payload.description, block);
-        if (relation.payload?.status) message(`Interpretation: ${relation.payload.status}`, block);
+        if (relation.payload?.status) message(`Model interpretation: ${relation.payload.status}. Source matching alone does not verify this relationship.`, block);
         raw(relation.payload, block, "Exact source quotes supporting this relation");
       }
     }
@@ -741,7 +742,7 @@ function drawGraph() {
       onEdge: (edge) => {
         details(`${edge.type}: ${nodeLabel(edge.source_id)} -> ${nodeLabel(edge.target_id)}`, edge);
         if (edge.description) el("p", edge.description, $("detail"));
-        if (edge.status) message(`Interpretation: ${edge.status}`, $("detail"));
+        if (edge.status) message(`Model interpretation: ${edge.status}. Source matching alone does not verify this relationship.`, $("detail"));
         sourceLink(edge.source_id, $("detail"), "Source: " + nodeLabel(edge.source_id));
         sourceLink(edge.target_id, $("detail"), "Target: " + nodeLabel(edge.target_id));
         const evidence = graph().enriched.evidence.find((item) => item.id === edge.evidence_id);

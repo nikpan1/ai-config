@@ -439,6 +439,7 @@ class KnowledgeGraph:
         queries: list[str] | None = None,
         mandatory_evidence_ids: list[str] | None = None,
         max_characters: int = 60000,
+        graph_assisted: bool = False,
     ) -> dict:
         if max_characters < 1:
             raise ValueError("Source context budget must be positive")
@@ -476,6 +477,8 @@ class KnowledgeGraph:
             ),
         )
         positions = {source["id"]: index for index, source in enumerate(sources)}
+        navigation = self.source_navigation(sources) if graph_assisted else {}
+        navigation_hints = []
         contextual_order = []
         queued = set()
         for source in ranked:
@@ -487,6 +490,13 @@ class KnowledgeGraph:
                 and sources[position]["path"] == source["path"]
                 and sources[position]["file_hash"] == source["file_hash"]
             ]
+            if source["id"] in required or any(
+                term in source["text"].casefold() for term in terms
+            ):
+                for hint in navigation.get(source["id"], [])[:2]:
+                    target = sources[positions[hint["evidence_id"]]]
+                    neighbors.append(target)
+                    navigation_hints.append({"seed_evidence_id": source["id"], **hint})
             for neighbor in neighbors:
                 if neighbor["id"] not in queued:
                     contextual_order.append(neighbor)
@@ -521,8 +531,56 @@ class KnowledgeGraph:
             "context_characters": used,
             "omitted_evidence_ids": [key for key in identifiers if key not in chosen],
             "excerpted_evidence_ids": excerpted,
-            "policy": "bounded-source-context",
+            "policy": (
+                "bounded-graph-assisted-context" if graph_assisted else "bounded-source-context"
+            ),
+            "missing_mandatory_evidence_ids": sorted(required - chosen),
+            "navigation_hints": [
+                {**hint, "authority": "navigation_only"}
+                for hint in navigation_hints
+                if hint["seed_evidence_id"] in chosen and hint["evidence_id"] in chosen
+            ],
         }
+
+    def source_navigation(self, sources: list[dict]) -> dict[str, list[dict]]:
+        from docgen_graph.semantic_graph import semantic_records
+
+        source_text = {source["id"]: source["text"] for source in sources}
+        nodes, edges = semantic_records(self)
+
+        def anchored_sources(record):
+            return list(
+                dict.fromkeys(
+                    quote["evidence_id"]
+                    for quote in record.get("quotes", [])
+                    if quote.get("evidence_id") in source_text
+                    and quote.get("text")
+                    and quote["text"] in source_text[quote["evidence_id"]]
+                )
+            )
+
+        anchors = {node["id"]: anchored_sources(node) for node in nodes}
+        navigation = {}
+        seen = set()
+        for edge in edges:
+            if edge.get("type") == "SUPPORTED_BY" or not anchored_sources(edge):
+                continue
+            first = anchors.get(edge.get("source_id"), [])
+            second = anchors.get(edge.get("target_id"), [])
+            for left, right in ((first, second), (second, first)):
+                for source_id in left:
+                    for target_id in right:
+                        if source_id == target_id or (source_id, target_id) in seen:
+                            continue
+                        seen.add((source_id, target_id))
+                        navigation.setdefault(source_id, []).append(
+                            {
+                                "evidence_id": target_id,
+                                "relationship_id": edge["id"],
+                                "status": edge.get("status", "uncertain"),
+                            }
+                        )
+        return navigation
 
     def retrieve(
         self,
