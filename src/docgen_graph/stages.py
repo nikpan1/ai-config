@@ -43,6 +43,7 @@ STEPS = (
     "classify_code_facts",
     "verify_code_classification",
     "publish_code_evidence",
+    "locate_visual_evidence",
 )
 STEP_NUMBERS = {name: index for index, name in enumerate(STEPS, 1)}
 REPEATED = {

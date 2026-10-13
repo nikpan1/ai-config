@@ -389,15 +389,18 @@ def test_unapproved_diagram_and_missing_alt_cannot_be_published():
     plan = {"title": "Approvals", "sections": [{"title": "Flow", "visuals": [image]}]}
     assert any(
         "source-provided" in finding
-        for finding in validate_quality_plan(plan, contract, [asset], {"e": {}})
+        for finding in validate_quality_plan(
+            plan, contract, [asset], {"e": {"text": "Source evidence"}}
+        )
     )
 
 
-def test_provider_schema_is_compact_but_local_contract_keeps_limits():
+def test_provider_schema_expands_references_and_preserves_array_limits():
     schema = response_schema(PagePlanDraft)
     serialized = json.dumps(schema)
     assert "$ref" not in serialized and "schema_version" not in serialized
-    assert "maxItems" not in serialized
+    assert schema["properties"]["sections"]["minItems"] == 1
+    assert schema["properties"]["diagrams"]["items"]["properties"]["nodes"]["maxItems"] == 16
     assert "maxItems" in json.dumps(PagePlanDraft.model_json_schema())
     assert schema["required"] == list(schema["properties"])
 
@@ -595,6 +598,7 @@ def test_later_writing_unit_continues_prior_content_and_normalizes_citations(tmp
     pipeline.call = write
     prior = "### Guided search\n\nShoppers retain the search filters. [Legacy D1]"
     state = {
+        "template_ref": store.put({"text": "## Capabilities"}),
         "section_index": 0,
         "unit_index": 1,
         "packet_ref": store.put(
@@ -617,7 +621,22 @@ def test_a_clean_model_audit_cannot_omit_diagram_element_support(tmp_path):
     store = ArtifactStore(tmp_path)
     pipeline = Pipeline(store, None, "diagram-audit")
     visual = {"id": "flow", "kind": "diagram", "diagram": diagram(), "evidence_ids": []}
-    evidence = [{"id": "e", "label": "D1"}]
+    evidence = [
+        {
+            "id": "e",
+            "label": "D1",
+            "kind": "docs",
+            "path": "rules.md",
+            "file_hash": "snapshot",
+            "start_line": 1,
+            "end_line": 1,
+            "text": "A reviewer approves before release.",
+            "heading": "Process",
+            "role": "legacy_document",
+        }
+    ]
+    pipeline.graph.add_evidence(evidence)
+    passage = "A reviewer approves before release. [Legacy D1]"
     section = {"title": "Process", "obligation_ids": [], "visuals": [visual]}
     pipeline._approved_plan = lambda state: {"sections": [section], "source_assets": []}
     pipeline._units = lambda section: [["support"]]
@@ -629,12 +648,27 @@ def test_a_clean_model_audit_cannot_omit_diagram_element_support(tmp_path):
     state = {
         "section_index": 0,
         "unit_index": 0,
+        "template_ref": store.put({"text": "## Process"}),
         "written_ref": store.put([]),
         "packet_ref": store.put(
-            {"assertions": [{"id": "support"}], "evidence": evidence, "visuals": [visual]}
+            {
+                "assertions": [{"id": "support", "evidence_ids": ["e"]}],
+                "evidence": evidence,
+                "visuals": [visual],
+            }
         ),
         "draft_ref": store.put(
-            {"markdown": render_visuals([visual], [], evidence), "mappings": []}
+            {
+                "markdown": passage + "\n\n" + render_visuals([visual], [], evidence),
+                "mappings": [
+                    {
+                        "obligation_id": "support",
+                        "passage": passage,
+                        "citation_ids": ["D1"],
+                        "support_quotes": {"D1": evidence[0]["text"]},
+                    }
+                ],
+            }
         ),
     }
     result = pipeline.verify_section(state)

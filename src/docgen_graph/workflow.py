@@ -13,11 +13,13 @@ from typing import TypedDict
 
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import interrupt
+from pydantic import ValidationError
 
 from docgen_graph.assets import asset_filename, validate_asset, verify_bundle
 from docgen_graph.authoring.template import (
     bind_plan_sections,
     document_title,
+    fold_plan_sections,
     number_generated_headings,
 )
 from docgen_graph.authoring.tools import AuthoringTools, declarations
@@ -28,6 +30,7 @@ from docgen_graph.contracts import (
     EditDraft,
     PagePlanDraft,
     SectionDraft,
+    VisualEvidenceDraft,
 )
 from docgen_graph.documentation_contracts import AspectInventory, SourceAudit
 from docgen_graph.evidence_contracts import (
@@ -41,6 +44,21 @@ from docgen_graph.evidence_contracts import (
 from docgen_graph.ingestion import inventory, snapshot_inputs
 from docgen_graph.knowledge import KnowledgeGraph, normalized_assertion
 from docgen_graph.model import implementation_signature
+from docgen_graph.presentation import (
+    business_prose_findings,
+    compact_citations,
+    exact_support,
+    group_repeated_list_citations,
+    mapping_occurrences,
+    merge_mapping_occurrences,
+    render_subprocess_catalog,
+    replace_subsection,
+    strip_authored_visuals,
+    support_findings,
+    uncited_business_passages,
+    unmapped_citation_findings,
+    visual_support_requirements,
+)
 from docgen_graph.quality import (
     compile_requirements,
     content_groups,
@@ -49,6 +67,7 @@ from docgen_graph.quality import (
     diagram_source,
     duplicate_risks,
     placement_records,
+    position_visuals,
     render_visuals,
     repetition_report,
     section_anchor,
@@ -78,6 +97,8 @@ from docgen_graph.storage import ArtifactStore, digest
 
 
 class PipelineState(TypedDict, total=False):
+    visual_attempt: int
+    visual_feedback_ref: str
     source_aspects_ref: str
     source_decisions_ref: str
     source_non_substantive_ref: str
@@ -237,15 +258,18 @@ def _bounded_evidence_packet(packet: dict, limit: int = 45000) -> dict:
 
 def _normalized_section_draft(draft: dict, packet: dict) -> dict:
     labels = {item["id"]: item["label"] for item in packet["evidence"]}
-    draft["markdown"] = normalize_citation_syntax(draft["markdown"])
+    draft["markdown"] = compact_citations(normalize_citation_syntax(draft["markdown"]))
     for mapping in draft["mappings"]:
-        mapping["passage"] = normalize_citation_syntax(mapping["passage"])
-        normalized = []
-        for key in mapping["citation_ids"]:
-            label = labels.get(key, key)
-            match = re.fullmatch(r"\[?(?:Legacy|Code)\s+([CD]\d+)\]?", label)
-            normalized.append(match.group(1) if match else label)
-        mapping["citation_ids"] = normalized
+        for occurrence in [mapping] + mapping.get("additional_passages", []):
+            occurrence["passage"] = compact_citations(
+                normalize_citation_syntax(occurrence["passage"])
+            )
+            normalized = []
+            for key in occurrence["citation_ids"]:
+                label = labels.get(key, key)
+                match = re.fullmatch(r"\[?(?:Legacy|Code)\s+([CD]\d+)\]?", label)
+                normalized.append(match.group(1) if match else label)
+            occurrence["citation_ids"] = normalized
     return draft
 
 
@@ -272,6 +296,8 @@ class Pipeline:
             key: getattr(settings, key, None)
             for key in (
                 "output_tokens",
+                "thinking_level",
+                "audit_thinking_level",
                 "request_tokens",
                 "timeout_seconds",
                 "authoring_turn_limit",
@@ -736,9 +762,23 @@ class Pipeline:
             "draft_plan",
             {
                 "brief": self.read(state, "snapshot_ref")["brief"],
+                "template_text": contract["text"],
                 "template_headings": contract["headings"],
                 "template_requirements": contract["requirements"],
                 "source_assets": self.read(state, "inventory_ref").get("assets", []),
+                "visual_source_excerpts": [
+                    span
+                    for span in self.spans(state).values()
+                    if span["id"]
+                    in {
+                        key
+                        for group in groups
+                        for fact in group["facts"]
+                        for key in fact["evidence_ids"]
+                    }
+                ]
+                if sum(len(span["text"]) for span in self.spans(state).values()) <= 45000
+                else [],
                 "groups": [
                     {key: group[key] for key in ("id", "topic", "facts")}
                     | {"obligation_count": len(group["obligation_ids"])}
@@ -764,10 +804,16 @@ class Pipeline:
             }
             draft["sections"] = bind_plan_sections(
                 contract["heading_tree"],
-                draft["sections"],
+                fold_plan_sections(contract["heading_tree"], draft["sections"]),
                 [item["text"] for item in contract["requirements"] if item["id"] in omitted],
             )
         except ValueError as error:
+            if state.get("attempt", 0) < self.repair_limit():
+                return {
+                    "attempt": state.get("attempt", 0) + 1,
+                    "plan_feedback": str(error),
+                    "route": "draft_page_plan",
+                }
             return self.issue(state, "draft_page_plan", [str(error)], "draft_page_plan")
         diagrams = {item["id"]: item for item in draft.get("diagrams", [])}
         sections = []
@@ -802,6 +848,19 @@ class Pipeline:
                     ],
                     "queries": [str(query) for query in raw.get("queries", [])],
                     "visuals": raw.get("visuals", []),
+                    "subsections": [
+                        {
+                            "title": child["title"],
+                            "purpose": child["purpose"],
+                            "obligation_ids": [
+                                identifier
+                                for key in child.get("group_ids", [])
+                                if key in group_map
+                                for identifier in group_map[key]["obligation_ids"]
+                            ],
+                        }
+                        for child in raw.get("subsections", [])
+                    ],
                 }
             )
         units = content_units(groups, sections)
@@ -819,6 +878,8 @@ class Pipeline:
                 and unit["canonical_section"] != section["title"]
             ]
             for visual in section["visuals"]:
+                if visual.get("section") != section["title"]:
+                    visual.setdefault("subsection", visual["section"])
                 visual["section_id"] = section["section_id"]
                 visual["section"] = section["title"]
                 visual["review_status"] = "planned"
@@ -854,6 +915,8 @@ class Pipeline:
             "plan_ref": self.store.put(plan),
             "plan_packet_index": 0,
             "plan_packets_ref": self.store.put([]),
+            "visual_attempt": 0,
+            "visual_feedback_ref": "",
             "route": "retrieve_plan_evidence",
         }
 
@@ -872,8 +935,65 @@ class Pipeline:
             "plan_packet_index": index,
             "route": "retrieve_plan_evidence"
             if index < len(plan["sections"])
-            else "validate_page_plan",
+            else "locate_visual_evidence",
         }
+
+    def locate_visual_evidence(self, state: PipelineState) -> dict:
+        plan = self.read(state, "plan_ref")
+        visuals = [visual for section in plan["sections"] for visual in section["visuals"]]
+        required = visual_support_requirements(visuals)
+        if not required:
+            return {"route": "validate_page_plan"}
+        spans = self.spans(state)
+        identifiers = {item["evidence_id"] for item in required}
+        if sum(len(spans[key]["text"]) for key in identifiers if key in spans) > 45000:
+            return self.issue(
+                state,
+                "locate_visual_evidence",
+                ["Visual evidence exceeds the bounded packet; split the planned visuals"],
+                "draft_page_plan",
+            )
+        draft = self.call(
+            "locate_visual_evidence",
+            {
+                "visuals": visuals,
+                "required_support": required,
+                "original_evidence": [spans[key] for key in sorted(identifiers) if key in spans],
+                "feedback": self.read(state, "visual_feedback_ref", []),
+            },
+            VisualEvidenceDraft,
+        )
+        actual = {item["support_id"]: item for item in draft["locations"]}
+        findings = []
+        if len(actual) != len(draft["locations"]) or set(actual) != {
+            item["support_id"] for item in required
+        }:
+            findings.append("Every visual element needs exactly one original support quote")
+        locations = []
+        for item in required:
+            key = item["evidence_id"]
+            if item["support_id"] not in actual or key not in spans:
+                continue
+            quote = actual[item["support_id"]]["quote"]
+            try:
+                support = exact_support({**spans[key], "label": key}, quote)
+                locations.append({**item, "quote": quote, "support_range": support})
+            except ValueError as error:
+                findings.append(str(error))
+        if findings:
+            if state.get("visual_attempt", 0) < self.repair_limit():
+                return {
+                    "visual_attempt": state.get("visual_attempt", 0) + 1,
+                    "visual_feedback_ref": self.store.put(findings),
+                    "route": "locate_visual_evidence",
+                }
+            return self.issue(state, "locate_visual_evidence", findings, "draft_page_plan")
+        for visual in visuals:
+            visual["support_quotes"] = {}
+            visual["support_locations"] = [
+                item for item in locations if item["visual_id"] == visual["id"]
+            ]
+        return {"plan_ref": self.store.put(plan), "route": "validate_page_plan"}
 
     def validate_page_plan(self, state: PipelineState) -> dict:
         plan = self.read(state, "plan_ref")
@@ -917,6 +1037,7 @@ class Pipeline:
             audit = self.call(
                 "verify_plan",
                 {
+                    "template_text": contract["text"],
                     "template_headings": contract["headings"],
                     "template_requirements": contract["requirements"],
                     "template_decisions": plan["template_decisions"],
@@ -944,6 +1065,15 @@ class Pipeline:
                         )
                         if key in self.spans(state)
                     ],
+                    "required_diagram_element_ids": sorted(
+                        diagram_element_ids(
+                            [
+                                visual
+                                for section in plan["sections"]
+                                for visual in section["visuals"]
+                            ]
+                        )
+                    ),
                     "groups": [
                         {
                             "id": group["id"],
@@ -958,6 +1088,7 @@ class Pipeline:
                             "purpose": section["purpose"],
                             "group_ids": section["group_ids"],
                             "support_group_ids": section["support_group_ids"],
+                            "subsections": section.get("subsections", []),
                         }
                         for section in plan["sections"]
                     ],
@@ -1065,6 +1196,7 @@ class Pipeline:
             f"runs/{self.run_id}/template-mapping.json",
             json.dumps(
                 {
+                    "template_text": contract["text"],
                     "template_headings": contract["headings"],
                     "plan_headings": [section["title"] for section in plan["sections"]],
                     "exclusions": plan["input_exclusions"] + plan["exclusions"],
@@ -1610,7 +1742,9 @@ class Pipeline:
             draft = self.call(
                 "write_section",
                 {
+                    "template_text": self.read(state, "template_ref")["text"],
                     "section": {"title": section["title"], "purpose": section["purpose"]},
+                    "planned_subsections": section.get("subsections", []),
                     "content_units": [
                         unit
                         for unit in plan["content_units"]
@@ -1633,7 +1767,7 @@ class Pipeline:
                     "unit_index": state["unit_index"],
                     "unit_count": len(self._units(section)),
                     "approved_visuals": packet.get("visuals", []),
-                    "mandatory_obligation_ids": canonical,
+                    "mandatory_obligation_ids": writing_ids,
                     "assertions": [
                         item for item in packet["assertions"] if item["id"] in canonical
                     ],
@@ -1661,12 +1795,31 @@ class Pipeline:
                 },
                 SectionDraft,
             )
-        draft = _normalized_section_draft(SectionDraft.model_validate(draft).model_dump(), packet)
+        draft = SectionDraft.model_validate(draft).model_dump()
+        draft["markdown"] = strip_authored_visuals(draft["markdown"])
+        if draft["subprocesses"]:
+            table, mappings, records = render_subprocess_catalog(draft["subprocesses"])
+            draft["markdown"] = replace_subsection(draft["markdown"], "4.2 Key Subprocesses", table)
+            draft["mappings"] = merge_mapping_occurrences(draft["mappings"], mappings)
+            draft["subprocess_records"] = records
+        draft = _normalized_section_draft(draft, packet)
+        for mapping in draft["mappings"]:
+            if (
+                mapping["obligation_id"] not in canonical
+                and mapping.get("disposition") != "out_of_scope"
+            ):
+                mapping["disposition"] = "overview"
         visuals = render_visuals(
             packet.get("visuals", []), plan["source_assets"], packet["evidence"]
         )
         if visuals:
             draft["markdown"] += "\n\n" + visuals
+            draft["markdown"] = position_visuals(
+                draft["markdown"],
+                packet.get("visuals", []),
+                plan["source_assets"],
+                packet["evidence"],
+            )
         return {"draft_ref": self.store.put(draft)}
 
     def verify_section(self, state: PipelineState) -> dict:
@@ -1680,6 +1833,17 @@ class Pipeline:
         assertions = {item["id"]: item for item in packet["assertions"]}
         mapped = set()
         findings = []
+        if (
+            "Python-owned catalog" in self.read(state, "template_ref")["text"]
+            and any(
+                child["title"] == "4.2 Key Subprocesses" for child in section.get("subsections", [])
+            )
+            and state["unit_index"] == 0
+            and not draft.get("subprocess_records")
+        ):
+            findings.append(
+                "Section 4.2 requires structured source-backed subprocesses for Python rendering"
+            )
         placements, placement_findings = placement_records(
             section["title"],
             draft["markdown"],
@@ -1688,6 +1852,23 @@ class Pipeline:
             {item["id"]: item for item in packet["evidence"]},
         )
         findings.extend(placement_findings)
+        findings.extend(support_findings(draft["mappings"], evidence))
+        findings.extend(
+            unmapped_citation_findings(
+                draft["markdown"],
+                draft["mappings"],
+                [
+                    render_visuals([visual], plan["source_assets"], packet["evidence"])
+                    for visual in packet.get("visuals", [])
+                ],
+            )
+        )
+        findings.extend(
+            business_prose_findings(draft["markdown"], self.read(state, "template_ref")["text"])
+        )
+        findings.extend(
+            uncited_business_passages(draft["markdown"], self.read(state, "template_ref")["text"])
+        )
         findings.extend(
             validate_visual_output(
                 draft["markdown"],
@@ -1699,35 +1880,41 @@ class Pipeline:
         for mapping in draft["mappings"]:
             identifier = mapping.get("obligation_id")
             labels = mapping.get("citation_ids", [])
-            if identifier not in canonical or not labels:
+            if identifier not in writing_ids or not labels:
                 findings.append("Invalid obligation mapping")
                 continue
             supported = {
                 self.graph.evidence(key)["label"] for key in assertions[identifier]["evidence_ids"]
             }
             if not set(labels).issubset(supported):
-                findings.append(f"Mapping cites unsupported evidence for {identifier}")
+                findings.append(f"Mapping {identifier} may cite only {sorted(supported)}")
             if mapping.get("passage") not in draft["markdown"]:
                 findings.append(f"Mapped passage is absent from prose for {identifier}")
             mapped.add(identifier)
-        if set(canonical) != mapped:
+        if set(writing_ids) != mapped:
             findings.append("Section misses approved obligations")
         cited = set(citation_labels(draft["markdown"]))
         if any(label not in evidence for label in cited):
             findings.append("Section contains an unknown citation")
         for mapping in draft["mappings"]:
-            if any(label not in cited for label in mapping.get("citation_ids", [])):
+            if mapping.get("disposition") != "out_of_scope" and any(
+                label not in cited for label in mapping.get("citation_ids", [])
+            ):
                 findings.append("Mapped citation is absent from prose")
         if not findings and writing_ids:
             audit = self.call(
                 "verify_section",
                 {
+                    "template_text": self.read(state, "template_ref")["text"],
                     "section": section["title"],
                     "markdown": draft["markdown"],
                     "mappings": draft["mappings"],
                     "placements": placements,
                     "visuals": packet.get("visuals", []),
-                    "mandatory_obligation_ids": canonical,
+                    "mandatory_obligation_ids": writing_ids,
+                    "required_diagram_element_ids": sorted(
+                        diagram_element_ids(packet.get("visuals", []))
+                    ),
                     "supporting_obligation_ids": [
                         identifier for identifier in writing_ids if identifier not in canonical
                     ],
@@ -1736,7 +1923,7 @@ class Pipeline:
                 },
                 AuditDraft,
             )
-            if not audit.get("accepted") or not set(canonical).issubset(
+            if not audit.get("accepted") or not set(writing_ids).issubset(
                 audit.get("covered_obligation_ids", [])
             ):
                 findings.extend(str(item) for item in audit.get("findings", []))
@@ -1764,6 +1951,7 @@ class Pipeline:
                 "placements": placements,
                 "visuals": packet.get("visuals", []),
                 "context_evidence_ids": [item["id"] for item in packet["evidence"]],
+                "subprocess_records": draft.get("subprocess_records", []),
             }
         )
         next_unit = state["unit_index"] + 1
@@ -1810,6 +1998,13 @@ class Pipeline:
                     and item["text"] != section["title"]
                 ]
                 markdown = number_generated_headings(markdown, title_number[1], fixed)
+            visual_ids = visual_evidence_ids(section.get("visuals", []))
+            markdown = position_visuals(
+                markdown,
+                section.get("visuals", []),
+                plan["source_assets"],
+                [self.graph.evidence(key) for key in sorted(visual_ids)],
+            )
             sections.append(
                 {
                     "title": section["title"],
@@ -1821,6 +2016,9 @@ class Pipeline:
                     "context_evidence_ids": sorted(
                         {key for item in parts for key in item.get("context_evidence_ids", [])}
                     ),
+                    "subprocess_records": [
+                        record for item in parts for record in item.get("subprocess_records", [])
+                    ],
                 }
             )
         return {
@@ -1845,9 +2043,23 @@ class Pipeline:
             draft = self.call(
                 "edit_page",
                 {
+                    "template_text": self.read(state, "template_ref")["text"],
                     "title": section["title"],
                     "markdown": section["markdown"],
                     "mappings": section["mappings"],
+                    "original_evidence": [
+                        self.graph.evidence(key)
+                        for key in sorted(
+                            {
+                                key
+                                for mapping in section["mappings"]
+                                for key in self.graph.assertion(mapping["obligation_id"])[
+                                    "evidence_ids"
+                                ]
+                            }
+                        )
+                    ],
+                    "subprocess_records": section.get("subprocess_records", []),
                     "visuals": section.get("visuals", []),
                     "template_requirements": [
                         item
@@ -1866,13 +2078,18 @@ class Pipeline:
                     ],
                     "feedback": self.read(state, "feedback_ref", [])
                     or state.get("release_feedback", ""),
+                    "previous": self.read(state, "draft_ref") if state.get("attempt") else None,
+                    "repair_attempt": state.get("attempt", 0),
                 },
                 EditDraft,
             )
         draft = EditDraft.model_validate(draft).model_dump()
-        draft["markdown"] = normalize_citation_syntax(draft["markdown"])
+        draft["markdown"] = compact_citations(normalize_citation_syntax(draft["markdown"]))
         for mapping in draft["mappings"]:
-            mapping["passage"] = normalize_citation_syntax(mapping["passage"])
+            for occurrence in [mapping] + mapping.get("additional_passages", []):
+                occurrence["passage"] = compact_citations(
+                    normalize_citation_syntax(occurrence["passage"])
+                )
         return {"draft_ref": self.store.put(draft)}
 
     def _editorial_evidence(
@@ -1919,6 +2136,7 @@ class Pipeline:
             "mappings": changed,
             "placements": [item for item in placements if mandatory & set(item["obligation_ids"])],
             "visuals": section.get("visuals", []),
+            "required_diagram_element_ids": sorted(diagram_element_ids(section.get("visuals", []))),
         }
 
     def verify_edited_page(self, state: PipelineState) -> dict:
@@ -1933,11 +2151,23 @@ class Pipeline:
         mappings.extend(
             item for item in draft.get("mappings", []) if item["obligation_id"] not in original_ids
         )
+        overview_ids = {
+            item["obligation_id"]
+            for item in section["mappings"]
+            if item.get("disposition") == "overview"
+        }
+        for item in mappings:
+            if item["obligation_id"] in overview_ids:
+                item["disposition"] = "overview"
         old_citations = set(citation_labels(section["markdown"]))
         new_citations = set(citation_labels(markdown))
         findings = []
         if len(replacements) != len(draft.get("mappings", [])):
             findings.append("Editorial revision returned duplicate obligation mappings")
+        if section.get("subprocess_records"):
+            table, _, _ = render_subprocess_catalog(section["subprocess_records"])
+            if table not in markdown:
+                findings.append("Preserve the Python-rendered subprocess catalog verbatim")
         if old_citations != new_citations:
             findings.append("Editorial revision changed citation coverage")
         ids = sorted(
@@ -1958,6 +2188,21 @@ class Pipeline:
             {item["id"]: item for item in evidence},
         )
         findings.extend(placement_findings)
+        findings.extend(support_findings(mappings, {item["label"]: item for item in evidence}))
+        findings.extend(
+            unmapped_citation_findings(
+                markdown,
+                mappings,
+                [
+                    render_visuals([visual], plan["source_assets"], evidence)
+                    for visual in section.get("visuals", [])
+                ],
+            )
+        )
+        findings.extend(business_prose_findings(markdown, self.read(state, "template_ref")["text"]))
+        findings.extend(
+            uncited_business_passages(markdown, self.read(state, "template_ref")["text"])
+        )
         if {item["obligation_id"] for item in mappings} != {
             item["obligation_id"] for item in section["mappings"]
         }:
@@ -2004,6 +2249,7 @@ class Pipeline:
                     "verify_page",
                     {
                         **payload,
+                        "template_text": contract["text"],
                         "template_requirements": local_contract["requirements"],
                         "template_decisions": plan["template_decisions"],
                     },
@@ -2036,6 +2282,7 @@ class Pipeline:
             "visuals": section.get("visuals", []),
             "context_evidence_ids": section.get("context_evidence_ids", []),
             "supporting_obligation_ids": section["supporting_obligation_ids"],
+            "subprocess_records": section.get("subprocess_records", []),
         }
         if state["edit_index"] < len(edited):
             edited[state["edit_index"]] = replacement
@@ -2058,7 +2305,10 @@ class Pipeline:
         sections = self.read(state, "edited_ref")
         expected = {item["id"] for item in self.assertions(state)}
         actual = [
-            mapping["obligation_id"] for section in sections for mapping in section["mappings"]
+            mapping["obligation_id"]
+            for section in sections
+            for mapping in section["mappings"]
+            if mapping.get("disposition") != "overview"
         ]
         findings = []
         findings.extend(
@@ -2075,7 +2325,11 @@ class Pipeline:
         if repetition["semantic_candidates"]:
             semantic_audit = self.call(
                 "audit_repetition",
-                {"candidates": repetition["semantic_candidates"], "facts": self.assertions(state)},
+                {
+                    "candidates": repetition["semantic_candidates"],
+                    "facts": self.assertions(state),
+                    "template_text": self.read(state, "template_ref")["text"],
+                },
                 AuditDraft,
             )
             if not semantic_audit["accepted"] or semantic_audit["findings"]:
@@ -2105,7 +2359,10 @@ class Pipeline:
             for label in citation_labels(section["markdown"]):
                 if not self.graph.evidence(label):
                     findings.append(f"Citation does not resolve: {label}")
-            assertions = {key: self.graph.assertion(key) for key in approved["obligation_ids"]}
+            assertions = {
+                key: self.graph.assertion(key)
+                for key in approved["obligation_ids"] + approved["supporting_obligation_ids"]
+            }
             evidence_ids = {key for item in assertions.values() for key in item["evidence_ids"]}
             evidence_ids.update(visual_evidence_ids(approved.get("visuals", [])))
             evidence = {key: self.graph.evidence(key) for key in evidence_ids}
@@ -2193,9 +2450,7 @@ class Pipeline:
                     }
                 )
             supporting_ids = {
-                item["obligation_id"]
-                for section in passages
-                for item in section["mappings"]
+                item["obligation_id"] for section in passages for item in section["mappings"]
             } - fact_ids
             citation_ids = {
                 citation
@@ -2211,6 +2466,7 @@ class Pipeline:
             audit = self.call(
                 "audit_source_to_document",
                 {
+                    "template_text": self.read(state, "template_ref")["text"],
                     "blocks": [self.spans(state)[key] for key in ids],
                     "aspects": packet_aspects,
                     "facts": facts,
@@ -2249,7 +2505,17 @@ class Pipeline:
             "total": sum(len(batch) for batch in batches),
             "independently_audited": sum(len(batch) for batch in batches),
         }
-        report["facts_in_text"] = {"total": len(self.assertions(state)), "mapped": len(mapped)}
+        excluded = [
+            item
+            for section in sections
+            for item in section["mappings"]
+            if item.get("disposition") == "out_of_scope"
+        ]
+        report["facts_in_text"] = {
+            "total": len(self.assertions(state)),
+            "mapped": len(mapped) - len(excluded),
+        }
+        report["scope_exclusions"] = excluded
         report["non_substantive_candidates"] = self.read(state, "source_non_substantive_ref", [])
         report["exclusions"] = self.read(state, "exclusions_ref", [])
         report["conflict_candidates"] = len(self.graph.conflict_candidates())
@@ -2409,6 +2675,8 @@ class Pipeline:
             section["title"]: f"#{section_anchor(section['title'])}" for section in sections
         }
         citation_occurrences = []
+        excerpt_targets = {}
+        diagram_targets = {}
 
         def render(
             markdown: str,
@@ -2417,49 +2685,95 @@ class Pipeline:
             audit: bool = False,
         ) -> str:
             scoped = []
-            for mapping in mappings or []:
+            for mapping in mapping_occurrences(mappings or []):
                 passage = mapping["passage"]
                 location = markdown.find(passage)
-                if location >= 0:
+                if passage and location >= 0:
                     scoped.append((location, location + len(passage), mapping))
+            visual_ranges = []
+            rendered_diagrams = set()
+            for planned in plan["sections"]:
+                for visual in planned.get("visuals", []):
+                    block = render_visuals([visual], plan["source_assets"], evidence)
+                    location = markdown.find(block)
+                    if location >= 0:
+                        visual_ranges.append((location, location + len(block), visual))
 
             def replace(match: re.Match) -> str:
                 if markdown[match.end() :].startswith("("):
                     return match.group()
-                kind = match.group(1)
                 labels = re.findall(r"[CD]\d+", match.group())
                 links = []
+                diagram = next(
+                    (
+                        visual
+                        for start, end, visual in visual_ranges
+                        if start <= match.start() < end and visual["kind"] != "image"
+                    ),
+                    None,
+                )
                 for label in labels:
-                    mapping = next(
-                        (
-                            item
-                            for start, end, item in scoped
-                            if start <= match.start() < end
-                            and label in item.get("citation_ids", [])
-                        ),
-                        None,
-                    )
-                    quote = mapping.get("support_quotes", {}).get(label) if mapping else None
-                    selection = select(label, quote, mapping["passage"] if mapping else None)
-                    href = selection.get("url") or f"../evidence/{label}.md"
-                    links.append(f"[{kind} {label}](<{href}>)")
-                    if audit:
-                        citation_occurrences.append(
-                            {
-                                "id": digest(
-                                    [
-                                        section,
-                                        match.start(),
-                                        label,
-                                        mapping.get("obligation_id") if mapping else None,
-                                    ]
-                                )[:20],
-                                "section": section,
-                                "label": label,
-                                "support_quote": quote,
-                                **selection,
-                            }
+                    related = [
+                        item
+                        for start, end, item in scoped
+                        if start <= match.start() < end and label in item.get("citation_ids", [])
+                    ]
+                    quotes = list(
+                        dict.fromkeys(
+                            item.get("support_quotes", {}).get(label, "") for item in related
                         )
+                    )
+                    if not quotes:
+                        quotes = list(
+                            dict.fromkeys(
+                                visual.get("support_quotes", {}).get(by_label[label]["id"], "")
+                                for start, end, visual in visual_ranges
+                                if start <= match.start() < end
+                                if by_label[label]["id"] in visual_evidence_ids([visual])
+                            )
+                        )
+                        quotes = [quote for quote in quotes if quote]
+                    if not quotes:
+                        quotes = list(
+                            dict.fromkeys(
+                                location["quote"]
+                                for start, end, visual in visual_ranges
+                                if start <= match.start() < end
+                                for location in visual.get("support_locations", [])
+                                if location["evidence_id"] == by_label[label]["id"]
+                            )
+                        )
+                    if not quotes:
+                        raise ValueError(f"Citation lacks precise local passage support: {label}")
+                    for quote in quotes:
+                        support = exact_support(by_label[label], quote)
+                        target_id = support["target_id"]
+                        excerpt_targets[target_id] = {"label": label, **support}
+                        selection = select(label, quote, related[0]["passage"] if related else None)
+                        selection["support_range"] = support
+                        href = f"../evidence/{label}-{target_id}.md"
+                        number = list(excerpt_targets).index(target_id) + 1
+                        links.append(f"[{number}](<{href}>)")
+                        if audit:
+                            citation_occurrences.append(
+                                {
+                                    "id": digest([section, match.start(), target_id])[:20],
+                                    "section": section,
+                                    "label": label,
+                                    "reference_number": number,
+                                    "support_quote": quote,
+                                    "obligation_ids": [item["obligation_id"] for item in related],
+                                    **selection,
+                                    "local_target": href,
+                                }
+                            )
+                if diagram:
+                    key = digest(diagram)[:20]
+                    diagram_targets[key] = diagram
+                    if key in rendered_diagrams:
+                        return ""
+                    rendered_diagrams.add(key)
+                    return f"[Diagram sources](../evidence/visual-{key}.md)"
                 return " ".join(links)
 
             return normalize_section_links(CITATION_GROUP.sub(replace, markdown), section_targets)
@@ -2473,6 +2787,19 @@ class Pipeline:
             )
             for section in sections
         ]
+        grouped_sections = [group_repeated_list_citations(text) for text in rendered_sections]
+        rendered_sections = [text for text, _ in grouped_sections]
+        citation_group_edits = {
+            section["title"]: replacements
+            for section, (_, replacements) in zip(sections, grouped_sections, strict=True)
+        }
+
+        def reader_passage(passage: str, section: dict) -> str:
+            rendered = render(passage, section["mappings"])
+            for original, replacement in citation_group_edits[section["title"]]:
+                rendered = rendered.replace(original, replacement)
+            return rendered
+
         chosen_hashes = {
             visual["asset_hash"]
             for section in plan["sections"]
@@ -2565,7 +2892,7 @@ class Pipeline:
             section_start = final_markdown.index(f"## {section['title']}\n\n")
             section_start += len(f"## {section['title']}\n\n")
             for placement in section["placements"]:
-                passage = render(placement["passage"], section["mappings"])
+                passage = reader_passage(placement["passage"], section)
                 offset = rendered.find(passage)
                 if offset < 0 or rendered.count(passage) != 1:
                     raise ValueError("Export changed or duplicated a factual placement")
@@ -2574,7 +2901,14 @@ class Pipeline:
                     {**placement, "passage": passage, "start": start, "end": start + len(passage)}
                 )
             final_mappings.extend(
-                {**mapping, "passage": render(mapping["passage"], [mapping])}
+                {
+                    **mapping,
+                    "passage": reader_passage(mapping["passage"], section),
+                    "additional_passages": [
+                        {**extra, "passage": reader_passage(extra["passage"], section)}
+                        for extra in mapping.get("additional_passages", [])
+                    ],
+                }
                 for mapping in section["mappings"]
             )
         index = ["# Source index", ""]
@@ -2605,6 +2939,43 @@ class Pipeline:
                     f"[Frozen attachment](../attachments/{item['file_hash']}{suffix})\n"
                 )
             self.store.write(f"{base}/evidence/{label}.md", content)
+        for target_id, target in excerpt_targets.items():
+            label = target["label"]
+            excerpt = "\n".join("    " + line for line in target["exact_quote"].splitlines())
+            original = select(label, target["exact_quote"]).get("url")
+            content = (
+                f"# Evidence {list(excerpt_targets).index(target_id) + 1}\n\n"
+                f"Source: `{target['source_path']}` lines "
+                f"{target['start_line']}-{target['end_line']}\n\n"
+                f"Frozen revision: `{target['snapshot_hash']}`\n\n"
+                f"{excerpt}\n\n[Full frozen context]({label}.md)\n"
+            )
+            if original:
+                content += f"\n[Original source excerpt](<{original}>)\n"
+            self.store.write(f"{base}/evidence/{label}-{target_id}.md", content)
+        for key, visual in diagram_targets.items():
+            requirements = {
+                item["support_id"]: item for item in visual_support_requirements([visual])
+            }
+            content = ["# Diagram sources", "", visual["diagram"]["description"], ""]
+            for location in visual.get("support_locations", []):
+                item = self.graph.evidence(location["evidence_id"])
+                support = exact_support(item, location["quote"])
+                requirement = requirements.get(location.get("support_id"), {})
+                content.extend(
+                    [
+                        f"## {requirement.get('label', location['element_id'])}",
+                        "",
+                        f"Source: `{item['path']}` lines "
+                        f"{support['start_line']}-{support['end_line']}",
+                        "",
+                        "\n".join("    " + line for line in location["quote"].splitlines()),
+                        "",
+                        f"[Frozen excerpt]({item['label']}-{support['target_id']}.md)",
+                        "",
+                    ]
+                )
+            self.store.write(f"{base}/evidence/visual-{key}.md", "\n".join(content))
         self.store.write(f"{base}/source-index.md", "\n".join(index) + "\n")
         self.store.write(
             f"{base}/audit.json",
@@ -2628,6 +2999,11 @@ class Pipeline:
                     "citations": citations,
                     "source_links": direct_links,
                     "citation_occurrences": citation_occurrences,
+                    "subprocess_catalog": [
+                        record
+                        for section in sections
+                        for record in section.get("subprocess_records", [])
+                    ],
                     "candidate_hash": candidate_hash,
                     "source_coverage": self.read(state, "source_coverage_ref"),
                     "attachments": snapshot.get("attachments", []),
@@ -2893,7 +3269,12 @@ class Pipeline:
             started = monotonic()
             event_path = self.store.root / "runs" / self.run_id / "events.jsonl"
             event_offset = event_path.stat().st_size if event_path.exists() else 0
-            update = function(state)
+            try:
+                update = function(state)
+            except ValidationError as error:
+                update = self.issue(
+                    state, name, [f"Model response failed structural validation: {error}"], name
+                )
             if name == "inventory_code_scope" and update.get("route") not in {
                 "review_issues",
                 "resolve_issues_automatically",
@@ -2905,7 +3286,7 @@ class Pipeline:
                     events.seek(event_offset)
                     for line in events:
                         event = json.loads(line)
-                        if event.get("event") == "response":
+                        if event.get("event") in {"response", "invalid_schema"}:
                             cost_pln += float(event.get("cost_pln", 0.0))
             if name not in {"review_plan", "review_release", "review_issues"}:
                 if name == "snapshot_inputs":

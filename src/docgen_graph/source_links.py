@@ -22,11 +22,18 @@ def citation_labels(markdown: str) -> list[str]:
 def normalize_citation_syntax(markdown: str) -> str:
     pattern = (
         CITATION_GROUP.pattern
-        + r"|```[\s\S]*?```|`[^`\n]*`|(?P<bare>\b(?:Legacy|Code)\s+[CD]\d+\b)"
+        + r"|```[\s\S]*?```|`[^`\n]*`|(?P<short>\[[CD]\d+\])(?!\()"
+        + r"|(?P<bare>\b(?:Legacy|Code)\s+[CD]\d+\b)"
     )
     return re.sub(
         pattern,
-        lambda match: f"[{match['bare']}]" if match["bare"] else match.group(),
+        lambda match: (
+            f"[{match['bare']}]"
+            if match["bare"]
+            else f"[{'Code' if match['short'][1] == 'C' else 'Legacy'} {match['short'][1:-1]}]"
+            if match["short"]
+            else match.group()
+        ),
         markdown,
     )
 

@@ -32,6 +32,12 @@ Use `uv run docgen history --thread-id ID`, `uv run docgen inspect-evidence --th
 
 Each citation is checked against its frozen Markdown source and, when configured, a supplied local HTML export. Set `DOCGEN_SOURCE_PAGE_MAP` in `.env` to a JSON file mapping source IDs or original URLs to local HTML paths relative to the map file. Those HTML bytes are frozen for navigation verification only; they are never ingested as product facts. Without a map, the citation audit reports `markdown_projection_only`. If a reliable selector cannot be made, the reader links to a portable local evidence record and shows the original page separately. Production Confluence highlighting remains unverified unless a browser can open the authenticated original page.
 
+Reader citations use compact numbers and open frozen, passage-specific evidence records with exact quotes and line ranges. Distinct excerpts from the same file retain distinct targets. Shared paragraphs retain every fact-to-quote mapping in the audit; repeated references within a supported passage are grouped. Missing or ambiguous authoring quotes fail verification. Evidence details retain full source context and, when available, navigation to the original page.
+
+Business templates describe participant actions, conditions, decisions and outcomes. Technical-only findings remain in audit mappings with an explicit scope exclusion; mixed findings retain their complete business meaning in the page. The writer, editor and independent audits receive the complete template contract. Images and diagrams use a two-row HTML table with a centered bold caption and remain in their planned subsection. Template instructions and examples do not become reader callouts.
+
+The production template's subprocess catalog is rendered by Python from structured, source-backed records with stable identities. Images and diagrams returned by the writer are discarded before approved visuals are inserted, preventing duplicate figures and invented paths. `DOCGEN_AUDIT_THINKING_LEVEL` optionally selects a separate Gemini reasoning level for verification and audit stages; when unset, audits use `DOCGEN_THINKING_LEVEL` or the provider default.
+
 ## Repository layout
 
 The repository root is the only application project. Run installation, CLI commands, tests, and builds here; neither an `old-approach/` nor a `new-approach/` application directory is needed.

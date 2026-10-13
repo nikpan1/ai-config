@@ -45,7 +45,7 @@ def response_schema(schema) -> dict | None:
     def simplify(node):
         if "$ref" in node:
             return simplify(definitions[node["$ref"].rsplit("/", 1)[-1]])
-        result = {key: node[key] for key in ("type", "enum") if key in node}
+        result = {key: node[key] for key in ("type", "enum", "minItems", "maxItems") if key in node}
         if "properties" in node:
             result["properties"] = {
                 key: simplify(value)
@@ -55,6 +55,11 @@ def response_schema(schema) -> dict | None:
             result["required"] = list(result["properties"])
         if "items" in node:
             result["items"] = simplify(node["items"])
+        if "additionalProperties" in node:
+            additional = node["additionalProperties"]
+            result["additionalProperties"] = (
+                simplify(additional) if isinstance(additional, dict) else additional
+            )
         if "anyOf" in node:
             result["anyOf"] = [simplify(value) for value in node["anyOf"]]
         return result
@@ -73,12 +78,16 @@ class GeminiModel:
 
     def call(self, stage: str, payload: dict, schema=None, *, tools=None, messages=None) -> dict:
         prompt = files("docgen_graph").joinpath("prompts", f"{stage}.v1.txt").read_text("utf-8")
+        thinking_level = self.settings.thinking_level
+        if stage.startswith(("verify_", "audit_")):
+            thinking_level = self.settings.audit_thinking_level or thinking_level
         signature = digest(
             [
                 self.settings.model,
                 prompt,
                 payload,
                 self.settings.output_tokens,
+                thinking_level,
                 implementation_signature(),
                 schema.model_json_schema() if schema else None,
                 tools,
@@ -134,6 +143,9 @@ class GeminiModel:
                         response_mime_type=None if tools else "application/json",
                         response_json_schema=None if tools else response_schema(schema),
                         max_output_tokens=self.settings.output_tokens,
+                        thinking_config=types.ThinkingConfig(thinking_level=thinking_level.upper())
+                        if thinking_level
+                        else None,
                         tools=[types.Tool(function_declarations=tools)] if tools else None,
                         automatic_function_calling=types.AutomaticFunctionCallingConfig(
                             disable=True
@@ -178,6 +190,17 @@ class GeminiModel:
                 or getattr(finish, "name", None) != "STOP"
             ):
                 ledger.settle(reservation, None, {"status": "incomplete", "usage": counts})
+                self.store.write(
+                    f"runs/{self.run_id}/incomplete/{stage}-{signature}.json",
+                    response.model_dump_json(exclude_none=True),
+                )
+                self.store.event(
+                    self.run_id,
+                    stage,
+                    "incomplete_response",
+                    finish_reason=getattr(finish, "name", None),
+                    usage=counts,
+                )
                 raise ValueError("Incomplete or truncated Gemini response")
             try:
                 if tools:
@@ -200,12 +223,35 @@ class GeminiModel:
             if schema:
                 try:
                     result = schema.model_validate(result).model_dump()
-                except ValueError:
+                except ValueError as error:
+                    self.store.write(
+                        f"runs/{self.run_id}/invalid/{stage}-{reservation}.json",
+                        json.dumps({"result": result, "error": str(error), "usage": counts}),
+                    )
                     ledger.settle(
                         reservation,
                         pricing.cost(counts["input_tokens"], counts["output_tokens"]),
                         {**counts, "status": "invalid_schema"},
                     )
+                    self.store.event(
+                        self.run_id,
+                        stage,
+                        "invalid_schema",
+                        reservation=reservation,
+                        cost_pln=pricing.cost(counts["input_tokens"], counts["output_tokens"]),
+                        attempt=attempt + 1,
+                    )
+                    if attempt < 2:
+                        request = json.dumps(
+                            {**payload, "schema_feedback": str(error)[:4000]}, ensure_ascii=False
+                        )
+                        size = len((prompt + request).encode())
+                        if size + self.settings.output_tokens > self.settings.request_tokens:
+                            raise
+                        reserve = max(
+                            reserve, pricing.cost(size + 4096, self.settings.output_tokens * 2)
+                        )
+                        continue
                     raise
             self.store.write(
                 f"cache/{signature}.json",

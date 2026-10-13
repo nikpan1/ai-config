@@ -1,0 +1,220 @@
+{
+  "verified_at_utc": "2026-10-12T22:53:07.840698+00:00",
+  "run_id": "risk-business-20261012-s",
+  "status": "complete_with_exclusions",
+  "document": ".docgen/codex-live-validation/runs/risk-business-20261012-s/candidates/47a0db110949d718c4f11b9c047eeb595e85e839110200ad70e2627f8058cee6/documentation/index.md",
+  "preview": ".docgen/business-validation/preview/index.html",
+  "candidate_hash": "47a0db110949d718c4f11b9c047eeb595e85e839110200ad70e2627f8058cee6",
+  "original_source_run": "codex-risk-live-20261012-i",
+  "source_reuse": "Frozen extracted sources and original provider provenance retained; writing, editing and audits performed with Gemini. Checkpoint lineage retained in each source-reuse.json.",
+  "model": "gemini-3.8-flash",
+  "template": "data/template.md",
+  "tests": {
+    "passed": 198,
+    "failed": 0,
+    "log": ".docgen/business-delivery-suite.log",
+    "ruff": "passed",
+    "diff_check": "passed"
+  },
+  "live_smoke": {
+    "artifact": ".docgen/business-validation/smoke.json",
+    "accepted": true
+  },
+  "coverage": {
+    "aspects": {
+      "represented": 36,
+      "total": 36
+    },
+    "blocks": {
+      "independently_audited": 22,
+      "total": 22
+    },
+    "complete": true,
+    "conflict_candidates": 0,
+    "exclusions": [
+      {
+        "evidence_id": "71611e288df78a785644",
+        "reason": "Frontmatter metadata containing source URLs, revisions, and system IDs without substantive business requirements.",
+        "schema_version": 1
+      },
+      {
+        "evidence_id": "b07338ec278b85cb73f8",
+        "reason": "Structural Markdown section heading.",
+        "schema_version": 1
+      },
+      {
+        "evidence_id": "f1192e63d8ea7839b463",
+        "reason": "Structural Markdown table header row.",
+        "schema_version": 1
+      },
+      {
+        "evidence_id": "b01a303b7039e20033bc",
+        "reason": "Structural Markdown table delimiter row.",
+        "schema_version": 1
+      },
+      {
+        "evidence_id": "a40e5be9ab13b94cf856",
+        "reason": "Structural section header with no substantive standalone assertions.",
+        "schema_version": 1
+      }
+    ],
+    "facts_in_text": {
+      "mapped": 30,
+      "total": 35
+    },
+    "graph_revision": "ab5a22258c505ce8cf97d0bedb5ac0568a656a2d4ad71250017fbad4826518e8",
+    "non_substantive_candidates": [
+      {
+        "decision": "Inventory candidate; independently checked against source",
+        "evidence_id": "71611e288df78a785644"
+      },
+      {
+        "decision": "Inventory candidate; independently checked against source",
+        "evidence_id": "b07338ec278b85cb73f8"
+      },
+      {
+        "decision": "Inventory candidate; independently checked against source",
+        "evidence_id": "f1192e63d8ea7839b463"
+      },
+      {
+        "decision": "Inventory candidate; independently checked against source",
+        "evidence_id": "b01a303b7039e20033bc"
+      },
+      {
+        "decision": "Inventory candidate; independently checked against source",
+        "evidence_id": "a40e5be9ab13b94cf856"
+      }
+    ],
+    "qualifiers": {
+      "represented": 20,
+      "total": 20
+    },
+    "scope_exclusions": [
+      {
+        "additional_passages": [],
+        "citation_ids": [
+          "D13",
+          "D14",
+          "D15",
+          "D16"
+        ],
+        "disposition": "out_of_scope",
+        "obligation_id": "115fce7cfb1b862db210b681",
+        "passage": "",
+        "schema_version": 1,
+        "scope_reason": "Relates to meta-documentation clarifying that rule entries represent test evidence and graphics are illustrative only.",
+        "support_quotes": {
+          "D13": "The visible rule is test evidence; the image is only a screen illustration.",
+          "D14": "The visible rule is test evidence; the image is only a screen illustration.",
+          "D15": "The visible rule is test evidence; the image is only a screen illustration.",
+          "D16": "The visible rule is test evidence; the image is only a screen illustration."
+        }
+      },
+      {
+        "additional_passages": [],
+        "citation_ids": [
+          "D21"
+        ],
+        "disposition": "out_of_scope",
+        "obligation_id": "c62fd7c3db98a26b9a7c26ef",
+        "passage": "",
+        "schema_version": 1,
+        "scope_reason": "Pertains to editorial commentary regarding the synthetic nature of sample test data.",
+        "support_quotes": {
+          "D21": "Sławomir's złoty example is synthetic."
+        }
+      },
+      {
+        "additional_passages": [],
+        "citation_ids": [
+          "D21"
+        ],
+        "disposition": "out_of_scope",
+        "obligation_id": "933c142302dccb648183e63f",
+        "passage": "",
+        "schema_version": 1,
+        "scope_reason": "Technical integration tracing mechanics via shared correlation identifiers are internal cross-system tracing details outside business-facing sections.",
+        "support_quotes": {
+          "D21": "RiskSignal &amp; platform share a correlation ID."
+        }
+      },
+      {
+        "additional_passages": [],
+        "citation_ids": [
+          "C9"
+        ],
+        "disposition": "out_of_scope",
+        "obligation_id": "798d5776127ff65effb070b2",
+        "passage": "",
+        "schema_version": 1,
+        "scope_reason": "Service class dependency injection, repository wiring, and transactional boundary annotations are framework-level implementation mechanics outside business documentation.",
+        "support_quotes": {
+          "C9": "public class RiskProfileService {\n    private final ProfileRepository profiles;\n    private final RiskSignalClient riskSignal;\n    private final MongoAuditRepository audits;\n\n    public RiskProfileService(ProfileRepository profiles, RiskSignalClient riskSignal, MongoAuditRepository audits) {\n        this.profiles = profiles;\n        this.riskSignal = riskSignal;\n        this.audits = audits;\n    }\n\n    @Transactional\n    public ProfileDtos.Draft start(String investorRef) {"
+        }
+      },
+      {
+        "additional_passages": [],
+        "citation_ids": [
+          "C9"
+        ],
+        "disposition": "out_of_scope",
+        "obligation_id": "07749034d10c3834145baaa4",
+        "passage": "",
+        "schema_version": 1,
+        "scope_reason": "Class-level code evidence limits, absence of authorization annotations, and lack of runtime endpoint declarations are technical auditing boundaries excluded from business sections.",
+        "support_quotes": {
+          "C9": "public class RiskProfileService {"
+        }
+      }
+    ],
+    "snapshot_id": "a7eadba28f4b5a5ec561715738b2d7f67e51cc44e85e79956d67c20850ecad0d",
+    "unresolved_attachments": [],
+    "unsupported_assertions": 0
+  },
+  "citations": {
+    "occurrences": 86,
+    "distinct_local_targets": 60,
+    "missing_rendered_links": [],
+    "maximum_numeric_references_per_line": 3,
+    "diagram_source_bundles": 1,
+    "file_level_reader_fallback": false,
+    "grouped_lists": 1
+  },
+  "visual_qa": {
+    "renderer": "MarkdownIt CommonMark HTML and bundled Mermaid; inspected in Codex in-app browser",
+    "diagram_count": 1,
+    "loaded_images": 2,
+    "visual_tables": 3,
+    "rows_per_visual": 2,
+    "columns_per_visual": 1,
+    "captions": "centered and bold"
+  },
+  "costs_all_validation_attempts": [
+    {
+      "status": "settled",
+      "requests": 283,
+      "charged_pln": 23.792248
+    },
+    {
+      "status": "uncertain",
+      "requests": 2,
+      "charged_pln": 3.349863
+    }
+  ],
+  "ledger": ".docgen/budget.sqlite",
+  "pricing": {
+    "exchange_date": "2026-10-12",
+    "exchange_source": "https://api.nbp.pl/api/exchangerates/rates/a/usd/?format=json",
+    "input_usd_per_million": 0.75,
+    "model": "gemini-3.8-flash",
+    "output_usd_per_million": 3.75,
+    "pricing_source": "https://ai.google.dev/gemini-api/docs/pricing",
+    "usd_pln": 3.9211,
+    "valid_until": "2026-10-19",
+    "verified_on": "2026-10-12"
+  },
+  "limitations": [
+    "Validation reused the frozen Risk Profiling corpus; it did not recollect live repository sources.",
+    "HTML tables require a renderer that permits HTML and parses the blank-line-separated Markdown content; Mermaid rendering must be enabled."
+  ]
+}

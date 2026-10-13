@@ -165,6 +165,7 @@ class VisualChoice(VersionedRecord):
     asset_hash: str = ""
     evidence_ids: list[str] = []
     text_alternative: str = ""
+    support_quotes: dict[str, str] = {}
     diagram_id: str = ""
     review_status: Literal["planned", "approved"] = "planned"
 
@@ -178,6 +179,12 @@ class AssetDecision(VersionedRecord):
     reason: str = Field(min_length=1)
 
 
+class PlanSubsectionDraft(VersionedRecord):
+    title: str = Field(min_length=1)
+    purpose: str = Field(min_length=1)
+    group_ids: list[str] = []
+
+
 class PlanSectionDraft(VersionedRecord):
     title: str = Field(min_length=1)
     purpose: str = Field(min_length=1)
@@ -185,6 +192,7 @@ class PlanSectionDraft(VersionedRecord):
     support_group_ids: list[str] = []
     queries: list[str] = []
     visuals: list[VisualChoice] = []
+    subsections: list[PlanSubsectionDraft] = []
 
 
 class PagePlanDraft(VersionedRecord):
@@ -198,11 +206,26 @@ class PagePlanDraft(VersionedRecord):
     diagrams: list[DiagramSpec] = []
 
 
-class CoverageMappingDraft(VersionedRecord):
-    obligation_id: str
+class EvidencePassage(VersionedRecord):
     citation_ids: list[str] = Field(min_length=1)
-    passage: str = Field(min_length=1)
+    passage: str
     support_quotes: dict[str, str] = {}
+
+
+class CoverageMappingDraft(EvidencePassage):
+    obligation_id: str
+    disposition: Literal["documented", "out_of_scope", "overview"] = "documented"
+    scope_reason: str = ""
+    additional_passages: list[EvidencePassage] = []
+
+
+class VisualSupportQuote(VersionedRecord):
+    support_id: str
+    quote: str = Field(min_length=1)
+
+
+class VisualEvidenceDraft(VersionedRecord):
+    locations: list[VisualSupportQuote]
 
 
 class PresentationPlacement(VersionedRecord):
@@ -216,9 +239,18 @@ class PresentationPlacement(VersionedRecord):
     end: int
 
 
+class SubprocessDraft(VersionedRecord):
+    title: str = Field(min_length=1)
+    purpose: str = Field(min_length=1)
+    participants: str = Field(min_length=1)
+    result: str = Field(min_length=1)
+    mappings: list[CoverageMappingDraft] = Field(min_length=1)
+
+
 class SectionDraft(VersionedRecord):
-    markdown: str = Field(min_length=1)
+    markdown: str
     mappings: list[CoverageMappingDraft]
+    subprocesses: list[SubprocessDraft] = []
 
 
 class EditDraft(VersionedRecord):

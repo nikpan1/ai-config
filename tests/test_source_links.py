@@ -161,8 +161,10 @@ def test_candidate_export_links_legacy_evidence_to_original_html(tmp_path, monke
                 "markdown": "## Room setup\n\n" + passage,
                 "mappings": [
                     {
+                        "obligation_id": "room",
                         "citation_ids": ["D1", "D2"],
                         "passage": passage,
+                        "support_quotes": {"D1": story_row, "D2": story_row},
                     }
                 ],
                 "placements": [{"id": "room-placement", "passage": passage}],
@@ -179,7 +181,9 @@ def test_candidate_export_links_legacy_evidence_to_original_html(tmp_path, monke
     )
     candidate = tmp_path / "runs" / "citation-check" / "candidates" / result["candidate_ref"]
     markdown = (candidate / "documentation" / "index.md").read_text("utf-8")
-    assert markdown.count("http://127.0.0.1:8765/kitchen-3d-planning.html#:~:text=") == 2
+    assert markdown.count("../evidence/D") == 2
+    assert "[1](<../evidence/D1-" in markdown
+    assert "[2](<../evidence/D2-" in markdown
     assert "[Legacy D1, D2]" not in markdown
     assert "[Details](#room-setup)" in markdown
     assert markdown.count("## Room setup") == 1

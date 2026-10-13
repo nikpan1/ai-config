@@ -160,3 +160,32 @@ def bind_plan_sections(tree: list[dict], sections: list[dict], omitted_titles=()
     if len(values) != len(set(values)):
         raise ValueError("Generated numbering conflicts with a fixed template number")
     return result
+
+
+def fold_plan_sections(tree: list[dict], sections: list[dict]) -> list[dict]:
+    parents = {item["title"]: item for item in tree if item["level"] == 2}
+    result = []
+    for raw in sections:
+        if raw["title"] in parents or not result:
+            result.append({**raw, "subsections": list(raw.get("subsections", []))})
+            continue
+        parent = parents.get(result[-1]["title"])
+        prefix = parent["number"] + "." if parent and parent["number"] else ""
+        if not prefix or not raw["title"].startswith(prefix):
+            result.append({**raw, "subsections": list(raw.get("subsections", []))})
+            continue
+        section = result[-1]
+        section["subsections"].append(raw)
+        for key in ("group_ids", "support_group_ids", "queries"):
+            section[key] = list(dict.fromkeys(section.get(key, []) + raw.get(key, [])))
+        section["visuals"] = section.get("visuals", []) + [
+            {**visual, "subsection": raw["title"]} for visual in raw.get("visuals", [])
+        ]
+    for section in result:
+        section["group_ids"] = list(
+            dict.fromkeys(
+                section.get("group_ids", [])
+                + [key for child in section["subsections"] for key in child.get("group_ids", [])]
+            )
+        )
+    return result

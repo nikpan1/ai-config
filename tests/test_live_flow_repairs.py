@@ -307,6 +307,7 @@ def final_audit_fixture(tmp_path, model):
     mappings.append({"obligation_id": "f4", "passage": "Other paragraph", "citation_ids": ["D4"]})
     facts = [{"id": f"f{i}", "evidence_ids": [f"e{i}"]} for i in range(1, 5)]
     state = {
+        "template_ref": store.put({"text": "## Rules"}),
         "inventory_ref": store.put(
             {
                 "document_batches": [["e1", "meta"]],

@@ -17,6 +17,14 @@ class FixtureModel:
 
     def call(self, stage, payload, schema=None):
         self.calls.append(stage)
+        if stage == "locate_visual_evidence":
+            spans = {item["id"]: item for item in payload["original_evidence"]}
+            return {
+                "locations": [
+                    {"support_id": item["support_id"], "quote": spans[item["evidence_id"]]["text"]}
+                    for item in payload["required_support"]
+                ]
+            }
         if stage == "inventory_aspects":
             return {
                 "aspects": [
@@ -127,6 +135,7 @@ class FixtureModel:
                             "obligation_id": item["id"],
                             "citation_ids": [label],
                             "passage": lines[-1],
+                            "support_quotes": {label: original[item["evidence_ids"][0]]["text"]},
                         }
                     )
             return {"markdown": "\n\n".join(lines), "mappings": mappings}

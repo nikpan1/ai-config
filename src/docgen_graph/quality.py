@@ -1,3 +1,4 @@
+import html
 import re
 from collections import defaultdict
 from difflib import SequenceMatcher
@@ -7,6 +8,7 @@ from markdown_it import MarkdownIt
 from docgen_graph.assets import asset_filename, image_references, meaningful_alt
 from docgen_graph.authoring.template import bind_plan_sections, heading_tree
 from docgen_graph.contracts import ContentUnit, PresentationPlacement, TemplateRequirement
+from docgen_graph.presentation import business_prose_findings, exact_support, mapping_occurrences
 from docgen_graph.source_links import CITATION_GROUP, citation_labels
 from docgen_graph.storage import digest
 
@@ -16,7 +18,7 @@ def compile_requirements(text: str, template_hash: str) -> dict:
     section = "__document__"
     headings = []
     optional = False
-    fenced = False
+    instruction_block = False
     lines = text.splitlines()
     tokens = MarkdownIt().parse(text)
     heading_lines = {
@@ -46,16 +48,18 @@ def compile_requirements(text: str, template_hash: str) -> dict:
 
     for index, line in enumerate(lines):
         value = line.strip()
-        if value.startswith("```"):
-            if value == "```mermaid":
+        if index in code_lines:
+            if value == "```mermaid" and section != "__document__":
                 add("flow", "Source-backed primary flow with text alternative", index)
-            fenced = not fenced
             continue
-        if fenced or not value or index in code_lines:
+        if not value:
             continue
         heading = heading_lines.get(index)
         if heading and heading[0] >= 2:
             title = heading[1]
+            if section == "__document__" and heading[0] > 2:
+                add("style", title, index, required=False)
+                continue
             if heading[0] == 2:
                 section = title
                 headings.append(title)
@@ -81,8 +85,14 @@ def compile_requirements(text: str, template_hash: str) -> dict:
                     rows.append(row.strip().strip("|").split("|")[0].strip())
                 requirements[-1]["rows"] = rows
         elif value.startswith(">"):
+            if index == 0 or not lines[index - 1].strip().startswith(">"):
+                instruction_block = False
             label = re.search(r"\*\*(.+?)\*\*", value)
-            if label and "purpose" not in label[1].casefold():
+            instruction = label and re.search(
+                r"instruction|contract|check|cross-reference|preview image|goal", label[1], re.I
+            )
+            instruction_block = instruction_block or bool(instruction)
+            if label and not instruction_block and "purpose" not in label[1].casefold():
                 add("callout", label[1].rstrip(":"), index)
             elif value not in {">", "> "}:
                 add("style", value, index)
@@ -93,6 +103,8 @@ def compile_requirements(text: str, template_hash: str) -> dict:
             add(kind, value[1:-1], index)
         elif value.startswith("**"):
             add("style", value, index)
+        elif not value.startswith(("---", "<", "</", "|")):
+            add("style", value, index, required=False)
     return {
         "schema_version": 2,
         "hash": template_hash,
@@ -361,6 +373,31 @@ def validate_quality_plan(plan: dict, contract: dict, assets: list[dict], spans:
             )
     seen_images, seen_visuals = set(), set()
     for section in plan["sections"]:
+        for visual in section.get("visuals", []):
+            for key in visual_evidence_ids([visual]):
+                if key in spans and len(spans[key]["text"]) > 1000:
+                    if key not in visual.get("support_quotes", {}) and not any(
+                        item["evidence_id"] == key for item in visual.get("support_locations", [])
+                    ):
+                        findings.append(f"Visual needs precise support within evidence: {key}")
+            if visual.get("diagram"):
+                findings.extend(
+                    business_prose_findings(
+                        "```mermaid\n"
+                        + diagram_source(visual["diagram"])
+                        + "\n```\n"
+                        + visual["diagram"]["description"],
+                        contract.get("text", ""),
+                    )
+                )
+            for key, quote in visual.get("support_quotes", {}).items():
+                if key not in spans:
+                    findings.append(f"Visual quote references unknown evidence: {key}")
+                    continue
+                try:
+                    exact_support({**spans[key], "label": key}, quote)
+                except ValueError as error:
+                    findings.append(str(error))
         visuals = section.get("visuals", [])
         if sum(visual["kind"] == "diagram" for visual in visuals) > 1:
             findings.append("At most one primary diagram per section is supported")
@@ -429,27 +466,67 @@ def render_visuals(visuals: list[dict], assets: list[dict], evidence: list[dict]
         if visual["kind"] == "image":
             asset = by_hash[visual["asset_hash"]]
             alt = visual["text_alternative"].replace("[", "\\[").replace("]", "\\]")
-            blocks.append(f"![{alt}](assets/{asset_filename(asset)})\n\n{cited}")
+            content = f"![{alt}](assets/{asset_filename(asset)})"
+            title = visual["purpose"]
         else:
             diagram = visual["diagram"]
-            blocks.append(
-                f"```mermaid\n{diagram_source(diagram)}\n```\n\n{diagram['description']} {cited}"
-            )
+            content = f"```mermaid\n{diagram_source(diagram)}\n```"
+            title = diagram["description"]
+        blocks.append(
+            "<table>\n  <tr>\n    <td>\n\n"
+            + content
+            + '\n\n</td>\n  </tr>\n  <tr>\n    <td style="text-align: center;">\n'
+            + f"      <strong>{html.escape(title)}</strong>\n"
+            + "    </td>\n  </tr>\n</table>\n\n"
+            + cited
+        )
     return "\n\n".join(blocks)
+
+
+def position_visuals(markdown: str, visuals: list[dict], assets: list, evidence: list) -> str:
+    for visual in visuals:
+        title = visual.get("subsection")
+        if not title:
+            continue
+        block = render_visuals([visual], assets, evidence)
+        if block not in markdown:
+            continue
+        heading = re.search(rf"^(###)\s+{re.escape(title)}\s*$", markdown, re.M)
+        if not heading:
+            continue
+        markdown = markdown.replace(block, "", 1)
+        heading = re.search(rf"^###\s+{re.escape(title)}\s*$", markdown, re.M)
+        following = re.search(r"^#{1,3}\s+", markdown[heading.end() :], re.M)
+        end = heading.end() + following.start() if following else len(markdown)
+        markdown = markdown[:end].rstrip() + "\n\n" + block + "\n\n" + markdown[end:]
+    return markdown.strip()
 
 
 def placement_records(
     title: str, markdown: str, mappings: list[dict], assertions: dict, evidence: dict
 ) -> tuple[list[dict], list[str]]:
     findings, placements = [], {}
+    identifiers = [item["obligation_id"] for item in mappings]
+    if len(identifiers) != len(set(identifiers)):
+        findings.append("Invalid or duplicate obligation mapping")
     seen = set()
-    for mapping in mappings:
+    for mapping in mapping_occurrences(mappings):
         identifier = mapping["obligation_id"]
-        if identifier not in assertions or identifier in seen:
+        occurrence = (identifier, mapping["passage"])
+        if identifier not in assertions or occurrence in seen:
             findings.append("Invalid or duplicate obligation mapping")
             continue
-        seen.add(identifier)
+        seen.add(occurrence)
+        if mapping.get("disposition") == "out_of_scope":
+            if mapping["passage"] or not mapping.get("scope_reason", "").strip():
+                findings.append(
+                    f"Excluded fact needs an empty passage and scope reason: {identifier}"
+                )
+            continue
         passage = mapping["passage"]
+        if not passage.strip():
+            findings.append(f"Documented fact needs a reader passage: {identifier}")
+            continue
         start = markdown.find(passage)
         if start < 0 or markdown.count(passage) != 1:
             findings.append(f"Mapped passage is absent or ambiguous: {identifier}")
@@ -458,7 +535,7 @@ def placement_records(
             findings.append(f"Mapped passage lacks its local citations: {identifier}")
         supported = {evidence[key]["label"] for key in assertions[identifier]["evidence_ids"]}
         if not mapping["citation_ids"] or not set(mapping["citation_ids"]).issubset(supported):
-            findings.append(f"Mapping cites unsupported evidence: {identifier}")
+            findings.append(f"Mapping {identifier} may cite only {sorted(supported)}")
         key = digest([title, start, passage])[:20]
         placement = placements.setdefault(
             key,
@@ -607,6 +684,8 @@ def validate_visual_output(
     if diagrams != approved:
         findings.append("Mermaid differs from approved evidence-mapped specifications")
     for visual in visuals:
-        if visual.get("diagram") and visual["diagram"]["description"] not in markdown:
-            findings.append("Diagram text alternative is missing")
+        block = render_visuals([visual], assets, evidence)
+        table = block.partition("</table>")[0] + "</table>"
+        if table not in markdown:
+            findings.append("Visual must retain its two-row table and centered bold title")
     return findings

@@ -137,7 +137,7 @@ def test_section_mapping_normalizes_evidence_ids_to_citation_labels():
     assert normalized["mappings"][0]["citation_ids"] == ["D7", "D8", "C2"]
 
 
-def test_supporting_summary_does_not_require_every_context_assertion(tmp_path):
+def test_supporting_summary_rejects_unmapped_citations(tmp_path):
     store = ArtifactStore(tmp_path / "runtime")
     pipeline = Pipeline(store, None, "summary-audit")
     section = {"title": "Executive Summary", "obligation_ids": []}
@@ -151,6 +151,7 @@ def test_supporting_summary_does_not_require_every_context_assertion(tmp_path):
 
     pipeline.call = audit
     state = {
+        "template_ref": store.put({"text": "## Executive Summary"}),
         "section_index": 0,
         "unit_index": 0,
         "packet_ref": store.put(
@@ -163,6 +164,6 @@ def test_supporting_summary_does_not_require_every_context_assertion(tmp_path):
         "written_ref": store.put([]),
     }
     result = pipeline.verify_section(state)
-    assert result["route"] == "assemble_pages"
-    assert observed["mandatory_obligation_ids"] == []
-    assert observed["supporting_obligation_ids"] == ["support-a", "support-b"]
+    assert result["route"] == "write_section"
+    assert "Section misses approved obligations" in store.get(result["feedback_ref"])
+    assert not observed

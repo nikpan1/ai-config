@@ -35,6 +35,8 @@ class Settings:
     authoring_turn_limit: int = 8
     authoring_timeout_seconds: int = 300
     authoring_result_limit: int = 60000
+    thinking_level: str | None = None
+    audit_thinking_level: str | None = None
 
     @classmethod
     def load(cls, env_file: Path | None = None) -> "Settings":
@@ -45,6 +47,14 @@ class Settings:
             return (selected.parent / str(values.get(name) or default)).resolve()
 
         model = str(values.get("GEMINI_MODEL") or "gemini-3.8-flash")
+        thinking_level = str(values.get("DOCGEN_THINKING_LEVEL") or "").lower() or None
+        if thinking_level not in {None, "low", "medium", "high"}:
+            raise ValueError("DOCGEN_THINKING_LEVEL must be low, medium or high when configured")
+        audit_thinking_level = str(values.get("DOCGEN_AUDIT_THINKING_LEVEL") or "").lower() or None
+        if audit_thinking_level not in {None, "low", "medium", "high"}:
+            raise ValueError(
+                "DOCGEN_AUDIT_THINKING_LEVEL must be low, medium or high when configured"
+            )
         if model != "gemini-3.8-flash":
             raise ValueError("GEMINI_MODEL must be gemini-3.8-flash")
         configured_budget = values.get("DOCGEN_BUDGET_PLN")
@@ -85,6 +95,8 @@ class Settings:
             pricing_file=path("DOCGEN_PRICING_FILE", ".docgen/pricing.json"),
             api_key=str(values.get("GEMINI_API_KEY") or ""),
             model=model,
+            thinking_level=thinking_level,
+            audit_thinking_level=audit_thinking_level,
             output_tokens=int(values.get("DOCGEN_OUTPUT_TOKENS") or 8192),
             request_tokens=int(values.get("DOCGEN_REQUEST_TOKENS") or 100000),
             timeout_seconds=int(values.get("DOCGEN_TIMEOUT_SECONDS") or 120),

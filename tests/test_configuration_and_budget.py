@@ -49,3 +49,14 @@ def test_shared_ledger_reserves_without_resetting_existing_charges(tmp_path):
     assert uncapped.summary()["limit_pln"] is None
     assert uncapped.summary()["remaining_pln"] is None
     assert uncapped.summary()["charged_pln"] == 49.25
+
+
+def test_independent_audit_reasoning_is_explicit_and_validated(tmp_path):
+    env = tmp_path / ".env"
+    env.write_text("DOCGEN_THINKING_LEVEL=low\nDOCGEN_AUDIT_THINKING_LEVEL=medium\n", "utf-8")
+    settings = Settings.load(env)
+    assert settings.thinking_level == "low"
+    assert settings.audit_thinking_level == "medium"
+    env.write_text("DOCGEN_AUDIT_THINKING_LEVEL=automatic\n", "utf-8")
+    with pytest.raises(ValueError, match="DOCGEN_AUDIT_THINKING_LEVEL"):
+        Settings.load(env)
