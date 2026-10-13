@@ -1,4 +1,6 @@
+import json
 from collections import Counter
+from pathlib import Path
 
 import pytest
 
@@ -7,8 +9,8 @@ from docgen_graph.source_documents import document_context, extraction_packet
 from docgen_graph.storage import ArtifactStore, digest
 
 
-def source(text):
-    return {"kind": "docs", "hash": digest(text.encode()), "path": "registration.md"}
+def source(text, path="registration.md"):
+    return {"kind": "docs", "hash": digest(text.encode()), "path": path}
 
 
 def packets(text, **limits):
@@ -19,34 +21,25 @@ def packets(text, **limits):
     ]
 
 
-def test_heading_paths_respect_levels_setext_and_fenced_code():
+def test_small_document_keeps_whole_source_without_inferred_business_boundaries():
     text = (
-        "Guide\n=====\n\n### Registration\n\nOnly adults may register.\n\n"
-        "```markdown\n# Not a section\n```\n\n### Recovery\n\nUse a token.\n"
+        "---\nsource_url: https://example.com\n---\n# Guide\n\n## Registration\n"
+        "Only adults may register.\n\n| ID | Rule |\n| --- | --- |\n"
+        "| X | Accept terms. |\n\n## Recovery\nUse a token.\n"
     )
-    spans = document_spans(source(text), text)
-    recovery = next(span for span in spans if "Use a token" in span["text"])
-    assert recovery["heading"] == "Guide / Recovery"
-    fence = next(span for span in spans if span["syntax_kind"] == "fence")
-    assert fence["heading"] == "Guide / Registration"
-    assert "# Not a section" in fence["text"]
-    assert [heading["level"] for heading in recovery["heading_path"]] == [1, 3]
-
-
-def test_front_matter_does_not_become_a_setext_heading():
-    text = "---\nsource_url: https://example.com\n---\n\n# Registration\n\nAccept terms.\n"
-    spans = document_spans(source(text), text)
-    assert spans[0]["syntax_kind"] == "source_metadata"
+    spans, batches = packets(text)
+    assert len(spans) == len(batches) == 1
+    assert spans[0]["text"] == text
     assert spans[0]["heading"] == ""
-    assert spans[-1]["heading"] == "Registration"
+    assert not {"story_id", "table_id", "table_columns", "heading_path"} & spans[0].keys()
+    assert batches[0]["context_is_complete"]
 
 
 def test_long_lines_preserve_unicode_crlf_and_exact_character_ranges():
-    text = "# Registration\r\n\r\n" + "ż🙂 requirement " * 1300 + "\r\n"
-    spans = document_spans(source(text), text)
-    paragraphs = [span for span in spans if span["syntax_kind"] == "paragraph"]
-    assert len(paragraphs) > 1
-    assert "".join(span["text"] for span in paragraphs) == text.split("\r\n\r\n", 1)[1]
+    text = "# Registration\r\n\r\n" + "ż🙂 requirement " * 6000 + "\r\n"
+    spans, batches = packets(text)
+    assert len(spans) > 1
+    assert "".join(span["text"] for span in spans) == text
     assert len({span["id"] for span in spans}) == len(spans)
     for span in spans:
         assert len(span["text"]) <= 8000
@@ -56,132 +49,65 @@ def test_long_lines_preserve_unicode_crlf_and_exact_character_ranges():
             "start": span["source_start_char"],
             "end": span["source_end_char"],
         }
-    assert paragraphs[1]["start_column"] > 1
+    assert spans[1]["start_column"] > 1
+    assert all(not batch["context_is_complete"] for batch in batches)
 
 
-@pytest.mark.parametrize(
-    "body",
-    [
-        "Registration requires email. Registration requires consent. Minors cannot register.",
-        "- Registration requires email.\n- Registration requires consent.\n"
-        "- Minors cannot register.",
-        "| Rule |\n| --- |\n| Registration requires email. |\n"
-        "| Registration requires consent. |\n| Minors cannot register. |",
-    ],
-)
-def test_format_variants_preserve_all_source_meaning_in_each_story_context(body):
-    text = "# Registration\n\n" + body
-    spans, batches = packets(text, maximum_items=1)
-    statements = [
-        "Registration requires email.",
-        "Registration requires consent.",
-        "Minors cannot register.",
-    ]
-    for packet in batches:
-        available = packet["blocks"] + packet["context_blocks"]
-        combined = "\n".join(span["text"] for span in available)
-        assert all(statement in combined for statement in statements)
-        assert len({span["id"] for span in available}) == len(available)
+@pytest.mark.parametrize("variant", ["prose", "headings", "list", "table"])
+def test_predeclared_library_variants_keep_complete_source_context(variant):
+    cases = json.loads(
+        (Path(__file__).parents[1] / "evaluation/source-first-cases.json").read_text("utf-8")
+    )["cases"]
+    case = next(item for item in cases if item["id"] == "formatting-equivalence")
+    text = case["variants"][variant]
+    spans, batches = packets(text)
+    assert batches[0]["blocks"][0]["text"] == text
+    assert batches[0]["context_is_complete"]
+    assert not any("story_id" in span or "table_id" in span for span in spans)
+
+
+def test_adjacent_exception_remains_available_across_size_boundary():
+    text = "Neutral background. " * 3500
+    boundary = 24000
+    rule = "Borrowing requires active membership. "
+    exception = "Invited readers are exempt from membership. "
+    text = text[: boundary - len(rule)] + rule + exception + text[boundary:]
+    spans, batches = packets(text)
+    matching = [packet for packet in batches if any(rule in s["text"] for s in packet["blocks"])]
+    assert matching
+    for packet in matching:
+        context = "".join(s["text"] for s in packet["blocks"] + packet["context_blocks"])
+        assert exception in context
+        assert len(context) <= 48000
     owners = Counter(span["id"] for packet in batches for span in packet["blocks"])
     assert owners == Counter({span["id"]: 1 for span in spans})
 
 
-def test_every_boundary_keeps_prerequisites_exceptions_and_ancestor_intro():
-    text = (
-        "# Accounts\n\nAll rules apply to customers only.\n\n## Registration\n\n"
-        + "\n\n".join(f"Requirement {index} must hold." for index in range(15))
-        + "\n\nIf any requirement fails, registration is denied except for invited users.\n\n"
-        "## Recovery\n\nUse an independent recovery token.\n"
-    )
-    spans, batches = packets(text, maximum_items=3)
-    registration_id = next(span["story_id"] for span in spans if "Requirement 0" in span["text"])
-    for packet in batches:
-        if not any(span["story_id"] == registration_id for span in packet["blocks"]):
-            continue
-        available = "\n".join(span["text"] for span in packet["blocks"] + packet["context_blocks"])
-        assert "customers only" in available
-        assert "Requirement 0" in available
-        assert "Requirement 14" in available
-        assert "except for invited users" in available
+def test_small_cross_document_corpus_is_available_together():
+    texts = {
+        "rental.md": "Collection requires the check in [eligibility](eligibility.md).",
+        "eligibility.md": "The check requires an unexpired identity document.",
+        "note.md": "R-17 may refer to either site's independently defined requirement.",
+    }
+    spans = [
+        span for path, text in texts.items() for span in document_spans(source(text, path), text)
+    ]
+    inventory = {"spans": spans, **document_context(spans)}
+    assert len(inventory["document_batches"]) == 1
+    packet = extraction_packet(inventory, 0)
+    assert {span["path"] for span in packet["blocks"]} == set(texts)
+    assert packet["stories"] == []
 
 
-def test_user_story_rows_share_headers_but_do_not_require_the_whole_large_table():
-    text = "# Accounts\n\n| ID | User story |\n| --- | --- |\n" + "".join(
-        f"| S{index} | As a user, {'register safely ' * 200}. |\n" for index in range(25)
-    )
+def test_oversized_unformatted_document_remains_bounded_without_failure():
+    text = "Must accept terms. " * 9000 + "Except invited users."
     spans, batches = packets(text)
-    assert len(text) > 48000
-    rows = [span for span in spans if span["syntax_kind"] == "table_row"]
-    assert len({span["story_id"] for span in rows}) == 25
-    for packet in batches:
-        available = packet["blocks"] + packet["context_blocks"]
-        assert any(span["syntax_kind"] == "table_header" for span in available)
-        assert sum(len(span["text"]) for span in available) <= 48000
-
-
-def test_later_section_does_not_inherit_sibling_table_stories_as_ancestor_introduction():
-    text = (
-        "# Accounts\n\nRules apply to customers.\n\n| ID | User story |\n| --- | --- |\n"
-        + "".join(f"| S{index} | As a user, {'register safely ' * 200}. |\n" for index in range(25))
-        + "\n## Visual references\n\nThe registration form.\n"
+    assert "".join(span["text"] for span in spans) == text
+    assert all(
+        sum(len(span["text"]) for span in batch["blocks"] + batch["context_blocks"]) <= 48000
+        for batch in batches
     )
-    spans, batches = packets(text, maximum_items=1)
-    for packet in batches:
-        if any("registration form" in span["text"] for span in packet["blocks"]):
-            assert not any(span["syntax_kind"] == "table_row" for span in packet["context_blocks"])
-            assert any("Rules apply" in span["text"] for span in packet["context_blocks"])
-
-
-@pytest.mark.parametrize("identifier_header", ["ID", "Question ID"])
-def test_large_keyed_catalog_preserves_intro_tail_headers_and_empty_cell_context(identifier_header):
-    text = (
-        "# Dictionary\n\nAll codes require version 3.\n\n"
-        f"| {identifier_header} | Meaning | Qualification |\n| --- | --- | --- |\n"
-        + "".join(
-            f"| D{index} | {'A standalone dictionary value. ' * 80} | "
-            f"{'Applies only to adults.' if index % 2 == 0 else ''} |\n"
-            for index in range(30)
-        )
-        + "\nHistorical values must never be treated as current.\n"
-    )
-    spans, batches = packets(text, maximum_items=1)
-    rows = [span for span in spans if span["syntax_kind"] == "table_row"]
-    assert len({span["story_id"] for span in rows}) == 30
-    for packet in batches:
-        owned_rows = [span for span in packet["blocks"] if span["syntax_kind"] == "table_row"]
-        if not owned_rows:
-            continue
-        context = "\n".join(span["text"] for span in packet["context_blocks"])
-        assert "All codes require version 3." in context
-        assert "Historical values must never be treated as current." in context
-        assert f"| {identifier_header} | Meaning | Qualification |" in context
-        if owned_rows[0]["carry_context_lines"]:
-            assert "Applies only to adults." in context
-
-
-def test_oversized_heading_container_partitions_child_pages_with_shared_qualifications():
-    text = (
-        "# Product\n\nGlobal rules remain mandatory.\n\n"
-        "## Feature catalogue\n\nAll features require an active account.\n\n"
-        + "\n\n".join(
-            f"### Feature {index}\n\n" + "An independent feature rule. " * 100
-            for index in range(25)
-        )
-    )
-    spans, batches = packets(text)
-    assert len({span["story_id"] for span in spans if "An independent" in span["text"]}) == 25
-    for packet in batches:
-        if not any("An independent" in span["text"] for span in packet["blocks"]):
-            continue
-        available = "\n".join(span["text"] for span in packet["blocks"] + packet["context_blocks"])
-        assert "Global rules remain mandatory." in available
-        assert "All features require an active account." in available
-
-
-def test_oversized_story_context_fails_without_discarding_qualifications():
-    text = "# Registration\n\n" + "Must accept terms. " * 3000 + "Except invited users."
-    with pytest.raises(ValueError, match="context was not truncated"):
-        packets(text)
+    assert any(batch["context_blocks"] for batch in batches)
 
 
 def test_graph_only_snapshot_does_not_require_a_documentation_template(tmp_path):
@@ -191,3 +117,18 @@ def test_graph_only_snapshot_does_not_require_a_documentation_template(tmp_path)
     snapshot = snapshot_inputs(store, document, None, None, "Build the graph")
     assert snapshot["template_path"] is None
     assert store.get_bytes(snapshot["template_hash"]) == b""
+
+
+def test_large_plain_text_attachment_has_bounded_windows_and_original_locator(tmp_path):
+    from docgen_graph.ingestion import inventory
+
+    document = tmp_path / "source.txt"
+    document.write_bytes(("No formatting is needed. " * 4000).encode())
+    store = ArtifactStore(tmp_path / "artifacts")
+    snapshot = snapshot_inputs(store, document, None, None, "Read the plain text")
+    result = inventory(store, snapshot)
+    assert result["spans"]
+    assert all(len(span["text"]) <= 8000 for span in result["spans"])
+    assert all(span["source_kind"] == "attachment" for span in result["spans"])
+    assert all("text_start" in span["locator"] for span in result["spans"])
+    assert "".join(span["text"] for span in result["spans"]) == document.read_text("utf-8")

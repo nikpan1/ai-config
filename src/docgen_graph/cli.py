@@ -3,6 +3,7 @@ import json
 import re
 import sqlite3
 import sys
+import time
 from contextlib import closing
 from pathlib import Path
 
@@ -243,6 +244,7 @@ def _main() -> int:
                 "graph_only": args.graph_only,
                 "policy_version": "v2",
                 "status": "running",
+                "deadline": time.time() + settings.run_timeout_seconds,
             }
             decision = json.loads(args.decisions.read_text("utf-8")) if args.decisions else None
             result = _drive(graph, config, inputs, decision, sys.stdin.isatty())
@@ -280,8 +282,24 @@ def _main() -> int:
                 result["quality_report"] = str(
                     store.root / "runs" / args.thread_id / "graph-quality.json"
                 )
-            if result["status"] in {"complete", "complete_with_exclusions"}:
-                result["exclusions"] = str(store.root / "runs" / args.thread_id / "exclusions.md")
+            if result["status"] in {
+                "complete",
+                "complete_with_exclusions",
+                "complete_with_omissions",
+                "complete_with_limitations",
+                "degraded_source_bundle",
+            }:
+                for key, filename in (
+                    ("exclusions", "exclusions.md"),
+                    ("coverage_report", "source-coverage.json"),
+                ):
+                    artifact = store.root / "runs" / args.thread_id / filename
+                    if artifact.exists():
+                        result[key] = str(artifact)
+                output = store.root / "runs" / args.thread_id / "output" / "documentation.md"
+                if output.exists():
+                    result["documentation"] = str(output)
+                    result["quality_report"] = str(output.parent / "report.json")
         if args.command == "status" and not args.json:
             print(f"Status: {result['state'].get('status', 'not started')}")
             print(f"Next nodes: {', '.join(result['next']) or 'none'}")
@@ -294,9 +312,13 @@ def _main() -> int:
                 "complete": 0,
                 "graph_complete": 0,
                 "complete_with_exclusions": 0,
+                "complete_with_omissions": 0,
+                "complete_with_limitations": 0,
+                "degraded_source_bundle": 15,
                 "awaiting_manual_review": 10,
                 "rejected": 12,
                 "incomplete": 13,
+                "timed_out": 14,
             }.get(result.get("status"), 11)
             if isinstance(result, dict) and args.command in {"run", "resume"}
             else 0

@@ -169,12 +169,11 @@ def test_same_topic_name_in_distinct_scopes_remains_separate(tmp_path):
         ("unknown_source", "unknown evidence"),
         ("missing_fact", "not allocated"),
         ("duplicate_fact", "more than once"),
-        ("scope", "scope differ"),
+        ("scope", "changes fact scope"),
         ("condition", "drops fact conditions"),
         ("exception", "drops fact exceptions"),
         ("modality", "changes fact modality"),
         ("context_only", "no owned source"),
-        ("finding", "Unresolved semantic"),
     ],
 )
 def test_semantic_validator_rejects_unreleasable_graph(corruption, expected):
@@ -191,7 +190,7 @@ def test_semantic_validator_rejects_unreleasable_graph(corruption, expected):
         another["key"] = "duplicate"
         draft["rules"].append(another)
     elif corruption == "scope":
-        draft["topics"][0]["scope"] = "Different scope"
+        rule["scope"] = "Different scope"
     elif corruption == "condition":
         rule["condition_groups"][0]["conditions"].pop()
     elif corruption == "exception":
@@ -201,11 +200,41 @@ def test_semantic_validator_rejects_unreleasable_graph(corruption, expected):
     elif corruption == "context_only":
         payload["context_evidence_ids"] = payload["owned_evidence_ids"]
         payload["owned_evidence_ids"] = []
-    elif corruption == "finding":
-        draft["findings"] = ["Unclear antecedent"]
     canonical, issues = validate_semantic_proposal(draft, payload)
     assert canonical == {}
     assert any(expected in issue for issue in issues), issues
+
+
+def test_broader_topic_retains_narrow_rule_scopes_and_source_membership(tmp_path):
+    graph = KnowledgeGraph(tmp_path / "graph.sqlite")
+    first, first_draft = registration_batch("first", "Customer portal registration eligibility")
+    second, second_draft = registration_batch("second", "Customer portal invited registration")
+    for payload, draft in ((first, first_draft), (second, second_draft)):
+        draft["topics"][0]["scope"] = "Customer portal"
+        draft["rules"][0]["condition_groups"][0]["source_conditions"] = []
+        add_batch(graph, payload, draft, payload["sources"][0]["id"])
+    topics = topic_register(graph)
+    assert len(topics) == 1
+    assert len(topics[0]["rules"]) == 2
+    nodes, _ = semantic_records(graph)
+    rules = [node for node in nodes if node["type"] == "Rule"]
+    assert {rule["scope"] for rule in rules} == {
+        first["facts"][0]["scope"], second["facts"][0]["scope"]
+    }
+    assert all(rule["quotes"] for rule in rules)
+    assert semantic_quality_report(graph)["accepted"]
+
+
+def test_broader_topic_does_not_allow_broadening_a_rule_or_dropping_membership_quotes():
+    payload, draft = registration_batch(scope="Customer portal invited registration")
+    draft["topics"][0]["scope"] = "Customer portal"
+    draft["rules"][0]["scope"] = "Customer portal"
+    _, findings = validate_semantic_proposal(draft, payload)
+    assert any("changes fact scope" in finding for finding in findings)
+    draft["rules"][0]["scope"] = payload["facts"][0]["scope"]
+    draft["rules"][0]["topic_quotes"] = []
+    _, findings = validate_semantic_proposal(draft, payload)
+    assert any("Invalid semantic graph contract" in finding for finding in findings)
 
 
 def test_existing_topic_cannot_change_scope_through_registered_key(tmp_path):

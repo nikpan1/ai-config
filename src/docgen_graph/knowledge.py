@@ -434,8 +434,103 @@ class KnowledgeGraph:
             item = FactRecord.model_validate(item).model_dump()
             return item
 
+    def source_context(
+        self,
+        queries: list[str] | None = None,
+        mandatory_evidence_ids: list[str] | None = None,
+        max_characters: int = 60000,
+    ) -> dict:
+        if max_characters < 1:
+            raise ValueError("Source context budget must be positive")
+        with self.connect() as connection:
+            identifiers = [
+                row[0]
+                for row in connection.execute("SELECT id FROM evidence ORDER BY path,start_line,id")
+            ]
+        sources = [self.evidence(identifier) for identifier in identifiers]
+        sources.sort(
+            key=lambda source: (
+                source["path"],
+                source["start_line"],
+                source.get("start_column", 1),
+                source.get("source_start_char", 0),
+            )
+        )
+        identifiers = [source["id"] for source in sources]
+        required = set(mandatory_evidence_ids or [])
+        terms = set(re.findall(r"[\w-]{3,}", " ".join(queries or []).casefold()))
+        total = sum(len(source["text"]) for source in sources)
+        if total <= max_characters:
+            return {
+                "evidence": sources,
+                "context_characters": total,
+                "omitted_evidence_ids": [],
+                "excerpted_evidence_ids": [],
+                "policy": "whole-source-context",
+            }
+        ranked = sorted(
+            sources,
+            key=lambda source: (
+                source["id"] not in required,
+                -sum(term in source["text"].casefold() for term in terms),
+            ),
+        )
+        positions = {source["id"]: index for index, source in enumerate(sources)}
+        contextual_order = []
+        queued = set()
+        for source in ranked:
+            index = positions[source["id"]]
+            neighbors = [source] + [
+                sources[position]
+                for position in (index - 1, index + 1)
+                if 0 <= position < len(sources)
+                and sources[position]["path"] == source["path"]
+                and sources[position]["file_hash"] == source["file_hash"]
+            ]
+            for neighbor in neighbors:
+                if neighbor["id"] not in queued:
+                    contextual_order.append(neighbor)
+                    queued.add(neighbor["id"])
+        ranked = sorted(contextual_order, key=lambda source: source["id"] not in required)
+        selected, excerpted, used = [], [], 0
+        for source in ranked:
+            remaining = max_characters - used
+            if remaining <= 0:
+                break
+            text = source["text"]
+            if len(text) > remaining:
+                if selected and source["id"] not in required:
+                    continue
+                positions = [text.casefold().find(term) for term in terms]
+                matches = [position for position in positions if position >= 0]
+                start = max(0, min(matches) - remaining // 3) if matches else 0
+                start = min(start, max(0, len(text) - remaining))
+                source = {
+                    **source,
+                    "text": text[start : start + remaining],
+                    "context_excerpt_start": start,
+                    "context_excerpt_end": start + remaining,
+                    "context_excerpt": True,
+                }
+                excerpted.append(source["id"])
+            selected.append(source)
+            used += len(source["text"])
+        chosen = {source["id"] for source in selected}
+        return {
+            "evidence": selected,
+            "context_characters": used,
+            "omitted_evidence_ids": [key for key in identifiers if key not in chosen],
+            "excerpted_evidence_ids": excerpted,
+            "policy": "bounded-source-context",
+        }
+
     def retrieve(
-        self, queries: list[str], mandatory: list[str], hops: int = 2, optional_limit: int = 40
+        self,
+        queries: list[str],
+        mandatory: list[str],
+        hops: int = 2,
+        optional_limit: int = 40,
+        source_context_characters: int = 60000,
     ) -> dict:
         seeds = []
         with self.connect() as connection:
@@ -512,6 +607,10 @@ class KnowledgeGraph:
             {item["id"]: item for item in assertions + semantic["assertions"]}.values()
         )
         evidence = list({item["id"]: item for item in evidence + semantic["evidence"]}.values())
+        context = self.source_context(
+            queries, [item["id"] for item in evidence], source_context_characters
+        )
+        evidence = list({item["id"]: item for item in context["evidence"] + evidence}.values())
         return {
             "queries": queries,
             "mandatory": mandatory,
@@ -523,5 +622,6 @@ class KnowledgeGraph:
             "limits_reached": bool(queue),
             "mandatory_closure": sorted(closure),
             "context_characters": sum(len(item["text"]) for item in evidence),
-            "policy": "lexical-two-hop-v1",
+            "policy": context["policy"],
+            "source_context": {key: value for key, value in context.items() if key != "evidence"},
         }

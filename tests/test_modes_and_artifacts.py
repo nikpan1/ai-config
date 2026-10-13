@@ -58,7 +58,7 @@ def test_manual_review_is_checkpointed_after_each_artifact(tmp_path):
         second = graph.get_state(config).tasks[0].interrupts[0].value
         assert second["kind"] == "stage"
         assert second["stage"] == "inventory_sources"
-        assert second["next"] == "inventory_source_aspects"
+        assert second["next"] == "prepare_source_images"
         assert not (store.root / "runs" / "example" / "step3").exists()
 
 

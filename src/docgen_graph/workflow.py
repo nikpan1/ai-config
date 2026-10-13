@@ -11,6 +11,8 @@ from pathlib import Path
 from time import monotonic
 from typing import TypedDict
 
+import httpx
+from google.genai.errors import APIError
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import interrupt
 from pydantic import ValidationError
@@ -23,6 +25,15 @@ from docgen_graph.authoring.template import (
     number_generated_headings,
 )
 from docgen_graph.authoring.tools import AuthoringTools, declarations
+from docgen_graph.completion import (
+    GroundedDocument,
+    SourceDocumentAudit,
+    SourcePlan,
+    citation_findings,
+    document_content_hash,
+    quarantine_document,
+    render_grounded_document,
+)
 from docgen_graph.contracts import (
     AuditDraft,
     DocumentExtractionDraft,
@@ -31,6 +42,7 @@ from docgen_graph.contracts import (
     SectionDraft,
     VisualEvidenceDraft,
 )
+from docgen_graph.document_repairs import repair_document_draft, unique_visual_quote
 from docgen_graph.documentation_contracts import AspectInventory, SourceAudit
 from docgen_graph.evidence_contracts import (
     AnalysisProvenance,
@@ -75,10 +87,12 @@ from docgen_graph.quality import (
     validate_visual_output,
     visual_evidence_ids,
 )
-from docgen_graph.semantic_contracts import SemanticGraphDraft
+from docgen_graph.quality_policy import evaluate_coverage
+from docgen_graph.semantic_contracts import NavigationalGraphDraft, SemanticGraphDraft
 from docgen_graph.semantic_graph import (
     anchor_semantic_quotes,
     publish_semantic_batch,
+    salvage_semantic_proposal,
     semantic_payload,
     semantic_quality_report,
     semantic_records,
@@ -86,9 +100,9 @@ from docgen_graph.semantic_graph import (
     validate_semantic_proposal,
 )
 from docgen_graph.source_coverage import (
-    audit_decisions,
     coverage_report,
     editorial_findings,
+    source_audit_findings,
     validate_aspect_inventory,
 )
 from docgen_graph.source_links import (
@@ -106,6 +120,21 @@ from docgen_graph.storage import ArtifactStore, digest
 
 
 class PipelineState(TypedDict, total=False):
+    completion_context_ref: str
+    completion_plan_ref: str
+    completion_draft_ref: str
+    completion_audit_ref: str
+    completion_findings_ref: str
+    completion_attempt: int
+    completion_packet_index: int
+    completion_sections_ref: str
+    completion_path: str
+    limitations_ref: str
+    recovery_counts: dict
+    deadline: float
+    prefetched_aspects_ref: str
+    prefetched_extractions_ref: str
+    final_source_decisions_ref: str
     graph_only: bool
     fact_batches_ref: str
     semantic_index: int
@@ -298,6 +327,30 @@ class Pipeline:
     def repair_limit(self) -> int:
         return getattr(getattr(self.model, "settings", None), "content_repair_limit", 2)
 
+    def fast_mode(self) -> bool:
+        return getattr(getattr(self.model, "settings", None), "fast_mode", False)
+
+    def minimum_coverage(self) -> float:
+        return getattr(getattr(self.model, "settings", None), "minimum_coverage", 1.0)
+
+    def source_first(self, state: PipelineState) -> bool:
+        return state.get("mode") == "autopilot" and getattr(
+            getattr(self.model, "settings", None), "source_first", False
+        )
+
+    def limitations(self, state: PipelineState, findings: list[str]) -> str:
+        return self.store.put(
+            list(dict.fromkeys(self.read(state, "limitations_ref", []) + findings))
+        )
+
+    def call_many(self, stage: str, payloads: list[dict], schema) -> list[dict]:
+        if hasattr(self.model, "call_many"):
+            return [
+                schema.model_validate(item).model_dump()
+                for item in self.model.call_many(stage, payloads, schema)
+            ]
+        return [self.call(stage, payload, schema) for payload in payloads]
+
     def runtime_signature(self) -> str:
         prompts = files("docgen_graph").joinpath("prompts")
         prompt_hashes = {item.name: digest(item.read_bytes()) for item in prompts.iterdir()}
@@ -314,6 +367,12 @@ class Pipeline:
                 "authoring_turn_limit",
                 "authoring_timeout_seconds",
                 "authoring_result_limit",
+                "fast_mode",
+                "model_workers",
+                "minimum_coverage",
+                "run_timeout_seconds",
+                "source_first",
+                "finalization_reserve_seconds",
             )
         }
         return digest(
@@ -409,6 +468,7 @@ class Pipeline:
         return {
             "snapshot_ref": self.store.put(snapshot),
             "runtime_signature": signature,
+            "deadline": state.get("deadline", 0),
             "status": "running",
         }
 
@@ -432,7 +492,32 @@ class Pipeline:
             "source_aspects_ref": self.store.put([]),
             "source_decisions_ref": self.store.put([]),
             "source_non_substantive_ref": self.store.put([]),
-            "route": "inventory_source_aspects",
+            "route": "prepare_source_images",
+        }
+
+    def prepare_source_images(self, state: PipelineState) -> dict:
+        from docgen_graph.image_preparation import prepare_image_context
+
+        prepared = prepare_image_context(
+            self.model,
+            self.store,
+            self.read(state, "snapshot_ref"),
+            self.read(state, "inventory_ref"),
+        )
+        self.graph.add_evidence(prepared["spans"])
+        return {
+            "inventory_ref": self.store.put(prepared),
+            "limitations_ref": self.limitations(
+                state,
+                [
+                    f"Image interpretation unavailable: {item['path']}"
+                    for item in prepared.get("image_analyses", [])
+                    if item.get("status") == "unavailable"
+                ],
+            ),
+            "route": "extract_document_batch"
+            if self.source_first(state)
+            else "inventory_source_aspects",
         }
 
     def inventory_source_aspects(self, state: PipelineState) -> dict:
@@ -441,15 +526,32 @@ class Pipeline:
         batches = inventory_record["document_batches"]
         if index >= len(batches):
             return {"route": "extract_document_batch"}
+        if self.fast_mode() and not state.get("prefetched_aspects_ref"):
+            drafts = self.call_many(
+                "inventory_aspects",
+                [
+                    {**extraction_packet(inventory_record, batch), "feedback": [], "previous": None}
+                    for batch in range(len(batches))
+                ],
+                AspectInventory,
+            )
+            return {
+                "prefetched_aspects_ref": self.store.put(drafts),
+                "route": "inventory_source_aspects",
+            }
         spans = self.spans(state)
-        draft = self.call(
-            "inventory_aspects",
-            {
-                **extraction_packet(inventory_record, index),
-                "feedback": self.read(state, "feedback_ref", []),
-                "previous": self.read(state, "draft_ref") if state.get("attempt") else None,
-            },
-            AspectInventory,
+        draft = (
+            self.read(state, "prefetched_aspects_ref")[index]
+            if (self.fast_mode() and not state.get("attempt"))
+            else self.call(
+                "inventory_aspects",
+                {
+                    **extraction_packet(inventory_record, index),
+                    "feedback": self.read(state, "feedback_ref", []),
+                    "previous": self.read(state, "draft_ref") if state.get("attempt") else None,
+                },
+                AspectInventory,
+            )
         )
         aspects, findings = validate_aspect_inventory(draft["aspects"], spans)
         covered = {item["evidence_id"] for item in aspects} | set(draft["non_substantive"])
@@ -499,12 +601,29 @@ class Pipeline:
                 ],
                 "inventory_sources",
             )
+        if self.fast_mode() and not state.get("prefetched_extractions_ref"):
+            drafts = self.call_many(
+                "extract_document",
+                [
+                    {**extraction_packet(inventory_record, batch), "feedback": [], "previous": None}
+                    for batch in range(len(inventory_record["document_batches"]))
+                ],
+                DocumentExtractionDraft,
+            )
+            return {
+                "prefetched_extractions_ref": self.store.put(drafts),
+                "route": "extract_document_batch",
+            }
         payload = {
             **extraction_packet(inventory_record, state["document_index"]),
             "feedback": self.read(state, "feedback_ref", []),
             "previous": self.read(state, "draft_ref") if state.get("attempt") else None,
         }
-        draft = self.call("extract_document", payload, DocumentExtractionDraft)
+        draft = (
+            self.read(state, "prefetched_extractions_ref")[state["document_index"]]
+            if (self.fast_mode() and not state.get("attempt"))
+            else self.call("extract_document", payload, DocumentExtractionDraft)
+        )
         model_name = getattr(getattr(self.model, "settings", None), "model", "test-double")
         provenance = AnalysisProvenance(
             id=digest([model_name, "extract_document.v1", payload, draft]),
@@ -552,7 +671,37 @@ class Pipeline:
         covered = {key for record in records for key in record["evidence_ids"]}
         covered.update(item["evidence_id"] for item in excluded)
         missing = set(ids) - covered
-        if missing:
+        if self.source_first(state):
+            valid_records = []
+            for item in draft["assertions"]:
+                try:
+                    valid_records.append(
+                        normalized_assertion({**item, "review_status": "unreviewed"}, allowed)
+                    )
+                except (ValueError, TypeError) as error:
+                    findings.append(str(error))
+            next_index = state["document_index"] + 1
+            return {
+                "assertions_ref": self.store.put(self.assertions(state) + valid_records),
+                "fact_batches_ref": self.store.put(
+                    self.read(state, "fact_batches_ref", [])
+                    + [[item["id"] for item in valid_records]]
+                ),
+                "document_provenance_ref": self.store.put(
+                    self.read(state, "document_provenance_ref", [])
+                    + [self.read(state, "document_candidate_provenance_ref")]
+                ),
+                "exclusions_ref": self.store.put(self.read(state, "exclusions_ref", []) + excluded),
+                "limitations_ref": self.limitations(state, findings),
+                "document_index": next_index,
+                "attempt": 0,
+                "draft_ref": "",
+                "feedback_ref": "",
+                "route": "extract_document_batch"
+                if next_index < len(inventory_record["document_batches"])
+                else "link_graph_batch",
+            }
+        if missing and self.minimum_coverage() == 1.0:
             findings.append(f"Document blocks lack coverage: {sorted(missing)}")
         audit = (
             self.call(
@@ -560,6 +709,7 @@ class Pipeline:
                 {
                     **packet,
                     "draft": draft,
+                    "coverage_audited_separately": self.minimum_coverage() < 1.0,
                 },
                 AuditDraft,
             )
@@ -594,6 +744,7 @@ class Pipeline:
             {
                 **extraction_packet(inventory_record, state["document_index"]),
                 "aspects": aspects,
+                "minimum_coverage": self.minimum_coverage(),
                 "facts": pending["records"],
                 "non_substantive_candidates": [
                     item
@@ -603,8 +754,13 @@ class Pipeline:
             },
             SourceAudit,
         )
-        findings = audit["findings"] + audit_decisions(
-            aspects, audit["decisions"], pending["records"]
+        findings = audit["findings"] + source_audit_findings(
+            aspects,
+            audit["decisions"],
+            pending["records"],
+            all_aspects=self.read(state, "source_aspects_ref", []),
+            prior_decisions=self.read(state, "source_decisions_ref", []),
+            minimum_coverage=self.minimum_coverage(),
         )
         if findings:
             if state.get("attempt", 0) < self.repair_limit():
@@ -684,7 +840,7 @@ class Pipeline:
                 if state.get("attempt")
                 else None,
             },
-            SemanticGraphDraft,
+            NavigationalGraphDraft if self.source_first(state) else SemanticGraphDraft,
         )
         draft, anchoring = anchor_semantic_quotes(raw_draft, payload)
         return {
@@ -699,6 +855,30 @@ class Pipeline:
         payload = self.read(state, "semantic_payload_ref")
         draft = self.read(state, "semantic_draft_ref")
         canonical, findings = validate_semantic_proposal(draft, payload)
+        if self.source_first(state):
+            if findings:
+                canonical, findings = salvage_semantic_proposal(draft, payload)
+            limitations = draft.get("findings", []) + [
+                "Graph interpretation withheld: " + item for item in findings
+            ]
+            if not canonical:
+                return {
+                    "semantic_index": state.get("semantic_index", 0) + 1,
+                    "limitations_ref": self.limitations(state, limitations),
+                    "route": "propose_semantic_graph",
+                }
+            return {
+                "semantic_canonical_ref": self.store.put(canonical),
+                "semantic_audit_ref": self.store.put(
+                    {
+                        "accepted": None,
+                        "status": "source_links_validated_semantics_unreviewed",
+                        "findings": draft.get("findings", []) + findings,
+                    }
+                ),
+                "limitations_ref": self.limitations(state, limitations),
+                "route": "publish_semantic_graph",
+            }
         audit = {"accepted": False, "findings": findings}
         if not findings:
             audit = self.call("audit_semantic_graph", {**payload, "draft": draft}, AuditDraft)
@@ -758,7 +938,7 @@ class Pipeline:
         covered = {key for item in assertions for key in item["evidence_ids"]}
         covered.update(item["evidence_id"] for item in exclusions)
         missing = set(spans) - covered
-        if missing:
+        if missing and self.minimum_coverage() == 1.0 and not self.source_first(state):
             return self.issue(
                 state,
                 "finalize_graph",
@@ -780,11 +960,24 @@ class Pipeline:
             state["snapshot_ref"],
             revision,
             self.read(state, "snapshot_ref").get("attachments", []),
+            minimum_coverage=self.minimum_coverage(),
         )
-        if not quality["source_coverage"]["complete"]:
+        if self.source_first(state):
+            quality["source_coverage"].update(
+                {
+                    "coverage_ratio": None,
+                    "complete": None,
+                    "accepted": None,
+                    "status": "not_independently_measured",
+                    "reason": "Source-first mode uses original context and a final document audit; "
+                    "no separate source-aspect inventory was audited",
+                }
+            )
+            quality["source_coverage"]["qualifiers"]["coverage_ratio"] = None
+        elif not quality["source_coverage"]["accepted"]:
             quality["accepted"] = False
             quality["findings"].append("Source aspect or attachment coverage is incomplete")
-        if not quality["accepted"]:
+        if not quality["accepted"] and not self.source_first(state):
             self.store.write(
                 f"runs/{self.run_id}/graph-quality.json",
                 json.dumps(quality, ensure_ascii=False, indent=2),
@@ -814,7 +1007,9 @@ class Pipeline:
             "excluded": exclusions,
             "input_exclusions": self.read(state, "snapshot_ref")["exclusions"],
             "conflict_candidates": self.graph.conflict_candidates(),
-            "policy": "lexical-two-hop-v1",
+            "policy": "source-first-context-v1"
+            if self.source_first(state)
+            else "lexical-two-hop-v1",
         }
         self.store.write(f"runs/{self.run_id}/graph-manifest.json", json.dumps(manifest, indent=2))
         frozen = self.store.root / "graphs" / revision / "graph.sqlite"
@@ -833,7 +1028,7 @@ class Pipeline:
                         {key for item in assertions for key in item["evidence_ids"]}
                     ),
                     "excluded_with_reason": exclusions + non_substantive,
-                    "unresolved": [],
+                    "unresolved": sorted(missing),
                 },
                 ensure_ascii=False,
                 indent=2,
@@ -851,7 +1046,361 @@ class Pipeline:
             )
             if state.get("graph_only")
             else "graph_ready",
-            "route": END if state.get("graph_only") else "compile_template",
+            "route": END
+            if state.get("graph_only")
+            else ("plan_source_document" if self.source_first(state) else "compile_template"),
+        }
+
+    def completion_context(self, state: PipelineState, queries: list[str] | None = None) -> dict:
+        settings = getattr(self.model, "settings", None)
+        capacity = max(
+            2000,
+            min(
+                120000,
+                int(getattr(settings, "request_tokens", 100000))
+                - int(getattr(settings, "output_tokens", 8192))
+                - 16000,
+            ),
+        )
+        return self.graph.source_context(queries=queries or [], max_characters=capacity)
+
+    def plan_source_document(self, state: PipelineState) -> dict:
+        context = self.completion_context(state, [state.get("brief", "")])
+        snapshot = self.read(state, "snapshot_ref")
+        overview = []
+        if context.get("omitted_evidence_ids") or context.get("excerpted_evidence_ids"):
+            by_path = {}
+            spans = self.spans(state)
+            for fact in self.assertions(state):
+                for source_id in fact["evidence_ids"]:
+                    if source_id in spans:
+                        by_path.setdefault(spans[source_id]["path"], []).append(fact["statement"])
+            capacity = 12000
+            for path in dict.fromkeys(span["path"] for span in spans.values()):
+                summary = " ".join(dict.fromkeys(by_path.get(path, [])))[:1000]
+                if len(path) + len(summary) > capacity:
+                    break
+                overview.append({"path": path, "navigation_summary": summary})
+                capacity -= len(path) + len(summary)
+        plan = self.call(
+            "source_plan",
+            {
+                "brief": state.get("brief", ""),
+                "template": self.store.get_bytes(snapshot["template_hash"]).decode("utf-8"),
+                "sources": context,
+                "corpus_overview": overview,
+                "overview_may_be_incomplete": bool(
+                    context.get("omitted_evidence_ids") or context.get("excerpted_evidence_ids")
+                )
+                and len(overview) < len(snapshot.get("files", [])),
+            },
+            SourcePlan,
+        )
+        return {
+            "completion_plan_ref": self.store.put(plan),
+            "completion_context_ref": self.store.put(context),
+            "completion_packet_index": 0,
+            "completion_attempt": 0,
+            "completion_sections_ref": self.store.put([]),
+            "route": "write_source_document",
+        }
+
+    def write_source_document(self, state: PipelineState) -> dict:
+        plan = self.read(
+            state,
+            "completion_plan_ref",
+            {"title": "Documentation", "sections": ["Source-backed behavior"], "questions": []},
+        )
+        context = self.read(state, "completion_context_ref") or self.completion_context(state)
+        packet_index = state.get("completion_packet_index", 0)
+        split = bool(context.get("omitted_evidence_ids") or context.get("excerpted_evidence_ids"))
+        selected_plan = plan
+        if split:
+            section = plan["sections"][packet_index]
+            selected_plan = {**plan, "sections": [section]}
+            context = self.completion_context(state, [section, state.get("brief", "")])
+        snapshot = self.read(state, "snapshot_ref")
+        draft = self.call(
+            "source_document",
+            {
+                "brief": state.get("brief", ""),
+                "plan": selected_plan,
+                "template": self.store.get_bytes(snapshot["template_hash"]).decode("utf-8"),
+                "sources": context,
+                "images": [
+                    {key: asset.get(key) for key in ("hash", "path", "format")}
+                    for asset in self.read(state, "inventory_ref").get("assets", [])
+                    if asset.get("disposition") != "rejected"
+                ],
+                "feedback": self.read(state, "completion_findings_ref", []),
+                "previous": self.read(state, "completion_draft_ref")
+                if state.get("completion_attempt")
+                else None,
+                "limitations": self.read(state, "limitations_ref", []),
+            },
+            GroundedDocument,
+        )
+        findings = citation_findings(draft, context["evidence"])
+        if findings and state.get("completion_attempt", 0) < 1:
+            return {
+                "completion_draft_ref": self.store.put(draft),
+                "completion_findings_ref": self.store.put(findings),
+                "completion_attempt": 1,
+                "route": "write_source_document",
+            }
+        if split:
+            sections = self.read(state, "completion_sections_ref", []) + draft["sections"]
+            if packet_index + 1 < len(plan["sections"]):
+                return {
+                    "completion_sections_ref": self.store.put(sections),
+                    "completion_draft_ref": "",
+                    "completion_packet_index": packet_index + 1,
+                    "completion_attempt": 0,
+                    "completion_findings_ref": self.store.put([]),
+                    "limitations_ref": self.limitations(state, findings + draft["limitations"]),
+                    "route": "write_source_document",
+                }
+            draft["sections"] = sections
+        return {
+            "completion_draft_ref": self.store.put(draft),
+            "completion_sections_ref": self.store.put([]),
+            "completion_findings_ref": self.store.put(findings),
+            "route": "audit_source_document",
+        }
+
+    def audit_source_document(self, state: PipelineState) -> dict:
+        draft = self.read(state, "completion_draft_ref")
+        draft, withheld = quarantine_document(draft, list(self.spans(state).values()), None)
+        audit_metadata = {
+            "document_content_hash": document_content_hash(draft),
+            "citation_withheld_paragraphs": withheld,
+        }
+        candidate_update = {
+            "completion_draft_ref": self.store.put(draft),
+            "limitations_ref": self.limitations(state, withheld),
+        }
+        evidence_ids = list(
+            dict.fromkeys(
+                source["evidence_id"]
+                for section in draft["sections"]
+                for paragraph in section["paragraphs"]
+                for source in paragraph["sources"]
+            )
+        )
+        context = self.completion_context(state)
+        known = {item["id"] for item in context["evidence"]}
+        missing = set(evidence_ids) - known
+        if missing or context.get("excerpted_evidence_ids"):
+            return {
+                **candidate_update,
+                "limitations_ref": self.limitations(
+                    state,
+                    withheld
+                    + [
+                        "Final semantic audit context is incomplete; "
+                        "some cited sources require separate review"
+                    ],
+                ),
+                "completion_audit_ref": self.store.put(
+                    {
+                        **audit_metadata,
+                        "accepted": False,
+                        "findings": [],
+                        "coverage_estimate": None,
+                        "coverage_explanation": "Draft exceeds the bounded final audit context",
+                    }
+                ),
+                "route": "finalize_source_document",
+            }
+        audit = self.call(
+            "audit_source_document",
+            {"document": draft, "sources": context, "minimum_coverage": self.minimum_coverage()},
+            SourceDocumentAudit,
+        )
+        return {
+            **candidate_update,
+            "completion_audit_ref": self.store.put({**audit, **audit_metadata}),
+            "route": "finalize_source_document",
+        }
+
+    def finalize_source_document(self, state: PipelineState) -> dict:
+        evidence = list(self.spans(state).values()) if state.get("inventory_ref") else []
+        draft = self.read(state, "completion_draft_ref")
+        audit = self.read(state, "completion_audit_ref")
+        limitations = self.read(state, "limitations_ref", [])
+        completed_sections = self.read(state, "completion_sections_ref", [])
+        if draft and completed_sections:
+            draft = {**draft, "sections": completed_sections + draft["sections"]}
+        if not draft:
+            sections = completed_sections
+            draft = {"title": "Documentation", "sections": sections, "limitations": []}
+            if not sections:
+                draft["sections"] = [
+                    {
+                        "title": "Preserved source extracts",
+                        "paragraphs": [
+                            {
+                                "text": span["text"],
+                                "sources": [{"evidence_id": span["id"], "quote": span["text"]}],
+                                "uncertainty": "Original extract; synthesis was not completed",
+                            }
+                            for span in evidence
+                        ],
+                        "image_hashes": [],
+                    }
+                ]
+                limitations.append(
+                    "Synthesis was unavailable. This is a source extract bundle, "
+                    "not completed documentation."
+                )
+        cleaned, removed = quarantine_document(draft, evidence, audit)
+        limitations.extend(removed)
+        limitations.extend(item["explanation"] for item in (audit or {}).get("findings", []))
+        if not audit:
+            limitations.append("Final semantic audit was not completed")
+        elif not audit.get("accepted") and not audit.get("findings"):
+            limitations.append("Final semantic audit did not accept the document")
+        context = self.read(state, "completion_context_ref", {})
+        if context.get("omitted_evidence_ids") or context.get("excerpted_evidence_ids"):
+            limitations.append(
+                f"Initial bounded context omitted {len(context.get('omitted_evidence_ids', []))} "
+                f"and excerpted {len(context.get('excerpted_evidence_ids', []))} "
+                "source fragments; coverage is not fully measured"
+            )
+        cleaned["limitations"] = list(dict.fromkeys(cleaned.get("limitations", []) + limitations))
+        generated = bool(
+            state.get("completion_draft_ref")
+            or state.get("completion_sections_ref")
+            and self.read(state, "completion_sections_ref")
+        )
+        usable = any(section["paragraphs"] for section in cleaned["sections"])
+        if not usable and evidence:
+            cleaned["sections"] = [
+                {
+                    "title": "Preserved source extracts",
+                    "paragraphs": [
+                        {
+                            "text": span["text"],
+                            "sources": [{"evidence_id": span["id"], "quote": span["text"]}],
+                            "uncertainty": "Original extract; generated synthesis was withheld",
+                        }
+                        for span in evidence
+                    ],
+                    "image_hashes": [],
+                }
+            ]
+            cleaned["limitations"].append(
+                "Generated synthesis was withheld. This is a source extract bundle, "
+                "not completed documentation."
+            )
+        accepted = bool(
+            audit
+            and audit.get("accepted")
+            and not removed
+            and not context.get("omitted_evidence_ids")
+            and not context.get("excerpted_evidence_ids")
+            and not cleaned["limitations"]
+            and audit.get("coverage_estimate", 0) >= self.minimum_coverage()
+            and audit.get("document_content_hash") == document_content_hash(cleaned)
+        )
+        status = (
+            "complete"
+            if accepted and generated and usable
+            else "complete_with_limitations"
+            if generated and usable
+            else "degraded_source_bundle"
+        )
+        directory = f"runs/{self.run_id}/output"
+        for span in evidence:
+            provenance = (
+                "AI-generated image interpretation"
+                if span.get("role") == "generated_image_description"
+                else "Original source fragment"
+            )
+            origin = (
+                f"Source image: [{span['source_image_path']}]"
+                f"(../originals/{span['source_image_path']}). "
+                f"Provider: {span.get('provider', 'unknown')}; "
+                f"model: {span.get('model', 'unknown')}. "
+                f"Image SHA-256: `{span.get('source_image_hash', '')}`.\n\n"
+                if span.get("source_image_path")
+                else f"[Original document](../originals/{span['path']})\n\n"
+            )
+            self.store.write(
+                f"{directory}/evidence/{span['id']}.md",
+                f"# {span['path']}\n\n{provenance}. "
+                f"Lines {span['start_line']}-{span['end_line']}.\n\n"
+                f"{origin}SHA-256: `{span['file_hash']}`\n\n{span['text']}\n",
+            )
+        image_paths = {}
+        inventory_record = self.read(state, "inventory_ref", {})
+        snapshot = self.read(state, "snapshot_ref", {})
+        for original in snapshot.get("files", []):
+            self.store.write(
+                f"{directory}/originals/{original['path']}",
+                self.store.get_bytes(original["hash"]),
+            )
+        for derivative in inventory_record.get("enriched_documents", []):
+            self.store.write(
+                f"{directory}/prepared/{derivative['path']}",
+                self.store.get_bytes(derivative["prepared_hash"]),
+            )
+        for asset in inventory_record.get("assets", []):
+            if asset.get("hash") and asset.get("disposition") != "rejected":
+                for folder in ("originals", "prepared"):
+                    self.store.write(
+                        f"{directory}/{folder}/{asset['path']}",
+                        self.store.get_bytes(asset["hash"]),
+                    )
+        selected_hashes = {
+            value for section in cleaned["sections"] for value in section.get("image_hashes", [])
+        }
+        known_hashes = {asset.get("hash") for asset in inventory_record.get("assets", [])}
+        if selected_hashes - known_hashes:
+            cleaned["limitations"].append("Unrecognized image references were omitted")
+            if status == "complete":
+                status = "complete_with_limitations"
+        for asset in inventory_record.get("assets", []):
+            if asset.get("hash") in selected_hashes and asset.get("disposition") != "rejected":
+                filename = f"assets/{asset['hash']}.{asset['format']}"
+                self.store.write(f"{directory}/{filename}", self.store.get_bytes(asset["hash"]))
+                image_paths[asset["hash"]] = filename
+        output = self.store.write(
+            f"{directory}/documentation.md",
+            render_grounded_document(cleaned, evidence, image_paths),
+        )
+        report = {
+            "status": status,
+            "semantic_audit": audit,
+            "semantic_audit_matches_exported_content": bool(
+                audit and audit.get("document_content_hash") == document_content_hash(cleaned)
+            ),
+            "exported_content_hash": document_content_hash(cleaned),
+            "exported_coverage_estimate": (
+                audit.get("coverage_estimate")
+                if audit and audit.get("document_content_hash") == document_content_hash(cleaned)
+                else None
+            ),
+            "exact_citations_valid": not citation_findings(cleaned, evidence),
+            "limitations": cleaned["limitations"],
+            "source_revision": state.get("snapshot_ref"),
+            "graph_revision": state.get("graph_revision"),
+            "coverage_kind": "model_estimate_not_measured_information_recall",
+            "coordinator_interventions": "Measure externally; not observable inside pipeline",
+            "automatic_recovery_counts": state.get("recovery_counts", {}),
+            "citation_repair_attempts_current_packet": state.get("completion_attempt", 0),
+            "withheld_paragraphs": (audit or {}).get("citation_withheld_paragraphs", []) + removed,
+        }
+        self.store.write(
+            f"{directory}/report.json", json.dumps(report, ensure_ascii=False, indent=2)
+        )
+        return {
+            "completion_path": str(output),
+            "completion_status": status,
+            "status": status,
+            "route": END,
+            "candidate_ref": self.store.put(cleaned),
+            "source_coverage_ref": self.store.put(report),
         }
 
     def compile_template(self, state: PipelineState) -> dict:
@@ -1098,6 +1647,17 @@ class Pipeline:
             if item["support_id"] not in actual or key not in spans:
                 continue
             quote = actual[item["support_id"]]["quote"]
+            expanded_quote = unique_visual_quote(spans[key]["text"], quote)
+            if expanded_quote != quote:
+                self.store.event(
+                    self.run_id,
+                    "locate_visual_evidence",
+                    "local_repair",
+                    support_id=item["support_id"],
+                    before=quote,
+                    after=expanded_quote,
+                )
+                quote = expanded_quote
             try:
                 support = exact_support({**spans[key], "label": key}, quote)
                 locations.append({**item, "quote": quote, "support_range": support})
@@ -1637,6 +2197,12 @@ class Pipeline:
         ), service.revision
 
     def plan_authoring_action(self, state: PipelineState) -> dict:
+        if self.fast_mode():
+            return {
+                "route": state.get("authoring_return", "write_section"),
+                "authoring_ref": "",
+                "authoring_context_ref": "",
+            }
         session = self.read(
             state,
             "authoring_ref",
@@ -1943,6 +2509,22 @@ class Pipeline:
                 plan["source_assets"],
                 packet["evidence"],
             )
+        draft, repairs = repair_document_draft(
+            draft,
+            evidence=packet["evidence"],
+            assertions=packet["assertions"],
+            fixed_headings=[
+                item["text"]
+                for item in plan["template_requirements"]
+                if item["section"] == section["title"] and item["kind"] == "heading"
+            ],
+            visuals=packet.get("visuals", []),
+            assets=plan["source_assets"],
+            subprocess_records=draft.get("subprocess_records", []),
+        )
+        if repairs:
+            draft["automatic_repairs"] = repairs
+            self.store.event(self.run_id, "write_section", "local_repair", repairs=repairs)
         return {"draft_ref": self.store.put(draft)}
 
     def verify_section(self, state: PipelineState) -> dict:
@@ -2015,7 +2597,24 @@ class Pipeline:
                 findings.append(f"Mapped passage is absent from prose for {identifier}")
             mapped.add(identifier)
         if set(writing_ids) != mapped:
-            findings.append("Section misses approved obligations")
+            prior_written = self.read(state, "written_ref", [])
+            prior_expected = {
+                key
+                for item in prior_written
+                for key in self._units(plan["sections"][item["section_index"]])[item["unit_index"]]
+            }
+            prior_mapped = {
+                mapping["obligation_id"] for item in prior_written for mapping in item["mappings"]
+            }
+            missing = (set(writing_ids) - mapped) | (prior_expected - prior_mapped)
+            expected = {fact["id"] for fact in self.assertions(state)}
+            if (
+                self.minimum_coverage() == 1.0
+                or not evaluate_coverage(
+                    expected | missing, expected - missing, self.minimum_coverage()
+                )["accepted"]
+            ):
+                findings.append("Section misses approved obligations")
         cited = set(citation_labels(draft["markdown"]))
         if any(label not in evidence for label in cited):
             findings.append("Section contains an unknown citation")
@@ -2034,20 +2633,22 @@ class Pipeline:
                     "mappings": draft["mappings"],
                     "placements": placements,
                     "visuals": packet.get("visuals", []),
-                    "mandatory_obligation_ids": writing_ids,
+                    "mandatory_obligation_ids": sorted(mapped),
                     "required_diagram_element_ids": sorted(
                         diagram_element_ids(packet.get("visuals", []))
                     ),
                     "supporting_obligation_ids": [
                         identifier for identifier in writing_ids if identifier not in canonical
                     ],
-                    "assertions": [assertions[key] for key in writing_ids],
+                    "assertions": [assertions[key] for key in sorted(mapped)],
                     "original_evidence": packet["evidence"],
                 },
                 AuditDraft,
             )
-            if not audit.get("accepted") or not set(writing_ids).issubset(
-                audit.get("covered_obligation_ids", [])
+            if (
+                audit.get("findings")
+                or not audit.get("accepted")
+                or not mapped.issubset(audit.get("covered_obligation_ids", []))
             ):
                 findings.extend(str(item) for item in audit.get("findings", []))
                 if not findings:
@@ -2128,12 +2729,28 @@ class Pipeline:
                 plan["source_assets"],
                 [self.graph.evidence(key) for key in sorted(visual_ids)],
             )
+            mappings = [mapping for item in parts for mapping in item["mappings"]]
+            assertions = {
+                item["obligation_id"]: self.graph.assertion(item["obligation_id"])
+                for item in mappings
+            }
+            evidence = {
+                key: self.graph.evidence(key)
+                for assertion in assertions.values()
+                for key in assertion["evidence_ids"]
+            }
+            placements, findings = placement_records(
+                section["title"], markdown, mappings, assertions, evidence
+            )
+            if findings:
+                return self.issue(state, "assemble_pages", findings, "assemble_pages")
             sections.append(
                 {
                     "title": section["title"],
                     "section_id": section.get("section_id", section["title"]),
                     "markdown": markdown,
-                    "mappings": [mapping for item in parts for mapping in item["mappings"]],
+                    "mappings": mappings,
+                    "placements": placements,
                     "supporting_obligation_ids": section["supporting_obligation_ids"],
                     "visuals": section.get("visuals", []),
                     "context_evidence_ids": sorted(
@@ -2146,10 +2763,10 @@ class Pipeline:
             )
         return {
             "assembled_ref": self.store.put(sections),
-            "edited_ref": self.store.put([]),
+            "edited_ref": self.store.put(sections if self.fast_mode() else []),
             "edit_index": 0,
             "edit_queue_ref": self.store.put(list(range(len(sections)))),
-            "route": "edit_page",
+            "route": "audit_documentation" if self.fast_mode() else "edit_page",
         }
 
     def _editing_section(self, state: PipelineState) -> dict:
@@ -2445,7 +3062,7 @@ class Pipeline:
             )
         )
         repetition = repetition_report(sections)
-        if repetition["semantic_candidates"]:
+        if repetition["semantic_candidates"] and not self.fast_mode():
             semantic_audit = self.call(
                 "audit_repetition",
                 {
@@ -2468,7 +3085,8 @@ class Pipeline:
                         ),
                     }
                 findings.extend(semantic_audit["findings"] or ["Unresolved semantic repetition"])
-        if set(actual) != expected or len(actual) != len(set(actual)):
+        coverage = evaluate_coverage(expected, actual, self.minimum_coverage())
+        if not coverage["accepted"] or len(actual) != len(set(actual)):
             findings.append("Final output does not map every obligation exactly once")
         if len(sections) != len(plan["sections"]):
             findings.append("Final section count differs from approved plan")
@@ -2503,6 +3121,7 @@ class Pipeline:
             )
         if (
             repetition["duplicate_paragraphs"]
+            and not self.fast_mode()
             and not findings
             and state.get("audit_attempt", 0) < 1
         ):
@@ -2527,7 +3146,7 @@ class Pipeline:
                     ]
                 ),
             }
-        if repetition["duplicate_paragraphs"]:
+        if repetition["duplicate_paragraphs"] and not self.fast_mode():
             findings.append("Final output contains duplicated full paragraphs")
         if findings:
             return self.issue(state, "audit_documentation", findings, "assemble_pages")
@@ -2539,11 +3158,17 @@ class Pipeline:
             "section_count": len(sections),
             "findings": [],
             "quality": repetition,
+            "coverage": coverage,
+            "repetition_is_advisory": self.fast_mode(),
             "template_decisions": plan["template_decisions"],
             "visual_count": sum(len(section.get("visuals", [])) for section in sections),
         }
         self.store.write(f"runs/{self.run_id}/audit.json", json.dumps(audit, indent=2))
-        return {"source_audit_index": 0, "route": "audit_source_to_document"}
+        return {
+            "source_audit_index": 0,
+            "final_source_decisions_ref": self.store.put([]),
+            "route": "audit_source_to_document",
+        }
 
     def audit_source_to_document(self, state: PipelineState) -> dict:
         inventory_record = self.read(state, "inventory_ref")
@@ -2592,6 +3217,7 @@ class Pipeline:
                     "template_text": self.read(state, "template_ref")["text"],
                     "blocks": [self.spans(state)[key] for key in ids],
                     "aspects": packet_aspects,
+                    "minimum_coverage": self.minimum_coverage(),
                     "facts": facts,
                     "final_passages": passages,
                     "document_context": [
@@ -2610,19 +3236,31 @@ class Pipeline:
                 },
                 SourceAudit,
             )
-            findings = audit["findings"] + audit_decisions(
-                packet_aspects, audit["decisions"], facts
+            findings = audit["findings"] + source_audit_findings(
+                packet_aspects,
+                audit["decisions"],
+                facts,
+                all_aspects=aspects,
+                prior_decisions=self.read(state, "final_source_decisions_ref", []),
+                minimum_coverage=self.minimum_coverage(),
             )
             if findings:
                 return self.issue(state, "audit_source_to_document", findings, "assemble_pages")
-            return {"source_audit_index": index + 1, "route": "audit_source_to_document"}
+            return {
+                "source_audit_index": index + 1,
+                "route": "audit_source_to_document",
+                "final_source_decisions_ref": self.store.put(
+                    self.read(state, "final_source_decisions_ref", []) + audit["decisions"]
+                ),
+            }
         report = coverage_report(
             aspects,
-            self.read(state, "source_decisions_ref", []),
+            self.read(state, "final_source_decisions_ref", []),
             mapped,
             state["snapshot_ref"],
             state["graph_revision"],
             inventory_record.get("attachments", []),
+            minimum_coverage=self.minimum_coverage(),
         )
         report["blocks"] = {
             "total": sum(len(batch) for batch in batches),
@@ -2643,14 +3281,14 @@ class Pipeline:
         report["exclusions"] = self.read(state, "exclusions_ref", [])
         report["conflict_candidates"] = len(self.graph.conflict_candidates())
         report["unsupported_assertions"] = 0
-        if not report["complete"]:
+        self.store.write(f"runs/{self.run_id}/source-coverage.json", json.dumps(report, indent=2))
+        if not report["accepted"]:
             return self.issue(
                 state,
                 "audit_source_to_document",
                 ["Source aspect or attachment coverage is incomplete"],
                 "assemble_pages",
             )
-        self.store.write(f"runs/{self.run_id}/source-coverage.json", json.dumps(report, indent=2))
         return {"source_coverage_ref": self.store.put(report), "route": "export_candidate"}
 
     def export_candidate(self, state: PipelineState) -> dict:
@@ -3253,6 +3891,8 @@ class Pipeline:
         completion = (
             "complete_with_exclusions" if self.read(state, "exclusions_ref", []) else "complete"
         )
+        if not self.read(state, "source_coverage_ref", {}).get("complete", True):
+            completion = "complete_with_omissions"
         return {
             "completion_status": completion,
             "status": "awaiting_final_receipt_review"
@@ -3316,10 +3956,92 @@ class Pipeline:
             event_path = self.store.root / "runs" / self.run_id / "events.jsonl"
             event_offset = event_path.stat().st_size if event_path.exists() else 0
             try:
-                update = function(state)
+                deadline = state.get("deadline", 0)
+                now = datetime.now(UTC).timestamp()
+                completion_nodes = {
+                    "plan_source_document",
+                    "write_source_document",
+                    "audit_source_document",
+                    "finalize_source_document",
+                }
+                reserve = getattr(
+                    getattr(self.model, "settings", None), "finalization_reserve_seconds", 180
+                )
+                if (
+                    self.source_first(state)
+                    and state.get("inventory_ref")
+                    and deadline
+                    and name not in completion_nodes
+                    and now >= deadline - reserve
+                ):
+                    update = {
+                        "limitations_ref": self.limitations(
+                            state,
+                            [
+                                f"Preparation stopped at {name} "
+                                "to reserve time for document completion"
+                            ],
+                        ),
+                        "route": "write_source_document",
+                    }
+                elif self.source_first(state) and name == "finalize_source_document":
+                    update = function(state)
+                elif deadline and now >= deadline:
+                    raise TimeoutError("Pipeline runtime limit reached")
+                else:
+                    if hasattr(self.model, "set_deadline"):
+                        retained = (
+                            20
+                            if name == "audit_source_document"
+                            else 60
+                            if name in completion_nodes
+                            else reserve
+                        )
+                        model_deadline = (
+                            max(now, deadline - retained)
+                            if deadline and self.source_first(state)
+                            else deadline
+                        )
+                        self.model.set_deadline(model_deadline or None)
+                    update = function(state)
+            except TimeoutError as error:
+                if self.source_first(state) and state.get("inventory_ref"):
+                    update = {
+                        "limitations_ref": self.limitations(
+                            state, [f"Time budget reached during {name}: {error}"]
+                        ),
+                        "route": "finalize_source_document"
+                        if name
+                        in {
+                            "write_source_document",
+                            "audit_source_document",
+                            "finalize_source_document",
+                        }
+                        else "write_source_document",
+                    }
+                else:
+                    update = {"status": "timed_out", "route": END}
+                self.store.write(
+                    f"runs/{self.run_id}/runtime-limit.json",
+                    json.dumps(
+                        {
+                            "stage": name,
+                            "deadline": state.get("deadline"),
+                            "reason": str(error),
+                            "completed": False,
+                        },
+                        indent=2,
+                    ),
+                )
             except ValidationError as error:
                 update = self.issue(
                     state, name, [f"Model response failed structural validation: {error}"], name
+                )
+            except (ValueError, RuntimeError, httpx.TransportError, APIError) as error:
+                if not self.source_first(state) or name == "finalize_source_document":
+                    raise
+                update = self.issue(
+                    state, name, [f"Recoverable {type(error).__name__}: {error}"], name
                 )
             cost_pln = 0.0
             if event_path.exists():
@@ -3330,7 +4052,7 @@ class Pipeline:
                         if event.get("event") in {"response", "invalid_schema"}:
                             cost_pln += float(event.get("cost_pln", 0.0))
             if name not in {"review_plan", "review_release", "review_issues"}:
-                if name == "snapshot_inputs":
+                if name == "snapshot_inputs" and update.get("runtime_signature"):
                     self.stages.initialize(
                         state.get("mode", "manual"),
                         state.get("policy_version", "v2"),
@@ -3460,12 +4182,34 @@ class Pipeline:
 
     def resolve_issues_automatically(self, state: PipelineState) -> dict:
         issue = self.read(state, "issue_ref")
+        if self.source_first(state) and state.get("inventory_ref"):
+            counts = dict(state.get("recovery_counts", {}))
+            stage = issue["stage"]
+            counts[stage] = counts.get(stage, 0) + 1
+            target = state.get("issue_return", stage)
+            if counts[stage] > 1:
+                target = {
+                    "prepare_source_images": "extract_document_batch",
+                    "plan_source_document": "write_source_document",
+                    "write_source_document": "finalize_source_document",
+                    "audit_source_document": "finalize_source_document",
+                }.get(stage, "plan_source_document")
+            result = {
+                "route": target,
+                "status": "running_with_limitations",
+                "recovery_counts": counts,
+                "limitations_ref": self.limitations(
+                    state, [f"{stage}: {finding}" for finding in issue["findings"]]
+                ),
+            }
+            self.stages.record("resolve_issues_automatically", state, result)
+            return result
         unresolved = {
             "actor_type": "policy",
             "stage": issue["stage"],
             "findings": issue["findings"],
             "source_revision": state.get("snapshot_ref"),
-            "reason": "Relevant unresolved information cannot be excluded to obtain completeness",
+            "reason": "Unresolved integrity failure or coverage below the configured threshold",
         }
         ref = self.store.put(unresolved)
         spans = self.spans(state) if state.get("inventory_ref") else {}

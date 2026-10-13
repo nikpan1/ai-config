@@ -28,6 +28,12 @@ class Settings:
     authoring_result_limit: int = 60000
     thinking_level: str | None = None
     audit_thinking_level: str | None = None
+    fast_mode: bool = False
+    model_workers: int = 4
+    run_timeout_seconds: int = 1200
+    minimum_coverage: float = 0.9
+    source_first: bool = True
+    finalization_reserve_seconds: int = 180
 
     @classmethod
     def load(cls, env_file: Path | None = None) -> "Settings":
@@ -64,6 +70,24 @@ class Settings:
         authoring_result = int(values.get("DOCGEN_AUTHORING_RESULT_LIMIT", 60000))
         if min(authoring_turns, authoring_timeout, authoring_result) <= 0 or authoring_turns > 50:
             raise ValueError("Authoring limits must be positive and turns at most 50")
+        fast_mode = str(values.get("DOCGEN_FAST_MODE") or "false").lower()
+        if fast_mode not in {"true", "false", "1", "0"}:
+            raise ValueError("DOCGEN_FAST_MODE must be true or false")
+        model_workers = int(values.get("DOCGEN_MODEL_WORKERS") or 4)
+        run_timeout = int(values.get("DOCGEN_RUN_TIMEOUT_SECONDS") or 1200)
+        minimum_coverage = float(values.get("DOCGEN_MINIMUM_COVERAGE") or 0.9)
+        source_first = str(values.get("DOCGEN_SOURCE_FIRST") or "true").lower()
+        if source_first not in {"true", "false", "1", "0"}:
+            raise ValueError("DOCGEN_SOURCE_FIRST must be true or false")
+        finalization_reserve = int(values.get("DOCGEN_FINALIZATION_RESERVE_SECONDS") or 180)
+        if finalization_reserve < 1:
+            raise ValueError("DOCGEN_FINALIZATION_RESERVE_SECONDS must be positive")
+        if not 1 <= model_workers <= 32:
+            raise ValueError("DOCGEN_MODEL_WORKERS must be between 1 and 32")
+        if run_timeout <= 0:
+            raise ValueError("DOCGEN_RUN_TIMEOUT_SECONDS must be positive")
+        if not math.isfinite(minimum_coverage) or not 0 < minimum_coverage <= 1:
+            raise ValueError("DOCGEN_MINIMUM_COVERAGE must be greater than 0 and at most 1")
         return cls(
             env_file=selected,
             workspace=path("DOCGEN_WORKSPACE", ".docgen/graph"),
@@ -87,4 +111,10 @@ class Settings:
             authoring_turn_limit=authoring_turns,
             authoring_timeout_seconds=authoring_timeout,
             authoring_result_limit=authoring_result,
+            fast_mode=fast_mode in {"true", "1"},
+            model_workers=model_workers,
+            run_timeout_seconds=run_timeout,
+            minimum_coverage=minimum_coverage,
+            source_first=source_first in {"true", "1"},
+            finalization_reserve_seconds=finalization_reserve,
         )

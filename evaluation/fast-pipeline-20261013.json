@@ -1,0 +1,667 @@
+{
+  "schema_version": 1,
+  "evaluation_date": "2026-10-13",
+  "workspace": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\.docgen\\fast-live-20261013",
+  "outcome": "incomplete",
+  "full_pipeline_success": false,
+  "summary": "The semantic graph passed validation, but documentation generation stopped before assembly, final source audit and release. The four related attempts stayed within the original approximately twenty-minute evaluation window. This is not a successful full-pipeline benchmark.",
+  "timing": {
+    "first_observed_event_epoch": 1791921009.451613,
+    "first_observed_event_utc": "2026-10-13T19:50:09.451613+00:00",
+    "last_observed_event_epoch": 1791922186.9359202,
+    "last_observed_event_utc": "2026-10-13T20:09:46.935920+00:00",
+    "calendar_event_window_seconds": 1177.4843072891235,
+    "sum_run_event_windows_seconds": 560.4715714454651,
+    "between_run_event_windows_seconds": 617.0127358436584,
+    "completed_stage_seconds_sum": 548.3669912815094,
+    "completed_stage_wall_union_seconds": 548.3669912815094,
+    "model_response_seconds_sum": 587.8373559000047,
+    "provider_error_seconds_sum": 0.15206949999810604,
+    "model_observed_wall_union_seconds": 554.2903623580933,
+    "first_attempt_deadline_epoch": 1791922209.3619576,
+    "preserved_b_c_d_deadline_epoch": 1791922211.1705031,
+    "deadline_difference_a_to_b_seconds": 1.8085455894470215,
+    "timing_caveats": [
+      "Calendar timing uses recorded first and last events; shell startup and final checkpoint persistence are outside these event endpoints.",
+      "Response time sums include overlapping concurrent calls and must not be interpreted as elapsed time.",
+      "Completed stage intervals omit an interrupted stage that never emitted a completion event.",
+      "Intervals between runs include investigation and changes; they are not a measured human or agent labor duration."
+    ]
+  },
+  "totals": {
+    "runs": 4,
+    "event_counts": {
+      "completed": 77,
+      "request": 42,
+      "provider_error": 2,
+      "response": 40,
+      "local_repair": 1,
+      "cache_hit": 0,
+      "invalid_schema": 0,
+      "incomplete_response": 0
+    },
+    "automatic_content_repair_transitions": 6,
+    "automatic_content_repairs_by_stage": {
+      "audit_source_coverage": 1,
+      "audit_semantic_graph": 1,
+      "locate_visual_evidence": 1,
+      "verify_section": 3
+    },
+    "provider_retries": 0,
+    "event_repair_flags": 5,
+    "ledger_by_status": {
+      "settled": {
+        "entries": 40,
+        "charged_pln": 2.8334491011,
+        "reservation_estimates_pln": 66.2628862308375
+      },
+      "uncertain": {
+        "entries": 2,
+        "charged_pln": 3.03037816815,
+        "reservation_estimates_pln": 3.03037816815
+      }
+    },
+    "ledger_total_charged_pln": 5.86382726925,
+    "ledger_note": "Settled charges use returned token usage. Uncertain amounts are conservative reservation estimates retained after provider errors, not confirmed invoices. Reservation estimates for settled rows are historical upper bounds, not additional charges.",
+    "outstanding_reserved_pln": 0.0
+  },
+  "interventions": {
+    "coordinator_code_interventions": 3,
+    "user_manual_interventions": 0,
+    "coordinator_changes": [
+      "Initialize the shared Gemini client before starting concurrent requests and retain its lifetime.",
+      "Align semantic proposal and audit contract for topic grouping and source condition bindings.",
+      "Deterministically expand ambiguous visual support quotes within their original evidence span."
+    ],
+    "source": "Coordinator execution record; these are explicit code interventions, not inferred from run-count differences.",
+    "reuse_chain": [
+      {
+        "from": "risk-fast-20261013-b",
+        "to": "risk-fast-20261013-c"
+      },
+      {
+        "from": "risk-fast-20261013-c",
+        "to": "risk-fast-20261013-d"
+      }
+    ]
+  },
+  "automatic_repair_records": [
+    {
+      "run_id": "risk-fast-20261013-b",
+      "stage": "audit_source_coverage",
+      "item": "0002",
+      "route": "extract_document_batch",
+      "counters": {
+        "attempt": {
+          "before": 0,
+          "after": 1
+        }
+      },
+      "artifact": "runs\\risk-fast-20261013-b\\step29\\items\\0002\\revisions\\r0001\\result.json"
+    },
+    {
+      "run_id": "risk-fast-20261013-b",
+      "stage": "audit_semantic_graph",
+      "item": "0001",
+      "route": "propose_semantic_graph",
+      "counters": {
+        "attempt": {
+          "before": 0,
+          "after": 1
+        }
+      },
+      "artifact": "runs\\risk-fast-20261013-b\\step42\\items\\0001\\revisions\\r0001\\result.json"
+    },
+    {
+      "run_id": "risk-fast-20261013-c",
+      "stage": "locate_visual_evidence",
+      "item": "run",
+      "route": "locate_visual_evidence",
+      "counters": {
+        "visual_attempt": {
+          "before": 0,
+          "after": 1
+        }
+      },
+      "artifact": "runs\\risk-fast-20261013-c\\step40\\revisions\\r0001\\result.json"
+    },
+    {
+      "run_id": "risk-fast-20261013-d",
+      "stage": "verify_section",
+      "item": "0004",
+      "route": "write_section",
+      "counters": {
+        "attempt": {
+          "before": 0,
+          "after": 1
+        }
+      },
+      "artifact": "runs\\risk-fast-20261013-d\\step17\\items\\0004\\revisions\\r0001\\result.json"
+    },
+    {
+      "run_id": "risk-fast-20261013-d",
+      "stage": "verify_section",
+      "item": "0002",
+      "route": "write_section",
+      "counters": {
+        "attempt": {
+          "before": 0,
+          "after": 1
+        }
+      },
+      "artifact": "runs\\risk-fast-20261013-d\\step17\\items\\0002\\revisions\\r0001\\result.json"
+    },
+    {
+      "run_id": "risk-fast-20261013-d",
+      "stage": "verify_section",
+      "item": "0001",
+      "route": "write_section",
+      "counters": {
+        "attempt": {
+          "before": 0,
+          "after": 1
+        }
+      },
+      "artifact": "runs\\risk-fast-20261013-d\\step17\\items\\0001\\revisions\\r0001\\result.json"
+    }
+  ],
+  "stage_metrics": {
+    "semantic_graph": {
+      "requests": 4,
+      "responses": 4,
+      "provider_errors": 0,
+      "response_seconds_sum": 106.49709450000046,
+      "completed_stage_seconds_sum": 0.0
+    },
+    "audit_source_coverage": {
+      "requests": 4,
+      "responses": 4,
+      "provider_errors": 0,
+      "response_seconds_sum": 99.31077580000238,
+      "completed_stage_seconds_sum": 99.5687986999983
+    },
+    "write_section": {
+      "requests": 8,
+      "responses": 8,
+      "provider_errors": 0,
+      "response_seconds_sum": 90.51302090000354,
+      "completed_stage_seconds_sum": 91.41559610000513
+    },
+    "audit_semantic_graph": {
+      "requests": 3,
+      "responses": 3,
+      "provider_errors": 0,
+      "response_seconds_sum": 70.08854560000145,
+      "completed_stage_seconds_sum": 70.27784579999934
+    },
+    "extract_document": {
+      "requests": 4,
+      "responses": 4,
+      "provider_errors": 0,
+      "response_seconds_sum": 52.348626899998635,
+      "completed_stage_seconds_sum": 0.0
+    },
+    "inventory_aspects": {
+      "requests": 6,
+      "responses": 4,
+      "provider_errors": 2,
+      "response_seconds_sum": 41.17379689999689,
+      "completed_stage_seconds_sum": 0.0
+    },
+    "verify_section": {
+      "requests": 4,
+      "responses": 4,
+      "provider_errors": 0,
+      "response_seconds_sum": 39.85212850000062,
+      "completed_stage_seconds_sum": 40.515748099998746
+    },
+    "verify_document": {
+      "requests": 4,
+      "responses": 4,
+      "provider_errors": 0,
+      "response_seconds_sum": 34.200200699999186,
+      "completed_stage_seconds_sum": 0.0
+    },
+    "draft_plan": {
+      "requests": 1,
+      "responses": 1,
+      "provider_errors": 0,
+      "response_seconds_sum": 20.542744799999127,
+      "completed_stage_seconds_sum": 0.0
+    },
+    "locate_visual_evidence": {
+      "requests": 3,
+      "responses": 3,
+      "provider_errors": 0,
+      "response_seconds_sum": 18.629414600001837,
+      "completed_stage_seconds_sum": 18.76210810000157
+    },
+    "verify_plan": {
+      "requests": 1,
+      "responses": 1,
+      "provider_errors": 0,
+      "response_seconds_sum": 14.68100670000058,
+      "completed_stage_seconds_sum": 0.0
+    },
+    "snapshot_inputs": {
+      "requests": 0,
+      "responses": 0,
+      "provider_errors": 0,
+      "response_seconds_sum": 0.0,
+      "completed_stage_seconds_sum": 0.16121689999999944
+    },
+    "inventory_sources": {
+      "requests": 0,
+      "responses": 0,
+      "provider_errors": 0,
+      "response_seconds_sum": 0.0,
+      "completed_stage_seconds_sum": 0.12901249999777065
+    },
+    "inventory_source_aspects": {
+      "requests": 0,
+      "responses": 0,
+      "provider_errors": 0,
+      "response_seconds_sum": 0.0,
+      "completed_stage_seconds_sum": 15.216485799999646
+    },
+    "extract_document_batch": {
+      "requests": 0,
+      "responses": 0,
+      "provider_errors": 0,
+      "response_seconds_sum": 0.0,
+      "completed_stage_seconds_sum": 34.01109590000124
+    },
+    "verify_document_batch": {
+      "requests": 0,
+      "responses": 0,
+      "provider_errors": 0,
+      "response_seconds_sum": 0.0,
+      "completed_stage_seconds_sum": 34.372244899996076
+    },
+    "link_graph_batch": {
+      "requests": 0,
+      "responses": 0,
+      "provider_errors": 0,
+      "response_seconds_sum": 0.0,
+      "completed_stage_seconds_sum": 0.035855199999787146
+    },
+    "verify_graph_batch": {
+      "requests": 0,
+      "responses": 0,
+      "provider_errors": 0,
+      "response_seconds_sum": 0.0,
+      "completed_stage_seconds_sum": 0.024430200001006597
+    },
+    "propose_semantic_graph": {
+      "requests": 0,
+      "responses": 0,
+      "provider_errors": 0,
+      "response_seconds_sum": 0.0,
+      "completed_stage_seconds_sum": 106.80525529999977
+    },
+    "publish_semantic_graph": {
+      "requests": 0,
+      "responses": 0,
+      "provider_errors": 0,
+      "response_seconds_sum": 0.0,
+      "completed_stage_seconds_sum": 0.2230967999985296
+    },
+    "finalize_graph": {
+      "requests": 0,
+      "responses": 0,
+      "provider_errors": 0,
+      "response_seconds_sum": 0.0,
+      "completed_stage_seconds_sum": 0.06538670000009006
+    },
+    "compile_template": {
+      "requests": 0,
+      "responses": 0,
+      "provider_errors": 0,
+      "response_seconds_sum": 0.0,
+      "completed_stage_seconds_sum": 0.04175750000104017
+    },
+    "plan_authoring_action": {
+      "requests": 0,
+      "responses": 0,
+      "provider_errors": 0,
+      "response_seconds_sum": 0.0,
+      "completed_stage_seconds_sum": 0.13701399999990826
+    },
+    "draft_page_plan": {
+      "requests": 0,
+      "responses": 0,
+      "provider_errors": 0,
+      "response_seconds_sum": 0.0,
+      "completed_stage_seconds_sum": 20.61124589999963
+    },
+    "retrieve_plan_evidence": {
+      "requests": 0,
+      "responses": 0,
+      "provider_errors": 0,
+      "response_seconds_sum": 0.0,
+      "completed_stage_seconds_sum": 0.646970899997541
+    },
+    "validate_page_plan": {
+      "requests": 0,
+      "responses": 0,
+      "provider_errors": 0,
+      "response_seconds_sum": 0.0,
+      "completed_stage_seconds_sum": 14.915494700000636
+    },
+    "review_plan": {
+      "requests": 0,
+      "responses": 0,
+      "provider_errors": 0,
+      "response_seconds_sum": 0.0,
+      "completed_stage_seconds_sum": 0.03557110000110697
+    },
+    "retrieve_section_evidence": {
+      "requests": 0,
+      "responses": 0,
+      "provider_errors": 0,
+      "response_seconds_sum": 0.0,
+      "completed_stage_seconds_sum": 0.39475990000210004
+    }
+  },
+  "runs": [
+    {
+      "run_id": "risk-fast-20261013-a",
+      "checkpoint_status": "running",
+      "checkpoint_timestamp": "2026-10-13T19:50:09.548091+00:00",
+      "first_event_epoch": 1791921009.451613,
+      "last_event_epoch": 1791921020.7848678,
+      "event_counts": {
+        "completed": 2,
+        "request": 3,
+        "provider_error": 2,
+        "response": 1
+      },
+      "run_event_window_seconds": 11.33325481414795,
+      "completed_stage_seconds_sum": 0.15087580680847168,
+      "completed_stage_wall_union_seconds": 0.15087580680847168,
+      "model_response_seconds_sum": 11.182583299998441,
+      "provider_error_seconds_sum": 0.15206949999810604,
+      "model_observed_wall_union_seconds": 11.21798825263977,
+      "automatic_content_repair_transitions": 0,
+      "event_repair_flags": 0,
+      "deadline_epoch": 1791922209.3619576,
+      "reused_from": null,
+      "reuse_provenance_path": null,
+      "issue": null,
+      "references": {
+        "snapshot_ref": "3360696d476b305081a13638ad3c130ea489274b6d7f548a154edba86cd8c156",
+        "assertions_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "ledger": {
+        "settled": {
+          "entries": 1,
+          "charged_pln": 0.0502797618
+        },
+        "uncertain": {
+          "entries": 2,
+          "charged_pln": 3.03037816815
+        }
+      }
+    },
+    {
+      "run_id": "risk-fast-20261013-b",
+      "checkpoint_status": "incomplete",
+      "checkpoint_timestamp": "2026-10-13T19:56:22.031053+00:00",
+      "first_event_epoch": 1791921128.2504876,
+      "last_event_epoch": 1791921381.9843307,
+      "event_counts": {
+        "completed": 27,
+        "request": 18,
+        "response": 18
+      },
+      "run_event_window_seconds": 253.73384308815002,
+      "completed_stage_seconds_sum": 253.42960143089294,
+      "completed_stage_wall_union_seconds": 253.42960143089294,
+      "model_response_seconds_sum": 285.6870745999986,
+      "provider_error_seconds_sum": 0,
+      "model_observed_wall_union_seconds": 252.10467553138733,
+      "automatic_content_repair_transitions": 2,
+      "event_repair_flags": 2,
+      "deadline_epoch": 1791922211.1705031,
+      "reused_from": null,
+      "reuse_provenance_path": null,
+      "issue": {
+        "findings": [
+          "Unjustified topic fragmentation: The table rows QF01 through QF08 all belong to the shared business capability of risk profiling, but were inappropriately split into separate per-item topics ('risk_profiling_qf01' through 'risk_profiling_qf08').",
+          "Missing condition decomposition bindings: The condition groups for rules 'qf01_questionnaire_versioning', 'qf05_consent_verification', 'qf07_idempotent_submission', and 'qf08_incomplete_provider_response' leave 'source_conditions' empty rather than binding the respective verified fact conditions to their elementary decomposition.",
+          "Independent semantic audit rejected the proposed graph"
+        ],
+        "revision": "704dc34d31501e1a7c60283872f8d8fcf8f1e2f6dc33e3127f7b1b5d34bf25cf",
+        "stage": "audit_semantic_graph"
+      },
+      "references": {
+        "snapshot_ref": "edc19b76bec2401c0ed004f681d56b728cdefb9d437d8a07b71fa0b2b9e71396",
+        "assertions_ref": "c4f95d7842936ee8dd74e8b5bc918b8c41647641bfde01f22a19e28daa0a5470"
+      },
+      "ledger": {
+        "settled": {
+          "entries": 18,
+          "charged_pln": 1.153892913525
+        },
+        "uncertain": {
+          "entries": 0,
+          "charged_pln": 0
+        }
+      }
+    },
+    {
+      "run_id": "risk-fast-20261013-c",
+      "checkpoint_status": "incomplete",
+      "checkpoint_timestamp": "2026-10-13T20:04:14.874182+00:00",
+      "first_event_epoch": 1791921713.8060298,
+      "last_event_epoch": 1791921854.823327,
+      "event_counts": {
+        "completed": 19,
+        "request": 7,
+        "response": 7
+      },
+      "run_event_window_seconds": 141.01729726791382,
+      "completed_stage_seconds_sum": 140.76423478126526,
+      "completed_stage_wall_union_seconds": 140.76423478126526,
+      "model_response_seconds_sum": 139.33465340000294,
+      "provider_error_seconds_sum": 0,
+      "model_observed_wall_union_seconds": 139.33465385437012,
+      "automatic_content_repair_transitions": 1,
+      "event_repair_flags": 0,
+      "deadline_epoch": 1791922211.1705031,
+      "reused_from": "risk-fast-20261013-b",
+      "reuse_provenance_path": "runs\\risk-fast-20261013-c\\reuse-provenance.json",
+      "issue": {
+        "findings": [
+          "Ambiguous support quote: df8141b2d1971b023be8"
+        ],
+        "revision": "ac803b1924c4c288295fd69005bb4935faa8ff40dbbf0af990e9f5ffa26409f2",
+        "stage": "locate_visual_evidence"
+      },
+      "references": {
+        "snapshot_ref": "edc19b76bec2401c0ed004f681d56b728cdefb9d437d8a07b71fa0b2b9e71396",
+        "assertions_ref": "c4f95d7842936ee8dd74e8b5bc918b8c41647641bfde01f22a19e28daa0a5470",
+        "graph_quality_ref": "0b3862816cb03d16765dcb2af1a752b772eef4e5d67c944104e6d22fe43c6db2",
+        "plan_ref": "6818a8d9139325568b464f1dd175d94e758dc5420297ed9ff381153e1f058363"
+      },
+      "ledger": {
+        "settled": {
+          "entries": 7,
+          "charged_pln": 0.6393568869
+        },
+        "uncertain": {
+          "entries": 0,
+          "charged_pln": 0
+        }
+      }
+    },
+    {
+      "run_id": "risk-fast-20261013-d",
+      "checkpoint_status": "incomplete",
+      "checkpoint_timestamp": "2026-10-13T20:09:46.986032+00:00",
+      "first_event_epoch": 1791922032.548744,
+      "last_event_epoch": 1791922186.9359202,
+      "event_counts": {
+        "request": 14,
+        "response": 14,
+        "local_repair": 1,
+        "completed": 29
+      },
+      "run_event_window_seconds": 154.3871762752533,
+      "completed_stage_seconds_sum": 154.02227926254272,
+      "completed_stage_wall_union_seconds": 154.02227926254272,
+      "model_response_seconds_sum": 151.63304460000472,
+      "provider_error_seconds_sum": 0,
+      "model_observed_wall_union_seconds": 151.63304471969604,
+      "automatic_content_repair_transitions": 3,
+      "event_repair_flags": 3,
+      "deadline_epoch": 1791922211.1705031,
+      "reused_from": "risk-fast-20261013-c",
+      "reuse_provenance_path": "runs\\risk-fast-20261013-d\\reuse-provenance.json",
+      "issue": {
+        "findings": [
+          "Mapped passage is absent or ambiguous: 2f4a5729065c46f9f1ca97cc",
+          "Mapped passage is absent or ambiguous: b622801d585af89d584c3123"
+        ],
+        "revision": "e74c3f3f0c9bf33686117c2f4036d0176ae570c5c416d6ad73c2b971ad0431ef",
+        "stage": "verify_section"
+      },
+      "references": {
+        "snapshot_ref": "edc19b76bec2401c0ed004f681d56b728cdefb9d437d8a07b71fa0b2b9e71396",
+        "assertions_ref": "c4f95d7842936ee8dd74e8b5bc918b8c41647641bfde01f22a19e28daa0a5470",
+        "graph_quality_ref": "0b3862816cb03d16765dcb2af1a752b772eef4e5d67c944104e6d22fe43c6db2",
+        "plan_ref": "b17e4c155e17811b3cab8787c2c9803d1ab42b14fa614df38e4395cbff99e28d",
+        "written_ref": "bb5d2382a0796cd65ab374f53f124543322c9e18302d704a03983869afaf0a28"
+      },
+      "documentation_progress": {
+        "approved_plan_sections": 5,
+        "planned_content_units": 20,
+        "verified_written_records": 4,
+        "written_record_kind": "Verified drafting packets; compare verified_written_records with planned_drafting_packets, not with planned_content_units or page count.",
+        "covered_section_indices": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "mapped_unique_assertions": 7,
+        "total_assertions": 20,
+        "next_section_index": 4,
+        "next_unit_index": 0,
+        "candidate_exported": false,
+        "release_created": false,
+        "planned_drafting_packets": 6,
+        "drafting_packets_by_section": [
+          {
+            "section_index": 0,
+            "title": "1. Executive Summary",
+            "packets": 1,
+            "packet_obligation_counts": [
+              3
+            ]
+          },
+          {
+            "section_index": 1,
+            "title": "2. Business Context & Scope",
+            "packets": 1,
+            "packet_obligation_counts": [
+              3
+            ]
+          },
+          {
+            "section_index": 2,
+            "title": "3. Core Functionalities & Feature Breakdown",
+            "packets": 1,
+            "packet_obligation_counts": [
+              3
+            ]
+          },
+          {
+            "section_index": 3,
+            "title": "4. End-to-End Process Overview",
+            "packets": 1,
+            "packet_obligation_counts": [
+              4
+            ]
+          },
+          {
+            "section_index": 4,
+            "title": "5. Detailed Business Reference",
+            "packets": 2,
+            "packet_obligation_counts": [
+              12,
+              8
+            ]
+          }
+        ],
+        "content_units_note": "Semantic content groups from the plan; _units packs several of them into a bounded drafting request."
+      },
+      "graph_result": {
+        "accepted": true,
+        "counts": {
+          "Condition": 13,
+          "ConditionGroup": 10,
+          "Exception": 1,
+          "Rule": 20,
+          "Topic": 1
+        },
+        "fact_count": 20,
+        "allocated_fact_count": 20,
+        "quote_count": 62,
+        "source_count": 22,
+        "quoted_source_count": 19,
+        "source_coverage": {
+          "accepted": true,
+          "aspects": {
+            "represented": 37,
+            "total": 38
+          },
+          "blocks": {
+            "total": 17
+          },
+          "complete": false,
+          "coverage_ratio": 0.9736842105263158,
+          "graph_revision": "18657e342abd42eb5e81836413f9e7b9281a43940254d0651c234c018b1d64ee",
+          "integrity_findings": [],
+          "minimum_coverage": 0.9,
+          "omitted_aspects": [
+            {
+              "description": "The visible rule serves as test evidence, whereas the image is solely a screen illustration.",
+              "end": 202,
+              "evidence_id": "5b738cea7beecd9ebd56",
+              "fact_ids": [],
+              "id": "33a7405bf50e1b825e3b31c2",
+              "kind": "condition",
+              "quote": "The visible rule is test evidence; the image is only a screen illustration.",
+              "reason": "The evidence note specifying that the visible rule is test evidence and the image is only a screen illustration is omitted from the extracted facts.",
+              "start": 127
+            }
+          ],
+          "qualifiers": {
+            "coverage_ratio": 0.9444444444444444,
+            "represented": 17,
+            "total": 18
+          },
+          "snapshot_id": "edc19b76bec2401c0ed004f681d56b728cdefb9d437d8a07b71fa0b2b9e71396",
+          "unresolved_attachments": []
+        },
+        "findings": []
+      },
+      "input_summary": {
+        "document_batches": 3,
+        "source_spans": 22,
+        "source_assets": 2
+      },
+      "ledger": {
+        "settled": {
+          "entries": 14,
+          "charged_pln": 0.989919538875
+        },
+        "uncertain": {
+          "entries": 0,
+          "charged_pln": 0
+        }
+      }
+    }
+  ]
+}

@@ -135,9 +135,10 @@ function createTopology(parent, options) {
   for (const edge of edges) {
     const group = make("g", { class: "topology-edge", tabindex: "0", role: "button", "aria-label": `${label(edge.source_id)} ${edge.type} ${label(edge.target_id)}` }, edgeLayer);
     const path = make("path", { "marker-end": "url(#topology-arrow)" }, group);
+    if (edge.status === "uncertain" || edge.status === "inferred") path.setAttribute("stroke-dasharray", "6 4");
     const hit = make("path", { class: "edge-hit" }, group);
     const text = make("text", { class: "edge-label", "text-anchor": "middle" }, group); text.textContent = edge.type;
-    make("title", {}, group).textContent = `${edge.type}: ${label(edge.source_id)} -> ${label(edge.target_id)}\n${edge.method || "Method not recorded"}`;
+    make("title", {}, group).textContent = `${edge.type}: ${label(edge.source_id)} -> ${label(edge.target_id)}\n${edge.description || edge.method || "Method not recorded"}\n${edge.status || ""}`;
     const activate = () => onEdge(edge);
     group.addEventListener("click", activate);
     group.addEventListener("keydown", (event) => { if (event.key === "Enter") activate(); });

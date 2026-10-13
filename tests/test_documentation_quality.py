@@ -832,8 +832,9 @@ def test_grouped_citations_survive_writing_editing_and_export(tmp_path, edit_gro
     docs = tmp_path / "docs"
     docs.mkdir()
     (docs / "rules.md").write_text(
-        "An active account is required.\n\nDrafts remain for 30 days.\n", encoding="utf-8"
+        "An active account is required.\n", encoding="utf-8"
     )
+    (docs / "retention.md").write_text("Drafts remain for 30 days.\n", encoding="utf-8")
     template = tmp_path / "template.md"
     template.write_text("## Rules\n", encoding="utf-8")
     store = ArtifactStore(tmp_path / "runtime")

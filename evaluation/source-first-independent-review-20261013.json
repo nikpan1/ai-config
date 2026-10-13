@@ -1,0 +1,974 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-13",
+  "review_method": "Independent agent source comparison, read-only inspection of both SQLite graphs, original Markdown and both image pixels, and actual generated stage and final-document artifacts. No paid API calls were made by this reviewer.",
+  "verdict": "The implementation improves source preservation, navigational flexibility, and autonomous completion. The first full run fails quality; the second restores a populated graph and several missing facts but still has semantic errors and provider-boundary omissions from the document body. Neither structural acceptance nor either model coverage estimate establishes complete semantic correctness. The two attempts and two stage evaluations remain distinct.",
+  "scopes": {
+    "historical_baseline": {
+      "run_id": "risk-fast-20261013-c",
+      "graph": ".docgen/fast-live-20261013/runs/risk-fast-20261013-c/graph.sqlite",
+      "prior_review": "evaluation/fast-graph-review-20261013.json",
+      "prior_review_sha256": "7ef2fe5a7624998bbf7089be7cbe20c5a239957d7fcada97102f9d6093560ba9",
+      "scope": "Persisted knowledge graph; the historical consumer run did not complete documentation. No final-document before/after score is possible.",
+      "verification_status": "Stored semantic nodes and condition groups independently queried, including both previously reported defects."
+    },
+    "first_source_first_main_run": {
+      "run_id": "source-first-20261013",
+      "root": ".docgen/source-first-live-20261013/runs/source-first-20261013",
+      "runtime_signature": "8edf5cc4a5451852591793f6490b2607ef84651b51cdd3294da50e6bad64d902",
+      "document": ".docgen/source-first-live-20261013/runs/source-first-20261013/output/documentation.md",
+      "document_sha256": "6d83874625ed23994d858323f8c974c9be0cbe1dccb23c9bc962c736ad964943",
+      "report_sha256": "7a96bf24e1c3c06ac14cf141d950a670f40ff1539e96f45b26f90a514b393698",
+      "pipeline_status": "complete_with_limitations",
+      "coordinator_reported_wall_seconds": 180.488,
+      "coordinator_reported_interventions_during_run": 0,
+      "verification_status": "Final Markdown, final candidate JSON, pre-final draft and audit artifacts, graph-quality report, and actual SQLite table inventory independently inspected.",
+      "attempt_identity": "This is the first measured full run. Later fixes or runs must not overwrite this result or be represented as this attempt."
+    },
+    "live_robustness_stage_run": {
+      "run_id": "source-robustness-20261013",
+      "report": ".docgen/source-first-robustness-20261013/runs/source-robustness-20261013/robustness.json",
+      "report_sha256": "4bd3aa490f7eb380b3289feb4628ecdd3d97c90600f373fe6ed9220e420f34a0",
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "scope": "Eight real extraction-plus-semantic-proposal cases or formatting variants. This is not eight full pipeline runs, and no final documentation or paid semantic audit was produced for these cases.",
+      "implementation_scope": "This stage run preceded the active-schema simplification made before the main run. It remains evidence of the implementation evaluated at that point, not proof that the later schema fixes passed the same real-model cases.",
+      "verification_status": "All eight actual extraction and anchored semantic outputs reviewed against the sources embedded in the report."
+    },
+    "final_schema_live_robustness_stage_run": {
+      "run_id": "source-robustness-final-20261013",
+      "report": ".docgen/source-first-robustness-final-20261013/runs/source-robustness-final-20261013/robustness.json",
+      "report_sha256": "87c81b0c3e43f463f48da5412b2cc5c37b0738a62dcda4f35cf3e5cad596a815",
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "scope": "Second, separate extraction-plus-navigational-graph evaluation of eight cases or variants. Same NavigationalGraphDraft schema as the first full run. No final document generation or full-pipeline completion is tested.",
+      "elapsed_seconds": 90.03436017036438,
+      "verification_status": "All actual extraction, concept, relationship and findings outputs independently read against the embedded source texts."
+    },
+    "second_source_first_main_run": {
+      "run_id": "source-first-verified-20261013",
+      "root": ".docgen/source-first-verified-20261013/runs/source-first-verified-20261013",
+      "runtime_signature": "a9d4f46e281cacd49d5f1d894a2aa8044e22cbe1fdf85f21e89e0724f1e842bd",
+      "document": ".docgen/source-first-verified-20261013/runs/source-first-verified-20261013/output/documentation.md",
+      "document_sha256": "2a0f7d77d8fd3295e07a6d60393132eb49f00cefff062643d3290a3c9dc7fa15",
+      "report_sha256": "1cf5a0cd51702765a266d0d380f905c2bdbaaf32a49b39ba24e1d8e4acc09216",
+      "source_sha256": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+      "pipeline_status": "complete_with_limitations",
+      "coordinator_reported_wall_seconds": 198.2037,
+      "coordinator_reported_interventions_during_run": 0,
+      "verification_status": "Actual SQLite semantic concepts, narrative relationships and image evidence metadata, numbered final Markdown, post-citation-quarantine audit candidate, final exported candidate and report independently inspected. Audit and exported content hashes independently recomputed.",
+      "attempt_identity": "A second full corrective attempt after fixes informed by the first attempt. It is not the first run resumed or made retrospectively successful."
+    }
+  },
+  "source_integrity": {
+    "path": "data/test_data_2_quick/risk-profiling.md",
+    "sha256": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+    "matches_historical_baseline": true,
+    "exported_original_matches_bytes": true,
+    "source_scope_quote": "A concise synthetic profile journey for INV-100.",
+    "source_scope_line": 10,
+    "images": [
+      {
+        "path": "data/test_data_2_quick/assets/questionnaire.jpg",
+        "sha256": "7ff702a0ae3648f2128692b828e4faf53e99aaa9047e7c6cad1eb35ea7dbf3ad",
+        "visual_review": "Synthetic Q3 draft D-104 with Beginner, 3-7 years, 5%, Flexible, and Processing consent CP-3. No next-action button is visible, although the authored caption mentions the next action."
+      },
+      {
+        "path": "data/test_data_2_quick/assets/assessment-result.jpg",
+        "sha256": "f3e53d07855ffbec9bc74d87dcd8a81a130d6bc8a5cb6c26479357d89c1f3795",
+        "visual_review": "Synthetic accepted profile P-204, Band R2 / Measured, Rules RS-2026-09, reasons HORIZON_3 and LOSS_5, accepted 2026-10-01 UTC, and review after 365 days. These displayed examples do not establish additional business rules."
+      }
+    ],
+    "traceability_assessment": "Original bytes and generated interpretations are separate. Exported image evidence includes original-image links, hashes, provider gemini, and model gemini-3.8-flash. Final paragraph quotes match stored text mechanically; that does not establish entailment."
+  },
+  "graph_comparison": {
+    "baseline": {
+      "topics": 1,
+      "rules": 20,
+      "condition_groups": 10,
+      "semantic_edges": 113,
+      "quotes": 62,
+      "known_defects_verified": [
+        {
+          "node_id": "semantic:rule:207ee9e2c80765907e4385b8",
+          "claim": "The visible rules in table 11 serve as test evidence, while the visual image references are screen illustrations only.",
+          "problem": "The source has no authored table 11 designation."
+        },
+        {
+          "rule_id": "semantic:rule:5a554a2b401829cd3163316d",
+          "condition_group_id": "semantic:conditiongroup:23d614e1e7d1f48d8d48af5f",
+          "problem": "A single all group combines incomplete response and missing reason code for two separate outcomes.",
+          "counterexample": "An incomplete RiskSignal response with a reason code present still cannot become an accepted profile under source line 21."
+        }
+      ]
+    },
+    "first_source_first_run": {
+      "stored_assertions": 14,
+      "stored_source_spans": 3,
+      "semantic_nodes": 0,
+      "semantic_edges": 0,
+      "semantic_batches": 0,
+      "semantic_quotes": 0,
+      "sqlite_verification": "The graph database contains evidence, nodes, assertions, support, edges and metadata tables, but no semantic_nodes, semantic_edges, semantic_quotes or semantic_batches tables.",
+      "proposal": "The preserved proposed draft contains six concepts and four narrative relationships. Two image relationships have invalid exact quotes; the batch is skipped wholesale, so none of its otherwise useful concepts are published.",
+      "proposal_artifact": "step41/items/0000/revisions/r0001/semantic_draft_ref.json",
+      "skip_artifact": "step42/items/0000/revisions/r0001/result.json",
+      "persisted_graph_verdict": "Regression. Absence of table-number leakage and the bad all group in an empty graph cannot count as semantic correction.",
+      "proposed_text_verdict": "The proposal narratively distinguishes incomplete drafts, incomplete responses, and missing reasons and has no invented table number. This is a useful proposal-level improvement, not a functioning persisted graph."
+    }
+  },
+  "final_document_findings": [
+    {
+      "id": "post-audit-quarantine-removes-critical-facts",
+      "severity": "high",
+      "verification_status": "confirmed in final Markdown and pre-final candidate artifacts",
+      "output_lines": [
+        43,
+        45,
+        65,
+        67,
+        115,
+        123,
+        124,
+        125
+      ],
+      "source_lines": [
+        20,
+        38
+      ],
+      "source_quotes": [
+        "A complete Q3 submission uses one stable idempotency key.",
+        "A duplicate with the same answers returns the stored result.",
+        "**No provider call** occurs for an incomplete draft."
+      ],
+      "problem": "All three facts are absent from the final document. They existed in draft paragraphs 4:0, 6:1 and 11:0, which were removed after the final model audit because each used the nonliteral quote 'No provider call occurs for an incomplete draft.' and omitted the Markdown emphasis markers. This also removes unrelated, valid idempotency material in the same paragraphs and leaves section 5.4 empty.",
+      "counterexample": "A reader of the final document cannot determine that repeating identical answers must return the stored result, or that an incomplete draft must suppress all provider calls.",
+      "audit_implication": "The accepted audit and 0.98 estimate describe the pre-quarantine draft, not the exported artifact. The audit explanation specifically claims idempotency coverage that the final artifact no longer has."
+    },
+    {
+      "id": "invented-permanent-history-retention",
+      "severity": "medium",
+      "verification_status": "confirmed",
+      "output_lines": [
+        53,
+        55
+      ],
+      "output_quote": "Following expiration, the record remains permanently visible in historical records.",
+      "source_line": 23,
+      "source_quote": "It remains visible in history after expiry.",
+      "problem": "After-expiry visibility does not specify permanent retention. The output adds a temporal guarantee and labels the paragraph 'Uncertainty: None.'",
+      "counterexample": "A system that retains expired results in history for seven years satisfies the source claim but contradicts the generated permanent-visibility guarantee."
+    },
+    {
+      "id": "specific-loss-tolerance-case-generalized",
+      "severity": "high",
+      "verification_status": "confirmed",
+      "output_lines": [
+        37,
+        110
+      ],
+      "output_quote": "The value must be discrete; exactly 5 percent belongs to band L5, whereas fractional entries such as 5.1 percent are invalid.",
+      "source_line": 17,
+      "source_quote": "Exactly 5 percent belongs to L5. | A 5.1 percent free-text answer is invalid.",
+      "problem": "The source rejects one particular free-text answer. It does not establish a general ban on fractional values, a discrete-entry schema, or rejection of 5.1 in every possible entry mode.",
+      "counterexample": "The source is compatible with an allowed preconfigured 2.5-percent choice while rejecting 5.1-percent free text; the generated rule could reject that supported choice."
+    },
+    {
+      "id": "invented-deployment-prerequisites-and-impacts",
+      "severity": "high",
+      "verification_status": "confirmed",
+      "output_lines": [
+        79,
+        83,
+        84,
+        85,
+        86,
+        88
+      ],
+      "output_quotes": [
+        "Before operating the risk profiling module, clients and deployment teams must ensure the operational parameters and consent versions are established:",
+        "RiskSignal provider integration enabled",
+        "Profile expiration and reassessment triggers cannot be computed"
+      ],
+      "source_lines": [
+        14,
+        18,
+        19,
+        23
+      ],
+      "source_quotes": [
+        "Q3 is the current questionnaire version.",
+        "PROFILE_PROCESSING consent at CP-3 is required.",
+        "RiskSignal is the only external business provider called by risk profiling.",
+        "A result expires 365 days after acceptance."
+      ],
+      "problem": "The source states runtime business rules, not client/deployment configuration deliverables, an integration enablement switch, configurable expiry policy, or impacts of omitted configuration. Filling the requested template has introduced unsupported operational requirements.",
+      "counterexample": "An implementation with an immutable built-in 365-day expiry constant and automatically provisioned provider connection satisfies the source without requiring the invented deployment configuration steps."
+    },
+    {
+      "id": "retry-trigger-inferred-from-proximity",
+      "severity": "medium",
+      "verification_status": "confirmed unsupported contextual interpretation",
+      "output_lines": [
+        45,
+        47,
+        120
+      ],
+      "source_line": 36,
+      "source_quote": "Retry once.",
+      "problem": "The output places the retry in incomplete-response/reason-code recovery and discusses handling after that single retry. The source does not identify the action, trigger, retry timing, or connection to the missing reason code. The uncertainty statement only acknowledges the post-retry outcome, not the unidentified retry scope.",
+      "counterexample": "The source is also compatible with a single user-interface retry or another operation. It does not independently prove that an incomplete provider response receives the retry."
+    },
+    {
+      "id": "some-exact-quotes-do-not-support-whole-paragraphs",
+      "severity": "medium",
+      "verification_status": "confirmed traceability-versus-entailment gap",
+      "output_lines": [
+        27,
+        67,
+        96,
+        136,
+        158,
+        168,
+        169
+      ],
+      "problem": "Several broad process summaries cite only the introductory profile-review sentence. The detailed image paragraph cites only the generated-interpretation preambles, rather than the actual visible-text passages. Full evidence files contain further relevant context, but literal quote validity by itself does not support the complete paragraph.",
+      "qualified_positive": "The observed screen values in the final paragraph match the actual image pixels, and generated status is explicit. This is primarily a citation granularity problem, not a finding that those screen values are fabricated."
+    },
+    {
+      "id": "synthetic-scope-not-prominent-in-business-prose",
+      "severity": "medium",
+      "verification_status": "confirmed presentation and scope concern",
+      "output_lines": [
+        5,
+        79,
+        94,
+        98,
+        127
+      ],
+      "source_lines": [
+        10,
+        14
+      ],
+      "source_quotes": [
+        "A concise synthetic profile journey for INV-100.",
+        "The visible rule is test evidence; the image is only a screen illustration."
+      ],
+      "problem": "The output labels the images synthetic, while its opening and deployment instructions present the broader journey as an operational specification. The synthetic status of the entire source remains discoverable in a footnote but is not made clear in the main business prose."
+    }
+  ],
+  "specific_business_fact_presence_check": {
+    "method": "Manual source-derived checklist of 27 explicit business facts or instructions. This is a reviewer convenience sample, not a validated exhaustive inventory or semantic-recall metric. Present means the fact can be found in final prose; it does not mean every related extension is correct.",
+    "counts": {
+      "present": 24,
+      "omitted": 3,
+      "total_checks": 27
+    },
+    "checks": [
+      {
+        "source_line": 10,
+        "fact": "Review current profile before a new draft",
+        "status": "present",
+        "output_line": 5
+      },
+      {
+        "source_line": 10,
+        "fact": "Review current profile after recovery",
+        "status": "present",
+        "output_line": 5
+      },
+      {
+        "source_line": 14,
+        "fact": "Q3 is current",
+        "status": "present",
+        "output_line": 33
+      },
+      {
+        "source_line": 14,
+        "fact": "Q2 cannot be submitted after 2026-09-01",
+        "status": "present",
+        "output_line": 33
+      },
+      {
+        "source_line": 15,
+        "fact": "Four allowed experience values",
+        "status": "present",
+        "output_line": 33
+      },
+      {
+        "source_line": 15,
+        "fact": "EXPERT is retired and rejected",
+        "status": "present",
+        "output_line": 33
+      },
+      {
+        "source_line": 16,
+        "fact": "Month 36 starts H3",
+        "status": "present",
+        "output_line": 33
+      },
+      {
+        "source_line": 16,
+        "fact": "Month 35 remains H1",
+        "status": "present",
+        "output_line": 33
+      },
+      {
+        "source_line": 17,
+        "fact": "Exactly 5 percent maps to L5",
+        "status": "present",
+        "output_line": 37
+      },
+      {
+        "source_line": 17,
+        "fact": "5.1-percent free text is invalid",
+        "status": "present",
+        "output_line": 37,
+        "qualification": "Also generalized incorrectly; see finding."
+      },
+      {
+        "source_line": 18,
+        "fact": "PROFILE_PROCESSING consent at CP-3 is required",
+        "status": "present",
+        "output_line": 37
+      },
+      {
+        "source_line": 18,
+        "fact": "Marketing consent alone never permits submission",
+        "status": "present",
+        "output_line": 37
+      },
+      {
+        "source_line": 19,
+        "fact": "RiskSignal is the only external business provider",
+        "status": "present",
+        "output_line": 17
+      },
+      {
+        "source_line": 19,
+        "fact": "MarketPulse and CustodyBridge are unrelated to profile submission",
+        "status": "present",
+        "output_line": 17
+      },
+      {
+        "source_line": 20,
+        "fact": "Complete Q3 uses one stable idempotency key",
+        "status": "omitted"
+      },
+      {
+        "source_line": 20,
+        "fact": "Identical-answer duplicate returns stored result",
+        "status": "omitted"
+      },
+      {
+        "source_line": 21,
+        "fact": "Incomplete RiskSignal response cannot become accepted profile",
+        "status": "present",
+        "output_line": 45
+      },
+      {
+        "source_line": 21,
+        "fact": "Missing reason code leaves draft recoverable",
+        "status": "present",
+        "output_line": 45
+      },
+      {
+        "source_lines": [
+          22,
+          38
+        ],
+        "fact": "Failed reassessment retains prior unexpired profile until original expiry",
+        "status": "present",
+        "output_line": 57
+      },
+      {
+        "source_line": 22,
+        "fact": "Failed attempt is not a new active profile",
+        "status": "present",
+        "output_line": 57
+      },
+      {
+        "source_line": 23,
+        "fact": "Result expires 365 days after acceptance",
+        "status": "present",
+        "output_line": 53
+      },
+      {
+        "source_line": 23,
+        "fact": "Result remains visible in history after expiry",
+        "status": "present",
+        "output_line": 53,
+        "qualification": "Unsupported permanence added; see finding."
+      },
+      {
+        "source_lines": [
+          24,
+          40
+        ],
+        "fact": "Orphan Mongo audit requires current human review",
+        "status": "present",
+        "output_line": 61
+      },
+      {
+        "source_lines": [
+          24,
+          40
+        ],
+        "fact": "Automatic reconciliation is planned and unimplemented",
+        "status": "present",
+        "output_line": 61
+      },
+      {
+        "source_line": 36,
+        "fact": "Retry once",
+        "status": "present",
+        "output_line": 45,
+        "qualification": "Retry scope is inferred; see finding."
+      },
+      {
+        "source_line": 38,
+        "fact": "Incomplete draft causes no provider call",
+        "status": "omitted"
+      },
+      {
+        "source_line": 38,
+        "fact": "RiskSignal and platform share correlation ID",
+        "status": "present",
+        "output_line": 21
+      }
+    ]
+  },
+  "live_stage_case_review": [
+    {
+      "case_id": "independent-outcomes",
+      "variant": "original",
+      "semantic_status": "pass for declared implications",
+      "structural_status": "pass",
+      "source_quote": "A damaged parcel cannot be dispatched. A missing label keeps the parcel in the packing area.",
+      "evidence": "Two separate rules and two separate one-condition groups are generated. Damage prohibits dispatch independently of label status. Missing label controls packing-area retention.",
+      "completion_status": "untested; extraction and graph proposal only"
+    },
+    {
+      "case_id": "formatting-equivalence",
+      "variant": "prose",
+      "semantic_status": "pass for both normal requirements and staff-only charge waiver",
+      "structural_status": "pass",
+      "source_quote": "Staff borrowing waives the overdue-charge requirement; active membership is still required.",
+      "evidence": "Graph exception and staff concept both retain active membership. No authored table number is invented."
+    },
+    {
+      "case_id": "formatting-equivalence",
+      "variant": "headings",
+      "semantic_status": "pass for intended borrowing meaning",
+      "structural_status": "fail",
+      "source_quote": "Borrowing requires an active membership and no unpaid overdue charge.",
+      "evidence": "Extractor conditions 'active membership is maintained' and 'no unpaid overdue charge exists' differ from graph source_conditions 'active membership' and 'no unpaid overdue charge'. The validator rejects equivalent wording.",
+      "structural_findings": [
+        "Group references unknown source condition: borrowing_eligibility_rule: active membership",
+        "Group references unknown source condition: borrowing_eligibility_rule: no unpaid overdue charge"
+      ]
+    },
+    {
+      "case_id": "formatting-equivalence",
+      "variant": "list",
+      "semantic_status": "pass for intended borrowing meaning",
+      "structural_status": "fail",
+      "source_quote": "- an active membership; and",
+      "evidence": "Graph uses 'an active membership' but extraction stores 'active membership'; the validator flags an unknown condition and a dropped condition despite intact meaning.",
+      "structural_findings": [
+        "Group references unknown source condition: rule_borrowing_requirements: an active membership",
+        "Rule drops fact conditions: 25e97ef541b9d1cbe1c71f84: ['active membership']"
+      ]
+    },
+    {
+      "case_id": "formatting-equivalence",
+      "variant": "table",
+      "semantic_status": "pass for intended borrowing meaning",
+      "structural_status": "fail",
+      "source_quote": "Active membership and no unpaid overdue charge",
+      "evidence": "Extractor condition starts 'No unpaid overdue charge', while graph source_conditions starts 'no'; capitalization alone causes rejection. No fictitious table number is added.",
+      "structural_findings": [
+        "Group references unknown source condition: borrowing_eligibility_rule: no unpaid overdue charge"
+      ]
+    },
+    {
+      "case_id": "cross-document-reference",
+      "variant": "original",
+      "semantic_status": "pass",
+      "structural_status": "pass",
+      "source_quotes": [
+        "Collection requires successful completion of that check.",
+        "The rental identity check compares the reservation name with an unexpired identity document. A mismatch requires staff review."
+      ],
+      "evidence": "Equipment Rental Collection is linked to Rental Identity Check with exact support from supplied sources. Name comparison, unexpired document and staff-review outcome remain intact; no false missing-document claim appears."
+    },
+    {
+      "case_id": "ambiguous-shorthand",
+      "variant": "original",
+      "semantic_status": "passes identity and ambiguity expectations, with minor modality drift",
+      "structural_status": "pass",
+      "source_quote": "The next release should address R-17. The site is not specified.",
+      "output_quote": "The next release is planned to address R-17, but the specific site context is not designated.",
+      "evidence": "Site A and Site B have separate concepts and two uncertain release relationships. The generated direct description changes 'should address' to 'is planned', slightly strengthening a requested scope into an established plan. Extraction and findings retain the original modality.",
+      "completion_status": "A proposal is returned, but full-pipeline nonblocking completion is untested."
+    },
+    {
+      "case_id": "unresolved-conflict",
+      "variant": "original",
+      "semantic_status": "pass",
+      "structural_status": "pass",
+      "source_quotes": [
+        "The return period is 30 days from delivery.",
+        "The return period is 45 days from delivery."
+      ],
+      "evidence": "Both policy-specific concepts remain and an uncertain relationship explicitly describes the conflict. No effective date, version or segment is invented.",
+      "completion_status": "Useful conflicting graph proposal exists; final documentation and full-pipeline completion are untested."
+    },
+    {
+      "case_id": "context-window-boundary",
+      "semantic_status": "untested with a real model",
+      "status": "not_run_constructed_fixture",
+      "evidence": "Offline tests check character preservation, bounded windows, adjacency and order. They do not establish model accuracy on oversized documents."
+    },
+    {
+      "case_id": "image-provenance",
+      "semantic_status": "declared constructed case untested live",
+      "status": "not_run_constructed_fixture",
+      "evidence": "The main risk-profiling run separately exercised two actual images. Their final visible-value descriptions match the pixels and preserve generated provenance, but that is a different fixture from this declared case."
+    }
+  ],
+  "implementation_review": {
+    "repaired_before_first_main_run": [
+      "Bounded authoring retrieval originally prioritized unrelated keyword hits over an adjacent exception; same-file/hash neighbors are now prioritized.",
+      "Same-line source windows originally sorted by digest; final retrieval now considers column and character offsets.",
+      "Stale citation-repair drafts could displace completed split sections during recovery; completed sections and current draft are now combined, with stale references cleared between packets.",
+      "Unavailable image interpretation originally remained only in internal metadata; it now propagates a final limitation."
+    ],
+    "verification_scope": "The reviewer inspected fixes and regression tests; the coordinator ran the test suite. No test pass is treated as proof of live semantic accuracy.",
+    "remaining_first_run_failures": [
+      "A partially invalid semantic proposal discards all valid graph content.",
+      "The final semantic audit runs before deterministic citation quarantine and its acceptance is reused for a different exported document.",
+      "A nonliteral quote can remove a whole paragraph containing several otherwise supported facts.",
+      "The final audit misses unsupported generalizations and invented template-driven deployment requirements."
+    ],
+    "unresolved_general_limit": "Bounded retrieval can omit distant or cross-document qualifiers. The added adjacency mechanism is useful but is not a guarantee of complete context.",
+    "repository_instruction_reference": ".ai/development-plan.md referenced by AGENTS.md was absent when inspected."
+  },
+  "coverage_comparison_limits": {
+    "historical_measure": "37 represented source aspects out of 38, with 17 of 18 qualifiers; a measured aspect-inventory proxy whose inventory itself is not ground truth.",
+    "first_main_run_measure": "The model estimated 0.98 over the pre-quarantine draft. Final source-aspect coverage is explicitly not independently measured.",
+    "comparison": "These are different instruments and different audited objects. No numerical improvement in semantic recall is supported. The independent 27-fact presence checklist is also not an exhaustive recall percentage.",
+    "completion": "The new path produces a readable document where the historical consumer did not finish, but this does not offset the final document's omissions and unsupported claims or establish adequate quality."
+  },
+  "review_limits": [
+    "This is a focused independent review, not a proof of every assertion, relationship or citation.",
+    "All main-run evidence is synthetic; this review establishes fidelity to the fixture, not production-system or financial correctness.",
+    "The eight live robustness outputs cover small examples and do not establish generalization to large or arbitrary documentation.",
+    "All line numbers refer to the hashed first-run Markdown and unchanged original source. Later attempts require separate review records.",
+    "Post-run fixes must be reported separately; they do not retroactively improve the preserved first attempt."
+  ],
+  "final_schema_live_stage_review": {
+    "counts": {
+      "generated_cases_or_variants": 8,
+      "structural_passes": 8,
+      "structural_failures": 0,
+      "constructed_cases_not_run": 2
+    },
+    "comparison": "The headings, list and table library variants rejected for equivalent condition strings in the earlier stage run now produce structurally valid navigational concepts and relationships. All four variants retain the AND requirements and waive only the overdue-charge requirement for staff.",
+    "case_results": [
+      {
+        "case_id": "independent-outcomes",
+        "variant": "original",
+        "semantic_status": "pass for declared implications",
+        "evidence": "Separate damage-dispatch and missing-label-retention concepts preserve independent outcomes. A broad process relationship is explicitly inferred, not a conjunctive prerequisite."
+      },
+      {
+        "case_id": "formatting-equivalence",
+        "variant": "prose",
+        "semantic_status": "pass",
+        "evidence": "Normal membership plus no unpaid charge; staff exception preserves membership."
+      },
+      {
+        "case_id": "formatting-equivalence",
+        "variant": "headings",
+        "semantic_status": "pass",
+        "evidence": "Normal membership plus no unpaid charge; staff exception preserves membership; no structural refusal."
+      },
+      {
+        "case_id": "formatting-equivalence",
+        "variant": "list",
+        "semantic_status": "pass",
+        "evidence": "Normal membership plus no unpaid charge; staff exception preserves membership; no structural refusal."
+      },
+      {
+        "case_id": "formatting-equivalence",
+        "variant": "table",
+        "semantic_status": "pass",
+        "evidence": "Normal membership plus no unpaid charge; staff exception preserves membership; no invented table designation or structural refusal."
+      },
+      {
+        "case_id": "cross-document-reference",
+        "variant": "original",
+        "semantic_status": "pass",
+        "evidence": "Collection links to the supplied identity-check document. Reservation name, unexpired identity document and mismatch requiring staff review are retained."
+      },
+      {
+        "case_id": "ambiguous-shorthand",
+        "variant": "original",
+        "semantic_status": "passes identity and ambiguity expectations, with minor modality drift",
+        "source_quote": "The next release should address R-17. The site is not specified.",
+        "output_quote": "The next release is planned to address R-17, though the target site is not specified.",
+        "evidence": "Two separate site definitions and uncertain release edges remain. The direct description again strengthens should to is planned; structural validity does not prevent this change."
+      },
+      {
+        "case_id": "unresolved-conflict",
+        "variant": "original",
+        "semantic_status": "pass",
+        "evidence": "Both 30-day and 45-day source-specific periods remain. An uncertain relation reports the discrepancy, and findings explicitly state no precedence or contextual scoping is defined."
+      }
+    ],
+    "not_run_live": [
+      "context-window-boundary",
+      "image-provenance constructed fixture"
+    ],
+    "limitations": "These small stage-level examples do not establish end-to-end document accuracy, large-corpus accuracy or full-pipeline nonblocking completion. The first full run already shows that structurally valid source-first architecture can still produce an inadequate final document."
+  },
+  "first_main_run_verdict": "The first measured source-first run completes with a readable artifact and strong source preservation, but fails the independent quality gate. The persisted semantic graph regresses to empty; the final document omits three specific operational facts and contains unsupported generalizations. Automated audit acceptance is not an independent quality pass.",
+  "second_main_run_review": {
+    "verdict": "Material improvement over the first attempt, with useful but incomplete documentation and a populated navigational graph. Semantic reliability remains mixed; this is not a clean independent quality pass.",
+    "graph": {
+      "concepts": 8,
+      "total_semantic_edges": 24,
+      "narrative_related_edges": 3,
+      "exact_quote_records": 17,
+      "source_spans": 3,
+      "assertions": 16,
+      "allocated_assertions": 13,
+      "structural_accepted": true,
+      "comparison_with_historical_baseline": "The stored graph now exists and preserves important distinctions in narrative concepts. The unsupported table-11 designation is absent, and independent incomplete-response versus missing-reason outcomes have no forced all-condition group. Eight broad concepts versus twenty older rules is a representation change, not evidence of improved or reduced semantic coverage.",
+      "image_evidence": "Both generated descriptions remain graph evidence with original-image hash/path, interpretation reference, provider gemini and model gemini-3.8-flash. Image-display assertions are retained but unallocated to business concepts. This is compatible with a navigational graph; a mandatory business node for every image is not required.",
+      "findings": [
+        {
+          "id": "necessary-response-completeness-strengthened-to-sufficiency",
+          "severity": "high_for_semantic_inference",
+          "verification_status": "confirmed in stored RELATED edge",
+          "edge_id": "semantic:edge:63a82a6655c14a77e4242e7e",
+          "status": "direct",
+          "output_quote": "A successful and complete RiskSignal response establishes an accepted profile with a 365-day validity, while a failed reassessment maintains the existing unexpired profile.",
+          "source_line": 21,
+          "source_quote": "An incomplete RiskSignal response cannot become an accepted profile.",
+          "problem": "The source establishes completeness as necessary. It does not establish that a complete response, or an undefined successful response, is sufficient for acceptance. The direct relationship strengthens the implication.",
+          "counterexample": "A complete provider response may still produce a nonaccepted outcome for an unspecified business reason; the source does not rule that out."
+        },
+        {
+          "id": "graph-retry-scope-and-execution-guarantee",
+          "severity": "medium",
+          "verification_status": "confirmed in stored concept and extracted assertion",
+          "node_id": "semantic:concept:b11916c202b02b2f5d9a7b17",
+          "output_quote": "a missing reason code keeps the draft recoverable, and retries are executed once.",
+          "source_line": 36,
+          "source_quote": "Retry once.",
+          "problem": "The graph attaches the unscoped instruction to RiskSignal recovery and describes retries as executed. The source does not identify the retry operation, trigger or automation."
+        }
+      ]
+    },
+    "document_improvements": [
+      {
+        "first_run_finding": "post-audit-quarantine-removes-critical-facts",
+        "result": "Stable idempotency key and same-answer stored result now appear at lines 11 and 69. No provider call for an incomplete draft now appears at lines 21 and 41."
+      },
+      {
+        "first_run_finding": "invented-permanent-history-retention",
+        "result": "Permanently visible is removed; line 33 retains only after-expiry history visibility."
+      },
+      {
+        "first_run_finding": "specific-loss-tolerance-case-generalized",
+        "result": "Lines 19 and 65 retain exactly 5 percent and specifically 5.1-percent free text. No blanket fractional-value or discrete-input prohibition remains."
+      },
+      {
+        "first_run_finding": "invented-deployment-prerequisites-and-impacts",
+        "result": "The model still generated invented deployment duties, but the audit identified them and finalization withheld that paragraph. The final body no longer presents the deployment table."
+      },
+      {
+        "first_run_finding": "synthetic-scope-not-prominent-in-business-prose",
+        "result": "Line 5 now explicitly describes a synthetic journey."
+      },
+      {
+        "first_run_finding": "some-exact-quotes-do-not-support-whole-paragraphs",
+        "result": "Citation locators are now precise line/column ranges rather than whole-document line ranges. Some broad summary/image paragraphs still quote less detail than their complete assertions; see remaining findings."
+      }
+    ],
+    "document_findings": [
+      {
+        "id": "provider-boundary-absent-from-business-body",
+        "severity": "high",
+        "verification_status": "confirmed",
+        "source_line": 19,
+        "source_quote": "RiskSignal is the only external business provider called by risk profiling. | MarketPulse and CustodyBridge are unrelated to the profile submission.",
+        "output_lines": [
+          25,
+          27,
+          67,
+          69,
+          86
+        ],
+        "problem": "The main business sections omit provider exclusivity and the two explicit unrelated providers. Both facts are recoverable only from the limitation at line 86 announcing the omission. It would be inaccurate to say their text is absent from the entire exported file.",
+        "mechanism": "Four otherwise useful paragraphs were quarantined before the audit because their quote joined adjacent table cells without the literal vertical-bar separator. The model repair repeated the nonliteral quote. All body occurrences of QF06 were in those paragraphs.",
+        "counterexample": "A reader using the Evaluation section alone cannot distinguish RiskSignal as the exclusive provider from one of multiple possible providers."
+      },
+      {
+        "id": "retry-failure-trigger-still-inferred",
+        "severity": "medium",
+        "verification_status": "confirmed",
+        "output_line": 41,
+        "output_quote": "allow a single retry on failure",
+        "source_line": 36,
+        "source_quote": "Retry once.",
+        "problem": "The final body invents a general failure trigger and locates the retry in external evaluation. The limitation at line 76 acknowledges unspecified exact error conditions but does not justify the broader assertion that failure is the trigger.",
+        "counterexample": "A single manual retry of a different operation is compatible with the source but not with this assumed evaluation retry scope."
+      },
+      {
+        "id": "auditor-explanation-introduces-unsupported-q2-permission",
+        "severity": "high",
+        "verification_status": "confirmed in final limitation and audit explanation",
+        "output_line": 85,
+        "output_quote": "the source evidence establishes that Q2 drafts remain valid and submittable until 2026-09-01",
+        "source_line": 14,
+        "source_quote": "A Q2 draft cannot be submitted after 2026-09-01.",
+        "problem": "The audit correctly rejected invented deployment duties but its explanation introduces a different unsupported claim: prohibition after a date does not establish unconditional validity or permission before that date. The explanation is copied verbatim into the final document limitations, bypassing paragraph citation checks.",
+        "counterexample": "A Q2 draft lacking required processing consent could be invalid before the cutoff; the source also leaves other pre-cutoff constraints unspecified.",
+        "implementation_note": "document_content_hash currently hashes title and sections, excluding limitations; citation_findings also only validates section paragraphs. Newly introduced limitation claims are outside those checks."
+      },
+      {
+        "id": "unresolved-caption-versus-visible-image-discrepancy",
+        "severity": "low",
+        "verification_status": "confirmed by original pixel inspection",
+        "output_line": 49,
+        "output_quote": "The questionnaire view displays selected codes, consent, and the next action.",
+        "source_line": 29,
+        "source_quote": "Caption: The questionnaire shows selected codes, consent and the next action.",
+        "problem": "This repeats an authored caption, so it is textually sourced, but no next-action button or action control is visible in the actual questionnaire JPG. The document does not separate this caption claim from what the image independently establishes.",
+        "qualified_positive": "The subsequent listed field values match the actual pixels and are explicitly labeled generated interpretations."
+      },
+      {
+        "id": "exact-citation-does-not-entail-complete-summary",
+        "severity": "medium",
+        "verification_status": "confirmed",
+        "output_lines": [
+          15,
+          41,
+          49,
+          53,
+          93,
+          107,
+          119,
+          121
+        ],
+        "problem": "Some process summaries cite the generic introductory review sentence, and detailed image-value paragraphs cite only broad image-description sentences rather than the visible-text values. Full linked evidence retains supporting information, but exact quotation validity remains weaker than paragraph-level entailment."
+      }
+    ],
+    "audit_identity": {
+      "model_accepted": false,
+      "model_coverage_estimate": 0.88,
+      "audited_content_hash": "16239ba71a763474cab81c549ca158b7d503b0c129ec7aea88af3386b3595efb",
+      "exported_content_hash": "7216a0a3e020b8eb346ee12653bc16a5834eacbdcf34dba36bc75e46aa684626",
+      "hashes_independently_verified": true,
+      "audited_candidate_paragraphs": 16,
+      "exported_candidate_paragraphs": 15,
+      "semantic_audit_matches_exported_content": false,
+      "exported_coverage_estimate": null,
+      "assessment": "Reporting is materially more honest than the first attempt. Citation quarantine precedes semantic audit, and a later semantic removal causes the export hash to differ. The report explicitly declines to reuse the model estimate as exported-document coverage. This is a disclosure improvement, not proof that final content is accurate."
+    },
+    "remaining_quality_limit": "The provider-boundary omission is disclosed rather than repaired, ambiguous retry scope persists in graph and prose, and generated audit explanations can themselves introduce unsupported business claims. The final artifact is useful for review but does not meet a strict complete-and-faithful documentation standard.",
+    "same_27_fact_presence_check": {
+      "method": "Same source-derived reviewer checklist as the first attempt. Counts distinguish business-body content from facts restated only inside an omission notice. This is not an exhaustive information-recall percentage.",
+      "counts": {
+        "present_in_business_body": 25,
+        "only_in_omission_notice": 2,
+        "absent_from_entire_export": 0,
+        "total_checks": 27
+      },
+      "checks": [
+        {
+          "source_line": 10,
+          "fact": "Review current profile before a new draft",
+          "status": "present_in_business_body",
+          "output_line": 5
+        },
+        {
+          "source_line": 10,
+          "fact": "Review current profile after recovery",
+          "status": "present_in_business_body",
+          "output_line": 5
+        },
+        {
+          "source_line": 14,
+          "fact": "Q3 is current",
+          "status": "present_in_business_body",
+          "output_line": 19
+        },
+        {
+          "source_line": 14,
+          "fact": "Q2 cannot be submitted after 2026-09-01",
+          "status": "present_in_business_body",
+          "output_line": 19
+        },
+        {
+          "source_line": 15,
+          "fact": "Four allowed experience values",
+          "status": "present_in_business_body",
+          "output_line": 19
+        },
+        {
+          "source_line": 15,
+          "fact": "EXPERT is retired and rejected",
+          "status": "present_in_business_body",
+          "output_line": 19
+        },
+        {
+          "source_line": 16,
+          "fact": "Month 36 starts H3",
+          "status": "present_in_business_body",
+          "output_line": 19
+        },
+        {
+          "source_line": 16,
+          "fact": "Month 35 remains H1",
+          "status": "present_in_business_body",
+          "output_line": 19
+        },
+        {
+          "source_line": 17,
+          "fact": "Exactly 5 percent maps to L5",
+          "status": "present_in_business_body",
+          "output_line": 19
+        },
+        {
+          "source_line": 17,
+          "fact": "5.1-percent free text is invalid",
+          "status": "present_in_business_body",
+          "output_line": 19
+        },
+        {
+          "source_line": 18,
+          "fact": "PROFILE_PROCESSING consent at CP-3 is required",
+          "status": "present_in_business_body",
+          "output_line": 21
+        },
+        {
+          "source_line": 18,
+          "fact": "Marketing consent alone never permits submission",
+          "status": "present_in_business_body",
+          "output_line": 21
+        },
+        {
+          "source_line": 19,
+          "fact": "RiskSignal is the only external business provider",
+          "status": "only_in_omission_notice",
+          "output_line": 86
+        },
+        {
+          "source_line": 19,
+          "fact": "MarketPulse and CustodyBridge are unrelated to profile submission",
+          "status": "only_in_omission_notice",
+          "output_line": 86
+        },
+        {
+          "source_line": 20,
+          "fact": "Complete Q3 uses one stable idempotency key",
+          "status": "present_in_business_body",
+          "output_line": 11
+        },
+        {
+          "source_line": 20,
+          "fact": "Identical-answer duplicate returns stored result",
+          "status": "present_in_business_body",
+          "output_line": 11
+        },
+        {
+          "source_line": 21,
+          "fact": "Incomplete RiskSignal response cannot become accepted profile",
+          "status": "present_in_business_body",
+          "output_line": 27
+        },
+        {
+          "source_line": 21,
+          "fact": "Missing reason code leaves draft recoverable",
+          "status": "present_in_business_body",
+          "output_line": 27
+        },
+        {
+          "source_lines": [
+            22,
+            38
+          ],
+          "fact": "Failed reassessment retains prior unexpired profile until original expiry",
+          "status": "present_in_business_body",
+          "output_line": 35
+        },
+        {
+          "source_line": 22,
+          "fact": "Failed attempt is not a new active profile",
+          "status": "present_in_business_body",
+          "output_line": 35
+        },
+        {
+          "source_line": 23,
+          "fact": "Result expires 365 days after acceptance",
+          "status": "present_in_business_body",
+          "output_line": 33
+        },
+        {
+          "source_line": 23,
+          "fact": "Result remains visible in history after expiry",
+          "status": "present_in_business_body",
+          "output_line": 33
+        },
+        {
+          "source_lines": [
+            24,
+            40
+          ],
+          "fact": "Orphan Mongo audit requires current human review",
+          "status": "present_in_business_body",
+          "output_line": 35
+        },
+        {
+          "source_lines": [
+            24,
+            40
+          ],
+          "fact": "Automatic reconciliation is planned and unimplemented",
+          "status": "present_in_business_body",
+          "output_line": 35
+        },
+        {
+          "source_line": 36,
+          "fact": "Retry once",
+          "status": "present_in_business_body",
+          "output_line": 69,
+          "qualification": "The unscoped instruction is present, but a failure trigger is incorrectly assigned elsewhere."
+        },
+        {
+          "source_line": 38,
+          "fact": "Incomplete draft causes no provider call",
+          "status": "present_in_business_body",
+          "output_line": 21
+        },
+        {
+          "source_line": 38,
+          "fact": "RiskSignal and platform share correlation ID",
+          "status": "present_in_business_body",
+          "output_line": 41
+        }
+      ]
+    }
+  },
+  "overall_comparison": {
+    "historical_to_first": "Autonomous document completion improved, but the semantic graph disappeared and the generated document contained omissions and unsupported claims. First attempt fails quality.",
+    "first_to_second": "Graph persistence, specific fact retention, image provenance, citation locations, synthetic scope and audit-object honesty improved. Two provider-boundary facts moved out of the body into an omission notice, and meaningful semantic errors remain.",
+    "historical_to_second": "The old table-number leak and false conjunctive condition group are absent from a now-populated narrative graph. New graph statements still strengthen source meaning, so the graph is suitable as navigation requiring source inspection rather than executable logical truth.",
+    "generalization": "Eight small live stage cases show that active navigational schema handles formatting variants, supplied links and ambiguity more robustly than the earlier optional legacy-formal schema. This does not establish arbitrary-document, oversized-input, final-document or production-system accuracy.",
+    "coverage": "Do not compare baseline 37/38, first audit 0.98, second audit 0.88 and reviewer fact-presence counts as a numerical quality trend. The metrics have different denominators, methods and audited objects."
+  }
+}

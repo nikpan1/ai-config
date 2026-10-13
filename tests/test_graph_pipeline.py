@@ -197,7 +197,9 @@ def test_graph_only_resumes_persistent_semantic_checkpoints_without_replaying_mo
             for snapshot in graph.get_state_history(config)
         }
         assert {
-            "propose_semantic_graph", "audit_semantic_graph", "publish_semantic_graph"
+            "propose_semantic_graph",
+            "audit_semantic_graph",
+            "publish_semantic_graph",
         } <= stages
         assert "compile_template" not in stages
         after = [stage for stage, _ in model.calls]
@@ -237,7 +239,7 @@ def test_independent_semantic_audit_blocks_publication_after_bounded_retries(tmp
 def context_state(tmp_path, model):
     store = ArtifactStore(tmp_path / "runtime")
     pipeline = Pipeline(store, model, "context-test")
-    text = "# Registration\n\n" + SOURCE
+    text = SOURCE + " " * (8000 - len(SOURCE)) + "Additional source context. " + SOURCE
     spans = document_spans({"kind": "docs", "path": "source.md", "hash": digest(text)}, text)
     owned, context = spans
     inventory = {
@@ -255,7 +257,9 @@ def test_extracted_fact_cannot_claim_only_context_sources(tmp_path):
     state["draft_ref"] = pipeline.store.put(
         {
             "assertions": [{"statement": SOURCE, "evidence_ids": [context["id"]]}],
-            "excluded": [{"evidence_id": owned["id"], "reason": "Heading retained as context"}],
+            "excluded": [
+                {"evidence_id": owned["id"], "reason": "Invalid fixture omits owned source"}
+            ],
         }
     )
     result = pipeline.verify_document_batch(state)
@@ -280,7 +284,10 @@ def test_source_context_reaches_extraction_and_independent_source_audits(tmp_pat
     pipeline.audit_source_coverage(state)
     stages = {stage: payload for stage, payload in model.calls}
     for stage in (
-        "inventory_aspects", "extract_document", "verify_document", "audit_source_coverage"
+        "inventory_aspects",
+        "extract_document",
+        "verify_document",
+        "audit_source_coverage",
     ):
         assert stages[stage]["context_blocks"] == [context]
         assert stages[stage]["blocks"] == [owned]

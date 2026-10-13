@@ -1,0 +1,448 @@
+{
+  "schema_version": 1,
+  "run_id": "source-first-20261013",
+  "workspace": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\.docgen\\source-first-live-20261013",
+  "status": "complete_with_limitations",
+  "state_references": {
+    "completion_context_ref": "0462b4f3d5171288304b768fcace8c27fce17821cbd707a2760e5c255753061a",
+    "completion_plan_ref": "5f0cd05f967325ade2d722b1aa7b6f074ad1bcbca1d39b7b0c8310a2298f9497",
+    "completion_draft_ref": "97b332d27561b0f62e884f7ded8135733fbb8ca05039b6d9db715b320348bce6",
+    "completion_audit_ref": "0e5df8db78720076ea4ec7413a97f86aea8e3bb89301754a9d138fbd6f935a58",
+    "completion_findings_ref": "a9bd4141b0ba07093e0fdeb6055b14a5f3ca391fde1df549b39a8e638ecf19be",
+    "completion_sections_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "limitations_ref": "a4f1a9fff90e69ed6699683d3741874d73866f834a12f7da78a7a998f389cb07",
+    "prefetched_extractions_ref": "c68971f2901fcf63afa67c5f6796135288f9e1f7734940316f98455b0d65fa88",
+    "fact_batches_ref": "fdf9c672823a18992313a23c4e3039fe38551c3beb03c7cf7738395c876cf95d",
+    "semantic_payload_ref": "c5fb1c234fd79cd578894fab71c67f34d16d0233a48ba228e0eebf29da4e7258",
+    "semantic_draft_ref": "3d5af6d2fe4f2049b77af9d28a78693631b1d0ddeef493324598be7882af8c46",
+    "semantic_raw_draft_ref": "34c3bf002cd90ce1b5bbcefd173d1f50be33651affb6c31a8f4958609ec130a8",
+    "semantic_anchoring_ref": "5f30821e7abc222f007b154c0caf0b186ce376aeecf4ef5450ab34f7a8de266f",
+    "graph_quality_ref": "493a1fc540547c7a7fa9485f73338ab3cb84c0fda5121a50fdbdb60a94afb180",
+    "source_aspects_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "source_decisions_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "source_non_substantive_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "source_coverage_ref": "bc150100a504b5e589d57d5fe8b120650f976819315bcd4efa87ba2062afbe55",
+    "document_provenance_ref": "f54a7e5c016e6feb8fe6a1a54dad0abfeeef9f5f28b6da5de7571ebca52e78be",
+    "document_candidate_provenance_ref": "4f792ec7c156bb1d16184fa8ff47f979a099ee32aac524b1bca9c0e5b4d4c6c0",
+    "snapshot_ref": "a637acbc4b544a313e48c9082332828ac5d0cfe863a8ec7feada64c76efe5b17",
+    "inventory_ref": "e887fe97cb725f77086659e89dd72d1004a5f76958b2fc587d7ae9d713b664d0",
+    "draft_ref": "",
+    "feedback_ref": "",
+    "assertions_ref": "f461a591859728aa98b1008ada3e5a3badcf4603c8a4ea701130613e487db821",
+    "exclusions_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "candidate_ref": "d8eb1ac1d77e98862d074a4289af7765e818a2b03a9edea680c4f88b559d6cd2"
+  },
+  "recorded_event_window_seconds": 179.03441619873047,
+  "model_response_wall_union_seconds": 178.0077691078186,
+  "event_counts": {
+    "completed": 17,
+    "request": 8,
+    "response": 8
+  },
+  "stage_metrics": {
+    "snapshot_inputs": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "inventory_sources": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "describe_image": {
+      "requests": 2,
+      "responses": 2,
+      "response_seconds_sum": 11.459270600002128
+    },
+    "prepare_source_images": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "extract_document": {
+      "requests": 1,
+      "responses": 1,
+      "response_seconds_sum": 28.427349999999933
+    },
+    "extract_document_batch": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "verify_document_batch": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "link_graph_batch": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "verify_graph_batch": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "semantic_graph": {
+      "requests": 1,
+      "responses": 1,
+      "response_seconds_sum": 26.865286100000958
+    },
+    "propose_semantic_graph": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "audit_semantic_graph": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "finalize_graph": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "source_plan": {
+      "requests": 1,
+      "responses": 1,
+      "response_seconds_sum": 3.6514480999994703
+    },
+    "plan_source_document": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "source_document": {
+      "requests": 2,
+      "responses": 2,
+      "response_seconds_sum": 95.3658564999987
+    },
+    "write_source_document": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "audit_source_document": {
+      "requests": 1,
+      "responses": 1,
+      "response_seconds_sum": 12.238558000000921
+    },
+    "finalize_source_document": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    }
+  },
+  "quality_artifacts": {
+    "completion_audit_ref": {
+      "accepted": true,
+      "coverage_estimate": 0.98,
+      "coverage_explanation": "The documentation thoroughly covers all authored rules, conditions, tickets, and operational constraints from the evidence, including questionnaire versioning, experience and horizon classifications, loss tolerance validations, consent requirements, external integration with RiskSignal, idempotency, retry mechanisms, profile expiration, and reassessment continuity. It accurately reflects the status and uncertainties surrounding planned automatic reconciliation of orphan Mongo audits and properly notes the interpretive nature of the visual mockup descriptions.",
+      "findings": []
+    },
+    "limitations_ref": [
+      "Graph interpretation withheld: The assessment result mockup depicts profile outcomes including review intervals and valid results reflecting risk profile lifecycle specifications.: quote does not match exact source characters",
+      "Graph interpretation withheld: The questionnaire screen mockup illustrates input fields corresponding to authored questionnaire rules such as Beginner experience, 5% loss tolerance, and CP-3 processing consent.: quote does not match exact source characters"
+    ],
+    "graph_quality_ref": {
+      "accepted": false,
+      "allocated_fact_count": 0,
+      "batch_count": 0,
+      "citations": [],
+      "counts": {},
+      "fact_count": 14,
+      "findings": [
+        "Fact has no semantic rule: 01687f10c309e939d19f60ed",
+        "Fact has no semantic rule: 110c4a667278e5be479fd665",
+        "Fact has no semantic rule: 39947e67b85106fefaa5f4c8",
+        "Fact has no semantic rule: 3e4cef330103822d75082e0a",
+        "Fact has no semantic rule: 41450663f361160214ca1d22",
+        "Fact has no semantic rule: 5ad59abf7bb46ef31af253d2",
+        "Fact has no semantic rule: 8c7865631f8eab3373979b35",
+        "Fact has no semantic rule: a26d189c3ea47fc6b73bb375",
+        "Fact has no semantic rule: b4e649b095122b1f2f6e1d32",
+        "Fact has no semantic rule: b91fa9de51270c7f3e4e88bd",
+        "Fact has no semantic rule: c4e7363b66bc0b20cf0ac7d3",
+        "Fact has no semantic rule: c8b6f661b3effd662ff2ffc3",
+        "Fact has no semantic rule: e19842496f57f0b7391e3218",
+        "Fact has no semantic rule: fe447ee2f7bc5932d6839a97"
+      ],
+      "graph_hash": "57501e5c6808b3e14852a4ea21dc7873abf9409032a06f9b740c973e83f62cf7",
+      "owned_source_count": 0,
+      "quote_count": 0,
+      "quoted_source_count": 0,
+      "schema_version": 1,
+      "semantic_edges": 0,
+      "source_count": 3,
+      "source_coverage": {
+        "accepted": null,
+        "aspects": {
+          "represented": 0,
+          "total": 0
+        },
+        "blocks": {
+          "total": 0
+        },
+        "complete": null,
+        "coverage_ratio": null,
+        "graph_revision": "bdea5ce95ebb294c1efada7b8422159bef27bee49fa738dac2bbb0ed13af2619",
+        "integrity_findings": [],
+        "minimum_coverage": 0.9,
+        "omitted_aspects": [],
+        "qualifiers": {
+          "coverage_ratio": null,
+          "represented": 0,
+          "total": 0
+        },
+        "reason": "Source-first mode uses original context and a final document audit; no separate source-aspect inventory was audited",
+        "snapshot_id": "a637acbc4b544a313e48c9082332828ac5d0cfe863a8ec7feada64c76efe5b17",
+        "status": "not_independently_measured",
+        "unresolved_attachments": []
+      },
+      "unallocated_fact_ids": [
+        "01687f10c309e939d19f60ed",
+        "110c4a667278e5be479fd665",
+        "39947e67b85106fefaa5f4c8",
+        "3e4cef330103822d75082e0a",
+        "41450663f361160214ca1d22",
+        "5ad59abf7bb46ef31af253d2",
+        "8c7865631f8eab3373979b35",
+        "a26d189c3ea47fc6b73bb375",
+        "b4e649b095122b1f2f6e1d32",
+        "b91fa9de51270c7f3e4e88bd",
+        "c4e7363b66bc0b20cf0ac7d3",
+        "c8b6f661b3effd662ff2ffc3",
+        "e19842496f57f0b7391e3218",
+        "fe447ee2f7bc5932d6839a97"
+      ],
+      "uncertainties": [],
+      "verification": "Exact provenance and structure; semantic correctness requires independent model audit"
+    },
+    "source_coverage_ref": {
+      "automatic_recovery_counts": {},
+      "citation_repair_attempts_current_packet": 1,
+      "coordinator_interventions": "Measure externally; not observable inside pipeline",
+      "coverage_kind": "model_estimate_not_measured_information_recall",
+      "exact_citations_valid": true,
+      "graph_revision": "bdea5ce95ebb294c1efada7b8422159bef27bee49fa738dac2bbb0ed13af2619",
+      "limitations": [
+        "Specific workflow criteria for planned automatic reconciliation of orphan Mongo audit records are not documented; currently, a manual review decision is required.",
+        "The exact business fallback and handling when a draft remains incomplete or a reason code remains missing after exhausting the single retry attempt are not specified in the evidence.",
+        "Graph interpretation withheld: The assessment result mockup depicts profile outcomes including review intervals and valid results reflecting risk profile lifecycle specifications.: quote does not match exact source characters",
+        "Graph interpretation withheld: The questionnaire screen mockup illustrates input fields corresponding to authored questionnaire rules such as Beginner experience, 5% loss tolerance, and CP-3 processing consent.: quote does not match exact source characters",
+        "Withheld paragraph 5.1",
+        "Withheld paragraph 7.2",
+        "Withheld paragraph 12.1"
+      ],
+      "semantic_audit": {
+        "accepted": true,
+        "coverage_estimate": 0.98,
+        "coverage_explanation": "The documentation thoroughly covers all authored rules, conditions, tickets, and operational constraints from the evidence, including questionnaire versioning, experience and horizon classifications, loss tolerance validations, consent requirements, external integration with RiskSignal, idempotency, retry mechanisms, profile expiration, and reassessment continuity. It accurately reflects the status and uncertainties surrounding planned automatic reconciliation of orphan Mongo audits and properly notes the interpretive nature of the visual mockup descriptions.",
+        "findings": []
+      },
+      "source_revision": "a637acbc4b544a313e48c9082332828ac5d0cfe863a8ec7feada64c76efe5b17",
+      "status": "complete_with_limitations",
+      "withheld_paragraphs": [
+        "Withheld paragraph 5.1",
+        "Withheld paragraph 7.2",
+        "Withheld paragraph 12.1"
+      ]
+    }
+  },
+  "ledger": [
+    {
+      "status": "settled",
+      "entries": 8,
+      "charged_pln": 0.527423300775
+    }
+  ],
+  "graph": {
+    "node_types": {
+      "Assertion": 14,
+      "SourceSpan": 3
+    },
+    "edge_types": {
+      "SUPPORTED_BY": 14
+    },
+    "assertions": [
+      {
+        "id": "e19842496f57f0b7391e3218",
+        "statement": "For INV-100, the current risk profile must be reviewed before starting a new draft and after recovery.",
+        "subject": "Risk profiling draft journey",
+        "predicate": "requires reviewing the current profile before starting a new draft and after recovery",
+        "scope": "INV-100",
+        "modality": "MUST",
+        "conditions": "[\"A new draft is being started or recovery has occurred\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "c8b6f661b3effd662ff2ffc3",
+        "statement": "Q3 is the current questionnaire version, and a Q2 draft cannot be submitted after 2026-09-01.",
+        "subject": "Questionnaire version",
+        "predicate": "is Q3 as current, disallowing Q2 submissions after 2026-09-01",
+        "scope": "INV-100",
+        "modality": "MUST",
+        "conditions": "[]",
+        "exceptions": "[\"A Q2 draft cannot be submitted after 2026-09-01\"]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "110c4a667278e5be479fd665",
+        "statement": "Experience accepts NONE, BEGINNER, INTERMEDIATE, and ADVANCED, while EXPERT is retired and rejected.",
+        "subject": "Experience level",
+        "predicate": "accepts NONE, BEGINNER, INTERMEDIATE, and ADVANCED, and rejects EXPERT",
+        "scope": "INV-100",
+        "modality": "MUST",
+        "conditions": "[]",
+        "exceptions": "[\"EXPERT is retired and rejected\"]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "c4e7363b66bc0b20cf0ac7d3",
+        "statement": "Month 36 starts horizon H3, whereas Month 35 remains H1.",
+        "subject": "Investment horizon",
+        "predicate": "maps Month 36 to H3 and Month 35 to H1",
+        "scope": "INV-100",
+        "modality": "MUST",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "b91fa9de51270c7f3e4e88bd",
+        "statement": "Exactly 5 percent belongs to L5, and a 5.1 percent free-text answer is invalid.",
+        "subject": "Loss tolerance",
+        "predicate": "assigns exactly 5 percent to L5 and rejects 5.1 percent as invalid",
+        "scope": "INV-100",
+        "modality": "MUST",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "01687f10c309e939d19f60ed",
+        "statement": "PROFILE_PROCESSING consent at CP-3 is required for submission; marketing consent alone never permits submission.",
+        "subject": "Profile submission consent",
+        "predicate": "requires PROFILE_PROCESSING consent at CP-3",
+        "scope": "INV-100",
+        "modality": "MUST",
+        "conditions": "[\"PROFILE_PROCESSING consent at CP-3 is granted\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "b4e649b095122b1f2f6e1d32",
+        "statement": "RiskSignal is the only external business provider called by risk profiling, sharing a correlation ID with the platform, while MarketPulse and CustodyBridge are unrelated to profile submission and no provider call occurs for an incomplete draft.",
+        "subject": "RiskSignal external integration",
+        "predicate": "is the sole external provider called by risk profiling, sharing a correlation ID with the platform, and is not called for incomplete drafts",
+        "scope": "INV-100",
+        "modality": "MUST",
+        "conditions": "[\"Draft is complete\"]",
+        "exceptions": "[\"No provider call occurs for an incomplete draft\"]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "5ad59abf7bb46ef31af253d2",
+        "statement": "A complete Q3 submission uses one stable idempotency key, and a duplicate submission with identical answers returns the stored result.",
+        "subject": "Q3 submission idempotency",
+        "predicate": "uses a stable idempotency key returning the stored result for duplicate answers",
+        "scope": "INV-100",
+        "modality": "MUST",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "3e4cef330103822d75082e0a",
+        "statement": "An incomplete RiskSignal response cannot become an accepted profile, and a missing reason code keeps the draft recoverable.",
+        "subject": "RiskSignal response validation",
+        "predicate": "rejects incomplete responses from becoming accepted profiles while keeping drafts recoverable when reason codes are missing",
+        "scope": "INV-100",
+        "modality": "MUST_NOT",
+        "conditions": "[]",
+        "exceptions": "[\"A missing reason code keeps the draft recoverable\"]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "39947e67b85106fefaa5f4c8",
+        "statement": "A failed reassessment leaves the prior unexpired profile active until its original expiry and does not constitute a new active profile.",
+        "subject": "Risk profile reassessment",
+        "predicate": "maintains the prior unexpired profile active until its original expiry upon reassessment failure",
+        "scope": "INV-100",
+        "modality": "MUST",
+        "conditions": "[\"Reassessment fails\", \"Prior profile is unexpired\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "41450663f361160214ca1d22",
+        "statement": "A risk profile result expires 365 days after acceptance and remains visible in history after expiry.",
+        "subject": "Risk profile lifecycle",
+        "predicate": "expires 365 days after acceptance while remaining visible in history",
+        "scope": "INV-100",
+        "modality": "MUST",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "a26d189c3ea47fc6b73bb375",
+        "statement": "An orphan Mongo audit record requires a human review decision; automatic reconciliation is planned and not implemented.",
+        "subject": "Orphan Mongo audit",
+        "predicate": "requires a human review decision while automatic reconciliation remains planned and unimplemented",
+        "scope": "INV-100",
+        "modality": "MUST",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "8c7865631f8eab3373979b35",
+        "statement": "The assessment-result view mockup illustrates an accepted risk profile display showing Band R2 · Measured, Rules RS-2026-09, Reasons: HORIZON_3, LOSS_5, Accepted 2026-10-01 UTC, and Review after 365 days under Accepted profile P-204.",
+        "subject": "Assessment result mockup",
+        "predicate": "depicts accepted profile P-204 with band, rules version, reason codes, acceptance timestamp, and review duration",
+        "scope": "UI mockup",
+        "modality": "MAY",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "generated_image_description"
+      },
+      {
+        "id": "fe447ee2f7bc5932d6839a97",
+        "statement": "The questionnaire screen mockup illustrates five stacked cards under 'Risk questionnaire' and 'Q3 · draft D-104' for Experience: Beginner, Horizon: 3–7 years, Loss tolerance: 5%, Liquidity: Flexible, and Processing consent CP-3.",
+        "subject": "Questionnaire mockup",
+        "predicate": "depicts draft D-104 with five input/selection cards including experience, horizon, loss tolerance, liquidity, and processing consent CP-3",
+        "scope": "UI mockup",
+        "modality": "MAY",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "generated_image_description"
+      }
+    ],
+    "source_count": 3,
+    "semantic_nodes": [],
+    "semantic_edges": []
+  },
+  "limitations": [
+    "Node counts and successful audits are not semantic accuracy measurements.",
+    "The recorded event window excludes process startup and shutdown.",
+    "Model response sums can include concurrent requests.",
+    "Coordinator interventions must be supplied from the execution record, not inferred."
+  ],
+  "external_process_measurement": {
+    "run_id": "source-first-20261013",
+    "started_utc": "2026-10-13T21:04:30.9939403+00:00",
+    "finished_utc": "2026-10-13T21:07:31.4820066+00:00",
+    "elapsed_seconds": 180.4880663,
+    "exit_code": 0,
+    "coordinator_interventions": 0,
+    "user_interventions": 0,
+    "fresh_full_pipeline_attempts": 1
+  },
+  "quality_review": "source-first-independent-review-20261013.json",
+  "measurement_note": "Read-only observation is not intervention. Between-attempt code corrections are disclosed in the comparison report. Model estimates and structural acceptance are not semantic accuracy."
+}

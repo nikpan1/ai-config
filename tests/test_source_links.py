@@ -86,14 +86,15 @@ def test_every_synthetic_story_has_a_matching_html_text_fragment():
             assert selector["phrase"] in visible
 
 
-def test_document_spans_keep_table_rows_separate():
+def test_document_spans_keep_small_table_with_its_original_context():
     file = {"kind": "docs", "hash": "a" * 64, "path": "source.md"}
     spans = document_spans(
         file, "# Source\n\n| ID | Story |\n| --- | --- |\n| A | As a shopper, I want a table. |\n"
     )
     row = next(item for item in spans if "As a shopper" in item["text"])
-    assert row["start_line"] == row["end_line"] == 5
-    assert row["table_columns"] == ["ID", "Story"]
+    assert row["start_line"] == 1 and row["end_line"] == 5
+    assert "| ID | Story |" in row["text"]
+    assert "table_columns" not in row
 
 
 def test_fragment_url_preserves_query_and_encodes_directive_delimiters():

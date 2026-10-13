@@ -46,9 +46,36 @@ class SemanticRule(SemanticRecord):
     topic_quotes: list[EvidenceQuote] = Field(min_length=1)
     condition_groups: list[SemanticConditionGroup] = []
     exceptions: list[SemanticQualifier] = []
+    preserved_conditions: list[str] = []
+    preserved_exceptions: list[str] = []
 
 
-class SemanticGraphDraft(SemanticRecord):
-    topics: list[SemanticTopic]
-    rules: list[SemanticRule]
+class SemanticConcept(SemanticRecord):
+    key: str = Field(min_length=1)
+    name: str = Field(min_length=1)
+    kind: str = Field(default="Concept", min_length=1)
+    scope: str = Field(default="Selected sources", min_length=1)
+    description: str = Field(min_length=1)
+    fact_ids: list[str] = []
+    quotes: list[EvidenceQuote] = Field(min_length=1)
+    status: Literal["direct", "inferred", "uncertain"] = "direct"
+
+
+class SemanticRelationship(SemanticRecord):
+    source_key: str = Field(min_length=1)
+    target_key: str = Field(min_length=1)
+    description: str = Field(min_length=1)
+    label: str = Field(default="Related", min_length=1)
+    status: Literal["direct", "inferred", "uncertain"] = "direct"
+    quotes: list[EvidenceQuote] = Field(min_length=1)
+
+
+class NavigationalGraphDraft(SemanticRecord):
+    concepts: list[SemanticConcept] = []
+    relationships: list[SemanticRelationship] = []
     findings: list[str] = []
+
+
+class SemanticGraphDraft(NavigationalGraphDraft):
+    topics: list[SemanticTopic] = []
+    rules: list[SemanticRule] = []

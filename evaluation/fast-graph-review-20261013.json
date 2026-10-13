@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-13",
+  "review_type": "Independent source comparison by a separate agent; no additional paid model run",
+  "scope": "Graph construction and source provenance, not acceptance of generated documentation",
+  "graph_run": "risk-fast-20261013-c",
+  "consumer_run": "risk-fast-20261013-d",
+  "workspace": ".docgen/fast-live-20261013",
+  "graph_revision": "18657e342abd42eb5e81836413f9e7b9281a43940254d0651c234c018b1d64ee",
+  "graph_hash": "5802f8788cfd4e99c3065835a5e1447039b872cd9592fdd341ab053c61a3f906",
+  "source": {
+    "path": "data/test_data_2_quick/risk-profiling.md",
+    "frozen_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+    "context_quote": "A concise synthetic profile journey for INV-100.",
+    "status": "Synthetic test evidence, not a verified production-system specification"
+  },
+  "summary": {
+    "topic_count": 1,
+    "topic_name": "Risk profiling",
+    "rule_count": 20,
+    "condition_count": 13,
+    "condition_group_count": 10,
+    "exception_count": 1,
+    "semantic_edge_count": 113,
+    "quote_count": 62,
+    "automated_graph_audit_accepted": true,
+    "independent_review_has_findings": true,
+    "improvement": "The recurring business capability is represented by one topic instead of separate topics for QF01 through QF08. Original narrow rule scopes remain attached to individual rules.",
+    "limitation": "Automated acceptance and exact source quotations do not establish perfect semantic correctness. Two source-grounded issues remain below."
+  },
+  "coverage": {
+    "measure": "Represented source aspects from the independently generated aspect inventory",
+    "represented_aspects": 37,
+    "total_aspects": 38,
+    "ratio": 0.9736842105263158,
+    "percentage": 97.36842105263158,
+    "minimum_ratio": 0.9,
+    "accepted_by_configured_policy": true,
+    "complete": false,
+    "represented_qualifiers": 17,
+    "total_qualifiers": 18,
+    "qualifier_ratio": 0.9444444444444444,
+    "omission": {
+      "aspect_id": "33a7405bf50e1b825e3b31c2",
+      "evidence_id": "5b738cea7beecd9ebd56",
+      "quote": "The visible rule is test evidence; the image is only a screen illustration.",
+      "reason": "The evidence note specifying that the visible rule is test evidence and the image is only a screen illustration is omitted from the extracted facts.",
+      "review_note": "A corresponding shared evidence note was extracted from later table rows. The original QF01 aspect remains explicitly unresolved in the recorded audit."
+    },
+    "interpretation": "97.37% is a measured aspect-coverage proxy, not proof that 97.37% of the source meaning was preserved. Aspect inventory completeness, semantic interpretation, repeated notes and unequal information importance affect this measurement. The same test-evidence note appears in four inventoried aspects, so the denominator does not consist of 38 unique independent business facts."
+  },
+  "findings": [
+    {
+      "id": "parser-table-identifier-in-semantic-claim",
+      "severity": "medium",
+      "status": "Confirmed unsupported reader-facing table designation in the graph rule",
+      "node_id": "semantic:rule:207ee9e2c80765907e4385b8",
+      "fact_id": "25f0f56aae6227a04ba36596",
+      "generated_statement": "The visible rules in table 11 serve as test evidence, while the visual image references are screen illustrations only.",
+      "source_quotes": [
+        {
+          "evidence_id": "980d9acfadb72a4eaed8",
+          "source_line": 22,
+          "start": 150,
+          "end": 225,
+          "text": "The visible rule is test evidence; the image is only a screen illustration."
+        },
+        {
+          "evidence_id": "1728c9d28a4ff07e1ccf",
+          "start": 125,
+          "end": 200,
+          "text": "The visible rule is test evidence; the image is only a screen illustration."
+        },
+        {
+          "evidence_id": "a822617d56da5317d7b2",
+          "start": 152,
+          "end": 227,
+          "text": "The visible rule is test evidence; the image is only a screen illustration."
+        }
+      ],
+      "parser_evidence": {
+        "inventory_artifact": ".docgen/fast-live-20261013/runs/risk-fast-20261013-b/step2/revisions/r0001/inventory_ref.json",
+        "table_id": "table:11",
+        "implementation": "src/docgen_graph/source_documents.py:42",
+        "construction": "table_id is constructed from the Markdown parser's zero-based table start line, not from an authored table caption or business identifier."
+      },
+      "explanation": "The source contains no authored designation 'table 11'. The matching parser identifier makes leakage of structural metadata into prose a plausible explanation. The test-evidence and illustration qualifications are supported, but the numeric table designation is not reader-facing source content.",
+      "recommended_repair": "Remove 'in table 11' from the claim, retain source locators only in provenance, and keep the synthetic test-evidence scope explicit. Do not infer real production behavior from this fixture."
+    },
+    {
+      "id": "separate-implications-combined-under-all",
+      "severity": "high_for_machine_inference",
+      "status": "Semantic ambiguity requiring correction before treating the graph as executable logical evidence",
+      "rule_id": "semantic:rule:5a554a2b401829cd3163316d",
+      "fact_id": "ec04fec8a8252965d8c7e0a3",
+      "condition_group_id": "semantic:conditiongroup:23d614e1e7d1f48d8d48af5f",
+      "operator": "all",
+      "rule_statement": "An incomplete RiskSignal response cannot become an accepted profile, and a missing reason code keeps the draft recoverable.",
+      "conditions": [
+        {
+          "node_id": "semantic:condition:fa0cbcc7f665e997ce27718a",
+          "statement": "RiskSignal response is incomplete",
+          "quote": "An incomplete RiskSignal response"
+        },
+        {
+          "node_id": "semantic:condition:3edb05e4399f12da5ca79abc",
+          "statement": "reason code is missing",
+          "quote": "A missing reason code"
+        }
+      ],
+      "source_quote": {
+        "evidence_id": "204a4965f904557e6fdd",
+        "source_line": 21,
+        "start": 9,
+        "end": 130,
+        "text": "An incomplete RiskSignal response cannot become an accepted profile. | A missing reason code keeps the draft recoverable."
+      },
+      "source_logic": [
+        "An incomplete response implies the profile cannot be accepted.",
+        "A missing reason code implies the draft remains recoverable."
+      ],
+      "explanation": "The source gives two condition-to-outcome implications. A single all group attaches both conditions to their combined rule without identifying which condition governs which outcome. If interpreted as a joint prerequisite, it can incorrectly require a missing reason code before applying the prohibition on accepting an incomplete response. The full rule text still preserves the source wording, so this finding concerns the graph's explicit logical structure rather than total textual loss.",
+      "counterexample": "An incomplete response with a reason code present must still be rejected according to the source. Treating both group members as necessary would fail to trigger that rejection.",
+      "recommended_repair": "Represent the separate implications with separately scoped outcomes or source-grounded atomic rules. Do not automatically replace all with any, which would also attach both outcomes to either condition. Preserve shared fact and source provenance when separating the implications."
+    }
+  ],
+  "checked_preserved_qualifiers": [
+    "Q3 current version and Q2 submission cutoff after 2026-09-01",
+    "Four permitted experience codes and rejection of EXPERT",
+    "Month 35 remains H1; month 36 begins H3",
+    "Exactly 5 percent belongs to L5; 5.1 percent free text is invalid",
+    "PROFILE_PROCESSING consent at CP-3 required; marketing consent alone insufficient",
+    "RiskSignal is the only relevant external provider; incomplete drafts produce no provider call",
+    "Stable idempotency key and identical-answer duplicate returning the stored result",
+    "Failed reassessment preserves the prior unexpired profile only until its original expiry",
+    "Expiry 365 days after acceptance and visibility in history after expiry",
+    "Orphan audit requires current human review; automatic reconciliation is planned and not implemented",
+    "Retry once is retained without inventing a trigger or automatic retry guarantee"
+  ],
+  "review_limitations": [
+    "This is a focused independent review, not an exhaustive proof of every graph edge.",
+    "The graph was reused unchanged by run d; this review does not certify final documentation, which remained incomplete.",
+    "Source provenance and exact quotes support traceability, but interpretation still needs semantic validation."
+  ]
+}

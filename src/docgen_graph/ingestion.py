@@ -368,17 +368,21 @@ def inventory(store: ArtifactStore, snapshot: dict) -> dict:
     for attachment in snapshot.get("attachments", []):
         for position, segment in enumerate(attachment.get("spans", []), 1):
             file = {"kind": "docs", "path": attachment["path"], "hash": attachment["hash"]}
-            span = _span(
-                file, position, position, attachment["path"], segment["text"], "attachment"
-            )
-            span.update(
-                {
-                    "source_kind": "attachment",
-                    "locator": segment["locator"],
-                    "parser_version": attachment["parser_version"],
-                }
-            )
-            spans.append(span)
+            for span in document_spans(file, segment["text"]):
+                span.update(
+                    {
+                        "id": digest([span["id"], segment["locator"], position])[:20],
+                        "role": "attachment",
+                        "source_kind": "attachment",
+                        "locator": {
+                            **segment["locator"],
+                            "text_start": span["source_start_char"],
+                            "text_end": span["source_end_char"],
+                        },
+                        "parser_version": attachment["parser_version"],
+                    }
+                )
+                spans.append(span)
     code_units = batches([span for span in spans if span["kind"] == "code"], 12000, 1)
     context = document_context(spans)
     return {

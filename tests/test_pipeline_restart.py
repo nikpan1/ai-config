@@ -59,9 +59,9 @@ class FixtureModel:
             return {
                 "assertions": [
                     {
-                        "statement": re.sub(r"!\[([^]]+)\]\([^)]+\)", r"\1", block["text"]).lstrip(
-                            "# "
-                        ),
+                        "statement": re.sub(r"!\[([^]]+)\]\([^)]+\)", r"\1", block["text"])
+                        .lstrip("# ")
+                        .replace("\r\n", "\n"),
                         "subject": "return_value",
                         "predicate": "describes",
                         "evidence_ids": [block["id"]],
@@ -107,7 +107,8 @@ class FixtureModel:
             for item in assertions:
                 label = original[item["evidence_ids"][0]]["label"]
                 role = "Code" if label.startswith("C") else "Legacy"
-                lines.append(f"{item['statement']} [{role} {label}]")
+                statement = item["statement"].replace("\r\n", "\n")
+                lines.append(f"{statement} [{role} {label}]")
                 if payload["mandatory_obligation_ids"]:
                     mappings.append(
                         {

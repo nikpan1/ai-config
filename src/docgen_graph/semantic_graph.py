@@ -123,6 +123,10 @@ def quote_issues(quotes: list[dict], sources: dict[str, dict], owner: str) -> li
 
 
 def all_quoted_records(draft: dict):
+    for concept in draft.get("concepts", []):
+        yield concept["key"], concept["quotes"]
+    for relation in draft.get("relationships", []):
+        yield relation["description"], relation["quotes"]
     for topic in draft["topics"]:
         yield topic["key"], topic["quotes"]
     for rule in draft["rules"]:
@@ -145,16 +149,34 @@ def validate_semantic_proposal(raw: dict, payload: dict) -> tuple[dict, list[str
     facts = {fact["id"]: fact for fact in payload["facts"]}
     owned = set(payload["owned_evidence_ids"])
     topics = {topic["key"]: topic for topic in draft["topics"]}
-    issues = [f"Unresolved semantic finding: {finding}" for finding in draft["findings"]]
-    for kind in ("topics", "rules"):
+    issues = []
+    for kind in ("topics", "rules", "concepts"):
         counts = Counter(item["key"] for item in draft[kind])
         issues.extend(f"Duplicate {kind} key: {key}" for key, count in counts.items() if count > 1)
     for owner, quotes in all_quoted_records(draft):
         issues.extend(quote_issues(quotes, sources, owner))
     assigned = Counter(fid for rule in draft["rules"] for fid in rule["fact_ids"])
-    issues.extend(f"Fact not allocated to a rule: {fid}" for fid in facts if not assigned[fid])
+    flexible = "concepts" in raw or "relationships" in raw
+    if not flexible:
+        issues.extend(f"Fact not allocated to a rule: {fid}" for fid in facts if not assigned[fid])
     issues.extend(f"Fact allocated more than once: {fid}" for fid, n in assigned.items() if n > 1)
     issues.extend(f"Rule references unknown fact: {fid}" for fid in assigned if fid not in facts)
+    endpoint_keys = set(topics) | {rule["key"] for rule in draft["rules"]}
+    for concept in draft["concepts"]:
+        if concept["key"] in endpoint_keys:
+            issues.append(f"Duplicate semantic endpoint key: {concept['key']}")
+        endpoint_keys.add(concept["key"])
+        issues.extend(
+            f"Concept references unknown fact: {fid}"
+            for fid in concept["fact_ids"]
+            if fid not in facts
+        )
+    endpoint_keys.update(sources)
+    endpoint_keys.update(facts)
+    for relation in draft["relationships"]:
+        for field in ("source_key", "target_key"):
+            if relation[field] not in endpoint_keys:
+                issues.append(f"Relationship references unknown endpoint: {relation[field]}")
     for fact in facts.values():
         if not owned.intersection(fact["evidence_ids"]):
             issues.append(f"Fact has no owned source: {fact['id']}")
@@ -166,8 +188,6 @@ def validate_semantic_proposal(raw: dict, payload: dict) -> tuple[dict, list[str
         topic = topics.get(rule["topic_key"])
         if topic is None:
             issues.append(f"Rule references unknown topic: {rule['key']}")
-        elif normalized_term(topic["scope"]) != normalized_term(rule["scope"]):
-            issues.append(f"Topic and rule scope differ: {rule['key']}")
         conditions = {
             normalized_term(item["statement"])
             for group in rule["condition_groups"]
@@ -187,7 +207,9 @@ def validate_semantic_proposal(raw: dict, payload: dict) -> tuple[dict, list[str
         for condition in sorted(source_conditions - verified_conditions):
             issues.append(f"Group references unknown source condition: {rule['key']}: {condition}")
         conditions.update(normalized_term(condition) for condition in source_conditions)
+        conditions.update(normalized_term(item) for item in rule["preserved_conditions"])
         exceptions = {normalized_term(item["statement"]) for item in rule["exceptions"]}
+        exceptions.update(normalized_term(item) for item in rule["preserved_exceptions"])
         rule_sources = {quote["evidence_id"] for quote in rule["quotes"]}
         for fid in rule["fact_ids"]:
             if fid not in facts:
@@ -212,11 +234,62 @@ def validate_semantic_proposal(raw: dict, payload: dict) -> tuple[dict, list[str
             issues.append(f"Existing topic identity or scope changed: {topic['key']}")
     if issues:
         return {}, sorted(set(issues))
-    return canonical_graph(draft, payload), []
+    canonical = canonical_graph(draft, payload)
+    if flexible:
+        canonical["representation"] = "source_map"
+    return canonical, []
 
 
 def topic_identifier(topic: dict) -> str:
     return semantic_id("Topic", [normalized_term(topic["name"]), normalized_term(topic["scope"])])
+
+
+def salvage_semantic_proposal(raw: dict, payload: dict) -> tuple[dict, list[str]]:
+    anchored, anchoring = anchor_semantic_quotes(raw, payload)
+    try:
+        draft = SemanticGraphDraft.model_validate(anchored).model_dump()
+    except ValidationError as error:
+        return {}, [f"Invalid semantic graph contract: {error}"]
+    if draft["topics"] or draft["rules"]:
+        return validate_semantic_proposal(raw, payload)
+    sources = {span["id"]: span for span in payload["sources"]}
+    facts = {fact["id"] for fact in payload["facts"]}
+    counts = Counter(concept["key"] for concept in draft["concepts"])
+    retained = []
+    withheld = []
+    for concept in draft["concepts"]:
+        findings = quote_issues(concept["quotes"], sources, concept["key"])
+        if counts[concept["key"]] > 1 or concept["key"] in sources or concept["key"] in facts:
+            findings.append("Ambiguous endpoint key")
+        if set(concept["fact_ids"]) - facts:
+            findings.append("Unknown fact reference")
+        if findings:
+            withheld.append({"kind": "concept", "key": concept["key"], "findings": findings})
+        else:
+            retained.append(concept)
+    endpoints = set(sources) | facts | {concept["key"] for concept in retained}
+    relationships = []
+    for index, relationship in enumerate(draft["relationships"]):
+        findings = quote_issues(relationship["quotes"], sources, relationship["description"])
+        if {relationship["source_key"], relationship["target_key"]} - endpoints:
+            findings.append("Unknown or withheld relationship endpoint")
+        if findings:
+            withheld.append({"kind": "relationship", "key": str(index), "findings": findings})
+        else:
+            relationships.append(relationship)
+    limitations = [
+        f"Withheld graph {record['kind']} {record['key']}: {'; '.join(record['findings'])}"
+        for record in withheld
+    ]
+    draft.update(
+        concepts=retained, relationships=relationships, findings=draft["findings"] + limitations
+    )
+    canonical, remaining = validate_semantic_proposal(draft, payload)
+    if remaining:
+        return {}, limitations + remaining
+    canonical["withheld_records"] = withheld
+    canonical["salvage_anchoring"] = anchoring
+    return canonical, limitations
 
 
 def canonical_graph(draft: dict, payload: dict) -> dict:
@@ -246,14 +319,18 @@ def canonical_graph(draft: dict, payload: dict) -> dict:
         nodes[identifier] = record
         return identifier
 
-    def add_edge(source, target, relation, quotes):
-        identifier = semantic_id("Edge", [source, target, relation])
+    def add_edge(source, target, relation, quotes, **attributes):
+        identifier = semantic_id(
+            "Edge",
+            [source, target, relation, attributes] if attributes else [source, target, relation],
+        )
         record = {
             "id": identifier,
             "source_id": source,
             "target_id": target,
             "type": relation,
             "quotes": unique_quotes(quotes),
+            **attributes,
         }
         if identifier in edges:
             record["quotes"] = unique_quotes(edges[identifier]["quotes"] + record["quotes"])
@@ -269,6 +346,9 @@ def canonical_graph(draft: dict, payload: dict) -> dict:
             topic["quotes"],
         )
     facts = {fact["id"]: fact for fact in payload["facts"]}
+    endpoint_ids = {item["id"]: item["id"] for item in payload["sources"]}
+    endpoint_ids.update({fid: fid for fid in facts})
+    endpoint_ids.update(topic_ids)
     for rule in draft["rules"]:
         groups = sorted(
             [
@@ -292,7 +372,10 @@ def canonical_graph(draft: dict, payload: dict) -> dict:
             rule["quotes"],
             modality=rule["modality"],
             fact_ids=sorted(rule["fact_ids"]),
+            preserved_conditions=rule["preserved_conditions"],
+            preserved_exceptions=rule["preserved_exceptions"],
         )
+        endpoint_ids[rule["key"]] = rid
         add_edge(topic_ids[rule["topic_key"]], rid, "HAS_RULE", rule["topic_quotes"])
         for fid in rule["fact_ids"]:
             quotes = [q for q in rule["quotes"] if q["evidence_id"] in facts[fid]["evidence_ids"]]
@@ -330,6 +413,36 @@ def canonical_graph(draft: dict, payload: dict) -> dict:
                 exception["quotes"],
             )
             add_edge(rid, eid, "HAS_EXCEPTION", exception["quotes"])
+    for concept in draft["concepts"]:
+        identifier = add_node(
+            "Concept",
+            [
+                normalized_term(concept["name"]),
+                normalized_term(concept["scope"]),
+                normalized_term(concept["description"]),
+                concept["status"],
+            ],
+            concept["name"],
+            concept["scope"],
+            concept["quotes"],
+            description=concept["description"],
+            concept_kind=concept["kind"],
+            status=concept["status"],
+            fact_ids=sorted(concept["fact_ids"]),
+        )
+        endpoint_ids[concept["key"]] = identifier
+        for fid in concept["fact_ids"]:
+            add_edge(identifier, fid, "INTERPRETS", concept["quotes"])
+    for relation in draft["relationships"]:
+        add_edge(
+            endpoint_ids[relation["source_key"]],
+            endpoint_ids[relation["target_key"]],
+            "RELATED",
+            relation["quotes"],
+            description=relation["description"],
+            label=relation["label"],
+            status=relation["status"],
+        )
     for node in nodes.values():
         for evidence_id in sorted({quote["evidence_id"] for quote in node["quotes"]}):
             add_edge(
@@ -339,13 +452,16 @@ def canonical_graph(draft: dict, payload: dict) -> dict:
                 [quote for quote in node["quotes"] if quote["evidence_id"] == evidence_id],
             )
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "nodes": sorted(nodes.values(), key=lambda item: item["id"]),
         "edges": sorted(edges.values(), key=lambda item: item["id"]),
         "fact_ids": sorted(facts),
         "owned_evidence_ids": payload["owned_evidence_ids"],
         "context_evidence_ids": payload["context_evidence_ids"],
-        "findings": [],
+        "findings": draft["findings"],
+        "representation": "source_map"
+        if draft["concepts"] or draft["relationships"]
+        else "legacy_rules",
     }
 
 
@@ -378,8 +494,9 @@ def semantic_structure_issues(
         "HAS_CONDITION": ("ConditionGroup", "Condition"),
         "HAS_EXCEPTION": ("Rule", "Exception"),
         "EXPRESSES": ("Rule", "Assertion"),
+        "INTERPRETS": ("Concept", "Assertion"),
     }
-    semantic_types = {"Topic", "Rule", "ConditionGroup", "Condition", "Exception"}
+    semantic_types = {"Topic", "Rule", "ConditionGroup", "Condition", "Exception", "Concept"}
     issues = []
     for node in nodes:
         if node["type"] not in semantic_types:
@@ -392,7 +509,13 @@ def semantic_structure_issues(
             issues.append(f"Invalid condition group operator: {node['id']}")
     for edge in edges:
         endpoints = (types.get(edge["source_id"]), types.get(edge["target_id"]))
-        if edge["type"] == "SUPPORTED_BY":
+        if edge["type"] == "RELATED":
+            valid = (
+                all(endpoints)
+                and bool(edge.get("description"))
+                and edge.get("status") in {"direct", "inferred", "uncertain"}
+            )
+        elif edge["type"] == "SUPPORTED_BY":
             valid = endpoints[0] in semantic_types and endpoints[1] == "SourceSpan"
         else:
             valid = edge["type"] in allowed and endpoints == allowed[edge["type"]]
@@ -404,8 +527,6 @@ def semantic_structure_issues(
 def publish_semantic_batch(
     graph: KnowledgeGraph, canonical: dict, batch_id: str, provenance: dict | None = None
 ) -> None:
-    if canonical.get("findings"):
-        raise ValueError("Cannot publish unresolved semantic findings")
     sources = {
         quote["evidence_id"]: graph.evidence(quote["evidence_id"])
         for record in canonical["nodes"] + canonical["edges"]
@@ -440,7 +561,9 @@ def publish_semantic_batch(
                 "INSERT OR IGNORE INTO nodes VALUES (?,?,?,?)",
                 (node["id"], node["type"], node["name"], node["scope"]),
             )
-            graph._search(connection, node["id"], node["name"])
+            graph._search(
+                connection, node["id"], " ".join([node["name"], node.get("description", "")])
+            )
             previous = connection.execute(
                 "SELECT payload FROM semantic_nodes WHERE id=?", (node["id"],)
             ).fetchone()
@@ -470,7 +593,7 @@ def publish_semantic_batch(
                     edge["source_id"],
                     edge["target_id"],
                     edge["type"],
-                    "verified_semantics",
+                    "source_grounded_interpretation",
                     edge["quotes"][0]["evidence_id"],
                 ),
             )
@@ -517,7 +640,7 @@ def topic_register(graph: KnowledgeGraph) -> list[dict]:
     rules = {node["id"]: node for node in nodes if node["type"] == "Rule"}
     topics = []
     for node in nodes:
-        if node["type"] == "Topic":
+        if node["type"] in {"Topic", "Concept"}:
             topics.append(
                 {
                     **node,
@@ -572,7 +695,26 @@ def source_citation(quote: dict, source: dict) -> dict:
 def semantic_bundle(graph: KnowledgeGraph, node_ids: list[str]) -> dict:
     nodes, edges = semantic_records(graph)
     selected = set(node_ids)
-    structural = {"HAS_RULE", "HAS_CONDITION_GROUP", "HAS_CONDITION", "HAS_EXCEPTION", "EXPRESSES"}
+    selected |= {
+        edge["source_id"]
+        for edge in edges
+        if edge["target_id"] in selected and edge["type"] in {"EXPRESSES", "INTERPRETS"}
+    }
+    structural = {
+        "HAS_RULE",
+        "HAS_CONDITION_GROUP",
+        "HAS_CONDITION",
+        "HAS_EXCEPTION",
+        "EXPRESSES",
+        "INTERPRETS",
+    }
+    selected |= {
+        endpoint
+        for edge in edges
+        if edge["type"] == "RELATED"
+        and (edge["source_id"] in selected or edge["target_id"] in selected)
+        for endpoint in (edge["source_id"], edge["target_id"])
+    }
     while True:
         expanded = selected | {
             edge["target_id"]
@@ -582,7 +724,7 @@ def semantic_bundle(graph: KnowledgeGraph, node_ids: list[str]) -> dict:
         expanded |= {
             edge["source_id"]
             for edge in edges
-            if edge["target_id"] in selected and edge["type"] == "EXPRESSES"
+            if edge["target_id"] in selected and edge["type"] in {"EXPRESSES", "INTERPRETS"}
         }
         if expanded == selected:
             break
@@ -626,7 +768,7 @@ def semantic_quality_report(graph: KnowledgeGraph) -> dict:
                 json.loads(row[0])
                 for row in connection.execute("SELECT payload FROM semantic_batches ORDER BY id")
             ]
-    allocated = {edge["target_id"] for edge in edges if edge["type"] == "EXPRESSES"}
+    allocated = {edge["target_id"] for edge in edges if edge["type"] in {"EXPRESSES", "INTERPRETS"}}
     issues.extend(semantic_structure_issues(nodes, edges, types))
     allocations = Counter(edge["target_id"] for edge in edges if edge["type"] == "EXPRESSES")
     issues.extend(
@@ -635,7 +777,8 @@ def semantic_quality_report(graph: KnowledgeGraph) -> dict:
         if count > 1
     )
     missing = sorted(facts - allocated)
-    issues.extend(f"Fact has no semantic rule: {identifier}" for identifier in missing)
+    if not any(batch.get("representation") == "source_map" for batch in batches):
+        issues.extend(f"Fact has no semantic rule: {identifier}" for identifier in missing)
     sources = {}
     for record in nodes + edges:
         if not record.get("quotes"):
@@ -671,6 +814,7 @@ def semantic_quality_report(graph: KnowledgeGraph) -> dict:
         "batch_count": len(batches),
         "quote_count": len(unique_quotes([q for r in nodes + edges for q in r["quotes"]])),
         "findings": sorted(set(issues)),
+        "uncertainties": [finding for batch in batches for finding in batch.get("findings", [])],
         "citations": [
             source_citation(quote, sources[quote["evidence_id"]])
             for quote in unique_quotes([q for record in nodes + edges for q in record["quotes"]])

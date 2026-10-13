@@ -1,8 +1,11 @@
 import json
 import time
+from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
 from importlib.resources import files
+from threading import Lock
 
+import httpx
 from google import genai
 from google.genai import errors, types
 
@@ -68,15 +71,50 @@ def response_schema(schema) -> dict | None:
 
 
 class GeminiModel:
+    provider = "gemini"
+
     def __init__(self, settings: Settings, store: ArtifactStore, run_id: str):
         self.settings = settings
         self.store = store
         self.run_id = run_id
+        self._deadline = None
+        self._event_lock = Lock()
+
+    def set_deadline(self, epoch_seconds: float | None) -> None:
+        self._deadline = epoch_seconds
+
+    def remaining_seconds(self) -> float:
+        if self._deadline is None:
+            return float(self.settings.timeout_seconds)
+        remaining = self._deadline - time.time()
+        if remaining <= 0:
+            raise TimeoutError("Pipeline runtime limit reached")
+        return min(float(self.settings.timeout_seconds), remaining)
+
+    def event(self, stage: str, event: str, **fields) -> None:
+        with self._event_lock:
+            self.store.event(self.run_id, stage, event, **fields)
+
+    def call_many(self, stage: str, payloads: list[dict], schema=None) -> list[dict]:
+        if not self.settings.fast_mode or len(payloads) < 2:
+            return [self.call(stage, payload, schema) for payload in payloads]
+        client_for(self.settings.api_key, self.settings.timeout_seconds)
+        with ThreadPoolExecutor(max_workers=self.settings.model_workers) as executor:
+            futures = [executor.submit(self.call, stage, payload, schema) for payload in payloads]
+            try:
+                return [future.result() for future in futures]
+            except BaseException:
+                for future in futures:
+                    future.cancel()
+                raise
 
     def tool_turn(self, payload: dict, messages: list[dict], declarations: list[dict]) -> dict:
         return self.call("authoring_action", payload, tools=declarations, messages=messages)
 
-    def call(self, stage: str, payload: dict, schema=None, *, tools=None, messages=None) -> dict:
+    def call(
+        self, stage: str, payload: dict, schema=None, *, tools=None, messages=None, images=None
+    ) -> dict:
+        self.remaining_seconds()
         prompt = files("docgen_graph").joinpath("prompts", f"{stage}.v1.txt").read_text("utf-8")
         thinking_level = self.settings.thinking_level
         if stage.startswith(("verify_", "audit_")):
@@ -92,6 +130,10 @@ class GeminiModel:
                 schema.model_json_schema() if schema else None,
                 tools,
                 messages,
+                [
+                    {"hash": digest(item["data"]), "mime_type": item["mime_type"]}
+                    for item in (images or [])
+                ],
             ]
         )
         cache_path = self.store.root / "cache" / f"{signature}.json"
@@ -99,46 +141,55 @@ class GeminiModel:
             cached = json.loads(cache_path.read_text("utf-8"))
             if digest(cached["result"]) != cached["digest"]:
                 raise ValueError("Cached model response failed integrity check")
-            self.store.event(self.run_id, stage, "cache_hit", key=signature)
+            self.event(stage, "cache_hit", key=signature)
             return (
                 schema.model_validate(cached["result"]).model_dump() if schema else cached["result"]
             )
         if not self.settings.api_key or self.settings.api_key == "replace-with-api-key":
             raise ValueError("GEMINI_API_KEY is required")
         request = json.dumps(payload, ensure_ascii=False)
-        contents = [types.Content(role="user", parts=[types.Part(text=request)])]
+        image_parts = [
+            types.Part.from_bytes(data=item["data"], mime_type=item["mime_type"])
+            for item in (images or [])
+        ]
+        contents = [types.Content(role="user", parts=[types.Part(text=request), *image_parts])]
         contents.extend(types.Content.model_validate(item) for item in (messages or []))
-        context = json.dumps(
-            [item.model_dump(mode="json") for item in contents], ensure_ascii=False
-        )
+        context = json.dumps([payload, messages or []], ensure_ascii=False)
+        image_token_reserve = 8192 * len(image_parts)
+        conservative_input_allowance = len((prompt + context).encode()) + image_token_reserve
         if (
-            len((prompt + context).encode()) + self.settings.output_tokens
+            conservative_input_allowance + self.settings.output_tokens
             > self.settings.request_tokens
         ):
-            raise ValueError("Model request exceeds configured context budget")
+            raise ValueError("Model request exceeds configured context budget (conservative bound)")
         pricing = Pricing.load(self.settings.pricing_file)
         ledger = BudgetLedger(self.settings.budget_ledger, self.settings.budget_pln)
         reserve = pricing.cost(
-            len((prompt + context).encode()) + 4096, self.settings.output_tokens * 2
+            conservative_input_allowance + 4096,
+            self.settings.output_tokens * 2,
         )
         for attempt in range(3):
+            timeout_ms = max(1, int(self.remaining_seconds() * 1000))
             reservation = ledger.reserve(self.run_id, stage, max(reserve * 1.5, 0.01), pricing)
             started = time.monotonic()
-            self.store.event(
-                self.run_id,
+            self.event(
                 stage,
                 "request",
                 key=signature,
                 attempt=attempt + 1,
                 reservation=reservation,
+                conservative_input_allowance=conservative_input_allowance,
             )
             try:
-                response = client_for(
-                    self.settings.api_key, self.settings.timeout_seconds
-                ).models.generate_content(
+                client = client_for(self.settings.api_key, self.settings.timeout_seconds)
+                response = client.models.generate_content(
                     model=self.settings.model,
-                    contents=contents if tools else request,
+                    contents=contents if tools or image_parts else request,
                     config=types.GenerateContentConfig(
+                        http_options=types.HttpOptions(
+                            timeout=timeout_ms,
+                            retry_options=types.HttpRetryOptions(attempts=1),
+                        ),
                         system_instruction=prompt,
                         response_mime_type=None if tools else "application/json",
                         response_json_schema=None if tools else response_schema(schema),
@@ -154,23 +205,20 @@ class GeminiModel:
                 )
             except Exception as error:
                 ledger.settle(reservation, None, {"error_type": type(error).__name__})
-                self.store.event(
-                    self.run_id,
+                self.event(
                     stage,
                     "provider_error",
                     error_type=type(error).__name__,
                     seconds=time.monotonic() - started,
                     attempt=attempt + 1,
                 )
-                retryable = isinstance(error, errors.APIError) and error.code in {
-                    429,
-                    500,
-                    502,
-                    503,
-                    504,
-                }
+                if self._deadline is not None and time.time() >= self._deadline:
+                    raise TimeoutError("Pipeline runtime limit reached") from error
+                retryable = isinstance(error, (TimeoutError, httpx.TransportError)) or (
+                    isinstance(error, errors.APIError) and error.code in {429, 500, 502, 503, 504}
+                )
                 if retryable and attempt < 2:
-                    time.sleep(2**attempt)
+                    time.sleep(min(2**attempt, self.remaining_seconds()))
                     continue
                 raise
             usage = response.usage_metadata
@@ -194,8 +242,7 @@ class GeminiModel:
                     f"runs/{self.run_id}/incomplete/{stage}-{signature}.json",
                     response.model_dump_json(exclude_none=True),
                 )
-                self.store.event(
-                    self.run_id,
+                self.event(
                     stage,
                     "incomplete_response",
                     finish_reason=getattr(finish, "name", None),
@@ -233,8 +280,7 @@ class GeminiModel:
                         pricing.cost(counts["input_tokens"], counts["output_tokens"]),
                         {**counts, "status": "invalid_schema"},
                     )
-                    self.store.event(
-                        self.run_id,
+                    self.event(
                         stage,
                         "invalid_schema",
                         reservation=reservation,
@@ -245,7 +291,10 @@ class GeminiModel:
                         request = json.dumps(
                             {**payload, "schema_feedback": str(error)[:4000]}, ensure_ascii=False
                         )
-                        size = len((prompt + request).encode())
+                        contents[0] = types.Content(
+                            role="user", parts=[types.Part(text=request), *image_parts]
+                        )
+                        size = len((prompt + request).encode()) + image_token_reserve
                         if size + self.settings.output_tokens > self.settings.request_tokens:
                             raise
                         reserve = max(
@@ -268,8 +317,7 @@ class GeminiModel:
             )
             actual_cost = pricing.cost(counts["input_tokens"], counts["output_tokens"])
             ledger.settle(reservation, actual_cost, counts)
-            self.store.event(
-                self.run_id,
+            self.event(
                 stage,
                 "response",
                 key=signature,

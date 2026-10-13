@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "purpose": "Predeclared semantic review cases, independent of generated output. These are expectations, not evidence that a model passed.",
+  "scoring": {
+    "dimensions": ["supported meaning", "qualifier preservation", "source traceability", "uncertainty preservation", "useful completion"],
+    "rule": "Assess each expectation against original sources and actual output. Record pass, fail or untested with a source quote. Do not infer semantic correctness from keyword presence, graph size or validation success.",
+    "comparison": "The unchanged historical risk-profiling corpus is the live before/after comparison. Other cases are robustness fixtures; explicitly state whether assessed with a real model or a controlled test double."
+  },
+  "cases": [
+    {
+      "id": "independent-outcomes",
+      "domain": "warehouse",
+      "sources": {"dispatch.md": "A damaged parcel cannot be dispatched. A missing label keeps the parcel in the packing area."},
+      "expectations": ["A damaged parcel with a valid label still cannot be dispatched.", "Missing a label controls retention in the packing area; it is not an additional prerequisite for the damage prohibition."]
+    },
+    {
+      "id": "formatting-equivalence",
+      "domain": "library",
+      "variants": {
+        "prose": "Borrowing requires an active membership and no unpaid overdue charge. Staff borrowing waives the overdue-charge requirement; active membership is still required.",
+        "headings": "# Borrowing\n## Requirements\nBorrowing requires an active membership and no unpaid overdue charge.\n## Exception\nStaff borrowing waives the overdue-charge requirement; active membership is still required.",
+        "list": "Borrowing requires:\n- an active membership; and\n- no unpaid overdue charge.\nStaff borrowing waives the overdue-charge requirement; active membership is still required.",
+        "table": "| Action | Requirements | Exception |\n| --- | --- | --- |\n| Borrowing | Active membership and no unpaid overdue charge | Staff borrowing waives the overdue-charge requirement; active membership is still required. |"
+      },
+      "expectations": ["Both requirements normally apply.", "Staff are exempt only from the overdue-charge requirement.", "No authored table number or heading-derived business scope is invented."]
+    },
+    {
+      "id": "cross-document-reference",
+      "domain": "equipment rental",
+      "sources": {
+        "rental.md": "Equipment rental uses the identity check described in [eligibility](eligibility.md). Collection requires successful completion of that check.",
+        "eligibility.md": "The rental identity check compares the reservation name with an unexpired identity document. A mismatch requires staff review."
+      },
+      "expectations": ["The identity check in both documents is connected with exact source support.", "A mismatch requires review, not automatic acceptance or permanent rejection.", "The output does not claim the linked document was unavailable when it was supplied."]
+    },
+    {
+      "id": "ambiguous-shorthand",
+      "domain": "mixed operational notes",
+      "sources": {
+        "site-a.md": "At site A, R-17 means two-person approval for overnight access.",
+        "site-b.md": "At site B, R-17 describes refrigeration inspection every morning.",
+        "note.md": "The next release should address R-17. The site is not specified."
+      },
+      "expectations": ["Matching R-17 strings do not merge unrelated requirements.", "The release note remains ambiguous instead of being assigned arbitrarily to either site.", "The pipeline completes without requiring a user to resolve the ambiguity."]
+    },
+    {
+      "id": "unresolved-conflict",
+      "domain": "returns",
+      "sources": {
+        "policy-a.md": "The return period is 30 days from delivery.",
+        "policy-b.md": "The return period is 45 days from delivery."
+      },
+      "expectations": ["Both source claims remain available.", "The model does not invent a version, customer segment or effective date to resolve the disagreement.", "Useful output states the discrepancy and identifies both sources without blocking."]
+    },
+    {
+      "id": "context-window-boundary",
+      "domain": "generic",
+      "construction": "Place a rule near a size-based source boundary and its explicit exception in the adjoining window. Repeat unrelated neutral prose to exceed the configured small-context threshold.",
+      "expectations": ["Every original character remains addressable.", "Overlap or bounded context expansion makes the adjacent exception available.", "The request stays within its configured input allowance.", "No heading or story identifier is required."]
+    },
+    {
+      "id": "image-provenance",
+      "domain": "generic interface",
+      "construction": "Use a local image with legible interface labels and a source caption that calls it illustrative.",
+      "expectations": ["The prepared Markdown contains a generated image description while the original bytes remain unchanged.", "The interpretation links to the original image and the actual model provenance.", "A visible input field does not by itself become a mandatory business requirement.", "Unreadable or unavailable image content remains explicitly unknown."]
+    }
+  ]
+}

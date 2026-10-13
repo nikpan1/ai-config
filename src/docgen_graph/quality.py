@@ -134,10 +134,9 @@ def bounded_fact_groups(facts: list[dict], spans: dict) -> list[list[dict]]:
 def content_groups(assertions: list[dict], spans: dict) -> list[dict]:
     grouped = defaultdict(list)
     for assertion in assertions:
-        span = spans[assertion["evidence_ids"][0]]
         subject = assertion["subject"].strip().casefold()
         if subject in {"unspecified", "system", "the system"}:
-            subject = f"{span['path']} / {span['heading']}"
+            subject = "source statements"
         grouped[(subject, assertion["predicate"].strip().casefold())].append(assertion)
     result = []
     for key, items in grouped.items():

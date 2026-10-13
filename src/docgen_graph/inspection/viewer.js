@@ -270,6 +270,10 @@ function selectNode(id) {
       "relevance",
       "temporal_status",
       "review_status",
+      "status",
+      "description",
+      "preserved_conditions",
+      "preserved_exceptions",
     ]) {
       const value = row.semantic?.[key] ?? row.assertion?.[key] ?? row.evidence?.[key];
       if (value !== undefined) message(`${key}: ${compact(value)}`, summary);
@@ -301,8 +305,11 @@ function selectNode(id) {
     sourceLink(edge.target_id, block, nodeLabel(edge.target_id));
     raw(edge, block);
     for (const relation of g.tables.semantic_edges || []) {
-      if (relation.source_id === edge.source_id && relation.target_id === edge.target_id && relation.type === edge.type)
+      if (relation.source_id === edge.source_id && relation.target_id === edge.target_id && relation.type === edge.type) {
+        if (relation.payload?.description) el("p", relation.payload.description, block);
+        if (relation.payload?.status) message(`Interpretation: ${relation.payload.status}`, block);
         raw(relation.payload, block, "Exact source quotes supporting this relation");
+      }
     }
   }
   if (row.quotes?.length) {
@@ -312,7 +319,7 @@ function selectNode(id) {
       const evidence = g.enriched.evidence.find((item) => item.id === quote.evidence_id);
       sourceLink(quote.evidence_id, card, evidence?.path || quote.evidence_id);
       el("pre", quote.text, card);
-      message(`Source-span characters ${quote.start}–${quote.end} (end exclusive)`, card);
+      message(`Source-span characters ${quote.start}-${quote.end} (end exclusive)`, card);
       raw({ ...quote, file_hash: evidence?.file_hash, locator: evidence?.locator }, card, "Source identity and exact locator");
     }
   }
@@ -721,7 +728,11 @@ function drawGraph() {
     const edges = (graph().tables.edges || []).filter((edge) =>
       ids.has(edge.source_id) && ids.has(edge.target_id) &&
       (!state.filters.edge_type || edge.type === state.filters.edge_type) &&
-      (!state.filters.method || edge.method === state.filters.method));
+      (!state.filters.method || edge.method === state.filters.method)).map((edge) => {
+        const interpretation = (graph().tables.semantic_edges || []).find((item) =>
+          item.source_id === edge.source_id && item.target_id === edge.target_id && item.type === edge.type)?.payload;
+        return { ...edge, ...(interpretation || {}) };
+      });
     if (!nodes.length) { message("No nodes match the filters. Reset filters to show the complete graph.", parent); return; }
     topologyView = createTopology(parent, {
       nodes, edges, label: nodeLabel, selected: state.selected,
@@ -729,6 +740,8 @@ function drawGraph() {
       onSelect: selectNode,
       onEdge: (edge) => {
         details(`${edge.type}: ${nodeLabel(edge.source_id)} -> ${nodeLabel(edge.target_id)}`, edge);
+        if (edge.description) el("p", edge.description, $("detail"));
+        if (edge.status) message(`Interpretation: ${edge.status}`, $("detail"));
         sourceLink(edge.source_id, $("detail"), "Source: " + nodeLabel(edge.source_id));
         sourceLink(edge.target_id, $("detail"), "Target: " + nodeLabel(edge.target_id));
         const evidence = graph().enriched.evidence.find((item) => item.id === edge.evidence_id);
