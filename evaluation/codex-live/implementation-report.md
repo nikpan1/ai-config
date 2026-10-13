@@ -1,5 +1,7 @@
 # Codex live-flow validation
 
+Historical report retained for source, model, checkpoint and cost provenance. As of 2026-10-13, the code-analysis integrations, evaluation runners and their runtime configuration have been removed. The behavior and validation results below describe the recorded 2026-10-12 implementation, not the current pipeline. See the [current repository guide](../../README.md) for supported documentation-only runs. Existing run artifacts and accounting records remain available.
+
 Date: 2026-10-12. The requested documentation is finished. Generation run `codex-risk-live-20261012-h` produced the verified document; explicit continuation `codex-risk-live-20261012-i` repeated final checks under the corrected audit contract and exported the release. Its status is `complete_with_exclusions`: the five exclusions are frontmatter and structural Markdown headings/table syntax, not business rules.
 
 ## Finished artifacts
@@ -50,19 +52,14 @@ Ten focused live-flow regression tests cover exact quotes, schema strictness, re
 
 Run `h` exhausted its eight-turn optional search allowance after successful evidence reads. A recorded agent review forked checkpoint `1f1c67c5-bd7c-6988-80b1-0678167cea4c` to `1f1c67c9-43f1-6a65-80b2-af0601309deb`, appending explicit readiness feedback while preserving seven already-used turns. Gemini declared readiness on the remaining eighth turn. The turn bound was not reset, and writing/evidence audits were not skipped.
 
-The final audit fix changed runtime identity, so run `h` was not silently rewritten. [continue_final_audit.py](continue_final_audit.py) imported checkpoint `1f1c67d5-7c74-649f-80ec-5aff242ea8c0` into a new run. It verified content-addressed state artifacts, source bytes, SQLite integrity and the copied graph's logical contents. It also checked that the upstream workflow AST was unchanged outside the final-audit method and that the only source-code changes were that method and its prompt. `continuation.json` records both runtime signatures, source/target commits, imported hashes and `actor_type=agent`. Run `h` remains the artifact producer; run `i` contains final validation/export history rather than fabricated upstream stages.
+The final audit fix changed runtime identity, so run `h` was not silently rewritten. The now-retired `continue_final_audit.py` utility imported checkpoint `1f1c67d5-7c74-649f-80ec-5aff242ea8c0` into a new run. It verified content-addressed state artifacts, source bytes, SQLite integrity and the copied graph's logical contents. It also checked that the upstream workflow AST was unchanged outside the final-audit method and that the only source-code changes were that method and its prompt. `continuation.json` records both runtime signatures, source/target commits, imported hashes and `actor_type=agent`. Run `h` remains the artifact producer; run `i` contains final validation/export history rather than fabricated upstream stages.
 
-## Accounting and reproduction
+## Accounting and historical reproduction
 
 Usage-priced completed calls across every listed attempt total **PLN 14.264979**. This is computed from returned usage and verified pricing, not a provider invoice. Separately, **PLN 20.496862** remains conservatively marked uncertain from the original rejected Codex schema request and truncated Gemini response; these reservation amounts are not measured charges. No outstanding reservation remains, and no historical ledger row was changed.
 
 Pricing was verified against [OpenAI model pricing](https://developers.openai.com/api/docs/models/gpt-6-astra) and [Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing), with the local verified USD/PLN rate dated 2026-10-08. Refresh dated pricing before a future run.
 
-For a new full run from the primary repository, use the existing nonsecret `.docgen/codex-live-settings/run.json` or adapt [configuration.example.json](configuration.example.json). Credentials are read from `.env`. Runtime artifacts remain in the primary repository independently of the temporary implementation checkout.
+The historical code-analysis run configuration and helper commands are retired. Original provider/model identities, runtime signatures, source references and continuation lineage remain in the retained artifacts and this report; they must not be relabeled as documentation-only results. Historical implementation code is available in repository history.
 
-```powershell
-$env:PYTHONPATH = 'src'
-.venv/Scripts/python.exe evaluation/codex-live/run.py --env-file .env --configuration .docgen/codex-live-settings/run.json --thread-id codex-risk-live-new
-```
-
-Use a new thread ID after implementation, source or configuration changes. The restricted historical continuation utility deliberately rejects unrelated upstream changes; ordinary future runs should start with a new thread rather than alter old runtime signatures.
+For a new documentation-only run, follow the [current repository guide](../../README.md) and use a new thread ID. Historical runtime settings are not current configuration examples, and this report does not provide a supported command for restarting the retired code-analysis pipeline.

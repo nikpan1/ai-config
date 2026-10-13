@@ -5,7 +5,6 @@ from docgen_graph.storage import digest
 
 
 class EvidenceService(Protocol):
-    def search_code(self, query: EvidenceQuery) -> EvidenceResult: ...
     def search_sources(self, query: EvidenceQuery) -> EvidenceResult: ...
     def search_graph(self, query: EvidenceQuery) -> EvidenceResult: ...
     def read_evidence(self, query: EvidenceQuery) -> EvidenceResult: ...
@@ -115,13 +114,6 @@ class FixtureEvidenceService:
             result.status = "not_found"
             result.warnings = ["Missing mandatory evidence: " + ", ".join(sorted(missing))]
         return result
-
-    def search_code(self, query):
-        return self.search_sources(
-            query.model_copy(
-                update={"filters": {**query.filters, "source_kinds": ["code", "patch"]}}
-            )
-        )
 
     def read_evidence(self, query):
         refs = [ref for ref in self.packet.evidence if ref.id in query.mandatory_ids]
@@ -334,7 +326,7 @@ class RevisionEvidenceService(FixtureEvidenceService):
                 if locator.end > len(text) or text[locator.start : locator.end] != ref.text:
                     raise ValueError("Evidence character range differs from frozen source")
             elif locator.kind == "diff_hunk":
-                from docgen_graph.code_analysis.history import parse_patch
+                from docgen_graph.source_index import parse_patch
 
                 hunks = parse_patch(content.decode("utf-8"))
                 if not any(h["header"] == locator.hunk and h["text"] == ref.text for h in hunks):

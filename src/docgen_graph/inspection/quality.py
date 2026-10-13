@@ -1,3 +1,64 @@
+from collections import Counter
+
+
+def graph_profile(tables):
+    nodes = {row["id"]: row for row in tables.get("nodes", [])}
+    edges = tables.get("edges", [])
+    neighbors = {identifier: set() for identifier in nodes}
+    relations = Counter()
+    dangling = []
+    for index, edge in enumerate(edges):
+        source, target = edge["source_id"], edge["target_id"]
+        if source not in nodes or target not in nodes:
+            dangling.append(index)
+        else:
+            neighbors[source].add(target)
+            neighbors[target].add(source)
+        relations[
+            (
+                nodes.get(source, {}).get("type", "Missing endpoint"),
+                edge.get("type", "Unknown"),
+                nodes.get(target, {}).get("type", "Missing endpoint"),
+                edge.get("method", "Not recorded"),
+            )
+        ] += 1
+    unseen = set(nodes)
+    components = []
+    while unseen:
+        pending = [min(unseen)]
+        members = set()
+        while pending:
+            identifier = pending.pop()
+            if identifier in members:
+                continue
+            members.add(identifier)
+            unseen.discard(identifier)
+            pending.extend(neighbors[identifier] - members)
+        components.append(sorted(members))
+    evidence = {row["id"] for row in tables.get("evidence", [])}
+    assertions = {row["id"] for row in tables.get("assertions", [])}
+    supported = {
+        row["assertion_id"] for row in tables.get("support", []) if row["evidence_id"] in evidence
+    }
+    return {
+        "node_types": dict(sorted(Counter(row["type"] for row in nodes.values()).items())),
+        "relations": [
+            dict(source_type=key[0], type=key[1], target_type=key[2], method=key[3], count=count)
+            for key, count in sorted(relations.items(), key=lambda item: (-item[1], item[0]))
+        ],
+        "components": sorted(components, key=lambda group: (-len(group), group[0])),
+        "isolated_ids": sorted(key for key, adjacent in neighbors.items() if not adjacent),
+        "dangling_edge_indices": dangling,
+        "unsupported_assertion_ids": sorted(assertions - supported),
+        "supported_assertions": len(assertions & supported),
+        "assertion_count": len(assertions),
+        "interpretation": (
+            "Topology and recorded evidence links do not establish semantic correctness "
+            "or source completeness."
+        ),
+    }
+
+
 def records(value):
     return [item for item in value if isinstance(item, dict)] if isinstance(value, list) else []
 

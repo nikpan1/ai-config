@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from docgen_graph.inspection.quality import quality_data
+from docgen_graph.inspection.quality import graph_profile, quality_data
 from docgen_graph.storage import digest
 
 GRAPH_TABLES = (
@@ -251,6 +251,7 @@ class RunReader:
             "manifest": manifest,
             "tables": tables,
             "enriched": enriched,
+            "profile": graph_profile(tables),
             "missing_tables": [name for name in GRAPH_TABLES if name not in tables],
         }
 

@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from docgen_graph.inspection import export_run
-from docgen_graph.inspection.quality import quality_data
+from docgen_graph.inspection.quality import graph_profile, quality_data
 from docgen_graph.inspection.reader import RunReader, redact, safe_sql_value
 from docgen_graph.stages import StageArtifacts
 from docgen_graph.storage import ArtifactStore, digest
@@ -67,7 +67,7 @@ def recorded(tmp_path):
     stages.pending(
         "review_stage", {"stage": "write_section", "item": "0000", "hash": "x", "path": "none"}
     )
-    stages.skip("analyze_code_unit", "No code in this run")
+    stages.skip("locate_visual_evidence", "No visual evidence in this run")
     store.event("example", "write_section", "model_request", api_key="secret-sentinel")
     with (run / "events.jsonl").open("ab") as output:
         output.write(b"{broken}\n")
@@ -124,6 +124,32 @@ def test_full_graph_all_revisions_and_read_only_inputs(recorded, tmp_path):
     assert data["checkpoints"]["checkpoints"][0]["checkpoint"]["encoding"] == "opaque"
     assert len(data["checkpoints"]["checkpoints"]) == 1
     assert data["checkpoints"]["writes"][0]["channel"] == "__interrupt__"
+
+
+def test_graph_profile_counts_full_topology_and_only_valid_evidence(recorded):
+    workspace, _ = recorded
+    graph = RunReader(workspace, "example").read()["graphs"][0]
+    profile = graph["profile"]
+    assert profile["node_types"] == {"Assertion": 203}
+    assert len(profile["components"]) == 202
+    assert profile["components"][0] == ["node-0000", "node-0202"]
+    assert len(profile["isolated_ids"]) == 200
+    assert len(profile["dangling_edge_indices"]) == 1
+    edge = graph["tables"]["edges"][profile["dangling_edge_indices"][0]]
+    assert edge["target_id"] == "missing"
+    assert profile["supported_assertions"] == 1
+    assert profile["unsupported_assertion_ids"] == []
+    assert sum(row["count"] for row in profile["relations"]) == 4
+    tables = graph["tables"]
+    tables["support"][0]["evidence_id"] = "missing-evidence"
+    assert graph_profile(tables)["unsupported_assertion_ids"] == ["node-0000"]
+
+
+def test_empty_graph_profile_has_no_invented_connections():
+    profile = graph_profile({})
+    assert profile["components"] == []
+    assert profile["relations"] == []
+    assert profile["assertion_count"] == 0
 
 
 def test_standalone_html_payload_and_csp(recorded, tmp_path):

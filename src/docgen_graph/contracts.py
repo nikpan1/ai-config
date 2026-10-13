@@ -39,37 +39,6 @@ class AssertionDraft(VersionedRecord):
         return value
 
 
-class CodeRelationDraft(VersionedRecord):
-    type: str = Field(min_length=1)
-    source_fact_index: int = Field(ge=0)
-    target_fact_index: int = Field(ge=0)
-    method: str = "code_analysis_candidate"
-    evidence_ids: list[str] = Field(min_length=1)
-
-
-class CodeAnalysisDraft(VersionedRecord):
-    report: str = Field(min_length=1)
-    details: list[AssertionDraft]
-    relations: list[CodeRelationDraft] = []
-
-
-class CodeFactClassification(BaseModel):
-    model_config = {"extra": "forbid"}
-
-    id: str
-    categories: list[Category] = Field(min_length=1)
-    classification_reason: str = Field(min_length=1)
-    relevance: Literal["essential", "supporting", "context", "unknown"]
-    relevance_reason: str = Field(min_length=1)
-    audience_scope: str = Field(min_length=1)
-    support_status: Literal["direct", "inferred", "unresolved"]
-
-
-class CodeClassificationDraft(VersionedRecord):
-    report: str = Field(min_length=1)
-    details: list[CodeFactClassification]
-
-
 class ExclusionDraft(VersionedRecord):
     evidence_id: str = Field(validation_alias=AliasChoices("evidence_id", "id"))
     reason: str = Field(min_length=1)

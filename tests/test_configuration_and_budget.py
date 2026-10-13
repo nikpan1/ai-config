@@ -60,3 +60,21 @@ def test_independent_audit_reasoning_is_explicit_and_validated(tmp_path):
     env.write_text("DOCGEN_AUDIT_THINKING_LEVEL=automatic\n", "utf-8")
     with pytest.raises(ValueError, match="DOCGEN_AUDIT_THINKING_LEVEL"):
         Settings.load(env)
+
+
+@pytest.mark.parametrize("option", ["--code", "--code-backend", "--code-model"])
+def test_removed_code_options_fail_before_pipeline_execution(option):
+    from docgen_graph.cli import parser
+
+    with pytest.raises(SystemExit) as error:
+        parser().parse_args(["run", "--docs", "docs", "--thread-id", "test", option, "value"])
+    assert error.value.code == 2
+
+
+def test_code_input_is_rejected_without_a_model_call(tmp_path):
+    from docgen_graph.storage import ArtifactStore
+    from docgen_graph.workflow import Pipeline
+
+    pipeline = Pipeline(ArtifactStore(tmp_path), object(), "docs-only")
+    with pytest.raises(ValueError, match="Code inputs are no longer supported"):
+        pipeline.snapshot_inputs({"code": "source-code"})

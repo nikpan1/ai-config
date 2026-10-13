@@ -190,42 +190,41 @@ summary {
   font-size: 13px;
   color: #98c8e7;
 }
-#graph-canvas {
-  width: 100%;
-  height: 390px;
-  display: block;
-  border: 1px solid #34485c;
-  background: #101a25;
-  border-radius: 8px;
-  touch-action: none;
-}
-#graph-canvas text {
-  font-size: 10px;
-  fill: #d9e8ee;
-  pointer-events: none;
-}
-#graph-canvas circle {
-  cursor: pointer;
-  stroke: #0d1721;
-  stroke-width: 2;
-}
-#graph-canvas line,
-#graph-canvas path.edge {
-  stroke: #51788c;
-  stroke-width: 1.1;
-  fill: none;
-  opacity: 0.65;
-}
-#graph-canvas .selected {
-  stroke: #fff;
-  stroke-width: 3;
-}
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 8px 0;
-  font-size: 11px;
+#workspace { min-width: 0; }
+.graph-modes, .graph-stats { display: flex; gap: 8px; flex-wrap: wrap; }
+.graph-modes { border-bottom: 1px solid #34485c; padding-bottom: 12px; }
+.graph-stats .card { flex: 1; min-width: 130px; }
+.graph-stats p { font-size: 12px; }
+.relation-map { display: grid; gap: 8px; margin: 14px 0; }
+.relation-row { display: grid; grid-template-columns: 1fr 1.4fr 1fr 42px; gap: 12px; align-items: center; padding: 14px; text-align: left; }
+.relation-endpoint { font-size: 13px; overflow-wrap: anywhere; }
+.relation-connector { display: grid; gap: 5px; color: #8ee3c6; }
+.relation-connector strong { font-size: 12px; }
+.relation-connector small { color: #9aafc3; font-size: 11px; }
+.relation-count { text-align: right; color: #8ee3c6; }
+.neighborhood { display: grid; grid-template-columns: 1fr 1.1fr 1fr; gap: 12px; align-items: start; margin: 16px 0; }
+.graph-lane { min-width: 0; }
+.graph-lane > h3 { margin: 0 0 12px; padding: 10px 0; border-bottom: 2px solid #3a576e; }
+.graph-node { border: 1px solid #35536a; border-radius: 8px; padding: 13px; margin-bottom: 12px; background: #122333; overflow-wrap: anywhere; }
+.graph-node .eyebrow { display: block; letter-spacing: 1px; font-size: 10px; margin-bottom: 10px; }
+.graph-node > button { width: 100%; text-align: left; background: #1b3243; line-height: 1.5; font-size: 12px; }
+.graph-node.focused { background: #17322d; border: 2px solid #70dab3; }
+.node-name { color: #e8f4f0; font-size: 13px; line-height: 1.65; }
+.node-identity { font-family: Consolas, monospace; font-size: 10px; margin: 15px 0; }
+.edge-description { margin-top: 12px; border-top: 1px solid #35536a; padding-top: 12px; font-size: 11px; }
+.edge-description > strong { color: #edbc79; }
+.edge-description button { font-size: 11px; }
+.edge-description summary { font-size: 11px; }
+.evidence-preview { max-height: 160px; overflow: auto; white-space: pre-wrap; font-size: 11px; }
+#listing { border-top: 1px solid #34485c; margin-top: 24px; }
+#detail .card { overflow-wrap: anywhere; }
+@media (min-width: 1450px) { main { grid-template-columns: minmax(0, 1fr) 360px; } }
+@media (max-width: 650px) {
+  main { padding: 16px; }
+  .neighborhood { grid-template-columns: 1fr; }
+  .graph-lane:nth-child(2) { grid-row: 1; }
+  .relation-row { grid-template-columns: 1fr 1fr; }
+  .relation-count { text-align: left; }
 }
 mark {
   color: #14251e;
@@ -275,3 +274,31 @@ footer {
     max-width: none;
   }
 }
+
+.advanced-filters { width: 100%; margin: 6px 0; }
+.filter-controls { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 12px; }
+
+.topology-toolbar, .topology-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0; }
+.topology-toolbar button { font-size: 12px; }
+.topology-toggle { display: flex; flex-direction: row; align-items: center; gap: 6px; }
+.topology-toggle input { min-width: 0; }
+.topology-frame { border: 1px solid #344b61; border-radius: 9px; background: radial-gradient(ellipse at center, #17283a, #0a131e); overflow: hidden; }
+.topology-canvas { display: block; width: 100%; height: min(70vh, 720px); min-height: 420px; touch-action: none; cursor: grab; }
+.topology-canvas:active { cursor: grabbing; }
+.topology-frame.expanded { position: fixed; inset: 24px; z-index: 10; }
+.topology-frame.expanded .topology-canvas { height: 100%; }
+.topology-close { display: none; }
+.topology-frame.expanded .topology-close { display: block; position: absolute; right: 12px; top: 12px; }
+.topology-frame.expanded::after { content: "Escape to close expanded canvas"; position: absolute; top: 12px; left: 12px; pointer-events: none; color: #a7b7c8; font-size: 12px; }
+.topology-edge path { fill: none; stroke: #67839a; stroke-width: 1.4; }
+.topology-edge .edge-hit { stroke: transparent; stroke-width: 14; cursor: pointer; }
+.topology-edge:hover path:not(.edge-hit), .topology-edge:focus path:not(.edge-hit), .topology-edge.related path:not(.edge-hit) { stroke: #edbc79; stroke-width: 2.5; }
+.topology-node { cursor: pointer; }
+.topology-node > circle, .topology-node > rect { stroke: #122131; stroke-width: 2; }
+.topology-node.selected > circle, .topology-node.selected > rect, .topology-node:focus > circle, .topology-node:focus > rect { stroke: #fff; stroke-width: 4; }
+.topology-canvas text { font-family: Segoe UI, sans-serif; font-size: 11px; fill: #e3edf5; paint-order: stroke; stroke: #0a131e; stroke-width: 4px; stroke-linejoin: round; pointer-events: none; }
+.topology-canvas .node-label, .topology-canvas .edge-label { display: none; }
+.topology-canvas.show-labels .node-label, .topology-node.related .node-label, .topology-node:hover .node-label, .topology-node:focus .node-label, .topology-edge.related .edge-label, .topology-edge:hover .edge-label, .topology-edge:focus .edge-label { display: block; }
+.topology-node.muted { opacity: .2; }
+.topology-edge.muted { opacity: .1; }
+.topology-legend { font-size: 12px; gap: 16px; }

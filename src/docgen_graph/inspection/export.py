@@ -26,7 +26,9 @@ def export_run(workspace: Path, run_id: str, output: Path, ledger: Path | None =
     data = reader.read()
     encoded = json.dumps(data, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     resources = files("docgen_graph.inspection")
-    script = resources.joinpath("viewer.js").read_text("utf-8")
+    script = "\n".join(
+        resources.joinpath(name).read_text("utf-8") for name in ("topology.js", "viewer.js")
+    )
     style = resources.joinpath("viewer.css").read_text("utf-8")
     hashes = [
         base64.b64encode(hashlib.sha256(value.encode()).digest()).decode()

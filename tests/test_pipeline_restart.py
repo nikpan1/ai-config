@@ -55,35 +55,6 @@ class FixtureModel:
                 ],
                 "findings": [],
             }
-        if stage == "analyze_code":
-            return {
-                "report": "A function returns the supplied value.",
-                "details": [
-                    {
-                        "statement": "The function returns the supplied value.",
-                        "subject": "return_value",
-                        "predicate": "returns",
-                        "evidence_ids": [span["id"]],
-                    }
-                    for span in payload["spans"]
-                ],
-            }
-        if stage == "analyze_code_classification":
-            return {
-                "report": "Classified code evidence",
-                "details": [
-                    {
-                        "id": fact["id"],
-                        "audience_scope": "selected audience",
-                        "categories": ["IMPLEMENTATION_FEATURE"],
-                        "classification_reason": "Implementation behavior",
-                        "relevance": "essential",
-                        "support_status": "direct",
-                        "relevance_reason": "Retained implementation detail",
-                    }
-                    for fact in payload["facts"]
-                ],
-            }
         if stage == "extract_document":
             return {
                 "assertions": [
@@ -169,11 +140,8 @@ def build(tmp_path: Path, model: FixtureModel):
 
 def test_plan_and_release_require_exact_review_across_restarts(tmp_path):
     docs = tmp_path / "docs"
-    code = tmp_path / "code"
     docs.mkdir()
-    code.mkdir()
     (docs / "guide.md").write_text("# Guide\n\nReturn the supplied value.\n", encoding="utf-8")
-    (code / "app.py").write_text("def return_value(value):\n    return value\n", encoding="utf-8")
     template = tmp_path / "template.md"
     template.write_text("## Behavior\n\n## Sources\n", encoding="utf-8")
     model = FixtureModel()
@@ -184,7 +152,6 @@ def test_plan_and_release_require_exact_review_across_restarts(tmp_path):
             {
                 "run_id": "test-run",
                 "docs": str(docs),
-                "code": str(code),
                 "template": str(template),
                 "brief": "",
                 "status": "running",

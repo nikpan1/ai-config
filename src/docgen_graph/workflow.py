@@ -23,7 +23,6 @@ from docgen_graph.authoring.template import (
     number_generated_headings,
 )
 from docgen_graph.authoring.tools import AuthoringTools, declarations
-from docgen_graph.code_analysis import stages as code_stages
 from docgen_graph.contracts import (
     AuditDraft,
     DocumentExtractionDraft,
@@ -114,16 +113,9 @@ class PipelineState(TypedDict, total=False):
     knowledge_delta_ref: str
     knowledge_revision_ref: str
     unresolved_ref: str
-    code_scope_ref: str
-    code_history_ref: str
-    code_provenance_ref: str
+    tool_provenance_ref: str
     document_provenance_ref: str
     document_candidate_provenance_ref: str
-    code_candidate_ref: str
-    verified_code_ref: str
-    classified_code_ref: str
-    code_classification_verified_ref: str
-    code_relations_ref: str
     mode: str
     policy_version: str
     stage_record: dict
@@ -137,7 +129,6 @@ class PipelineState(TypedDict, total=False):
     snapshot_ref: str
     runtime_signature: str
     inventory_ref: str
-    code_index: int
     document_index: int
     graph_index: int
     section_index: int
@@ -303,15 +294,8 @@ class Pipeline:
                 "authoring_turn_limit",
                 "authoring_timeout_seconds",
                 "authoring_result_limit",
-                "code_analysis_backend",
-                "code_analysis_model",
-                "code_analysis_timeout",
-                "code_analysis_turn_limit",
-                "code_analysis_result_limit",
             )
         }
-        scope_file = getattr(settings, "code_scope_file", None)
-        configuration["code_scope_hash"] = digest(scope_file.read_bytes()) if scope_file else None
         return digest(
             [
                 implementation_signature(),
@@ -356,11 +340,13 @@ class Pipeline:
         }
 
     def snapshot_inputs(self, state: PipelineState) -> dict:
+        if state.get("code"):
+            raise ValueError("Code inputs are no longer supported; start a documentation-only run")
         settings = getattr(self.model, "settings", None)
         snapshot = snapshot_inputs(
             self.store,
             Path(state["docs"]),
-            Path(state["code"]) if state.get("code") else None,
+            None,
             Path(state["template"]),
             state.get("brief", ""),
             getattr(settings, "asset_max_bytes", 10000000),
@@ -411,12 +397,8 @@ class Pipeline:
         result = inventory(self.store, source)
         self.graph.add_evidence(result["spans"])
         self.graph.add_structure(result)
-        if not result["code_units"]:
-            self.stages.skip("analyze_code_unit", "No code input was selected")
-            self.stages.skip("verify_code_unit", "No code input was selected")
         return {
             "inventory_ref": self.store.put(result),
-            "code_index": 0,
             "document_index": 0,
             "graph_index": 0,
             "assertions_ref": self.store.put([]),
@@ -425,7 +407,7 @@ class Pipeline:
             "source_aspects_ref": self.store.put([]),
             "source_decisions_ref": self.store.put([]),
             "source_non_substantive_ref": self.store.put([]),
-            "route": "inventory_code_scope",
+            "route": "inventory_source_aspects",
         }
 
     def inventory_source_aspects(self, state: PipelineState) -> dict:
@@ -433,11 +415,7 @@ class Pipeline:
         index = state.get("source_aspect_index", 0)
         batches = inventory_record["document_batches"]
         if index >= len(batches):
-            return {
-                "route": "analyze_code_unit"
-                if inventory_record["code_units"]
-                else "extract_document_batch"
-            }
+            return {"route": "extract_document_batch"}
         spans = self.spans(state)
         blocks = [spans[key] for key in batches[index]]
         draft = self.call(
@@ -513,7 +491,7 @@ class Pipeline:
             sdk_version=version("google-genai"),
             prompt_version="extract_document.v1",
             input_hash=digest(payload),
-            scope_id=self.read(state, "code_scope_ref", {}).get("scope_id", "full"),
+            scope_id="full",
         )
         for assertion in draft["assertions"]:
             assertion["provenance_ids"] = [provenance.id]
@@ -655,8 +633,6 @@ class Pipeline:
         spans = self.spans(state)
         assertions = self.assertions(state)
         exclusions = self.read(state, "exclusions_ref", [])
-        if self.read(state, "code_relations_ref", []):
-            self.graph.add_relations(self.read(state, "code_relations_ref", []))
         covered = {key for item in assertions for key in item["evidence_ids"]}
         covered.update(item["evidence_id"] for item in exclusions)
         missing = set(spans) - covered
@@ -702,19 +678,6 @@ class Pipeline:
                 source.backup(target)
             os.replace(temporary, frozen)
         self.store.write(f"graphs/{revision}/manifest.json", json.dumps(manifest, indent=2))
-        report_lines = ["# Code analysis", ""]
-        for index in range(state.get("code_index", 0)):
-            report_lines.append(f"- [Unit {index + 1}](reports/code-{index:04d}.md)")
-        self.store.write(f"runs/{self.run_id}/code-analysis.md", "\n".join(report_lines) + "\n")
-        self.store.write(
-            f"runs/{self.run_id}/code-analysis.jsonl",
-            "\n".join(
-                json.dumps(item, ensure_ascii=False)
-                for item in assertions
-                if any(spans[key]["kind"] == "code" for key in item["evidence_ids"])
-            )
-            + "\n",
-        )
         self.store.write(
             f"runs/{self.run_id}/coverage.json",
             json.dumps(
@@ -1461,7 +1424,7 @@ class Pipeline:
         from docgen_graph.evidence_service import RevisionEvidenceService
 
         service = getattr(self, "evidence_service", None)
-        scope_id = self.read(state, "code_scope_ref", {}).get("scope_id", "full")
+        scope_id = "full"
         decisions = {
             item["aspect_id"]: item for item in self.read(state, "source_decisions_ref", [])
         }
@@ -1497,7 +1460,7 @@ class Pipeline:
                     state["snapshot_ref"],
                     scope_id,
                     coverage=coverage,
-                    provenance=self.read(state, "code_provenance_ref", [])
+                    provenance=self.read(state, "tool_provenance_ref", [])
                     + self.read(state, "document_provenance_ref", []),
                 )
             )
@@ -1710,7 +1673,7 @@ class Pipeline:
                 [item.model_dump(mode="json") for item in published.packet.facts]
             ),
             "inventory_ref": self.store.put(inventory_record),
-            "code_provenance_ref": self.store.put(
+            "tool_provenance_ref": self.store.put(
                 [item.model_dump(mode="json") for item in published.packet.provenance]
             ),
             "document_provenance_ref": "",
@@ -3167,100 +3130,23 @@ class Pipeline:
 
     def build(self, checkpointer):
         builder = StateGraph(PipelineState)
-        for name in STEPS[:25]:
-            builder.add_node(name, self.logged_node(name))
-        for name in STEPS[27:]:
-            builder.add_node(name, self.logged_node(name))
-        builder.add_node("review_stage", self.review_stage)
-        builder.add_node("resolve_issues_automatically", self.resolve_issues_automatically)
+        control_nodes = {"review_stage", "resolve_issues_automatically"}
+        review_nodes = {"review_plan", "review_release", "review_issues"}
+        for name in STEPS:
+            function = getattr(self, name) if name in control_nodes else self.logged_node(name)
+            builder.add_node(name, function)
         builder.add_edge(START, "snapshot_inputs")
-        fixed = {
-            "snapshot_inputs": "inventory_sources",
-            "analyze_code_unit": "verify_code_unit",
-            "extract_document_batch": "verify_document_batch",
-            "link_graph_batch": "verify_graph_batch",
-            "write_section": "verify_section",
-            "edit_page": "verify_edited_page",
-            "export_candidate": "review_release",
-            "finalize_release": END,
-        }
-        routed = {
-            "inventory_sources": ["analyze_code_unit", "extract_document_batch"],
-            "verify_code_unit": ["analyze_code_unit", "extract_document_batch", "review_issues"],
-            "verify_document_batch": [
-                "extract_document_batch",
-                "link_graph_batch",
-                "review_issues",
-            ],
-            "verify_graph_batch": ["link_graph_batch", "finalize_graph", "review_issues"],
-            "finalize_graph": ["compile_template", "review_issues"],
-            "compile_template": ["draft_page_plan", "review_issues"],
-            "draft_page_plan": ["retrieve_plan_evidence"],
-            "retrieve_plan_evidence": ["retrieve_plan_evidence", "validate_page_plan"],
-            "validate_page_plan": ["draft_page_plan", "review_plan", "review_issues"],
-            "review_plan": ["retrieve_section_evidence", "draft_page_plan", "review_plan", END],
-            "retrieve_section_evidence": ["write_section", "review_issues"],
-            "verify_section": [
-                "write_section",
-                "retrieve_section_evidence",
-                "assemble_pages",
-                "review_issues",
-            ],
-            "assemble_pages": ["edit_page", "review_issues"],
-            "verify_edited_page": ["edit_page", "audit_documentation", "review_issues"],
-            "audit_documentation": ["export_candidate", "edit_page", "review_issues"],
-            "review_release": ["finalize_release", "edit_page", "review_release", END],
-            "review_issues": [
-                "analyze_code_unit",
-                "extract_document_batch",
-                "link_graph_batch",
-                "finalize_graph",
-                "compile_template",
-                "draft_page_plan",
-                "retrieve_section_evidence",
-                "write_section",
-                "assemble_pages",
-                "edit_page",
-                "review_issues",
-                END,
-            ],
-        }
-        for name in STEPS[:25]:
-            if name in {"review_plan", "review_release", "review_issues"}:
+        for name in STEPS:
+            if name in control_nodes | review_nodes:
                 builder.add_conditional_edges(
                     name, lambda state: state["route"], list(STEPS) + [END]
                 )
             else:
                 builder.add_edge(name, "review_stage")
-        for name in STEPS[27:]:
-            builder.add_edge(name, "review_stage")
-        targets = sorted(
-            set(fixed.values())
-            | {target for values in routed.values() for target in values}
-            | {"review_stage", "resolve_issues_automatically"}
-            | set(STEPS[27:])
-        )
-        builder.add_conditional_edges("review_stage", lambda state: state["route"], targets)
-        builder.add_conditional_edges(
-            "resolve_issues_automatically",
-            lambda state: state["route"],
-            [
-                END,
-                "verify_document_batch",
-                "extract_document_batch",
-                "link_graph_batch",
-                "finalize_graph",
-                "analyze_code_unit",
-            ],
-        )
         return builder.compile(checkpointer=checkpointer)
 
     def logged_node(self, name: str):
-        function = (
-            (lambda state: getattr(code_stages, name)(self, state))
-            if name in code_stages.CODE_STAGE_NAMES
-            else getattr(self, name)
-        )
+        function = getattr(self, name)
 
         def execute(state: PipelineState) -> dict:
             if name not in {"snapshot_inputs", "review_plan", "review_release", "review_issues"}:
@@ -3275,11 +3161,6 @@ class Pipeline:
                 update = self.issue(
                     state, name, [f"Model response failed structural validation: {error}"], name
                 )
-            if name == "inventory_code_scope" and update.get("route") not in {
-                "review_issues",
-                "resolve_issues_automatically",
-            }:
-                update["route"] = "inventory_source_aspects"
             cost_pln = 0.0
             if event_path.exists():
                 with event_path.open("rb") as events:
@@ -3298,7 +3179,6 @@ class Pipeline:
                     )
                 default_routes = {
                     "snapshot_inputs": "inventory_sources",
-                    "analyze_code_unit": "verify_code_unit",
                     "extract_document_batch": "verify_document_batch",
                     "link_graph_batch": "verify_graph_batch",
                     "write_section": "verify_section",
@@ -3387,7 +3267,6 @@ class Pipeline:
             )
             return {"route": END, "status": "rejected"}
         repair_targets = {
-            "verify_code_unit": "analyze_code_unit",
             "verify_document_batch": "extract_document_batch",
             "validate_page_plan": "draft_page_plan",
             "verify_section": "write_section",
@@ -3395,7 +3274,6 @@ class Pipeline:
         }
         target = repair_targets.get(record["stage"], record["stage"])
         if action == "request_correction" and target in {
-            "analyze_code_unit",
             "extract_document_batch",
             "draft_page_plan",
             "write_section",

@@ -18,8 +18,11 @@ const state = {
   filters: {},
   selected: null,
   hops: 0,
+  graphMode: "topology",
+  neighborLimit: 8,
   page: 0,
 };
+let topologyView = null;
 const asRecords = (value) =>
   Array.isArray(value)
     ? value.filter(
@@ -235,6 +238,8 @@ function sourceLink(id, parent = $("detail"), label = id) {
   );
 }
 function selectNode(id) {
+  if (state.graphMode !== "topology") state.graphMode = "neighborhood";
+  state.neighborLimit = 8;
   const g = graph(),
     row = allRows().find((item) => item.id === id);
   details(
@@ -283,9 +288,9 @@ function selectNode(id) {
   for (const edge of edges) {
     const block = el("div", undefined, target, "card");
     el("p", `${edge.type}  |  ${edge.method}`, block);
-    sourceLink(edge.source_id, block);
+    sourceLink(edge.source_id, block, nodeLabel(edge.source_id));
     el("span", "  ->  ", block);
-    sourceLink(edge.target_id, block);
+    sourceLink(edge.target_id, block, nodeLabel(edge.target_id));
     raw(edge, block);
   }
   el("h3", "Original evidence", target);
@@ -329,7 +334,11 @@ function selectNode(id) {
         target,
       );
   }
-  if (state.view === "graph") drawGraph();
+  if (state.view === "graph") {
+    if (state.graphMode === "topology" && topologyView) topologyView.select(id);
+    else drawGraph();
+    $("visual").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 function nodeFilters(row) {
   for (const [key, wanted] of Object.entries(state.filters)) {
@@ -375,6 +384,9 @@ function graphControls() {
   );
   commonControls();
   const rows = allRows();
+  const advanced = el("details", undefined, $("controls"), "advanced-filters");
+  el("summary", "Filters and table neighborhood", advanced);
+  const filterControls = el("div", undefined, advanced, "filter-controls");
   for (const [key, label] of [
     ["type", "Node type"],
     ["source_kind", "Origin"],
@@ -395,6 +407,7 @@ function graphControls() {
           state.page = 0;
           renderBody();
         },
+        filterControls,
       );
   }
   for (const key of ["edge_type", "method"]) {
@@ -410,10 +423,11 @@ function graphControls() {
           state.page = 0;
           renderBody();
         },
+        filterControls,
       );
   }
   select(
-    "Selected neighborhood",
+    "Table neighborhood",
     [
       [0, "All matching nodes"],
       [1, "One hop"],
@@ -425,6 +439,7 @@ function graphControls() {
       state.page = 0;
       renderBody();
     },
+    filterControls,
   );
 }
 function matchingNodes() {
@@ -462,15 +477,15 @@ function graphBody() {
   const g = graph(),
     rows = matchingNodes();
   $("summary").textContent =
-    `Revision: ${g.id}  |  Loaded ${g.tables.nodes?.length || 0} nodes / ${g.tables.edges?.length || 0} stored edges  |  Matching ${rows.length} nodes  |  Missing tables: ${g.missing_tables.join(", ") || "none"}`;
+    `Revision: ${g.id}  |  Loaded ${g.tables.nodes?.length || 0} nodes / ${g.tables.edges?.length || 0} stored edges  |  Matching ${rows.length} nodes`;
   drawGraph();
   if (state.table === "nodes")
     table(
       rows,
       [
-        ["Node", (r) => r.name],
+        ["Node", (r) => nodeLabel(r.id)],
         ["Type", (r) => r.type],
-        ["Identity", (r) => r.id],
+        ["Source / scope", (r) => r.evidence?.path || r.assertion?.scope || r.scope || r.id],
       ],
       (r) => selectNode(r.id),
     );
@@ -506,186 +521,195 @@ function graphBody() {
     );
   }
   message(
-    "Tables page all matching rows; no records are omitted from the export. Graph drawing shows the current node page, independently of non-node table pages.",
+    "All records remain available in the tables. Table pagination never hides connections in the neighborhood view.",
     $("listing"),
   );
 }
+function nodeLabel(id) {
+  const g = graph(),
+    node = (g.tables.nodes || []).find((row) => row.id === id),
+    fact = g.enriched.assertions.find((row) => row.id === id),
+    evidence = g.enriched.evidence.find((row) => row.id === id);
+  if (fact) return fact.statement;
+  if (evidence) {
+    const lines = evidence.start_line == null ? "" : `:${evidence.start_line}-${evidence.end_line ?? evidence.start_line}`;
+    return `${evidence.label || "Source"} | ${evidence.path}${lines}`;
+  }
+  return node?.name || id;
+}
+function graphOverview(parent) {
+  const g = graph(), profile = g.profile;
+  el("h2", "What is in this graph?", parent);
+  message("Start with the relation map, or search below and select a fact to follow its evidence. Counts include the entire selected revision.", parent);
+  if (!profile) return message("Re-export this run to include graph diagnostics.", parent);
+  const stats = el("div", undefined, parent, "graph-stats");
+  for (const [value, label] of [
+    [g.tables.nodes?.length || 0, "nodes"],
+    [g.tables.edges?.length || 0, "stored edges"],
+    [profile.components.length, "connected components"],
+    [`${profile.supported_assertions}/${profile.assertion_count}`, "facts with recorded evidence"],
+  ]) {
+    const card = el("div", undefined, stats, "card");
+    el("strong", value, card, "stat");
+    message(label, card);
+  }
+  const types = el("div", undefined, parent, "links");
+  for (const [type, count] of Object.entries(profile.node_types)) {
+    button(`${type} (${count})`, () => {
+      state.filters = { type };
+      state.query = "";
+      state.table = "nodes";
+      state.page = 0;
+      render();
+      $("listing").scrollIntoView({ behavior: "smooth", block: "start" });
+    }, types);
+  }
+  el("h3", "Relation map", parent);
+  message("Each row aggregates stored edges with the same endpoint types, relation and method. Select a row to inspect a concrete connection. Arrows run from source to target.", parent);
+  const map = el("div", undefined, parent, "relation-map");
+  for (const relation of profile.relations) {
+    const row = button("", () => {
+      state.filters = { edge_type: relation.type, method: relation.method };
+      const nodes = new Map((g.tables.nodes || []).map((node) => [node.id, node]));
+      const edge = (g.tables.edges || []).find((item) =>
+        item.type === relation.type && item.method === relation.method &&
+        nodes.get(item.source_id)?.type === relation.source_type &&
+        nodes.get(item.target_id)?.type === relation.target_type,
+      );
+      state.query = "";
+      state.page = 0;
+      state.selected = edge?.source_id || null;
+      state.graphMode = "neighborhood";
+      render();
+      if (state.selected) selectNode(state.selected);
+    }, map);
+    row.className = "relation-row";
+    el("span", relation.source_type, row, "relation-endpoint");
+    const connector = el("span", undefined, row, "relation-connector");
+    el("strong", `${relation.type} ->`, connector);
+    el("small", relation.method, connector);
+    el("span", relation.target_type, row, "relation-endpoint");
+    el("strong", relation.count, row, "relation-count");
+  }
+  if (!profile.relations.length) message("No stored edges in this revision.", map);
+  const health = el("div", undefined, parent, "card");
+  el("h3", "Graph checks", health);
+  for (const [label, ids] of [
+    ["Isolated nodes", profile.isolated_ids],
+    ["Facts without a valid support-table evidence link", profile.unsupported_assertion_ids],
+  ]) {
+    const fold = el("details", undefined, health);
+    el("summary", `${label}: ${ids.length}`, fold);
+    for (const id of ids) sourceLink(id, fold, nodeLabel(id));
+  }
+  message(`Edges with missing endpoints: ${profile.dangling_edge_indices.length}. Largest connected component: ${profile.components[0]?.length || 0} nodes.`, health,
+    profile.dangling_edge_indices.length ? "warning" : "hint");
+  message(profile.interpretation, health);
+}
+function neighborhood(parent) {
+  const g = graph(),
+    rows = new Map(allRows().map((row) => [row.id, row])),
+    selected = rows.get(state.selected);
+  el("h2", "Follow one connection at a time", parent);
+  if (!selected) {
+    message("Select a node from the search results below, or choose a relation from the overview.", parent, "empty");
+    return;
+  }
+  const edges = (g.tables.edges || []).filter((edge) =>
+    (!state.filters.edge_type || edge.type === state.filters.edge_type) &&
+    (!state.filters.method || edge.method === state.filters.method),
+  );
+  const incoming = edges.filter((edge) => edge.target_id === selected.id),
+    outgoing = edges.filter((edge) => edge.source_id === selected.id);
+  message("Direct connections across the entire revision, independent of search results and table pages. Relation filters apply here; node filters apply to the table below. Select a connected node to move through the graph.", parent);
+  if (state.filters.edge_type || state.filters.method)
+    button("Show all relation types and methods", () => {
+      delete state.filters.edge_type;
+      delete state.filters.method;
+      render();
+    }, parent);
+  const lanes = el("div", undefined, parent, "neighborhood");
+  const lane = (title) => {
+    const column = el("section", undefined, lanes, "graph-lane");
+    el("h3", title, column);
+    return column;
+  };
+  const before = lane(`Incoming (${incoming.length})`),
+    center = lane("Selected node"),
+    after = lane(`Outgoing (${outgoing.length})`);
+  const nodeCard = (id, container, focus = false) => {
+    const row = rows.get(id), card = el("article", undefined, container, focus ? "graph-node focused" : "graph-node");
+    el("span", row?.type || "Missing endpoint", card, "eyebrow");
+    if (focus) el("p", nodeLabel(id), card, "node-name");
+    else button(nodeLabel(id), () => selectNode(id), card);
+    if (row?.assertion?.subject) message(`Subject: ${row.assertion.subject}`, card);
+    if (row?.evidence) message(row.evidence.text || "No source text recorded", card, "evidence-preview");
+    if (row?.support.length) message(`${row.support.length} original evidence records`, card);
+    if (focus) {
+      message(id, card, "node-identity");
+      button("Read evidence and provenance", () => {
+        selectNode(id);
+        $("detail-title").scrollIntoView({ behavior: "smooth", block: "start" });
+      }, card);
+    }
+    return card;
+  };
+  nodeCard(selected.id, center, true);
+  const addEdges = (values, container, endpoint) => {
+    for (const edge of values.slice(0, state.neighborLimit)) {
+      const card = nodeCard(edge[endpoint], container),
+        relation = el("div", undefined, card, "edge-description");
+      el("strong", `${edge.type} ->`, relation);
+      message(`Method: ${edge.method || "Not recorded"}`, relation);
+      if (edge.evidence_id) sourceLink(edge.evidence_id, relation, "Open relation evidence");
+      raw(edge, relation, "Stored edge record");
+    }
+    if (!values.length) message("No matching stored edges.", container, "empty");
+    if (values.length > state.neighborLimit)
+      button(`Show more (${values.length - state.neighborLimit} remaining)`, () => {
+        state.neighborLimit += 8;
+        drawGraph();
+      }, container);
+  };
+  addEdges(incoming, before, "source_id");
+  addEdges(outgoing, after, "target_id");
+  message("Incoming: connected node -> selected node. Outgoing: selected node -> connected node. Repeated cards preserve parallel edges and their separate methods/evidence. Self-relations appear in both directions.", parent);
+}
 function drawGraph() {
   if (state.view !== "graph") return;
-  $("visual").replaceChildren();
-  const rows = matchingNodes(),
-    drawn = rows.slice(state.page * 75, (state.page + 1) * 75),
-    types = unique(allRows().map((row) => row.type)),
-    colors = new Map(
-      types.map((type, index) => [type, palette[index % palette.length]]),
-    );
-  const legend = el("div", undefined, $("visual"), "legend");
-  for (const type of types)
-    el("span", `${type}  | `, legend).style.color = colors.get(type);
-  message(
-    `Drawn ${drawn.length} / ${rows.length} matching / ${allRows().length} loaded nodes. Drag to pan; scroll to zoom. Select a node for evidence. Edge labels show type / method.`,
-    $("visual"),
-  );
-  const ns = "http://www.w3.org/2000/svg",
-    svg = document.createElementNS(ns, "svg");
-  svg.id = "graph-canvas";
-  svg.setAttribute("viewBox", "0 0 900 480");
-  svg.setAttribute("role", "img");
-  svg.setAttribute("aria-label", "Directed stored knowledge graph");
-  $("visual").append(svg);
-  const element = (tag, attrs, parent) => {
-    const node = document.createElementNS(ns, tag);
-    for (const [key, value] of Object.entries(attrs))
-      node.setAttribute(key, value);
-    parent.append(node);
-    return node;
-  };
-  const defs = element("defs", {}, svg),
-    marker = element(
-      "marker",
-      {
-        id: "arrow",
-        viewBox: "0 0 10 10",
-        refX: 9,
-        refY: 5,
-        markerWidth: 6,
-        markerHeight: 6,
-        orient: "auto-start-reverse",
-      },
-      defs,
-    );
-  element("path", { d: "M 0 0 L 10 5 L 0 10 z", fill: "#7397a8" }, marker);
-  const group = element("g", {}, svg),
-    positions = new Map(
-      drawn.map((row, index) => {
-        const angle = (index * 2 * Math.PI) / Math.max(1, drawn.length);
-        return [
-          row.id,
-          { x: 450 + 330 * Math.cos(angle), y: 240 + 180 * Math.sin(angle) },
-        ];
-      }),
-    );
-  const drawnIds = new Set(drawn.map((row) => row.id));
-  const edges = (graph().tables.edges || []).filter(
-    (edge) =>
-      drawnIds.has(edge.source_id) &&
-      drawnIds.has(edge.target_id) &&
+  const parent = $("visual");
+  parent.replaceChildren();
+  const modes = el("div", undefined, parent, "graph-modes");
+  for (const [mode, label] of [["topology", "Interactive graph"], ["overview", "Graph overview"], ["neighborhood", "Node and evidence"]]) {
+    const item = button(label, () => {
+      state.graphMode = mode;
+      drawGraph();
+    }, modes);
+    item.classList.toggle("active", state.graphMode === mode);
+    item.setAttribute("aria-pressed", String(state.graphMode === mode));
+  }
+  topologyView = null;
+  if (state.graphMode === "topology") {
+    const nodes = matchingNodes(), ids = new Set(nodes.map((node) => node.id));
+    const edges = (graph().tables.edges || []).filter((edge) =>
+      ids.has(edge.source_id) && ids.has(edge.target_id) &&
       (!state.filters.edge_type || edge.type === state.filters.edge_type) &&
-      (!state.filters.method || edge.method === state.filters.method),
-  );
-  for (const edge of edges) {
-    const a = positions.get(edge.source_id),
-      b = positions.get(edge.target_id);
-    const node =
-      edge.source_id === edge.target_id
-        ? element(
-            "path",
-            {
-              class: "edge",
-              d: `M ${a.x} ${a.y} C ${a.x + 45} ${a.y - 60},${a.x - 45} ${a.y - 60},${a.x} ${a.y - 8}`,
-              "marker-end": "url(#arrow)",
-            },
-            group,
-          )
-        : element(
-            "line",
-            {
-              x1: a.x,
-              y1: a.y,
-              x2: b.x + (a.x - b.x) * 0.035,
-              y2: b.y + (a.y - b.y) * 0.035,
-              "marker-end": "url(#arrow)",
-            },
-            group,
-          );
-    element("title", {}, node).textContent = `${edge.type} / ${edge.method}`;
-    node.addEventListener("click", () => details("Stored edge", edge));
-    if (drawn.length <= 25) {
-      element(
-        "text",
-        { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 },
-        group,
-      ).textContent = `${edge.type} / ${edge.method}`;
-    }
-  }
-  for (const row of drawn) {
-    const p = positions.get(row.id),
-      circle = element(
-        "circle",
-        {
-          cx: p.x,
-          cy: p.y,
-          r: 8,
-          fill: colors.get(row.type),
-          class: row.id === state.selected ? "selected" : "",
-          tabindex: 0,
-          role: "button",
-          "aria-label": `${row.type}: ${row.name}`,
-        },
-        group,
-      );
-    element("title", {}, circle).textContent = `${row.name}\n${row.id}`;
-    circle.addEventListener("click", () => selectNode(row.id));
-    circle.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") selectNode(row.id);
+      (!state.filters.method || edge.method === state.filters.method));
+    if (!nodes.length) { message("No nodes match the filters. Reset filters to show the complete graph.", parent); return; }
+    topologyView = createTopology(parent, {
+      nodes, edges, label: nodeLabel, selected: state.selected,
+      key: JSON.stringify([state.graph, nodes.map((node) => node.id), state.filters]),
+      onSelect: selectNode,
+      onEdge: (edge) => {
+        details(`${edge.type}: ${nodeLabel(edge.source_id)} -> ${nodeLabel(edge.target_id)}`, edge);
+        sourceLink(edge.source_id, $("detail"), "Source: " + nodeLabel(edge.source_id));
+        sourceLink(edge.target_id, $("detail"), "Target: " + nodeLabel(edge.target_id));
+        const evidence = graph().enriched.evidence.find((item) => item.id === edge.evidence_id);
+        if (evidence) { el("h3", "Original edge evidence", $("detail")); el("pre", evidence.text, $("detail")); raw(evidence); }
+      },
     });
-    element("text", { x: p.x + 11, y: p.y + 4 }, group).textContent =
-      row.name.length > 28 ? row.name.slice(0, 28) + "... " : row.name;
-  }
-  let scale = 1,
-    panX = 0,
-    panY = 0,
-    drag = null;
-  const apply = () =>
-    group.setAttribute(
-      "transform",
-      `translate(${panX} ${panY}) scale(${scale})`,
-    );
-  svg.addEventListener(
-    "wheel",
-    (event) => {
-      event.preventDefault();
-      scale = Math.min(
-        8,
-        Math.max(0.25, scale * (event.deltaY < 0 ? 1.15 : 0.87)),
-      );
-      apply();
-    },
-    { passive: false },
-  );
-  svg.addEventListener("pointerdown", (event) => {
-    if (event.target === svg) {
-      drag = { x: event.clientX, y: event.clientY };
-      svg.setPointerCapture(event.pointerId);
-    }
-  });
-  svg.addEventListener("pointermove", (event) => {
-    if (drag) {
-      panX += ((event.clientX - drag.x) * 900) / svg.clientWidth;
-      panY += ((event.clientY - drag.y) * 480) / svg.clientHeight;
-      drag = { x: event.clientX, y: event.clientY };
-      apply();
-    }
-  });
-  svg.addEventListener("pointerup", () => {
-    drag = null;
-  });
-  const actions = el("div", undefined, $("visual"), "paging");
-  button(
-    "Fit / reset view",
-    () => {
-      scale = 1;
-      panX = 0;
-      panY = 0;
-      apply();
-    },
-    actions,
-  );
-  el(
-    "span",
-    `${edges.length} drawn / ${graph().tables.edges?.length || 0} loaded edges`,
-    actions,
-  );
+  } else if (state.graphMode === "overview") graphOverview(parent);
+  else neighborhood(parent);
 }
 function runControls() {
   select(

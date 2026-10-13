@@ -10,7 +10,7 @@ from docgen_graph.assets import (
     freeze_asset,
     resolve_asset_references,
 )
-from docgen_graph.code_analysis.inventory import source_role, structural_index
+from docgen_graph.source_index import source_role, structural_index
 from docgen_graph.storage import ArtifactStore, digest
 
 SKIP_NAMES = {

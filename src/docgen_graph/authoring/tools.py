@@ -26,7 +26,6 @@ class VerifyArguments(BaseModel):
 ARGUMENTS = {
     "search_original_sources": SearchArguments,
     "search_knowledge_graph": SearchArguments,
-    "search_code": SearchArguments,
     "read_evidence": SearchArguments,
     "build_mermaid": DiagramSpec,
     "verify_content": VerifyArguments,
@@ -64,7 +63,6 @@ class AuthoringTools:
         methods = {
             "search_original_sources": "search_sources",
             "search_knowledge_graph": "search_graph",
-            "search_code": "search_code",
             "read_evidence": "read_evidence",
         }
         if name in methods:

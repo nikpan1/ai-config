@@ -58,9 +58,8 @@ def test_manual_review_is_checkpointed_after_each_artifact(tmp_path):
         second = graph.get_state(config).tasks[0].interrupts[0].value
         assert second["kind"] == "stage"
         assert second["stage"] == "inventory_sources"
-        assert (store.root / "runs" / "example" / "step3" / "README.md").read_text("utf-8").find(
-            "Skipped"
-        ) >= 0
+        assert second["next"] == "inventory_source_aspects"
+        assert not (store.root / "runs" / "example" / "step3").exists()
 
 
 def test_autopilot_reaches_release_with_attributed_decisions(tmp_path):

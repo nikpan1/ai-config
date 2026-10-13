@@ -76,30 +76,22 @@ uv run pytest tests
 uv run ruff check src tests evaluation
 ```
 
-The quick investment fixture and its citation cases are in `data/test_data_2_quick/` and `data/test_data_2_reference/`. The full corpus is in `data/test_data_2/`. Java and Angular use a bounded text index with entry-point discovery; feature and ticket scopes require explicit path mappings. The HTML mirrors verify locators only. Passing offline tests does not establish semantic completeness or browser highlighting against live Confluence.
+The quick investment fixture and its citation cases are in `data/test_data_2_quick/` and `data/test_data_2_reference/`. The full corpus is in `data/test_data_2/`. The HTML mirrors verify locators only. Passing offline tests does not establish semantic completeness or browser highlighting against live Confluence.
 
-## Evidence authoring and code analysis
+## Evidence authoring
 
-Code analysis can use `gemini`, `codex_sdk`, or `auggie_sdk` through
-`DOCGEN_CODE_ANALYSIS_BACKEND` and `DOCGEN_CODE_ANALYSIS_MODEL` in `.env`.
-The CLI also accepts global `--code-backend` and `--code-model` options:
-
-```powershell
-uv run docgen --code-backend gemini --code-model gemini-3.8-flash run --docs data/docs --code data/code --thread-id example
-```
-
-Use the same effective configuration when resuming a thread. Changing the model,
-tool limits, source revision, prompts, or implementation invalidates runtime
-compatibility and requires a new run. Documentation extraction, planning,
-authoring, editing, and independent audits always use `gemini-3.8-flash`.
-The SDK exception is restricted to read-only code analysis. Native Codex uses
-the verified isolation boundary; Auggie reports `unsupported` where its host
-cannot establish equivalent isolation. Neither backend silently falls back.
-Provider execution also requires an authorized shared accounting allowance.
+New runs accept documentation inputs only. The previous Gemini, Codex SDK and
+Auggie code-analysis integrations, provider settings, CLI code-input options,
+and model analysis stages have been removed. Gemini `gemini-3.8-flash` remains
+responsible for document extraction, planning, writing, editing and audits.
+Historical artifacts and provider provenance remain inspectable; deterministic
+source indexing and patch validation are retained for frozen evidence compatibility.
+Start a new thread after this implementation change; old checkpoints remain
+available for inspection and are not silently resumed under a different runtime.
 
 The authoring workflow checkpoints each model action, tool execution, result
 verification, new-fact audit, and graph revision publication separately. Tools
-search frozen original sources, the revision-bound knowledge graph, and code;
+search frozen original sources, the revision-bound knowledge graph;
 read exact evidence and attachments; build restricted Mermaid diagrams; and
 independently check proposed content. Gemini automatic function execution is
 disabled. Full serialized protocol messages, including opaque thinking
@@ -135,9 +127,9 @@ and source quotes, audits changes to qualifiers and causal explanations, and
 checks candidate repetition in prose and tables before removing it.
 
 The implementation was initially exercised with offline fixtures. Live
-SDK/Gemini compatibility and human readability acceptance remain separate
+Gemini compatibility and human readability acceptance remain separate
 acceptance steps. Usage accounting persists across offline and live evaluations.
-# Offline graph and run inspection
+## Offline graph and run inspection
 
 Export a recorded run without credentials, a model call, or a running pipeline:
 
@@ -154,7 +146,18 @@ checkpoint headers, pending writes, and selected-run ledger records. Content fol
 candidate passages back to their facts and evidence. Quality separates recorded source coverage,
 graph utilization, and integrity diagnostics; missing audits never imply complete coverage.
 
-Filters and drawing pages show explicit counts. Table pagination does not truncate the export.
+The graph opens with an interactive directed node-and-edge drawing of the complete matching revision.
+Scroll to zoom, drag the background to pan, drag nodes to rearrange them, and select nodes or edges
+to inspect their evidence. Fit, zoom, selection centering and expanded-canvas controls are available.
+Disconnected components are laid out separately; geometry does not imply semantic similarity.
+The separate relation overview shows node types, relation counts, connected components, isolated
+records and assertions without recorded support. Select a relation or fact to explore its
+incoming and outgoing neighbors, full statements, source locations, evidence and extraction method.
+The neighborhood uses the entire selected graph revision, independently of table pagination;
+additional neighbors are explicitly expandable. Structural links and factual relations retain their
+recorded types. These integrity indicators do not establish semantic correctness or complete coverage.
+
+Filters and tables show explicit counts. Table pagination does not truncate the export.
 Source Markdown, HTML, and Mermaid are inert text. Binary checkpoint objects are not executed.
 Input files and databases are not modified; unsafe references are rejected and credential fields
 are redacted. The export still contains project source and documentation, so keep it private.
