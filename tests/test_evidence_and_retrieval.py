@@ -27,15 +27,14 @@ def test_snapshot_preserves_bytes_and_excludes_secrets(tmp_path):
     result = inventory(store, snapshot)
     assert len(snapshot["files"]) == 2
     assert any(item["path"] == ".env.local" for item in snapshot["exclusions"])
-    assert all(
-        item["text"]
-        == "\n".join(
-            store.get_bytes(item["file_hash"])
-            .decode()
-            .splitlines()[item["start_line"] - 1 : item["end_line"]]
-        )
-        for item in result["spans"]
-    )
+    for item in result["spans"]:
+        original = store.get_bytes(item["file_hash"]).decode()
+        if item.get("locator", {}).get("kind") == "characters":
+            assert item["text"] == original[item["locator"]["start"] : item["locator"]["end"]]
+        else:
+            assert item["text"] == "\n".join(
+                original.splitlines()[item["start_line"] - 1 : item["end_line"]]
+            )
     assert result["analysis"]["app.py"]["capability"] == "python_ast"
     assert any(symbol["name"] == "process" for symbol in result["analysis"]["app.py"]["symbols"])
     assert any(span["heading"] == "process" and span["start_line"] == 3 for span in result["spans"])

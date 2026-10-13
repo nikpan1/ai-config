@@ -1,6 +1,5 @@
 import ast
 import os
-import re
 import subprocess
 from pathlib import Path
 
@@ -9,6 +8,15 @@ from docgen_graph.assets import (
     attach_asset_evidence,
     freeze_asset,
     resolve_asset_references,
+)
+from docgen_graph.source_documents import (
+    document_context,
+)
+from docgen_graph.source_documents import (
+    document_spans as document_spans,
+)
+from docgen_graph.source_documents import (
+    extraction_packet as extraction_packet,
 )
 from docgen_graph.source_index import source_role, structural_index
 from docgen_graph.storage import ArtifactStore, digest
@@ -146,7 +154,7 @@ def snapshot_inputs(
     store: ArtifactStore,
     docs: Path,
     code: Path | None,
-    template: Path,
+    template: Path | None,
     brief: str,
     asset_max_bytes: int = 10000000,
     asset_max_pixels: int = 20000000,
@@ -212,7 +220,7 @@ def snapshot_inputs(
         raise ValueError("No readable Markdown documentation remains after selection")
     if code and not any(item["kind"] == "code" for item in files):
         raise ValueError("No readable code remains after selection")
-    template_bytes = template.resolve().read_bytes()
+    template_bytes = template.resolve().read_bytes() if template else b""
     template_bytes.decode("utf-8")
     assets = resolve_asset_references(store, files, assets, docs.resolve())
     return {
@@ -225,7 +233,7 @@ def snapshot_inputs(
         "roots": {"docs": str(docs.resolve()), "code": str(code.resolve()) if code else None},
         "code_revision": git_revision(code) if code else None,
         "template_hash": store.put_bytes(template_bytes),
-        "template_path": str(template.resolve()),
+        "template_path": str(template.resolve()) if template else None,
         "brief": brief,
         "revision": digest(
             [files, assets, attachments, exclusions, store.put_bytes(template_bytes), brief]
@@ -246,70 +254,6 @@ def _span(file: dict, start: int, end: int, heading: str, text: str, role: str) 
         "text": text,
         "role": role,
     }
-
-
-def document_spans(file: dict, text: str) -> list[dict]:
-    lines = text.splitlines()
-    blocks = []
-    headings = []
-    current = []
-    start = 0
-    table_columns = []
-
-    def flush():
-        nonlocal current, start
-        if current and any(line.strip() for line in current):
-            offset = 0
-            while offset < len(current):
-                end = offset
-                size = 0
-                while end < len(current) and size + len(current[end]) < 8000:
-                    size += len(current[end]) + 1
-                    end += 1
-                if end == offset:
-                    raise ValueError(
-                        f"Document line exceeds source span limit: {file['path']}:{start + offset}"
-                    )
-                blocks.append(
-                    _span(
-                        file,
-                        start + offset,
-                        start + end - 1,
-                        " / ".join(headings),
-                        "\n".join(current[offset:end]),
-                        "legacy_document",
-                    )
-                )
-                offset = end
-        current = []
-
-    for number, line in enumerate(lines, 1):
-        match = re.match(r"^(#{1,6})\s+(.+)$", line)
-        if match:
-            flush()
-            table_columns = []
-            level = len(match.group(1))
-            headings = headings[: level - 1] + [match.group(2).strip()]
-            current, start = [line], number
-            flush()
-        elif line.lstrip().startswith("|"):
-            flush()
-            cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
-            if not table_columns:
-                table_columns = cells
-            span = _span(file, number, number, " / ".join(headings), line, "legacy_document")
-            span["table_columns"] = table_columns
-            blocks.append(span)
-        elif not line.strip():
-            flush()
-            table_columns = []
-        else:
-            table_columns = []
-            if not current:
-                start = number
-            current.append(line)
-    flush()
-    return blocks
 
 
 def code_spans(file: dict, text: str) -> tuple[list[dict], dict]:
@@ -436,14 +380,14 @@ def inventory(store: ArtifactStore, snapshot: dict) -> dict:
             )
             spans.append(span)
     code_units = batches([span for span in spans if span["kind"] == "code"], 12000, 1)
-    document_batches = batches([span for span in spans if span["kind"] == "docs"])
+    context = document_context(spans)
     return {
         "schema": 1,
         "spans": spans,
         "analysis": analysis,
         "code_units": code_units,
-        "document_batches": document_batches,
+        **context,
         "assets": attach_asset_evidence(snapshot.get("assets", []), spans),
         "attachments": snapshot.get("attachments", []),
-        "revision": digest([snapshot["revision"], [s["id"] for s in spans], analysis]),
+        "revision": digest([snapshot["revision"], [s["id"] for s in spans], analysis, context]),
     }

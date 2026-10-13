@@ -505,6 +505,13 @@ class KnowledgeGraph:
                 if evidence_ids
                 else []
             )
+        from docgen_graph.semantic_graph import semantic_bundle
+
+        semantic = semantic_bundle(self, sorted(selected | seen))
+        assertions = list(
+            {item["id"]: item for item in assertions + semantic["assertions"]}.values()
+        )
+        evidence = list({item["id"]: item for item in evidence + semantic["evidence"]}.values())
         return {
             "queries": queries,
             "mandatory": mandatory,
@@ -512,6 +519,7 @@ class KnowledgeGraph:
             "traversed_edges": traversed,
             "assertions": assertions,
             "evidence": evidence,
+            "semantic_graph": semantic,
             "limits_reached": bool(queue),
             "mandatory_closure": sorted(closure),
             "context_characters": sum(len(item["text"]) for item in evidence),

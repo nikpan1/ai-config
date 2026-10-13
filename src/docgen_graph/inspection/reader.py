@@ -21,6 +21,10 @@ GRAPH_TABLES = (
     "graph_metadata",
     "analysis_provenance",
     "evidence_service_state",
+    "semantic_nodes",
+    "semantic_edges",
+    "semantic_quotes",
+    "semantic_batches",
 )
 HASH = re.compile(r"[a-f0-9]{64}")
 SECRET_KEY = re.compile(

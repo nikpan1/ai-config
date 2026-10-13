@@ -30,6 +30,7 @@ def parser() -> argparse.ArgumentParser:
     run = subcommands.add_parser("run")
     run.add_argument("--docs", type=Path, required=True)
     run.add_argument("--template", type=Path)
+    run.add_argument("--graph-only", action="store_true")
     run.add_argument("--brief", default="")
     run.add_argument("--mode", choices=("manual", "autopilot"), default="manual")
     run.add_argument("--thread-id", required=True)
@@ -239,6 +240,7 @@ def _main() -> int:
                 "template": str((args.template or settings.shared_data / "template.md").resolve()),
                 "brief": args.brief,
                 "mode": args.mode,
+                "graph_only": args.graph_only,
                 "policy_version": "v2",
                 "status": "running",
             }
@@ -273,6 +275,11 @@ def _main() -> int:
             ]
         if args.command in {"run", "resume"}:
             result["run_path"] = str(store.root / "runs" / args.thread_id)
+            if result["status"] == "graph_complete":
+                result["graph_path"] = str(store.root / "runs" / args.thread_id / "graph.sqlite")
+                result["quality_report"] = str(
+                    store.root / "runs" / args.thread_id / "graph-quality.json"
+                )
             if result["status"] in {"complete", "complete_with_exclusions"}:
                 result["exclusions"] = str(store.root / "runs" / args.thread_id / "exclusions.md")
         if args.command == "status" and not args.json:
@@ -285,6 +292,7 @@ def _main() -> int:
         return (
             {
                 "complete": 0,
+                "graph_complete": 0,
                 "complete_with_exclusions": 0,
                 "awaiting_manual_review": 10,
                 "rejected": 12,

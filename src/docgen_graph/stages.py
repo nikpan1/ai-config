@@ -38,6 +38,9 @@ STEPS = (
     "verify_knowledge_delta",
     "commit_knowledge_revision",
     "locate_visual_evidence",
+    "propose_semantic_graph",
+    "audit_semantic_graph",
+    "publish_semantic_graph",
 )
 STEP_NUMBERS = {
     "snapshot_inputs": 1,
@@ -74,8 +77,14 @@ STEP_NUMBERS = {
     "verify_knowledge_delta": 34,
     "commit_knowledge_revision": 35,
     "locate_visual_evidence": 40,
+    "propose_semantic_graph": 41,
+    "audit_semantic_graph": 42,
+    "publish_semantic_graph": 43,
 }
 REPEATED = {
+    "propose_semantic_graph": "semantic_index",
+    "audit_semantic_graph": "semantic_index",
+    "publish_semantic_graph": "semantic_index",
     "inventory_source_aspects": "source_aspect_index",
     "audit_source_coverage": "document_index",
     "audit_source_to_document": "source_audit_index",

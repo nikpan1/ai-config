@@ -70,6 +70,14 @@ class FixtureModel:
                 ],
                 "excluded": [],
             }
+        if stage == "semantic_graph":
+            return self.semantic_graph(payload)
+        if stage == "audit_semantic_graph":
+            return {
+                "accepted": True,
+                "findings": [],
+                "covered_obligation_ids": [fact["id"] for fact in payload["facts"]],
+            }
         if stage == "draft_plan":
             groups = payload["groups"]
             headings = payload["template_headings"]
@@ -120,6 +128,62 @@ class FixtureModel:
             return {"markdown": payload["markdown"]}
         return {"accepted": True, "findings": []}
 
+    def semantic_graph(self, payload):
+        sources = {source["id"]: source for source in payload["sources"]}
+        topics = {}
+        rules = []
+        for fact in payload["facts"]:
+            quotes = [
+                {
+                    "evidence_id": identifier,
+                    "start": 0,
+                    "end": len(sources[identifier]["text"]),
+                    "text": sources[identifier]["text"],
+                }
+                for identifier in fact["evidence_ids"]
+            ]
+            topic_key = f"{fact['scope']}:{fact['subject']}"
+            topic = topics.setdefault(
+                topic_key,
+                {
+                    "key": topic_key,
+                    "name": fact["subject"],
+                    "scope": fact["scope"],
+                    "quotes": [],
+                },
+            )
+            topic["quotes"].extend(quotes)
+            rules.append(
+                {
+                    "key": fact["id"],
+                    "topic_key": topic_key,
+                    "statement": fact["statement"],
+                    "scope": fact["scope"],
+                    "modality": fact["modality"]
+                    if fact["modality"]
+                    in {"necessary", "sufficient", "necessary_and_sufficient", "prohibited"}
+                    else "descriptive",
+                    "fact_ids": [fact["id"]],
+                    "quotes": quotes,
+                    "topic_quotes": quotes,
+                    "condition_groups": [
+                        {
+                            "operator": "unspecified",
+                            "quotes": quotes,
+                            "conditions": [
+                                {"statement": item, "quotes": quotes} for item in fact["conditions"]
+                            ],
+                        }
+                    ]
+                    if fact["conditions"]
+                    else [],
+                    "exceptions": [
+                        {"statement": item, "quotes": quotes} for item in fact["exceptions"]
+                    ],
+                }
+            )
+        return {"topics": list(topics.values()), "rules": rules, "findings": []}
+
     def tool_turn(self, payload, messages, declarations):
         self.calls.append("authoring_action")
         return {
@@ -136,6 +200,29 @@ def build(tmp_path: Path, model: FixtureModel):
     connection = sqlite3.connect(store.root / "checkpoints.sqlite", check_same_thread=False)
     graph = Pipeline(store, model, "test-run").build(SqliteSaver(connection))
     return store, connection, graph
+
+
+def test_shared_fixture_model_supports_graph_only_pipeline(tmp_path):
+    document = tmp_path / "guide.md"
+    document.write_text("# Guide\n\nReturn the supplied value.\n", encoding="utf-8")
+    model = FixtureModel()
+    store, connection, graph = build(tmp_path, model)
+    with closing(connection):
+        result = graph.invoke(
+            {
+                "run_id": "test-run",
+                "docs": str(document),
+                "graph_only": True,
+                "brief": "",
+                "mode": "autopilot",
+            },
+            {"configurable": {"thread_id": "test-run"}, "recursion_limit": 150},
+        )
+    assert result["status"] == "graph_complete"
+    assert "semantic_graph" in model.calls
+    assert "audit_semantic_graph" in model.calls
+    assert not {"draft_plan", "write_section", "edit_page"}.intersection(model.calls)
+    assert (store.root / "runs" / "test-run" / "graph-quality.json").is_file()
 
 
 def test_plan_and_release_require_exact_review_across_restarts(tmp_path):

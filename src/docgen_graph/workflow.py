@@ -40,7 +40,7 @@ from docgen_graph.evidence_contracts import (
     KnowledgeDelta,
     SourceCoverageItem,
 )
-from docgen_graph.ingestion import inventory, snapshot_inputs
+from docgen_graph.ingestion import extraction_packet, inventory, snapshot_inputs
 from docgen_graph.knowledge import KnowledgeGraph, normalized_assertion
 from docgen_graph.model import implementation_signature
 from docgen_graph.presentation import (
@@ -75,6 +75,16 @@ from docgen_graph.quality import (
     validate_visual_output,
     visual_evidence_ids,
 )
+from docgen_graph.semantic_contracts import SemanticGraphDraft
+from docgen_graph.semantic_graph import (
+    anchor_semantic_quotes,
+    publish_semantic_batch,
+    semantic_payload,
+    semantic_quality_report,
+    semantic_records,
+    topic_register,
+    validate_semantic_proposal,
+)
 from docgen_graph.source_coverage import (
     audit_decisions,
     coverage_report,
@@ -96,6 +106,16 @@ from docgen_graph.storage import ArtifactStore, digest
 
 
 class PipelineState(TypedDict, total=False):
+    graph_only: bool
+    fact_batches_ref: str
+    semantic_index: int
+    semantic_payload_ref: str
+    semantic_draft_ref: str
+    semantic_raw_draft_ref: str
+    semantic_anchoring_ref: str
+    semantic_canonical_ref: str
+    semantic_audit_ref: str
+    graph_quality_ref: str
     visual_attempt: int
     visual_feedback_ref: str
     source_aspects_ref: str
@@ -347,7 +367,7 @@ class Pipeline:
             self.store,
             Path(state["docs"]),
             None,
-            Path(state["template"]),
+            None if state.get("graph_only") else Path(state["template"]),
             state.get("brief", ""),
             getattr(settings, "asset_max_bytes", 10000000),
             getattr(settings, "asset_max_pixels", 20000000),
@@ -394,13 +414,18 @@ class Pipeline:
 
     def inventory_sources(self, state: PipelineState) -> dict:
         source = self.read(state, "snapshot_ref")
-        result = inventory(self.store, source)
+        try:
+            result = inventory(self.store, source)
+        except ValueError as error:
+            return self.issue(state, "inventory_sources", [str(error)], "inventory_sources")
         self.graph.add_evidence(result["spans"])
         self.graph.add_structure(result)
         return {
             "inventory_ref": self.store.put(result),
             "document_index": 0,
             "graph_index": 0,
+            "semantic_index": 0,
+            "fact_batches_ref": self.store.put([]),
             "assertions_ref": self.store.put([]),
             "exclusions_ref": self.store.put([]),
             "source_aspect_index": 0,
@@ -417,11 +442,10 @@ class Pipeline:
         if index >= len(batches):
             return {"route": "extract_document_batch"}
         spans = self.spans(state)
-        blocks = [spans[key] for key in batches[index]]
         draft = self.call(
             "inventory_aspects",
             {
-                "blocks": blocks,
+                **extraction_packet(inventory_record, index),
                 "feedback": self.read(state, "feedback_ref", []),
                 "previous": self.read(state, "draft_ref") if state.get("attempt") else None,
             },
@@ -475,10 +499,8 @@ class Pipeline:
                 ],
                 "inventory_sources",
             )
-        ids = inventory_record["document_batches"][state["document_index"]]
-        spans = self.spans(state)
         payload = {
-            "blocks": [spans[key] for key in ids],
+            **extraction_packet(inventory_record, state["document_index"]),
             "feedback": self.read(state, "feedback_ref", []),
             "previous": self.read(state, "draft_ref") if state.get("attempt") else None,
         }
@@ -504,14 +526,17 @@ class Pipeline:
     def verify_document_batch(self, state: PipelineState) -> dict:
         inventory_record = self.read(state, "inventory_ref")
         ids = inventory_record["document_batches"][state["document_index"]]
-        spans = self.spans(state)
         draft = self.read(state, "draft_ref")
         findings = []
+        packet = extraction_packet(inventory_record, state["document_index"])
+        allowed = {item["id"] for item in packet["blocks"] + packet["context_blocks"]}
         try:
             records = [
-                normalized_assertion({**item, "review_status": "verified"}, set(ids))
+                normalized_assertion({**item, "review_status": "verified"}, allowed)
                 for item in draft["assertions"]
             ]
+            if any(not set(record["evidence_ids"]).intersection(ids) for record in records):
+                findings.append("Every extracted fact must cite at least one owned source block")
         except (ValueError, TypeError) as error:
             records = []
             findings.append(str(error))
@@ -533,13 +558,13 @@ class Pipeline:
             self.call(
                 "verify_document",
                 {
-                    "blocks": [spans[key] for key in ids],
+                    **packet,
                     "draft": draft,
                 },
                 AuditDraft,
             )
             if not findings
-            else {"accepted": False, "findings": findings}
+            else {"accepted": False, "findings": []}
         )
         findings.extend(str(item) for item in audit.get("findings", []))
         if not audit.get("accepted") or findings:
@@ -558,7 +583,6 @@ class Pipeline:
     def audit_source_coverage(self, state: PipelineState) -> dict:
         inventory_record = self.read(state, "inventory_ref")
         ids = inventory_record["document_batches"][state["document_index"]]
-        spans = self.spans(state)
         pending = self.read(state, "pending_document_ref")
         aspects = [
             item
@@ -568,7 +592,7 @@ class Pipeline:
         audit = self.call(
             "audit_source_coverage",
             {
-                "blocks": [spans[key] for key in ids],
+                **extraction_packet(inventory_record, state["document_index"]),
                 "aspects": aspects,
                 "facts": pending["records"],
                 "non_substantive_candidates": [
@@ -593,6 +617,10 @@ class Pipeline:
         next_index = state["document_index"] + 1
         return {
             "assertions_ref": self.store.put(self.assertions(state) + pending["records"]),
+            "fact_batches_ref": self.store.put(
+                self.read(state, "fact_batches_ref", [])
+                + [[record["id"] for record in pending["records"]]]
+            ),
             "document_provenance_ref": self.store.put(
                 self.read(state, "document_provenance_ref", [])
                 + [self.read(state, "document_candidate_provenance_ref")]
@@ -613,6 +641,8 @@ class Pipeline:
         }
 
     def link_graph_batch(self, state: PipelineState) -> dict:
+        if not self.assertions(state):
+            return {"route": "propose_semantic_graph"}
         batch = _chunks(self.assertions(state), 50)[state["graph_index"]]
         self.graph.add_assertions(batch)
         return {"route": "verify_graph_batch"}
@@ -626,7 +656,99 @@ class Pipeline:
             "graph_index": next_index,
             "route": "link_graph_batch"
             if next_index < len(_chunks(self.assertions(state), 50))
-            else "finalize_graph",
+            else "propose_semantic_graph",
+        }
+
+    def propose_semantic_graph(self, state: PipelineState) -> dict:
+        index = state.get("semantic_index", 0)
+        batches = self.read(state, "fact_batches_ref", [])
+        if index >= len(batches):
+            return {"route": "finalize_graph"}
+        if not batches[index]:
+            return {"semantic_index": index + 1, "route": "propose_semantic_graph"}
+        packet = extraction_packet(self.read(state, "inventory_ref"), index)
+        fact_ids = set(batches[index])
+        payload = semantic_payload(
+            [fact for fact in self.assertions(state) if fact["id"] in fact_ids],
+            packet["blocks"],
+            packet["context_blocks"],
+            topic_register(self.graph),
+        )
+        payload.update({"stories": packet["stories"], "context_policy": packet["context_policy"]})
+        raw_draft = self.call(
+            "semantic_graph",
+            {
+                **payload,
+                "feedback": self.read(state, "feedback_ref", []),
+                "previous": self.read(state, "semantic_draft_ref")
+                if state.get("attempt")
+                else None,
+            },
+            SemanticGraphDraft,
+        )
+        draft, anchoring = anchor_semantic_quotes(raw_draft, payload)
+        return {
+            "semantic_payload_ref": self.store.put(payload),
+            "semantic_raw_draft_ref": self.store.put(raw_draft),
+            "semantic_anchoring_ref": self.store.put(anchoring),
+            "semantic_draft_ref": self.store.put(draft),
+            "route": "audit_semantic_graph",
+        }
+
+    def audit_semantic_graph(self, state: PipelineState) -> dict:
+        payload = self.read(state, "semantic_payload_ref")
+        draft = self.read(state, "semantic_draft_ref")
+        canonical, findings = validate_semantic_proposal(draft, payload)
+        audit = {"accepted": False, "findings": findings}
+        if not findings:
+            audit = self.call("audit_semantic_graph", {**payload, "draft": draft}, AuditDraft)
+            findings.extend(audit.get("findings", []))
+            if not audit["accepted"]:
+                findings.append("Independent semantic audit rejected the proposed graph")
+            if set(audit.get("covered_obligation_ids", [])) != {
+                fact["id"] for fact in payload["facts"]
+            }:
+                findings.append("Semantic audit must account for every verified fact")
+            if audit.get("missing_evidence_ids"):
+                findings.append("Semantic audit reported missing evidence")
+        if findings:
+            if state.get("attempt", 0) < self.repair_limit():
+                return {
+                    "attempt": state.get("attempt", 0) + 1,
+                    "feedback_ref": self.store.put(findings),
+                    "semantic_audit_ref": self.store.put(audit),
+                    "route": "propose_semantic_graph",
+                }
+            return self.issue(state, "audit_semantic_graph", findings, "propose_semantic_graph")
+        return {
+            "semantic_canonical_ref": self.store.put(canonical),
+            "semantic_audit_ref": self.store.put(audit),
+            "route": "publish_semantic_graph",
+        }
+
+    def publish_semantic_graph(self, state: PipelineState) -> dict:
+        model_name = getattr(getattr(self.model, "settings", None), "model", "test-double")
+        publish_semantic_batch(
+            self.graph,
+            self.read(state, "semantic_canonical_ref"),
+            f"{self.run_id}:{state['semantic_index']}",
+            {
+                "provider": "gemini" if model_name == "gemini-3.8-flash" else "test-double",
+                "model": model_name,
+                "sdk_version": version("google-genai"),
+                "prompt_version": "semantic_graph.v1",
+                "payload_ref": state["semantic_payload_ref"],
+                "draft_ref": state["semantic_draft_ref"],
+                "raw_draft_ref": state["semantic_raw_draft_ref"],
+                "anchoring_ref": state["semantic_anchoring_ref"],
+                "audit_ref": state["semantic_audit_ref"],
+            },
+        )
+        return {
+            "semantic_index": state["semantic_index"] + 1,
+            "attempt": 0,
+            "feedback_ref": "",
+            "route": "propose_semantic_graph",
         }
 
     def finalize_graph(self, state: PipelineState) -> dict:
@@ -646,7 +768,28 @@ class Pipeline:
         findings = self.graph.verify()
         if findings:
             return self.issue(state, "finalize_graph", findings, "finalize_graph")
-        revision = digest([state["snapshot_ref"], state["inventory_ref"], assertions, exclusions])
+        quality = semantic_quality_report(self.graph)
+        semantic = semantic_records(self.graph)
+        revision = digest(
+            [state["snapshot_ref"], state["inventory_ref"], assertions, exclusions, semantic]
+        )
+        quality["source_coverage"] = coverage_report(
+            self.read(state, "source_aspects_ref", []),
+            self.read(state, "source_decisions_ref", []),
+            {fact["id"] for fact in assertions},
+            state["snapshot_ref"],
+            revision,
+            self.read(state, "snapshot_ref").get("attachments", []),
+        )
+        if not quality["source_coverage"]["complete"]:
+            quality["accepted"] = False
+            quality["findings"].append("Source aspect or attachment coverage is incomplete")
+        if not quality["accepted"]:
+            self.store.write(
+                f"runs/{self.run_id}/graph-quality.json",
+                json.dumps(quality, ensure_ascii=False, indent=2),
+            )
+            return self.issue(state, "finalize_graph", quality["findings"], "finalize_graph")
         inventory_record = self.read(state, "inventory_ref")
         non_substantive = [
             {"path": path, **range_record}
@@ -657,11 +800,15 @@ class Pipeline:
             "schema": 1,
             "revision": revision,
             "source_revision": state["snapshot_ref"],
-            "data_hash": digest([assertions, exclusions]),
+            "data_hash": digest([assertions, exclusions, semantic]),
+            "semantic_schema": 1,
+            "graph_quality": quality,
             "model": getattr(getattr(self.model, "settings", None), "model", "test-double"),
             "parser_capabilities": sorted(
                 {metadata["capability"] for metadata in inventory_record["analysis"].values()}
+                | {inventory_record.get("parser_version", "legacy-document-parser")}
             ),
+            "story_count": len(inventory_record.get("stories", [])),
             "assertion_count": len(assertions),
             "evidence_count": len(spans),
             "excluded": exclusions,
@@ -692,7 +839,20 @@ class Pipeline:
                 indent=2,
             ),
         )
-        return {"graph_revision": revision, "status": "graph_ready", "route": "compile_template"}
+        self.store.write(
+            f"runs/{self.run_id}/graph-quality.json",
+            json.dumps(quality, ensure_ascii=False, indent=2),
+        )
+        return {
+            "graph_revision": revision,
+            "graph_quality_ref": self.store.put(quality),
+            "status": (
+                "awaiting_manual_review" if state.get("mode") == "manual" else "graph_complete"
+            )
+            if state.get("graph_only")
+            else "graph_ready",
+            "route": END if state.get("graph_only") else "compile_template",
+        }
 
     def compile_template(self, state: PipelineState) -> dict:
         source = self.read(state, "snapshot_ref")
@@ -3258,6 +3418,8 @@ class Pipeline:
             update = {"route": destination, "review_error": ""}
             if record["stage"] == "finalize_release":
                 update["status"] = state["completion_status"]
+            if record["stage"] == "finalize_graph" and state.get("graph_only"):
+                update["status"] = "graph_complete"
             return update
         if action == "reject":
             self.stages.record(
@@ -3267,6 +3429,7 @@ class Pipeline:
             )
             return {"route": END, "status": "rejected"}
         repair_targets = {
+            "audit_semantic_graph": "propose_semantic_graph",
             "verify_document_batch": "extract_document_batch",
             "validate_page_plan": "draft_page_plan",
             "verify_section": "write_section",
@@ -3274,6 +3437,7 @@ class Pipeline:
         }
         target = repair_targets.get(record["stage"], record["stage"])
         if action == "request_correction" and target in {
+            "propose_semantic_graph",
             "extract_document_batch",
             "draft_page_plan",
             "write_section",

@@ -115,6 +115,10 @@ function allRows() {
   return (g.tables.nodes || []).map((node) => {
     const a = assertions.get(node.id),
       e = evidence.get(node.id);
+    const semantic = (g.tables.semantic_nodes || []).find((row) => row.id === node.id)?.payload;
+    const quotes = (g.tables.semantic_quotes || [])
+      .filter((row) => row.owner_kind === "node" && row.owner_id === node.id)
+      .map((row) => row.payload);
     const support = (g.tables.support || [])
       .filter((row) => row.assertion_id === node.id)
       .map((row) => evidence.get(row.evidence_id))
@@ -141,6 +145,8 @@ function allRows() {
       source_kind: unique([origin(e), ...support.map(origin)]),
       assertion: a,
       evidence: e,
+      semantic,
+      quotes,
       support,
       provenance,
     };
@@ -256,6 +262,8 @@ function selectNode(id) {
     );
     for (const key of [
       "modality",
+      "operator",
+      "scope",
       "conditions",
       "exceptions",
       "categories",
@@ -263,7 +271,7 @@ function selectNode(id) {
       "temporal_status",
       "review_status",
     ]) {
-      const value = row.assertion?.[key] ?? row.evidence?.[key];
+      const value = row.semantic?.[key] ?? row.assertion?.[key] ?? row.evidence?.[key];
       if (value !== undefined) message(`${key}: ${compact(value)}`, summary);
     }
     for (const p of row.provenance || [])
@@ -292,6 +300,21 @@ function selectNode(id) {
     el("span", "  ->  ", block);
     sourceLink(edge.target_id, block, nodeLabel(edge.target_id));
     raw(edge, block);
+    for (const relation of g.tables.semantic_edges || []) {
+      if (relation.source_id === edge.source_id && relation.target_id === edge.target_id && relation.type === edge.type)
+        raw(relation.payload, block, "Exact source quotes supporting this relation");
+    }
+  }
+  if (row.quotes?.length) {
+    el("h3", "Exact source quotations", target);
+    for (const quote of row.quotes) {
+      const card = el("div", undefined, target, "card");
+      const evidence = g.enriched.evidence.find((item) => item.id === quote.evidence_id);
+      sourceLink(quote.evidence_id, card, evidence?.path || quote.evidence_id);
+      el("pre", quote.text, card);
+      message(`Source-span characters ${quote.start}–${quote.end} (end exclusive)`, card);
+      raw({ ...quote, file_hash: evidence?.file_hash, locator: evidence?.locator }, card, "Source identity and exact locator");
+    }
   }
   el("h3", "Original evidence", target);
   for (const evidence of row.support || []) {
@@ -374,6 +397,10 @@ function graphControls() {
       "support",
       "verified_relations",
       "evidence_service_state",
+      "semantic_nodes",
+      "semantic_edges",
+      "semantic_quotes",
+      "semantic_batches",
     ],
     state.table,
     (value) => {

@@ -28,6 +28,23 @@ Runs, including repeated item revisions, are under `.docgen/graph/runs/<thread-i
 
 Use `uv run docgen history --thread-id ID`, `uv run docgen inspect-evidence --thread-id ID --citation D1`, and `uv run docgen budget` for inspection. Resume always uses the stored mode. Changing inputs, policy or runtime implementation requires a new thread ID; incompatible checkpoints are not silently resumed.
 
+### Graph-only evaluation
+
+```powershell
+uv run docgen run --graph-only --mode autopilot --docs tests/fixtures/graph_formatting/prose.md --thread-id registration-graph-001
+uv run docgen inspect-run --workspace .docgen/graph --thread-id registration-graph-001 --output .docgen/inspection-registration
+```
+
+`--graph-only` needs no template and stops with `graph_complete` (exit code 0) after freezing the verified graph. It does not execute documentation planning or writing. The run includes `graph-quality.json`, `graph-manifest.json`, and sequential checkpointed semantic proposal, independent audit and publication stages (steps 41–43).
+
+The live formatting evaluation uses `DOCGEN_THINKING_LEVEL=low`, `DOCGEN_AUDIT_THINKING_LEVEL=medium` and `DOCGEN_OUTPUT_TOKENS=16384`. These can be set in `.env` or the process environment. Exact unique quotations are located by code; ambiguous matches still require a valid source occurrence. Raw model drafts and any corrected quote offsets remain in the stage artifacts.
+
+The Markdown parser retains exact original characters, heading ancestry and story context. Extraction owns each block once and receives supporting context separately. The semantic graph connects recurring scoped `Topic` nodes to `Rule` nodes, then to `ConditionGroup` (`all`, `any`, `unspecified`), `Condition` and `Exception` nodes. `EXPRESSES` links rules to verified assertions; `SUPPORTED_BY` links semantic records to original evidence. Every semantic relation retains exact supporting quotes. Retrieval exposes these records and precise original-source locators for later citation use.
+
+When a verified condition combines alternatives or prerequisites, a group's `source_conditions` binds its original phrasing to the elementary conditions and operator. The independent audit checks the decomposition against the original text; string retention alone does not establish semantic equivalence.
+
+Formatting regression tests use equivalent prose, lists, tables and headings with a controlled semantic oracle. They verify contracts, meaning comparisons and provenance; they do not prove that every live model response preserves meaning. Independent source and semantic audits must pass before a graph is frozen. Context that cannot be preserved within a bounded request is reported explicitly.
+
 ## Source links
 
 Each citation is checked against its frozen Markdown source and, when configured, a supplied local HTML export. Set `DOCGEN_SOURCE_PAGE_MAP` in `.env` to a JSON file mapping source IDs or original URLs to local HTML paths relative to the map file. Those HTML bytes are frozen for navigation verification only; they are never ingested as product facts. Without a map, the citation audit reports `markdown_projection_only`. If a reliable selector cannot be made, the reader links to a portable local evidence record and shows the original page separately. Production Confluence highlighting remains unverified unless a browser can open the authenticated original page.
