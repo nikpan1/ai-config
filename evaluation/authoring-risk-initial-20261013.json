@@ -1,0 +1,1773 @@
+{
+  "schema_version": 1,
+  "run_id": "authoring-risk-20261013",
+  "workspace": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\.docgen\\authoring-risk-20261013",
+  "status": "degraded_source_bundle",
+  "state_references": {
+    "limitations_ref": "03f7f823e39a555d71d0dfb25d328acb91330f8f659522deabb92679b18d0225",
+    "prefetched_extractions_ref": "285398714b9caee9c04e372e88952d8f869a2c55dfd4ffd458d995181190c879",
+    "fact_batches_ref": "e233791df0241277e27d8ef29c2223ed8889c44ddcdb6dc7944dd7083229a9be",
+    "semantic_payload_ref": "a31ccd0fac9ccc496dad6d8c7c30974af8e33de7bef9b3071c8b1ed6a8f3fc05",
+    "semantic_draft_ref": "435b07359737e29dc702d9f1d7e4f0def8c57c440d671bd79ea1fd9015526514",
+    "semantic_raw_draft_ref": "390218a1d9103fe4216cbb960258a8dde7a10386d3cb19d5af1920f087f21ec3",
+    "semantic_anchoring_ref": "c1ab7d16a1fddbe89d5f4708ce1c679c54c8f2614daf77bb3736aeec0eecdbcc",
+    "semantic_canonical_ref": "6ad2a1f531a81d179fb61365e546292f17caba9d0704903cfa88213324b9344a",
+    "semantic_audit_ref": "b056d59dfb0c1224f864f044940d3331a62312413245106d7be0d823de56ef63",
+    "graph_quality_ref": "b522f9c2afc59b28143155d74297259e99b0a8a7faae6d97b0f68639ece93381",
+    "source_aspects_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "source_decisions_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "source_non_substantive_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "source_coverage_ref": "ca77f9f586c70872866e823d5bf5a052d1efc28ae667028c2944309f2bd634d4",
+    "document_provenance_ref": "5a1a400e387010ecc3997fbfa44c3ecdcc6df30673acce12fc7c7fa982c8fb92",
+    "document_candidate_provenance_ref": "d2e9e12946be642c5ebaef556396eb478339f4300f0821a833aac0defa0a3176",
+    "snapshot_ref": "747629ace24fa1877bbfe6450256a40e2ed558a635411554074c64dc5d940611",
+    "inventory_ref": "db2bb447648ac182ce8c174de8d7434f10d81699fb60b55438398f9a455bc5c2",
+    "draft_ref": "",
+    "feedback_ref": "",
+    "assertions_ref": "f6f562eb51a72f073f69286dca69bbef9f556d142f438a020c7136ecb51c014b",
+    "exclusions_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "candidate_ref": "77abf6f6dbe5bd3d99ee612446ea7cc82cf122d8c058a7de2517e0ade36ad04e",
+    "issue_ref": "a3a7402a549edcd51fa1e3ed907ab39533773367eabd987f8d0a8c7bbe6f833e"
+  },
+  "recorded_event_window_seconds": 497.43981885910034,
+  "model_response_wall_union_seconds": 66.45201659202576,
+  "event_counts": {
+    "completed": 18,
+    "request": 8,
+    "response": 4,
+    "provider_error": 2,
+    "incomplete_response": 2
+  },
+  "stage_metrics": {
+    "snapshot_inputs": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "inventory_sources": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "describe_image": {
+      "requests": 2,
+      "responses": 2,
+      "response_seconds_sum": 9.09987700000056
+    },
+    "prepare_source_images": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "extract_document": {
+      "requests": 1,
+      "responses": 1,
+      "response_seconds_sum": 28.826690699999745
+    },
+    "extract_document_batch": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "verify_document_batch": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "link_graph_batch": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "verify_graph_batch": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "semantic_graph": {
+      "requests": 1,
+      "responses": 1,
+      "response_seconds_sum": 28.525448800002778
+    },
+    "propose_semantic_graph": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "audit_semantic_graph": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "publish_semantic_graph": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "finalize_graph": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "source_plan": {
+      "requests": 2,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "plan_source_document": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "source_document": {
+      "requests": 2,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "write_source_document": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "finalize_source_document": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    }
+  },
+  "quality_artifacts": {
+    "limitations_ref": [
+      "Automatic reconciliation of orphan Mongo audit records is planned but not implemented; current operations require a human review decision.",
+      "Draft submissions of Q2 are subject to a hard sunset deadline of 2026-09-01.",
+      "Image mockups (assets/questionnaire.jpg and assets/assessment-result.jpg) are model-interpreted test illustrations and do not dictate business rules independently.",
+      "Graph interpretation withheld: Withheld graph relationship 4: The questionnaire UI mockup visually illustrates draft D-104 configured for questionnaire version Q3.: quote does not match exact source characters",
+      "Graph interpretation withheld: Withheld graph relationship 5: The assessment result mockup visually reflects the 365-day review period corresponding to profile lifecycle rules.: quote does not match exact source characters",
+      "plan_source_document: Recoverable ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}",
+      "write_source_document: Recoverable ValueError: Incomplete or truncated Gemini response"
+    ],
+    "semantic_audit_ref": {
+      "accepted": null,
+      "findings": [
+        "Automatic reconciliation of orphan Mongo audit records is planned but not implemented; current operations require a human review decision.",
+        "Draft submissions of Q2 are subject to a hard sunset deadline of 2026-09-01.",
+        "Image mockups (assets/questionnaire.jpg and assets/assessment-result.jpg) are model-interpreted test illustrations and do not dictate business rules independently.",
+        "Withheld graph relationship 4: The questionnaire UI mockup visually illustrates draft D-104 configured for questionnaire version Q3.: quote does not match exact source characters",
+        "Withheld graph relationship 5: The assessment result mockup visually reflects the 365-day review period corresponding to profile lifecycle rules.: quote does not match exact source characters"
+      ],
+      "status": "source_links_validated_semantics_unreviewed"
+    },
+    "graph_quality_ref": {
+      "accepted": true,
+      "allocated_fact_count": 16,
+      "batch_count": 1,
+      "citations": [
+        {
+          "end": 2515,
+          "end_column": 99,
+          "end_line": 23,
+          "evidence_id": "13148b72a8052994bd5d",
+          "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+          "locator": {
+            "end": 2515,
+            "kind": "characters",
+            "start": 2426
+          },
+          "path": "risk-profiling.md",
+          "quote_locator": {
+            "end": 2515,
+            "kind": "characters",
+            "start": 2426
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 3723,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 2426,
+          "start_column": 10,
+          "start_line": 23,
+          "text": "A result expires 365 days after acceptance. | It remains visible in history after expiry."
+        },
+        {
+          "end": 1353,
+          "end_column": 109,
+          "end_line": 18,
+          "evidence_id": "13148b72a8052994bd5d",
+          "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+          "locator": {
+            "end": 1353,
+            "kind": "characters",
+            "start": 1254
+          },
+          "path": "risk-profiling.md",
+          "quote_locator": {
+            "end": 1353,
+            "kind": "characters",
+            "start": 1254
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 3723,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 1254,
+          "start_column": 10,
+          "start_line": 18,
+          "text": "PROFILE_PROCESSING consent at CP-3 is required. | Marketing consent alone never permits submission."
+        },
+        {
+          "end": 2734,
+          "end_column": 115,
+          "end_line": 24,
+          "evidence_id": "13148b72a8052994bd5d",
+          "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+          "locator": {
+            "end": 2734,
+            "kind": "characters",
+            "start": 2629
+          },
+          "path": "risk-profiling.md",
+          "quote_locator": {
+            "end": 2734,
+            "kind": "characters",
+            "start": 2629
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 3723,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 2629,
+          "start_column": 10,
+          "start_line": 24,
+          "text": "An orphan Mongo audit needs a review decision. | Automatic reconciliation is planned and not implemented."
+        },
+        {
+          "end": 1140,
+          "end_column": 87,
+          "end_line": 17,
+          "evidence_id": "13148b72a8052994bd5d",
+          "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+          "locator": {
+            "end": 1140,
+            "kind": "characters",
+            "start": 1063
+          },
+          "path": "risk-profiling.md",
+          "quote_locator": {
+            "end": 1140,
+            "kind": "characters",
+            "start": 1063
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 3723,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 1063,
+          "start_column": 10,
+          "start_line": 17,
+          "text": "Exactly 5 percent belongs to L5. | A 5.1 percent free-text answer is invalid."
+        },
+        {
+          "end": 1542,
+          "end_column": 85,
+          "end_line": 19,
+          "evidence_id": "13148b72a8052994bd5d",
+          "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+          "locator": {
+            "end": 1542,
+            "kind": "characters",
+            "start": 1467
+          },
+          "path": "risk-profiling.md",
+          "quote_locator": {
+            "end": 1542,
+            "kind": "characters",
+            "start": 1467
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 3723,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 1467,
+          "start_column": 10,
+          "start_line": 19,
+          "text": "RiskSignal is the only external business provider called by risk profiling."
+        },
+        {
+          "end": 3420,
+          "end_column": 142,
+          "end_line": 38,
+          "evidence_id": "13148b72a8052994bd5d",
+          "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+          "locator": {
+            "end": 3420,
+            "kind": "characters",
+            "start": 3371
+          },
+          "path": "risk-profiling.md",
+          "quote_locator": {
+            "end": 3420,
+            "kind": "characters",
+            "start": 3371
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 3723,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 3371,
+          "start_column": 93,
+          "start_line": 38,
+          "text": "RiskSignal &amp; platform share a correlation ID."
+        },
+        {
+          "end": 785,
+          "end_column": 102,
+          "end_line": 15,
+          "evidence_id": "13148b72a8052994bd5d",
+          "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+          "locator": {
+            "end": 785,
+            "kind": "characters",
+            "start": 693
+          },
+          "path": "risk-profiling.md",
+          "quote_locator": {
+            "end": 785,
+            "kind": "characters",
+            "start": 693
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 3723,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 693,
+          "start_column": 10,
+          "start_line": 15,
+          "text": "Experience uses NONE, BEGINNER, INTERMEDIATE and ADVANCED. | EXPERT is retired and rejected."
+        },
+        {
+          "end": 2084,
+          "end_column": 131,
+          "end_line": 21,
+          "evidence_id": "13148b72a8052994bd5d",
+          "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+          "locator": {
+            "end": 2084,
+            "kind": "characters",
+            "start": 1963
+          },
+          "path": "risk-profiling.md",
+          "quote_locator": {
+            "end": 2084,
+            "kind": "characters",
+            "start": 1963
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 3723,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 1963,
+          "start_column": 10,
+          "start_line": 21,
+          "text": "An incomplete RiskSignal response cannot become an accepted profile. | A missing reason code keeps the draft recoverable."
+        },
+        {
+          "end": 366,
+          "end_column": 156,
+          "end_line": 10,
+          "evidence_id": "13148b72a8052994bd5d",
+          "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+          "locator": {
+            "end": 366,
+            "kind": "characters",
+            "start": 211
+          },
+          "path": "risk-profiling.md",
+          "quote_locator": {
+            "end": 366,
+            "kind": "characters",
+            "start": 211
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 3723,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 211,
+          "start_column": 1,
+          "start_line": 10,
+          "text": "A concise synthetic profile journey for INV-100. Review the current profile before starting a new draft. Review the current profile after recovery as well."
+        },
+        {
+          "end": 373,
+          "end_column": 254,
+          "end_line": 3,
+          "evidence_id": "1fe65832e6264417b084",
+          "file_hash": "2e97059f1c4b402f42f7daa5fa1d97ae6572fe15f1ef0ee61253a713c18b5073",
+          "locator": {
+            "end": 373,
+            "kind": "characters",
+            "start": 120
+          },
+          "path": "assets/questionnaire.jpg.ai-description.md",
+          "quote_locator": {
+            "end": 373,
+            "kind": "characters",
+            "start": 120
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1117,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 120,
+          "start_column": 1,
+          "start_line": 3,
+          "text": "A user interface screenshot depicting a synthetic risk questionnaire mockup under 'Northstar Investment'. The main panel is titled 'Risk questionnaire' and displays five stacked input or selected fields along with draft metadata and footer mockup notes."
+        },
+        {
+          "end": 3331,
+          "end_column": 53,
+          "end_line": 38,
+          "evidence_id": "13148b72a8052994bd5d",
+          "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+          "locator": {
+            "end": 3331,
+            "kind": "characters",
+            "start": 3279
+          },
+          "path": "risk-profiling.md",
+          "quote_locator": {
+            "end": 3331,
+            "kind": "characters",
+            "start": 3279
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 3723,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 3279,
+          "start_column": 1,
+          "start_line": 38,
+          "text": "**No provider call** occurs for an incomplete draft."
+        },
+        {
+          "end": 1849,
+          "end_column": 130,
+          "end_line": 20,
+          "evidence_id": "13148b72a8052994bd5d",
+          "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+          "locator": {
+            "end": 1849,
+            "kind": "characters",
+            "start": 1729
+          },
+          "path": "risk-profiling.md",
+          "quote_locator": {
+            "end": 1849,
+            "kind": "characters",
+            "start": 1729
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 3723,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 1729,
+          "start_column": 10,
+          "start_line": 20,
+          "text": "A complete Q3 submission uses one stable idempotency key. | A duplicate with the same answers returns the stored result."
+        },
+        {
+          "end": 2312,
+          "end_column": 124,
+          "end_line": 22,
+          "evidence_id": "13148b72a8052994bd5d",
+          "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+          "locator": {
+            "end": 2312,
+            "kind": "characters",
+            "start": 2198
+          },
+          "path": "risk-profiling.md",
+          "quote_locator": {
+            "end": 2312,
+            "kind": "characters",
+            "start": 2198
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 3723,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 2198,
+          "start_column": 10,
+          "start_line": 22,
+          "text": "A failed reassessment leaves the prior unexpired profile active. | The failed attempt is not a new active profile."
+        },
+        {
+          "end": 949,
+          "end_column": 60,
+          "end_line": 16,
+          "evidence_id": "13148b72a8052994bd5d",
+          "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+          "locator": {
+            "end": 949,
+            "kind": "characters",
+            "start": 899
+          },
+          "path": "risk-profiling.md",
+          "quote_locator": {
+            "end": 949,
+            "kind": "characters",
+            "start": 899
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 3723,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 899,
+          "start_column": 10,
+          "start_line": 16,
+          "text": "Month 36 starts horizon H3. | Month 35 remains H1."
+        },
+        {
+          "end": 372,
+          "end_column": 249,
+          "end_line": 3,
+          "evidence_id": "6d6e8104bae3a4098f09",
+          "file_hash": "2055633c1be9677ae2da2229841ff9f79f3344e688cd96de5048b3eaa24fedf1",
+          "locator": {
+            "end": 372,
+            "kind": "characters",
+            "start": 124
+          },
+          "path": "assets/assessment-result.jpg.ai-description.md",
+          "quote_locator": {
+            "end": 372,
+            "kind": "characters",
+            "start": 124
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1304,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 124,
+          "start_column": 1,
+          "start_line": 3,
+          "text": "A synthetic UI mockup showing an assessment result interface for Northstar Investment. A dark green header bar is positioned at the top, followed by a main area containing the heading 'Assessment result', a subtitle identifying the accepted profile"
+        },
+        {
+          "end": 1615,
+          "end_column": 158,
+          "end_line": 19,
+          "evidence_id": "13148b72a8052994bd5d",
+          "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+          "locator": {
+            "end": 1615,
+            "kind": "characters",
+            "start": 1467
+          },
+          "path": "risk-profiling.md",
+          "quote_locator": {
+            "end": 1615,
+            "kind": "characters",
+            "start": 1467
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 3723,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 1467,
+          "start_column": 10,
+          "start_line": 19,
+          "text": "RiskSignal is the only external business provider called by risk profiling. | MarketPulse and CustodyBridge are unrelated to the profile submission."
+        },
+        {
+          "end": 579,
+          "end_column": 101,
+          "end_line": 14,
+          "evidence_id": "13148b72a8052994bd5d",
+          "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+          "locator": {
+            "end": 579,
+            "kind": "characters",
+            "start": 488
+          },
+          "path": "risk-profiling.md",
+          "quote_locator": {
+            "end": 579,
+            "kind": "characters",
+            "start": 488
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 3723,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 488,
+          "start_column": 10,
+          "start_line": 14,
+          "text": "Q3 is the current questionnaire version. | A Q2 draft cannot be submitted after 2026-09-01."
+        }
+      ],
+      "counts": {
+        "Concept": 12
+      },
+      "fact_count": 16,
+      "findings": [],
+      "graph_hash": "19bcd2052ee82ecbff7f367011eb5e3bb36d4b7b953dfe15d72a4775bf908a58",
+      "owned_source_count": 3,
+      "quote_count": 17,
+      "quoted_source_count": 3,
+      "schema_version": 1,
+      "semantic_edges": 32,
+      "source_count": 3,
+      "source_coverage": {
+        "accepted": null,
+        "aspects": {
+          "represented": 0,
+          "total": 0
+        },
+        "blocks": {
+          "total": 0
+        },
+        "complete": null,
+        "coverage_ratio": null,
+        "graph_revision": "2b70e95cf529c44b8aac90ea1f568a131b981c6d596647be2f71a1b0e9bbc700",
+        "integrity_findings": [],
+        "minimum_coverage": 0.9,
+        "omitted_aspects": [],
+        "qualifiers": {
+          "coverage_ratio": null,
+          "represented": 0,
+          "total": 0
+        },
+        "reason": "Source-first mode uses original context and a final document audit; no separate source-aspect inventory was audited",
+        "snapshot_id": "747629ace24fa1877bbfe6450256a40e2ed558a635411554074c64dc5d940611",
+        "status": "not_independently_measured",
+        "unresolved_attachments": []
+      },
+      "unallocated_fact_ids": [],
+      "uncertainties": [
+        "Automatic reconciliation of orphan Mongo audit records is planned but not implemented; current operations require a human review decision.",
+        "Draft submissions of Q2 are subject to a hard sunset deadline of 2026-09-01.",
+        "Image mockups (assets/questionnaire.jpg and assets/assessment-result.jpg) are model-interpreted test illustrations and do not dictate business rules independently.",
+        "Withheld graph relationship 4: The questionnaire UI mockup visually illustrates draft D-104 configured for questionnaire version Q3.: quote does not match exact source characters",
+        "Withheld graph relationship 5: The assessment result mockup visually reflects the 365-day review period corresponding to profile lifecycle rules.: quote does not match exact source characters"
+      ],
+      "verification": "Exact provenance and structure; semantic correctness requires independent model audit"
+    },
+    "source_coverage_ref": {
+      "audit_target_diagnostics": [],
+      "automatic_recovery_counts": {
+        "plan_source_document": 2,
+        "write_source_document": 2
+      },
+      "citation_repair_attempts_current_packet": 0,
+      "coordinator_interventions": "Measure externally; not observable inside pipeline",
+      "coverage_kind": "model_estimate_not_measured_information_recall",
+      "editorial_review": null,
+      "editorial_revisions": [],
+      "editorial_rounds": 0,
+      "exact_citations_valid": true,
+      "exported_content_hash": "419ac8aec76a2f2d51d56dd1f3649267602ad6935d1436d386615c8a73809465",
+      "exported_coverage_estimate": null,
+      "graph_revision": "2b70e95cf529c44b8aac90ea1f568a131b981c6d596647be2f71a1b0e9bbc700",
+      "limitations": [
+        "Automatic reconciliation of orphan Mongo audit records is planned but not implemented; current operations require a human review decision.",
+        "Draft submissions of Q2 are subject to a hard sunset deadline of 2026-09-01.",
+        "Image mockups (assets/questionnaire.jpg and assets/assessment-result.jpg) are model-interpreted test illustrations and do not dictate business rules independently.",
+        "Graph interpretation withheld: Withheld graph relationship 4: The questionnaire UI mockup visually illustrates draft D-104 configured for questionnaire version Q3.: quote does not match exact source characters",
+        "Graph interpretation withheld: Withheld graph relationship 5: The assessment result mockup visually reflects the 365-day review period corresponding to profile lifecycle rules.: quote does not match exact source characters",
+        "plan_source_document: Recoverable ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}",
+        "write_source_document: Recoverable ValueError: Incomplete or truncated Gemini response",
+        "Synthesis was unavailable. This is a source extract bundle, not completed documentation.",
+        "Document presentation still has structural issues requiring review",
+        "Final semantic audit was not completed"
+      ],
+      "paragraph_repairs": [],
+      "semantic_audit": null,
+      "semantic_audit_matches_exported_content": false,
+      "source_revision": "747629ace24fa1877bbfe6450256a40e2ed558a635411554074c64dc5d940611",
+      "status": "degraded_source_bundle",
+      "structure_findings": [
+        "Heading embedded in paragraph: paragraph-b88c58bac99df809",
+        "Visual embedded in paragraph: paragraph-b88c58bac99df809"
+      ],
+      "targeted_repair_counts": {},
+      "visual_findings": [],
+      "withheld_paragraphs": []
+    }
+  },
+  "ledger": [
+    {
+      "status": "settled",
+      "entries": 4,
+      "charged_pln": 0.1868977962
+    },
+    {
+      "status": "uncertain",
+      "entries": 4,
+      "charged_pln": 6.49947017655
+    }
+  ],
+  "graph": {
+    "node_types": {
+      "Assertion": 16,
+      "Concept": 12,
+      "SourceSpan": 3
+    },
+    "edge_types": {
+      "INTERPRETS": 16,
+      "RELATED": 4,
+      "SUPPORTED_BY": 28
+    },
+    "assertions": [
+      {
+        "id": "cb9b81a08eeedef14e78f338",
+        "statement": "For INV-100, the current profile must be reviewed before starting a new draft and also after recovery.",
+        "subject": "risk profile journey",
+        "predicate": "requires reviewing the current profile before starting a new draft and after recovery",
+        "scope": "INV-100",
+        "modality": "must",
+        "conditions": "[\"starting a new draft or completing recovery\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "a8be6ac93ca6ea61686f4799",
+        "statement": "Q3 is the current questionnaire version, and a Q2 draft cannot be submitted after 2026-09-01.",
+        "subject": "questionnaire version",
+        "predicate": "sets Q3 as current and prohibits Q2 submission after 2026-09-01",
+        "scope": "risk profiling",
+        "modality": "must",
+        "conditions": "[]",
+        "exceptions": "[\"A Q2 draft cannot be submitted after 2026-09-01\"]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "aad2855ba418904227acaf86",
+        "statement": "Experience uses NONE, BEGINNER, INTERMEDIATE and ADVANCED, while EXPERT is retired and rejected.",
+        "subject": "experience attribute",
+        "predicate": "accepts NONE, BEGINNER, INTERMEDIATE, and ADVANCED, and rejects EXPERT",
+        "scope": "risk profiling",
+        "modality": "must",
+        "conditions": "[]",
+        "exceptions": "[\"EXPERT is retired and rejected\"]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "ccf9486ceba031c0b1e239fd",
+        "statement": "Month 36 starts horizon H3, whereas Month 35 remains H1.",
+        "subject": "investment horizon",
+        "predicate": "maps Month 36 to horizon H3 while Month 35 remains H1",
+        "scope": "risk profiling",
+        "modality": "must",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "955c24530c68462b2e105c85",
+        "statement": "Exactly 5 percent belongs to loss tolerance tier L5, and a 5.1 percent free-text answer is invalid.",
+        "subject": "loss tolerance",
+        "predicate": "assigns exactly 5 percent to L5 and rejects 5.1 percent free-text answers",
+        "scope": "risk profiling",
+        "modality": "must",
+        "conditions": "[]",
+        "exceptions": "[\"A 5.1 percent free-text answer is invalid\"]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "b7bd997115f94b818a0f27cc",
+        "statement": "PROFILE_PROCESSING consent at CP-3 (Q3 consent) is required for submission, and marketing consent alone never permits submission.",
+        "subject": "profile submission consent",
+        "predicate": "requires PROFILE_PROCESSING consent at CP-3 and prohibits submission with marketing consent alone",
+        "scope": "risk profiling",
+        "modality": "must",
+        "conditions": "[\"PROFILE_PROCESSING consent at CP-3 is granted\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "34105645cb5e9fbe678c808f",
+        "statement": "RiskSignal is the only external business provider called by risk profiling, while MarketPulse and CustodyBridge are unrelated to profile submission.",
+        "subject": "RiskSignal",
+        "predicate": "is the sole external business provider called by risk profiling",
+        "scope": "risk profiling integration",
+        "modality": "must",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "1566a0e9ac3e5098c970a5a9",
+        "statement": "A complete Q3 submission uses one stable idempotency key, and a duplicate submission with the same answers returns the stored result.",
+        "subject": "Q3 submission idempotency",
+        "predicate": "uses one stable idempotency key and returns the stored result upon duplicate submission with matching answers",
+        "scope": "risk profiling",
+        "modality": "must",
+        "conditions": "[\"duplicate submission contains the same answers\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "88078f0b0d3242ddaed1d4a4",
+        "statement": "An incomplete RiskSignal response cannot become an accepted profile, and a missing reason code keeps the draft recoverable.",
+        "subject": "RiskSignal response validation",
+        "predicate": "prevents acceptance of incomplete responses and keeps the draft recoverable if a reason code is missing",
+        "scope": "risk profiling",
+        "modality": "must",
+        "conditions": "[\"RiskSignal response is incomplete or missing a reason code\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "c61b9d41f214359be2138cc6",
+        "statement": "A failed reassessment leaves the prior unexpired profile active until its original expiry, and the failed attempt is not a new active profile.",
+        "subject": "profile reassessment",
+        "predicate": "maintains the prior unexpired profile active until its original expiry upon reassessment failure",
+        "scope": "risk profiling",
+        "modality": "must",
+        "conditions": "[\"reassessment fails\", \"prior profile has not expired\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "0a0b23d1ec055bdf367b3519",
+        "statement": "A result expires 365 days after acceptance, but remains visible in history after expiry.",
+        "subject": "risk profile result lifecycle",
+        "predicate": "expires 365 days after acceptance while remaining visible in history",
+        "scope": "risk profiling",
+        "modality": "must",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "bdd5f9f3bca5aef9b0f32b1e",
+        "statement": "An orphan Mongo audit requires a human review decision; automatic reconciliation is planned and not implemented.",
+        "subject": "orphan Mongo audit",
+        "predicate": "requires a human review decision while automatic reconciliation remains planned and unimplemented",
+        "scope": "audit reconciliation",
+        "modality": "must",
+        "conditions": "[\"audit record is an orphan in Mongo\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "81cb3651797a445dc48def46",
+        "statement": "No external provider call occurs for an incomplete draft.",
+        "subject": "external provider call",
+        "predicate": "does not occur for an incomplete draft",
+        "scope": "risk profiling",
+        "modality": "must",
+        "conditions": "[\"draft is incomplete\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "de5834d944b33272301526e9",
+        "statement": "RiskSignal and the platform share a correlation ID.",
+        "subject": "RiskSignal integration",
+        "predicate": "shares a correlation ID with the platform",
+        "scope": "risk profiling integration",
+        "modality": "must",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "234f8d7bc168b8de8b51ad75",
+        "statement": "The assessment-result view mockup illustrates an accepted profile P-204 with Band R2 Measured, Rules RS-2026-09, Reasons HORIZON_3, LOSS_5, accepted 2026-10-01 UTC, and review after 365 days under Northstar Investment.",
+        "subject": "assessment-result view mockup",
+        "predicate": "displays accepted profile P-204 attributes including band, rules, reasons, acceptance timestamp, and review period",
+        "scope": "UI mockup observation",
+        "modality": "may",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "generated_image_description"
+      },
+      {
+        "id": "2ef8b7d81929392c78dc4304",
+        "statement": "The risk questionnaire view mockup illustrates draft D-104 for version Q3 with fields Experience: Beginner, Horizon: 3–7 years, Loss tolerance: 5%, Liquidity: Flexible, and Processing consent CP-3 under Northstar Investment.",
+        "subject": "risk questionnaire view mockup",
+        "predicate": "displays draft D-104 input fields and processing consent",
+        "scope": "UI mockup observation",
+        "modality": "may",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "generated_image_description"
+      }
+    ],
+    "source_count": 3,
+    "semantic_nodes": [
+      {
+        "concept_kind": "business_rule",
+        "description": "Investment horizon boundary where Month 36 starts horizon tier H3, whereas Month 35 remains in tier H1.",
+        "fact_ids": [
+          "ccf9486ceba031c0b1e239fd"
+        ],
+        "id": "semantic:concept:015661c01d25c66957700bf2",
+        "name": "Investment Horizon Classification",
+        "quotes": [
+          {
+            "end": 949,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 899,
+            "text": "Month 36 starts horizon H3. | Month 35 remains H1."
+          }
+        ],
+        "scope": "risk profiling",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "domain_lifecycle",
+        "description": "Profiles expire 365 days post-acceptance but remain visible in history. Failed reassessments keep the prior unexpired profile active until its original expiry rather than creating a new profile.",
+        "fact_ids": [
+          "0a0b23d1ec055bdf367b3519",
+          "c61b9d41f214359be2138cc6"
+        ],
+        "id": "semantic:concept:3bcdaf50cbaa781d4c78df17",
+        "name": "Profile Lifecycle and Expiry",
+        "quotes": [
+          {
+            "end": 2515,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 2426,
+            "text": "A result expires 365 days after acceptance. | It remains visible in history after expiry."
+          },
+          {
+            "end": 2312,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 2198,
+            "text": "A failed reassessment leaves the prior unexpired profile active. | The failed attempt is not a new active profile."
+          }
+        ],
+        "scope": "risk profiling",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "business_process",
+        "description": "Procedural journey for risk profiling where the current profile must be reviewed prior to starting a new draft and also following recovery.",
+        "fact_ids": [
+          "cb9b81a08eeedef14e78f338"
+        ],
+        "id": "semantic:concept:43666ddbc9dda20d60e9081a",
+        "name": "Risk Profile Journey",
+        "quotes": [
+          {
+            "end": 366,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 211,
+            "text": "A concise synthetic profile journey for INV-100. Review the current profile before starting a new draft. Review the current profile after recovery as well."
+          }
+        ],
+        "scope": "INV-100",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "compliance_rule",
+        "description": "PROFILE_PROCESSING consent at CP-3 (Q3 consent) is strictly required to submit; marketing consent alone is insufficient.",
+        "fact_ids": [
+          "b7bd997115f94b818a0f27cc"
+        ],
+        "id": "semantic:concept:46147771c507d663cdb46323",
+        "name": "Profile Submission Consent",
+        "quotes": [
+          {
+            "end": 1353,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1254,
+            "text": "PROFILE_PROCESSING consent at CP-3 is required. | Marketing consent alone never permits submission."
+          }
+        ],
+        "scope": "risk profiling",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "operational_procedure",
+        "description": "Orphan Mongo audit records require a human review decision; automatic reconciliation is planned but not implemented.",
+        "fact_ids": [
+          "bdd5f9f3bca5aef9b0f32b1e"
+        ],
+        "id": "semantic:concept:9495813dc4ee434102103e7b",
+        "name": "Mongo Audit Reconciliation",
+        "quotes": [
+          {
+            "end": 2734,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 2629,
+            "text": "An orphan Mongo audit needs a review decision. | Automatic reconciliation is planned and not implemented."
+          }
+        ],
+        "scope": "audit reconciliation",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "ui_mockup",
+        "description": "Model-generated observation of assets/questionnaire.jpg showing draft D-104 for version Q3 with input fields (Beginner, 3–7 years, 5%, Flexible) and CP-3 processing consent.",
+        "fact_ids": [
+          "2ef8b7d81929392c78dc4304"
+        ],
+        "id": "semantic:concept:c70f699ca61ce736c91e4734",
+        "name": "Questionnaire View Mockup",
+        "quotes": [
+          {
+            "end": 373,
+            "evidence_id": "1fe65832e6264417b084",
+            "start": 120,
+            "text": "A user interface screenshot depicting a synthetic risk questionnaire mockup under 'Northstar Investment'. The main panel is titled 'Risk questionnaire' and displays five stacked input or selected fields along with draft metadata and footer mockup notes."
+          }
+        ],
+        "scope": "UI mockup observation",
+        "status": "inferred",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "data_field",
+        "description": "Experience accepts NONE, BEGINNER, INTERMEDIATE, and ADVANCED. The EXPERT option is retired and rejected.",
+        "fact_ids": [
+          "aad2855ba418904227acaf86"
+        ],
+        "id": "semantic:concept:d6e7a5345407087ac1aa34fa",
+        "name": "Experience Attribute",
+        "quotes": [
+          {
+            "end": 785,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 693,
+            "text": "Experience uses NONE, BEGINNER, INTERMEDIATE and ADVANCED. | EXPERT is retired and rejected."
+          }
+        ],
+        "scope": "risk profiling",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "system_integration",
+        "description": "RiskSignal is the sole external provider called during risk profiling; MarketPulse and CustodyBridge are uninvolved. A shared correlation ID is used.",
+        "fact_ids": [
+          "34105645cb5e9fbe678c808f",
+          "81cb3651797a445dc48def46",
+          "de5834d944b33272301526e9"
+        ],
+        "id": "semantic:concept:df5618e208461d97a4721891",
+        "name": "RiskSignal Integration",
+        "quotes": [
+          {
+            "end": 3420,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 3371,
+            "text": "RiskSignal &amp; platform share a correlation ID."
+          },
+          {
+            "end": 3331,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 3279,
+            "text": "**No provider call** occurs for an incomplete draft."
+          },
+          {
+            "end": 1615,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1467,
+            "text": "RiskSignal is the only external business provider called by risk profiling. | MarketPulse and CustodyBridge are unrelated to the profile submission."
+          }
+        ],
+        "scope": "risk profiling integration",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "ui_mockup",
+        "description": "Model-generated observation of assets/assessment-result.jpg displaying accepted profile P-204 with Band R2 Measured, RS-2026-09 rules, and 365 days review period.",
+        "fact_ids": [
+          "234f8d7bc168b8de8b51ad75"
+        ],
+        "id": "semantic:concept:df6ae79af9a6dd8d9751e5be",
+        "name": "Assessment Result View Mockup",
+        "quotes": [
+          {
+            "end": 372,
+            "evidence_id": "6d6e8104bae3a4098f09",
+            "start": 124,
+            "text": "A synthetic UI mockup showing an assessment result interface for Northstar Investment. A dark green header bar is positioned at the top, followed by a main area containing the heading 'Assessment result', a subtitle identifying the accepted profile"
+          }
+        ],
+        "scope": "UI mockup observation",
+        "status": "inferred",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "product_configuration",
+        "description": "Q3 is the active questionnaire version. Submissions using a Q2 draft are barred after 2026-09-01.",
+        "fact_ids": [
+          "a8be6ac93ca6ea61686f4799"
+        ],
+        "id": "semantic:concept:e91c5159dc0cbf5da584c703",
+        "name": "Questionnaire Versions",
+        "quotes": [
+          {
+            "end": 579,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 488,
+            "text": "Q3 is the current questionnaire version. | A Q2 draft cannot be submitted after 2026-09-01."
+          }
+        ],
+        "scope": "risk profiling",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "business_rule",
+        "description": "Exactly 5 percent maps to loss tolerance tier L5, while a 5.1 percent free-text entry is invalid.",
+        "fact_ids": [
+          "955c24530c68462b2e105c85"
+        ],
+        "id": "semantic:concept:f3b7529a6b738ac73b6932b7",
+        "name": "Loss Tolerance",
+        "quotes": [
+          {
+            "end": 1140,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1063,
+            "text": "Exactly 5 percent belongs to L5. | A 5.1 percent free-text answer is invalid."
+          }
+        ],
+        "scope": "risk profiling",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "system_behavior",
+        "description": "Q3 submissions use a stable idempotency key returning the stored result on duplicate submission. Responses from RiskSignal that are incomplete or missing reason codes prevent acceptance, keeping drafts recoverable.",
+        "fact_ids": [
+          "1566a0e9ac3e5098c970a5a9",
+          "88078f0b0d3242ddaed1d4a4"
+        ],
+        "id": "semantic:concept:fabae53432bbfc92017b8572",
+        "name": "Submission Idempotency and Validation",
+        "quotes": [
+          {
+            "end": 2084,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1963,
+            "text": "An incomplete RiskSignal response cannot become an accepted profile. | A missing reason code keeps the draft recoverable."
+          },
+          {
+            "end": 1849,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1729,
+            "text": "A complete Q3 submission uses one stable idempotency key. | A duplicate with the same answers returns the stored result."
+          }
+        ],
+        "scope": "risk profiling",
+        "status": "direct",
+        "type": "Concept"
+      }
+    ],
+    "semantic_edges": [
+      {
+        "description": "Risk profiling submission triggers a call exclusively to RiskSignal once a draft is complete, using a shared correlation ID.",
+        "id": "semantic:edge:06b8d0d81d1761703714ed0f",
+        "label": "dispatches to external provider",
+        "quotes": [
+          {
+            "end": 1542,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1467,
+            "text": "RiskSignal is the only external business provider called by risk profiling."
+          },
+          {
+            "end": 3331,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 3279,
+            "text": "**No provider call** occurs for an incomplete draft."
+          }
+        ],
+        "source_id": "semantic:concept:fabae53432bbfc92017b8572",
+        "status": "direct",
+        "target_id": "semantic:concept:df5618e208461d97a4721891",
+        "type": "RELATED"
+      },
+      {
+        "id": "semantic:edge:1141c5827c3101348f60ea65",
+        "quotes": [
+          {
+            "end": 3420,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 3371,
+            "text": "RiskSignal &amp; platform share a correlation ID."
+          },
+          {
+            "end": 3331,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 3279,
+            "text": "**No provider call** occurs for an incomplete draft."
+          },
+          {
+            "end": 1615,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1467,
+            "text": "RiskSignal is the only external business provider called by risk profiling. | MarketPulse and CustodyBridge are unrelated to the profile submission."
+          }
+        ],
+        "source_id": "semantic:concept:df5618e208461d97a4721891",
+        "target_id": "13148b72a8052994bd5d",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:19b18100d6d6870c11e9ae2e",
+        "quotes": [
+          {
+            "end": 3420,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 3371,
+            "text": "RiskSignal &amp; platform share a correlation ID."
+          },
+          {
+            "end": 3331,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 3279,
+            "text": "**No provider call** occurs for an incomplete draft."
+          },
+          {
+            "end": 1615,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1467,
+            "text": "RiskSignal is the only external business provider called by risk profiling. | MarketPulse and CustodyBridge are unrelated to the profile submission."
+          }
+        ],
+        "source_id": "semantic:concept:df5618e208461d97a4721891",
+        "target_id": "81cb3651797a445dc48def46",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:1a2ef1cccd01b2861ee1f252",
+        "quotes": [
+          {
+            "end": 2734,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 2629,
+            "text": "An orphan Mongo audit needs a review decision. | Automatic reconciliation is planned and not implemented."
+          }
+        ],
+        "source_id": "semantic:concept:9495813dc4ee434102103e7b",
+        "target_id": "bdd5f9f3bca5aef9b0f32b1e",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:1bbf3b540e6b440449c2e740",
+        "quotes": [
+          {
+            "end": 3420,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 3371,
+            "text": "RiskSignal &amp; platform share a correlation ID."
+          },
+          {
+            "end": 3331,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 3279,
+            "text": "**No provider call** occurs for an incomplete draft."
+          },
+          {
+            "end": 1615,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1467,
+            "text": "RiskSignal is the only external business provider called by risk profiling. | MarketPulse and CustodyBridge are unrelated to the profile submission."
+          }
+        ],
+        "source_id": "semantic:concept:df5618e208461d97a4721891",
+        "target_id": "de5834d944b33272301526e9",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:1bd92a184b3ba08a4a08da0b",
+        "quotes": [
+          {
+            "end": 1140,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1063,
+            "text": "Exactly 5 percent belongs to L5. | A 5.1 percent free-text answer is invalid."
+          }
+        ],
+        "source_id": "semantic:concept:f3b7529a6b738ac73b6932b7",
+        "target_id": "13148b72a8052994bd5d",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:1c49c00a4fed292e345e44ae",
+        "quotes": [
+          {
+            "end": 949,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 899,
+            "text": "Month 36 starts horizon H3. | Month 35 remains H1."
+          }
+        ],
+        "source_id": "semantic:concept:015661c01d25c66957700bf2",
+        "target_id": "ccf9486ceba031c0b1e239fd",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:2a0baa8900eba41c1ca7ce97",
+        "quotes": [
+          {
+            "end": 1353,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1254,
+            "text": "PROFILE_PROCESSING consent at CP-3 is required. | Marketing consent alone never permits submission."
+          }
+        ],
+        "source_id": "semantic:concept:46147771c507d663cdb46323",
+        "target_id": "13148b72a8052994bd5d",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:485c787f13a8934109951283",
+        "quotes": [
+          {
+            "end": 366,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 211,
+            "text": "A concise synthetic profile journey for INV-100. Review the current profile before starting a new draft. Review the current profile after recovery as well."
+          }
+        ],
+        "source_id": "semantic:concept:43666ddbc9dda20d60e9081a",
+        "target_id": "cb9b81a08eeedef14e78f338",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:4de9f6253de1c00f0ac0ef11",
+        "quotes": [
+          {
+            "end": 2084,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1963,
+            "text": "An incomplete RiskSignal response cannot become an accepted profile. | A missing reason code keeps the draft recoverable."
+          },
+          {
+            "end": 1849,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1729,
+            "text": "A complete Q3 submission uses one stable idempotency key. | A duplicate with the same answers returns the stored result."
+          }
+        ],
+        "source_id": "semantic:concept:fabae53432bbfc92017b8572",
+        "target_id": "13148b72a8052994bd5d",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:5137c401533a1a583cc73bb6",
+        "quotes": [
+          {
+            "end": 373,
+            "evidence_id": "1fe65832e6264417b084",
+            "start": 120,
+            "text": "A user interface screenshot depicting a synthetic risk questionnaire mockup under 'Northstar Investment'. The main panel is titled 'Risk questionnaire' and displays five stacked input or selected fields along with draft metadata and footer mockup notes."
+          }
+        ],
+        "source_id": "semantic:concept:c70f699ca61ce736c91e4734",
+        "target_id": "2ef8b7d81929392c78dc4304",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:543a26401696e3053f3eac27",
+        "quotes": [
+          {
+            "end": 949,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 899,
+            "text": "Month 36 starts horizon H3. | Month 35 remains H1."
+          }
+        ],
+        "source_id": "semantic:concept:015661c01d25c66957700bf2",
+        "target_id": "13148b72a8052994bd5d",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:564934da24cc02939e41e02b",
+        "quotes": [
+          {
+            "end": 366,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 211,
+            "text": "A concise synthetic profile journey for INV-100. Review the current profile before starting a new draft. Review the current profile after recovery as well."
+          }
+        ],
+        "source_id": "semantic:concept:43666ddbc9dda20d60e9081a",
+        "target_id": "13148b72a8052994bd5d",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "description": "PROFILE_PROCESSING consent at CP-3 is an indispensable prerequisite before submitting a draft for idempotency evaluation and external assessment.",
+        "id": "semantic:edge:5bd8a39df5c866030ce404a4",
+        "label": "required for submission",
+        "quotes": [
+          {
+            "end": 1353,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1254,
+            "text": "PROFILE_PROCESSING consent at CP-3 is required. | Marketing consent alone never permits submission."
+          }
+        ],
+        "source_id": "semantic:concept:46147771c507d663cdb46323",
+        "status": "direct",
+        "target_id": "semantic:concept:fabae53432bbfc92017b8572",
+        "type": "RELATED"
+      },
+      {
+        "description": "Accepted profile submissions enter the lifecycle with a 365-day validity, while failed reassessment attempts keep the existing unexpired profile in force.",
+        "id": "semantic:edge:5dcffc8b4a6ebcb5f846e2b6",
+        "label": "transitions profile state",
+        "quotes": [
+          {
+            "end": 2515,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 2426,
+            "text": "A result expires 365 days after acceptance. | It remains visible in history after expiry."
+          },
+          {
+            "end": 2312,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 2198,
+            "text": "A failed reassessment leaves the prior unexpired profile active. | The failed attempt is not a new active profile."
+          }
+        ],
+        "source_id": "semantic:concept:fabae53432bbfc92017b8572",
+        "status": "direct",
+        "target_id": "semantic:concept:3bcdaf50cbaa781d4c78df17",
+        "type": "RELATED"
+      },
+      {
+        "id": "semantic:edge:7086b6b8422cb7bce7e17e37",
+        "quotes": [
+          {
+            "end": 1353,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1254,
+            "text": "PROFILE_PROCESSING consent at CP-3 is required. | Marketing consent alone never permits submission."
+          }
+        ],
+        "source_id": "semantic:concept:46147771c507d663cdb46323",
+        "target_id": "b7bd997115f94b818a0f27cc",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:76eb1b3afa75ab8f9644d6fe",
+        "quotes": [
+          {
+            "end": 373,
+            "evidence_id": "1fe65832e6264417b084",
+            "start": 120,
+            "text": "A user interface screenshot depicting a synthetic risk questionnaire mockup under 'Northstar Investment'. The main panel is titled 'Risk questionnaire' and displays five stacked input or selected fields along with draft metadata and footer mockup notes."
+          }
+        ],
+        "source_id": "semantic:concept:c70f699ca61ce736c91e4734",
+        "target_id": "1fe65832e6264417b084",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:788aa1c71634f29f597e7dc5",
+        "quotes": [
+          {
+            "end": 372,
+            "evidence_id": "6d6e8104bae3a4098f09",
+            "start": 124,
+            "text": "A synthetic UI mockup showing an assessment result interface for Northstar Investment. A dark green header bar is positioned at the top, followed by a main area containing the heading 'Assessment result', a subtitle identifying the accepted profile"
+          }
+        ],
+        "source_id": "semantic:concept:df6ae79af9a6dd8d9751e5be",
+        "target_id": "6d6e8104bae3a4098f09",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:7a589ef7d2e387c0814f0863",
+        "quotes": [
+          {
+            "end": 2515,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 2426,
+            "text": "A result expires 365 days after acceptance. | It remains visible in history after expiry."
+          },
+          {
+            "end": 2312,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 2198,
+            "text": "A failed reassessment leaves the prior unexpired profile active. | The failed attempt is not a new active profile."
+          }
+        ],
+        "source_id": "semantic:concept:3bcdaf50cbaa781d4c78df17",
+        "target_id": "c61b9d41f214359be2138cc6",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:868c1252230f8e325f69540d",
+        "quotes": [
+          {
+            "end": 1140,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1063,
+            "text": "Exactly 5 percent belongs to L5. | A 5.1 percent free-text answer is invalid."
+          }
+        ],
+        "source_id": "semantic:concept:f3b7529a6b738ac73b6932b7",
+        "target_id": "955c24530c68462b2e105c85",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:90712651039626603290c59e",
+        "quotes": [
+          {
+            "end": 2084,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1963,
+            "text": "An incomplete RiskSignal response cannot become an accepted profile. | A missing reason code keeps the draft recoverable."
+          },
+          {
+            "end": 1849,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1729,
+            "text": "A complete Q3 submission uses one stable idempotency key. | A duplicate with the same answers returns the stored result."
+          }
+        ],
+        "source_id": "semantic:concept:fabae53432bbfc92017b8572",
+        "target_id": "1566a0e9ac3e5098c970a5a9",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:931c7b1a3beb4d09fba96e97",
+        "quotes": [
+          {
+            "end": 2515,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 2426,
+            "text": "A result expires 365 days after acceptance. | It remains visible in history after expiry."
+          },
+          {
+            "end": 2312,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 2198,
+            "text": "A failed reassessment leaves the prior unexpired profile active. | The failed attempt is not a new active profile."
+          }
+        ],
+        "source_id": "semantic:concept:3bcdaf50cbaa781d4c78df17",
+        "target_id": "13148b72a8052994bd5d",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:a18c760a862ea18f695d8671",
+        "quotes": [
+          {
+            "end": 2515,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 2426,
+            "text": "A result expires 365 days after acceptance. | It remains visible in history after expiry."
+          },
+          {
+            "end": 2312,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 2198,
+            "text": "A failed reassessment leaves the prior unexpired profile active. | The failed attempt is not a new active profile."
+          }
+        ],
+        "source_id": "semantic:concept:3bcdaf50cbaa781d4c78df17",
+        "target_id": "0a0b23d1ec055bdf367b3519",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:aeeba8fa119bed9c020d1a0a",
+        "quotes": [
+          {
+            "end": 579,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 488,
+            "text": "Q3 is the current questionnaire version. | A Q2 draft cannot be submitted after 2026-09-01."
+          }
+        ],
+        "source_id": "semantic:concept:e91c5159dc0cbf5da584c703",
+        "target_id": "a8be6ac93ca6ea61686f4799",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:bc7ad80df9c5a68124a079e8",
+        "quotes": [
+          {
+            "end": 3420,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 3371,
+            "text": "RiskSignal &amp; platform share a correlation ID."
+          },
+          {
+            "end": 3331,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 3279,
+            "text": "**No provider call** occurs for an incomplete draft."
+          },
+          {
+            "end": 1615,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1467,
+            "text": "RiskSignal is the only external business provider called by risk profiling. | MarketPulse and CustodyBridge are unrelated to the profile submission."
+          }
+        ],
+        "source_id": "semantic:concept:df5618e208461d97a4721891",
+        "target_id": "34105645cb5e9fbe678c808f",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:e01ea583d63a147c416b7f41",
+        "quotes": [
+          {
+            "end": 785,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 693,
+            "text": "Experience uses NONE, BEGINNER, INTERMEDIATE and ADVANCED. | EXPERT is retired and rejected."
+          }
+        ],
+        "source_id": "semantic:concept:d6e7a5345407087ac1aa34fa",
+        "target_id": "aad2855ba418904227acaf86",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:e5776ff7354d0d1bd3401366",
+        "quotes": [
+          {
+            "end": 2734,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 2629,
+            "text": "An orphan Mongo audit needs a review decision. | Automatic reconciliation is planned and not implemented."
+          }
+        ],
+        "source_id": "semantic:concept:9495813dc4ee434102103e7b",
+        "target_id": "13148b72a8052994bd5d",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:e9f24d346268fa8e0eba4233",
+        "quotes": [
+          {
+            "end": 372,
+            "evidence_id": "6d6e8104bae3a4098f09",
+            "start": 124,
+            "text": "A synthetic UI mockup showing an assessment result interface for Northstar Investment. A dark green header bar is positioned at the top, followed by a main area containing the heading 'Assessment result', a subtitle identifying the accepted profile"
+          }
+        ],
+        "source_id": "semantic:concept:df6ae79af9a6dd8d9751e5be",
+        "target_id": "234f8d7bc168b8de8b51ad75",
+        "type": "INTERPRETS"
+      },
+      {
+        "description": "The risk profile journey operates on questionnaire versions, mandating Q3 while disallowing Q2 submissions after September 1, 2026.",
+        "id": "semantic:edge:ec224eaf63ee916e3a00e071",
+        "label": "governed by questionnaire version",
+        "quotes": [
+          {
+            "end": 366,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 211,
+            "text": "A concise synthetic profile journey for INV-100. Review the current profile before starting a new draft. Review the current profile after recovery as well."
+          },
+          {
+            "end": 579,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 488,
+            "text": "Q3 is the current questionnaire version. | A Q2 draft cannot be submitted after 2026-09-01."
+          }
+        ],
+        "source_id": "semantic:concept:43666ddbc9dda20d60e9081a",
+        "status": "direct",
+        "target_id": "semantic:concept:e91c5159dc0cbf5da584c703",
+        "type": "RELATED"
+      },
+      {
+        "id": "semantic:edge:f29de4f11f0662e2f514658b",
+        "quotes": [
+          {
+            "end": 579,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 488,
+            "text": "Q3 is the current questionnaire version. | A Q2 draft cannot be submitted after 2026-09-01."
+          }
+        ],
+        "source_id": "semantic:concept:e91c5159dc0cbf5da584c703",
+        "target_id": "13148b72a8052994bd5d",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:f97e7b0f9272d63843636d83",
+        "quotes": [
+          {
+            "end": 2084,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1963,
+            "text": "An incomplete RiskSignal response cannot become an accepted profile. | A missing reason code keeps the draft recoverable."
+          },
+          {
+            "end": 1849,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 1729,
+            "text": "A complete Q3 submission uses one stable idempotency key. | A duplicate with the same answers returns the stored result."
+          }
+        ],
+        "source_id": "semantic:concept:fabae53432bbfc92017b8572",
+        "target_id": "88078f0b0d3242ddaed1d4a4",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:ff187194ea127bc6ffd26361",
+        "quotes": [
+          {
+            "end": 785,
+            "evidence_id": "13148b72a8052994bd5d",
+            "start": 693,
+            "text": "Experience uses NONE, BEGINNER, INTERMEDIATE and ADVANCED. | EXPERT is retired and rejected."
+          }
+        ],
+        "source_id": "semantic:concept:d6e7a5345407087ac1aa34fa",
+        "target_id": "13148b72a8052994bd5d",
+        "type": "SUPPORTED_BY"
+      }
+    ]
+  },
+  "limitations": [
+    "Node counts and successful audits are not semantic accuracy measurements.",
+    "The recorded event window excludes process startup and shutdown.",
+    "Model response sums can include concurrent requests.",
+    "Coordinator interventions must be supplied from the execution record, not inferred."
+  ]
+}

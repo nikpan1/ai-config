@@ -1,0 +1,25 @@
+{
+  "method": "Mermaid parser in isolated Node and jsdom; grammar validation only, no pixel rendering or semantic entailment check.",
+  "results": [
+    {
+      "path": ".docgen/authoring-verified-risk-20261013/runs/authoring-verified-risk-20261013/output/documentation.md",
+      "diagram": 1,
+      "valid": true
+    },
+    {
+      "path": ".docgen/authoring-verified-library-20261013/runs/authoring-verified-library-20261013/output/documentation.md",
+      "diagram": 1,
+      "valid": true
+    },
+    {
+      "path": ".docgen/authoring-verified-appointments-20261013/runs/authoring-verified-appointments-20261013/output/documentation.md",
+      "diagram": 1,
+      "valid": true
+    },
+    {
+      "path": ".docgen/authoring-verified-appointments-20261013/runs/authoring-verified-appointments-20261013/output/documentation.md",
+      "diagram": 2,
+      "valid": true
+    }
+  ]
+}

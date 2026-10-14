@@ -48,55 +48,13 @@ Risk Profiling authoring examples:
 > - The citation labels in worked examples are placeholders only. Replace them with precise excerpt links and group them according to these rules in generated output.
 
 > **Visual Presentation Contract — every image and diagram:**
-> - Place each visual in its own HTML table with exactly two rows and one column. The first row contains the Markdown image attachment or Mermaid diagram. The second row contains a centered, bold, descriptive business title.
-> - Apply this layout to screenshots, mockups, previews, photographs, and all generated diagrams, including the main process diagram in Section 4.1. Do not leave a visual as a standalone image or Mermaid block outside this wrapper.
-> - Give images meaningful alternative text. Keep captions in business language and do not invent details absent from the source. A diagram's nodes, decisions, and relationships must remain individually traceable in the audit records.
-> - Put any concise grouped visual reference immediately after the table, outside its two rows. Do not add a third source row or repeat the same citation in the visual, caption, and surrounding sentences.
-> - Preserve relative asset paths and valid Mermaid syntax. The publication renderer must process Markdown images and Mermaid inside the HTML cells; verify the rendered result rather than assuming that every Markdown renderer supports this nesting. Blank lines around the embedded Markdown are intentional.
-> - These examples specify formatting only. Replace placeholders with source-backed content and omit instructional text from the generated page.
+> - Store each visual separately from prose with its kind, approved image hash or Mermaid source, meaningful alternative text, a concise business caption, and exact source quotations.
+> - Render images as ordinary Markdown attachments and diagrams as fenced Mermaid blocks. Never use HTML tables, cells, figures, or layout wrappers.
+> - Place a bold numbered caption immediately beneath every visual: **Figure 1. Descriptive business title**. Number figures consecutively across the page. Put compact evidence references beside the caption.
+> - Use business-language captions without invented detail. Every diagram decision, relationship, and outcome requires source support. Preserve necessary versus sufficient conditions and current versus planned behavior in diagram labels and arrows.
+> - Prefer small flowchart diagrams with quoted node labels. Do not invent a process merely to fill the template. The code renderer owns layout, captions, heading levels, and numbering.
 
-Image layout:
-
-```html
-<table>
-  <tr>
-    <td>
-
-![Meaningful alternative text](assets/source-image.jpg)
-
-</td>
-  </tr>
-  <tr>
-    <td style="text-align: center;">
-      <strong>Descriptive business title</strong>
-    </td>
-  </tr>
-</table>
-```
-
-Diagram layout:
-
-````html
-<table>
-  <tr>
-    <td>
-
-```mermaid
-flowchart LR
-    A[Business entry condition] --> B[Business outcome]
-```
-
-</td>
-  </tr>
-  <tr>
-    <td style="text-align: center;">
-      <strong>Descriptive business process title</strong>
-    </td>
-  </tr>
-</table>
-````
-
-> **Final Acceptance Check:** Preserve the numbered template hierarchy and the single-page structure. Confirm that Core Functionalities and all other business sections contain no implementation narration, every material business qualifier remains represented, each visible citation resolves to precise support without redundant repetition, and every visual renders in the required two-row table. Template instructions, authoring contracts, placeholders, and worked examples are instructions to the generator, not content to reproduce in the final document. Use the actual epic title; do not add "Plan" to a documentation title.
+> **Final Acceptance Check:** Preserve the approved hierarchy; the renderer assigns consecutive numbers to the retained sections and the single-page structure. Confirm that Core Functionalities and all other business sections contain no implementation narration, every material business qualifier remains represented, each visible citation resolves to precise support without redundant repetition, and every visual has its caption immediately below it without an HTML wrapper. Template instructions, authoring contracts, placeholders, and worked examples are instructions to the generator, not content to reproduce in the final document. Use the actual epic title; do not add "Plan" to a documentation title.
 
 ---
 
@@ -179,23 +137,12 @@ flowchart LR
 
 ### 4.1 Main Process Overview
 
-<table>
-  <tr>
-    <td>
-
 ```mermaid
 flowchart LR
-    A[Phase 1: Initiation] --> B[Phase 2: Rules & Validation] --> C[Phase 3: Core Processing] --> D[Phase 4: Completion]
+    A["Source-backed entry condition"] --> B["Source-backed outcome"]
 ```
 
-</td>
-  </tr>
-  <tr>
-    <td style="text-align: center;">
-      <strong>[Source-backed business process title]</strong>
-    </td>
-  </tr>
-</table>
+**Figure 1. Source-backed business process title**
 
 1. **[Phase 1 Title]:** Source-backed initiator and entry condition.
 2. **[Phase 2 Title]:** Source-backed major business phase and decision point.
@@ -225,8 +172,8 @@ flowchart LR
 * **Target Audience:** Implementation Engineers, Business Analysts, Product Managers, System Integrators, Client Configuration Owners
 
 > **Authoring Contract:**
-> * **Role:** This mandatory section is the single source of truth for exactly what the client must configure, define, or deliver inside the system before each Section 3 functionality can operate.
-> * **Required Structure:** Organize content by Section 3 core functionality/process, one subsection per functionality (or closely related functionality group) that has a client-configurable dependency; name the functionality it enables in each subsection heading. Skip a functionality only when the corpus shows no client-configurable dependency for it.
+> * **Role:** When supported by explicit source evidence, this section is the single source of truth for exactly what the client must configure, define, or deliver inside the system before each Section 3 functionality can operate.
+> * **Required Structure:** Organize content by core functionality/process, one approved subsection per functionality (or closely related functionality group) that has a client-configurable dependency; name the functionality it enables in each subsection heading. Skip a functionality only when the corpus shows no client-configurable dependency for it.
 > * **Per-Functionality Content:** For each functionality, extract every source-backed configuration item the client must set up in the system: business parameter or default value, threshold or limit, validation or decision rule, controlled vocabulary or dictionary entry, document or communication template, permission or role assignment, and business-tunable calculation formula. State the exact configured value or rule from the source, why the functionality cannot operate correctly without it, and the concrete consequence (blocked process, fallback default, error, incorrect calculation) when it is missing or incomplete.
 > * **Out of Scope:** Deployment settings, infrastructure, internal service configuration, code, schemas, integrations, and algorithm implementation.
 > * **Formatting Requirement:** Use one Markdown table per functionality with columns Configuration Item, Required Value / Business Rule, Required or Optional, and Impact if Missing.
@@ -240,10 +187,10 @@ flowchart LR
 * **Target Audience:** Frontend Engineers, UI/UX Designers, Business Analysts, Stakeholders
 
 > **Authoring Contract:**
-> * **Role:** This mandatory section acts as the central repository for all visual representations on the page.
+> * **Role:** When useful source images exist, this section acts as the central repository for all visual representations on the page.
 > * **Guideline:** Sections 1-4 should not be cluttered with UI screens; they focus on the "what" and "why" and include at most one preview per core functionality. This section holds the visual "how".
 > * **In Scope:** Inventory of user interfaces, screen layouts, mockups, modal dialogs, component state transitions, and user interaction paths grouped logically.
-> * **Visual Layout:** Every visual uses the two-row, one-column HTML table defined in the Visual Presentation Contract: visual above, centered bold business title below. Group precise evidence references immediately after the table.
+> * **Visual Layout:** Every visual follows the Visual Presentation Contract: Markdown image or Mermaid block, followed immediately by a bold numbered business caption and precise evidence references.
 
 ---
 

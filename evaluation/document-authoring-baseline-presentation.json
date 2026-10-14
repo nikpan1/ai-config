@@ -1,0 +1,239 @@
+{
+  "method": "Read-only Markdown inspection, no model calls or document mutations",
+  "documents": [
+    {
+      "path": ".docgen\\business-final-risk-20261013\\runs\\business-final-risk-20261013\\output\\documentation.md",
+      "sha256": "9dd1379e3e7fa4e0fbdcdfa760354bd8559d6afb70bdb1b9379e14a44905a33e",
+      "headings": [
+        {
+          "line": 1,
+          "level": 1,
+          "title": "INV-100: Risk Profiling",
+          "number": null
+        },
+        {
+          "line": 3,
+          "level": 2,
+          "title": "1. Executive Summary",
+          "number": "1"
+        },
+        {
+          "line": 11,
+          "level": 2,
+          "title": "2. Business Context & Scope",
+          "number": "2"
+        },
+        {
+          "line": 21,
+          "level": 2,
+          "title": "3. Core Functionalities & Feature Breakdown",
+          "number": "3"
+        },
+        {
+          "line": 29,
+          "level": 2,
+          "title": "4. End-to-End Process Overview",
+          "number": "4"
+        },
+        {
+          "line": 63,
+          "level": 2,
+          "title": "5.1 Client Implementation Prerequisites & Deliverables",
+          "number": "5.1"
+        },
+        {
+          "line": 76,
+          "level": 2,
+          "title": "5.2 UI Mockups & View Directory",
+          "number": "5.2"
+        },
+        {
+          "line": 114,
+          "level": 2,
+          "title": "5.3 Questionnaire & Eligibility Rules",
+          "number": "5.3"
+        },
+        {
+          "line": 123,
+          "level": 2,
+          "title": "5.4 Assessment Processing, Lifecycle & Recovery Rules",
+          "number": "5.4"
+        }
+      ],
+      "orphan_numbered_headings": [
+        {
+          "line": 63,
+          "level": 2,
+          "title": "5.1 Client Implementation Prerequisites & Deliverables",
+          "number": "5.1"
+        },
+        {
+          "line": 76,
+          "level": 2,
+          "title": "5.2 UI Mockups & View Directory",
+          "number": "5.2"
+        },
+        {
+          "line": 114,
+          "level": 2,
+          "title": "5.3 Questionnaire & Eligibility Rules",
+          "number": "5.3"
+        },
+        {
+          "line": 123,
+          "level": 2,
+          "title": "5.4 Assessment Processing, Lifecycle & Recovery Rules",
+          "number": "5.4"
+        }
+      ],
+      "heading_level_jumps": [],
+      "numbered_pseudo_headings": [
+        {
+          "line": 23,
+          "text": "3.1 Questionnaire Capture & Validation: Gathers investor answers on version Q3 across defined experience levels, investment horizons, loss tolerance thresholds,"
+        },
+        {
+          "line": 25,
+          "text": "3.2 Risk Assessment & Scoring Integration: Executes external risk profiling strictly through RiskSignal using a shared correlation ID and a stable idempotency k"
+        },
+        {
+          "line": 27,
+          "text": "3.3 Profile Lifecycle, Recovery & Reassessment: Accepted profiles expire 365 days after acceptance and remain visible in historical records. In the event of a r"
+        },
+        {
+          "line": 31,
+          "text": "4.1 Main Process Overview:"
+        },
+        {
+          "line": 56,
+          "text": "4.2 Key Subprocesses:"
+        }
+      ],
+      "html_table_count": 3,
+      "visuals": [
+        {
+          "visual_line": 9,
+          "kind": "image",
+          "immediate_caption": false,
+          "next_nonempty_line": "## 2. Business Context & Scope"
+        },
+        {
+          "visual_line": 37,
+          "kind": "diagram",
+          "immediate_caption": false,
+          "next_nonempty_line": "</td>"
+        },
+        {
+          "visual_line": 84,
+          "kind": "image",
+          "immediate_caption": false,
+          "next_nonempty_line": "</td>"
+        },
+        {
+          "visual_line": 101,
+          "kind": "image",
+          "immediate_caption": false,
+          "next_nonempty_line": "</td>"
+        }
+      ],
+      "missing_immediate_visual_captions": 4,
+      "local_links": 27,
+      "broken_local_links": [],
+      "citation_uses": 63,
+      "citation_definitions": 24,
+      "unresolved_footnote_references": [],
+      "body_words": 1354,
+      "body_blocks_over_120_words": 0,
+      "longest_body_block_words": 116,
+      "qualification": "Mechanical presentation checks only. Heading patterns do not prove content hierarchy, exact citations do not prove entailment, block lengths do not establish readability, and rendered appearance requires separate inspection."
+    },
+    {
+      "path": ".docgen\\business-final-library-20261013\\runs\\business-final-library-20261013\\output\\documentation.md",
+      "sha256": "bcc49f382b05562daf1371dce38f934588d7ee4d32cf851072cdeaaad71e7745",
+      "headings": [
+        {
+          "line": 1,
+          "level": 1,
+          "title": "Equipment Library Operations and Borrowing Lifecycle",
+          "number": null
+        },
+        {
+          "line": 3,
+          "level": 2,
+          "title": "1. Executive Summary",
+          "number": "1"
+        },
+        {
+          "line": 9,
+          "level": 2,
+          "title": "2. Business Context & Scope",
+          "number": "2"
+        },
+        {
+          "line": 15,
+          "level": 2,
+          "title": "3. Core Functionalities & Feature Breakdown",
+          "number": "3"
+        },
+        {
+          "line": 21,
+          "level": 2,
+          "title": "4. End-to-End Process Overview",
+          "number": "4"
+        },
+        {
+          "line": 27,
+          "level": 2,
+          "title": "5.3 Reservation, Hold Management, and Collection Rules",
+          "number": "5.3"
+        },
+        {
+          "line": 33,
+          "level": 2,
+          "title": "5.4 Identity Verification and Delegation Rules",
+          "number": "5.4"
+        },
+        {
+          "line": 39,
+          "level": 2,
+          "title": "5.5 Loan Extensions, Returns, Inspections, and Unclaimed Property Policies",
+          "number": "5.5"
+        }
+      ],
+      "orphan_numbered_headings": [
+        {
+          "line": 27,
+          "level": 2,
+          "title": "5.3 Reservation, Hold Management, and Collection Rules",
+          "number": "5.3"
+        },
+        {
+          "line": 33,
+          "level": 2,
+          "title": "5.4 Identity Verification and Delegation Rules",
+          "number": "5.4"
+        },
+        {
+          "line": 39,
+          "level": 2,
+          "title": "5.5 Loan Extensions, Returns, Inspections, and Unclaimed Property Policies",
+          "number": "5.5"
+        }
+      ],
+      "heading_level_jumps": [],
+      "numbered_pseudo_headings": [],
+      "html_table_count": 0,
+      "visuals": [],
+      "missing_immediate_visual_captions": 0,
+      "local_links": 30,
+      "broken_local_links": [],
+      "citation_uses": 39,
+      "citation_definitions": 30,
+      "unresolved_footnote_references": [],
+      "body_words": 1019,
+      "body_blocks_over_120_words": 0,
+      "longest_body_block_words": 108,
+      "qualification": "Mechanical presentation checks only. Heading patterns do not prove content hierarchy, exact citations do not prove entailment, block lengths do not establish readability, and rendered appearance requires separate inspection."
+    }
+  ]
+}

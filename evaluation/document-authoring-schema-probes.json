@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-13",
+  "purpose": "Isolate source_plan provider rejection without changing the active pipeline runs.",
+  "method": "Three sequential isolated GeminiModel.call requests with the same source_plan prompt, tiny one-source payload, gemini-3.8-flash model, high authoring reasoning and shared cost ledger. Only the sections maxItems constraint differed.",
+  "results": [
+    {"sections_max_items": 40, "outcome": "provider_rejected", "error": "400 INVALID_ARGUMENT: Request contains an invalid argument.", "record": ".docgen/authoring-schema-probes/probe-40.json", "ledger_run": "schema-probe-40"},
+    {"sections_max_items": 12, "outcome": "valid_source_plan", "record": ".docgen/authoring-schema-probes/probe-12.json", "ledger_run": "schema-probe-12"},
+    {"sections_max_items": null, "outcome": "valid_source_plan", "record": ".docgen/authoring-schema-probes/probe-None.json", "ledger_run": "schema-probe-None"}
+  ],
+  "conclusion": "The outbound sections maxItems=40 constraint triggered provider rejection in this controlled comparison. High reasoning itself worked with both alternative schemas. The provider's generic error does not identify its internal cause or a generally applicable threshold.",
+  "implemented_change": "Removed this upper-bound keyword from the SourcePlan provider schema while retaining a local Pydantic validator limiting the plan to 40 sections. Other schemas retain their existing bounds. Added a separate authoring output allowance of 65536 tokens and a 420-second authoring request timeout, bounded by the remaining run deadline; reasoning tokens consume the same provider output allowance as visible output.",
+  "final_actual_schema_probe": {"outcome": "valid_source_plan", "record": ".docgen/authoring-schema-probes/probe-final-65536.json", "ledger_run": "schema-probe-final-65536", "authoring_output_tokens": 65536, "authoring_timeout_seconds": 420, "reasoning": "high", "schema": "Actual corrected SourcePlan class, no probe schema wrapper"},
+  "limitations": ["One request per schema variant; not a general Gemini schema-complexity benchmark.", "These were diagnostic provider calls, not successful end-to-end document-generation runs."]
+}

@@ -83,13 +83,14 @@ class GeminiModel:
     def set_deadline(self, epoch_seconds: float | None) -> None:
         self._deadline = epoch_seconds
 
-    def remaining_seconds(self) -> float:
+    def remaining_seconds(self, timeout_seconds: int | None = None) -> float:
+        timeout = timeout_seconds or self.settings.timeout_seconds
         if self._deadline is None:
-            return float(self.settings.timeout_seconds)
+            return float(timeout)
         remaining = self._deadline - time.time()
         if remaining <= 0:
             raise TimeoutError("Pipeline runtime limit reached")
-        return min(float(self.settings.timeout_seconds), remaining)
+        return min(float(timeout), remaining)
 
     def event(self, stage: str, event: str, **fields) -> None:
         with self._event_lock:
@@ -117,14 +118,28 @@ class GeminiModel:
         self.remaining_seconds()
         prompt = files("docgen_graph").joinpath("prompts", f"{stage}.v1.txt").read_text("utf-8")
         thinking_level = self.settings.thinking_level
+        output_tokens = self.settings.output_tokens
+        timeout_seconds = self.settings.timeout_seconds
         if stage.startswith(("verify_", "audit_")):
             thinking_level = self.settings.audit_thinking_level or thinking_level
+        if stage in {
+            "source_plan",
+            "source_document",
+            "source_document_repair",
+            "audit_source_document",
+            "source_editorial",
+            "source_revision",
+            "verify_source_revision",
+        }:
+            thinking_level = getattr(self.settings, "authoring_thinking_level", "high")
+            output_tokens = getattr(self.settings, "authoring_output_tokens", output_tokens)
+            timeout_seconds = getattr(self.settings, "authoring_timeout_seconds", timeout_seconds)
         signature = digest(
             [
                 self.settings.model,
                 prompt,
                 payload,
-                self.settings.output_tokens,
+                output_tokens,
                 thinking_level,
                 implementation_signature(),
                 schema.model_json_schema() if schema else None,
@@ -157,19 +172,16 @@ class GeminiModel:
         context = json.dumps([payload, messages or []], ensure_ascii=False)
         image_token_reserve = 8192 * len(image_parts)
         conservative_input_allowance = len((prompt + context).encode()) + image_token_reserve
-        if (
-            conservative_input_allowance + self.settings.output_tokens
-            > self.settings.request_tokens
-        ):
+        if conservative_input_allowance + output_tokens > self.settings.request_tokens:
             raise ValueError("Model request exceeds configured context budget (conservative bound)")
         pricing = Pricing.load(self.settings.pricing_file)
         ledger = BudgetLedger(self.settings.budget_ledger, self.settings.budget_pln)
         reserve = pricing.cost(
             conservative_input_allowance + 4096,
-            self.settings.output_tokens * 2,
+            output_tokens * 2,
         )
         for attempt in range(3):
-            timeout_ms = max(1, int(self.remaining_seconds() * 1000))
+            timeout_ms = max(1, int(self.remaining_seconds(timeout_seconds) * 1000))
             reservation = ledger.reserve(self.run_id, stage, max(reserve * 1.5, 0.01), pricing)
             started = time.monotonic()
             self.event(
@@ -181,7 +193,7 @@ class GeminiModel:
                 conservative_input_allowance=conservative_input_allowance,
             )
             try:
-                client = client_for(self.settings.api_key, self.settings.timeout_seconds)
+                client = client_for(self.settings.api_key, timeout_seconds)
                 response = client.models.generate_content(
                     model=self.settings.model,
                     contents=contents if tools or image_parts else request,
@@ -193,7 +205,7 @@ class GeminiModel:
                         system_instruction=prompt,
                         response_mime_type=None if tools else "application/json",
                         response_json_schema=None if tools else response_schema(schema),
-                        max_output_tokens=self.settings.output_tokens,
+                        max_output_tokens=output_tokens,
                         thinking_config=types.ThinkingConfig(thinking_level=thinking_level.upper())
                         if thinking_level
                         else None,
@@ -218,7 +230,12 @@ class GeminiModel:
                     isinstance(error, errors.APIError) and error.code in {429, 500, 502, 503, 504}
                 )
                 if retryable and attempt < 2:
-                    time.sleep(min(2**attempt, self.remaining_seconds()))
+                    delay = (
+                        (10, 30)[attempt]
+                        if isinstance(error, errors.APIError) and error.code == 503
+                        else 2**attempt
+                    )
+                    time.sleep(min(delay, self.remaining_seconds(timeout_seconds)))
                     continue
                 raise
             usage = response.usage_metadata
@@ -295,11 +312,9 @@ class GeminiModel:
                             role="user", parts=[types.Part(text=request), *image_parts]
                         )
                         size = len((prompt + request).encode()) + image_token_reserve
-                        if size + self.settings.output_tokens > self.settings.request_tokens:
+                        if size + output_tokens > self.settings.request_tokens:
                             raise
-                        reserve = max(
-                            reserve, pricing.cost(size + 4096, self.settings.output_tokens * 2)
-                        )
+                        reserve = max(reserve, pricing.cost(size + 4096, output_tokens * 2))
                         continue
                     raise
             self.store.write(

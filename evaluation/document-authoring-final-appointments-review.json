@@ -1,0 +1,54 @@
+{
+  "run_id": "authoring-verified-appointments-20261013",
+  "document": ".docgen/authoring-verified-appointments-20261013/runs/authoring-verified-appointments-20261013/output/documentation.md",
+  "method": "Independent source-to-document reading against the 13 predeclared appointment checks. Read original appointments.md and payments.md, final Markdown, exact excerpt mappings in verification.json and diagram code. Did not use the pipeline's semantic audit to score the document. No generated artifact was edited.",
+  "limits": [
+    "This is a new synthetic acceptance fixture, not an independently sampled production document.",
+    "There is no prior appointment output baseline, so this is an acceptance review rather than a before/after improvement estimate.",
+    "The initial draft was read while waiting; final text and citations were then checked separately. This is not a blinded evaluation.",
+    "Browser-rendered diagrams and visual layout were not inspected; appearance findings concern Markdown structure, captions, diagram semantics and link existence.",
+    "This run's event log shows provider errors during factual audit followed by limited completion; no editorial candidate was produced. These findings do not demonstrate the effect of the full multipass editing loop."
+  ],
+  "overall": {
+    "verdict": "All 13 core source topics are present, but two checks have inconsistent elaborations elsewhere. The document is not ready for unreviewed business publication.",
+    "checks_without_detected_defect": 11,
+    "checks_with_partial_preservation_or_inconsistent_elaboration": 2,
+    "checks_wholly_omitted": 0,
+    "interpretation": "These are rubric counts, not an information-retention percentage or a claim of complete factual correctness. Unsupported additions and citation weaknesses are counted separately below."
+  },
+  "checks": [
+    {"id": 1, "status": "partial", "locations": ["1", "2.2", "3.1", "5.1"], "assessment": "Address/contact prerequisites, separate confirmation and non-reservation are correctly present. The domain dictionary additionally requires the contact number to be verified, which the source does not require."},
+    {"id": 2, "status": "pass", "locations": ["3.2", "4.2", "5.2"], "assessment": "18:00 local office time on the previous day remains distinct from cancellation's 24-hour threshold."},
+    {"id": 3, "status": "pass", "locations": ["3.2", "4.2", "5.2"], "assessment": "Original appointment stays confirmed until replacement confirmation; an unsuccessful change does not cancel it."},
+    {"id": 4, "status": "pass", "locations": ["3.2", "4.2", "5.2", "Figure 2"], "assessment": "At least 24 hours gives eligibility for refund review, not refund approval."},
+    {"id": 5, "status": "pass", "locations": ["3.2", "4.2", "5.2"], "assessment": "20-credit late fee and discretionary supervisor waiver with service-outage evidence are retained. Figure 2 adds a stronger no-evidence branch, separately flagged as a possible inference."},
+    {"id": 6, "status": "pass", "locations": ["2.2", "3.3", "5.3"], "assessment": "For unpaid bookings, fee waiver cancels the fee obligation and is neither payment nor refund; it does not approve compensation."},
+    {"id": 7, "status": "pass", "locations": ["3.2", "5.2"], "assessment": "Technician cancellation preserves customer choice of new slot/full refund and explicitly avoids automatic rescheduling or transfer of those rights to customer cancellation."},
+    {"id": 8, "status": "partial", "locations": ["1", "3.1", "4.1", "5.1", "Figure 1"], "assessment": "Premium visits remain unapproved/unavailable and a concern is not a finding of an unsafe home. However, 4.1 invents universal pre-dispatch review, and Figure 1 implies that review or no concern establishes dispatch eligibility."},
+    {"id": 9, "status": "pass", "locations": ["3.3", "4.2", "5.3"], "assessment": "Payment status/reference, no full card numbers and no automatic appointment cancellation solely because payment failed are preserved."},
+    {"id": 10, "status": "pass", "locations": ["2.1", "3.3", "4.2", "5.3"], "assessment": "One payment-status refresh on timeout is distinguished from retrying a card charge."},
+    {"id": 11, "status": "pass", "locations": ["3.3", "5.3"], "assessment": "Approved refund returns to original payment method; approval and settlement are separate; no bank-availability time is promised."},
+    {"id": 12, "status": "pass", "locations": ["3.3", "4.2", "5.3"], "assessment": "Both two- and five-working-day submission instructions after approval remain unresolved, with neither mistaken for bank settlement."},
+    {"id": 13, "status": "pass", "locations": ["1", "2.2", "3.3", "5.3"], "assessment": "Compensation requires an independent decision and no amount or automatic entitlement is invented."}
+  ],
+  "findings": [
+    {"severity": "high", "kind": "unsupported_diagram_implication", "location": "4.1 / Figure 1", "observed": "F -- No --> H[Eligible for technician dispatch]; G[Review required before dispatch] --> H", "source": "A booking with a safety concern requires review before a technician is dispatched; a concern is not a finding that the home is unsafe.", "assessment": "The source establishes a necessary review for a flagged concern. It does not establish dispatch eligibility from no concern, from completion of any review, or from merely requiring review. The diagram's direct G-to-H transition is particularly misleading."},
+    {"severity": "high", "kind": "unsupported_generalization", "paragraph_id": "paragraph-d1ee5ae994d61bbe", "location": "4.1", "observed": "Once confirmed, the appointment undergoes pre-dispatch review.", "source": "A booking with a safety concern requires review before a technician is dispatched", "assessment": "Conditional review was generalized to every confirmed appointment. The following conditional sentence does not undo this broader preceding assertion."},
+    {"severity": "medium", "kind": "invented_requirement", "paragraph_id": "paragraph-fd215c03c1b63101", "location": "2.2", "observed": "a confirmed address and contact number are verified", "source": "A confirmed address and a contact number are required before a booking can be confirmed.", "assessment": "The contact number must be provided; its verification is not specified. Other sections accurately retain the weaker requirement, creating internal inconsistency."},
+    {"severity": "medium", "kind": "insufficient_quote_support_and_filler", "paragraph_id": "paragraph-ebd738ed9092ea33", "location": "2", "observed": "Operational governance balances customer scheduling preferences against technician dispatch readiness and payment verification rules.", "cited_excerpts": ["The repair appointment service accepts bookings for home visits. This is fictional test material.", "Payments notes for the fictional repair appointment service."], "assessment": "These introductory excerpts do not support the claimed governance relationship or payment-verification rules. The phrasing is generic filler rather than useful sourced detail."},
+    {"severity": "medium", "kind": "unsupported_process_elaboration", "paragraph_id": "paragraph-d48bd7bcf18faab7", "location": "4", "observed": "The overarching appointment lifecycle coordinates booking intake, validation, pre-dispatch review, schedule management, and financial reconciliation.", "assessment": "Financial reconciliation is not described by the corpus. The cited service introduction and payment-recording sentence also do not substantiate the full asserted process sequence."},
+    {"severity": "low", "kind": "possible_exclusivity_inference", "location": "5.2 / Figure 2", "observed": "Outage evidence provided? -- No --> Fee obligation stands", "assessment": "The source permits a supervisor waiver when outage evidence is supplied; it does not explicitly define an exhaustive decision tree or rule out every other possible basis. Prefer a diagram limited to the documented discretionary exception."},
+    {"severity": "medium", "kind": "caption_numbering", "locations": ["Figure 1", "Figure 2"], "observed": ["Figure 1. Figure 1.", "Figure 2. Figure 2."], "assessment": "Both model-provided captions already contain numbering and the renderer adds it again. This is directly visible and violates consistent caption formatting."},
+    {"severity": "medium", "kind": "reader_burden", "assessment": "Approximately 426 source words expand to 2194 body words, including diagram labels, across 15 headings and 42 paragraphs. Booking, cancellations and refund rules recur in the summary, dictionary, core functions, subprocesses and detailed reference. Most repetition contributes little additional explanation."},
+    {"severity": "low", "kind": "source_instruction_leak", "location": "5.3", "observed": "Both deadlines and the unresolved difference must be preserved", "assessment": "This fixture's preservation instruction is repeated as customer prose. Explain the unresolved deadline conflict directly instead of telling the document reader how source information must be preserved."}
+  ],
+  "positive_findings": [
+    "All five top-level sections and their subsection parents are present with continuous heading levels.",
+    "Rules and exceptions concerning cancellation, refund-review eligibility, payment refresh, compensation and conflicting submission deadlines remain easy to verify against exact source excerpts.",
+    "All 23 unique local excerpt links exist.",
+    "No HTML table wrappers or AI-generation/audit-status disclaimers appear in the business body.",
+    "Both Mermaid diagrams have captions immediately beneath them, although caption numbering is duplicated."
+  ],
+  "mechanical_observations": {"source_words_approximate": 426, "body_words_approximate_including_diagram_labels": 2194, "grounded_paragraphs": 42, "structured_visuals": 2, "headings_excluding_title": 15, "unique_excerpt_links": 23, "all_excerpt_links_exist": true},
+  "editorial_candidate_review": {"candidate_available": false, "assessment": "No accepted or rejected editorial revision exists for this run because it finalized following audit-provider failures. The published document therefore cannot establish that the multipass authoring feature improved quality."}
+}

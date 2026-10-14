@@ -24,10 +24,14 @@ class Settings:
     source_page_map: Path | None = None
     content_repair_limit: int = 2
     authoring_turn_limit: int = 8
-    authoring_timeout_seconds: int = 300
+    authoring_timeout_seconds: int = 420
+    authoring_output_tokens: int = 65536
     authoring_result_limit: int = 60000
     thinking_level: str | None = None
     audit_thinking_level: str | None = None
+    authoring_thinking_level: str = "high"
+    editorial_review: bool = True
+    editorial_round_limit: int = 3
     fast_mode: bool = False
     model_workers: int = 4
     run_timeout_seconds: int = 1200
@@ -53,6 +57,15 @@ class Settings:
             raise ValueError(
                 "DOCGEN_AUDIT_THINKING_LEVEL must be low, medium or high when configured"
             )
+        authoring_thinking = str(values.get("DOCGEN_AUTHORING_THINKING_LEVEL") or "high").lower()
+        if authoring_thinking not in {"low", "medium", "high"}:
+            raise ValueError("DOCGEN_AUTHORING_THINKING_LEVEL must be low, medium or high")
+        editorial_review = str(values.get("DOCGEN_EDITORIAL_REVIEW") or "true").lower()
+        if editorial_review not in {"true", "false", "1", "0"}:
+            raise ValueError("DOCGEN_EDITORIAL_REVIEW must be true or false")
+        editorial_rounds = int(values.get("DOCGEN_EDITORIAL_ROUND_LIMIT", 3))
+        if not 1 <= editorial_rounds <= 3:
+            raise ValueError("DOCGEN_EDITORIAL_ROUND_LIMIT must be between 1 and 3")
         if model != "gemini-3.8-flash":
             raise ValueError("GEMINI_MODEL must be gemini-3.8-flash")
         configured_budget = values.get("DOCGEN_BUDGET_PLN")
@@ -67,7 +80,10 @@ class Settings:
         if content_repair_limit < 0 or content_repair_limit > 10:
             raise ValueError("DOCGEN_CONTENT_REPAIR_LIMIT must be between 0 and 10")
         authoring_turns = int(values.get("DOCGEN_AUTHORING_TURN_LIMIT", 8))
-        authoring_timeout = int(values.get("DOCGEN_AUTHORING_TIMEOUT_SECONDS", 300))
+        authoring_timeout = int(values.get("DOCGEN_AUTHORING_TIMEOUT_SECONDS", 420))
+        authoring_output = int(values.get("DOCGEN_AUTHORING_OUTPUT_TOKENS", 65536))
+        if not 1024 <= authoring_output <= 65536:
+            raise ValueError("DOCGEN_AUTHORING_OUTPUT_TOKENS must be between 1024 and 65536")
         authoring_result = int(values.get("DOCGEN_AUTHORING_RESULT_LIMIT", 60000))
         if min(authoring_turns, authoring_timeout, authoring_result) <= 0 or authoring_turns > 50:
             raise ValueError("Authoring limits must be positive and turns at most 50")
@@ -103,6 +119,9 @@ class Settings:
             model=model,
             thinking_level=thinking_level,
             audit_thinking_level=audit_thinking_level,
+            authoring_thinking_level=authoring_thinking,
+            editorial_review=editorial_review in {"true", "1"},
+            editorial_round_limit=editorial_rounds,
             output_tokens=int(values.get("DOCGEN_OUTPUT_TOKENS") or 8192),
             request_tokens=int(values.get("DOCGEN_REQUEST_TOKENS") or 100000),
             timeout_seconds=int(values.get("DOCGEN_TIMEOUT_SECONDS") or 120),
@@ -114,6 +133,7 @@ class Settings:
             content_repair_limit=content_repair_limit,
             authoring_turn_limit=authoring_turns,
             authoring_timeout_seconds=authoring_timeout,
+            authoring_output_tokens=authoring_output,
             authoring_result_limit=authoring_result,
             fast_mode=fast_mode in {"true", "1"},
             model_workers=model_workers,

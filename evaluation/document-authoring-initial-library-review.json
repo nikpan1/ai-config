@@ -1,0 +1,26 @@
+{
+  "run_id": "authoring-library-20261013",
+  "review_type": "Independent read-only source comparison of the initial provider-plan-fallback run",
+  "artifact": ".docgen/authoring-library-20261013/runs/authoring-library-20261013/output/documentation.md",
+  "semantic_summary": "All declared business topics appear in prose, and the previous successful-identity-check authorization statement is absent. A new diagram nevertheless promotes a necessary approval condition to a sufficient one.",
+  "findings": [
+    {
+      "severity": "material",
+      "kind": "necessary_to_sufficient_in_diagram",
+      "output": "B -- No conflict --> C[Extension approved for seven days]",
+      "source": "Approval requires that no subsequent reservation conflicts with the extended period.",
+      "source_path": "evaluation/fixtures/business-output/returns.md:5",
+      "reason": "The source makes conflict absence necessary for approval, without guaranteeing that a conflict-free request is approved. The diagram supplies that guarantee while the accompanying prose preserves the condition correctly.",
+      "caption": "Figure 1. Loan extension evaluation and due date outcomes"
+    },
+    {
+      "severity": "minor",
+      "kind": "narrowed_prohibition",
+      "output": "they cannot silently replace the rejected request with a different extension duration",
+      "source": "Staff may explain the decision but cannot silently replace it with a different extension.",
+      "reason": "The generated restriction mentions only a different duration; the source prohibits substituting a different extension more generally. This is a narrower formulation, although the practical impact depends on the possible extension variations."
+    }
+  ],
+  "presentation_summary": "A numbered Markdown caption and HTML-free diagram meet the requested rendering format. The generic title and one long Source-backed behavior section fail to provide topic navigation because the AI planning request failed and fallback was used.",
+  "limits": "This is not the final corrected run and is not evidence that successful hierarchical planning was exercised. No model calls or generated-output edits were made for this review."
+}

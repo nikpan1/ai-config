@@ -94,7 +94,13 @@ def preserve_planned_sections(
             result["sections"].append(section)
         elif identifier:
             section["id"] = identifier
-        if section["paragraphs"]:
+        section["parent_id"] = planned.get("parent_id", "") if isinstance(planned, dict) else ""
+        section["title"] = title
+        structural_parent = any(
+            isinstance(item, dict) and item.get("parent_id") == section["id"]
+            for item in plan.get("sections", [])
+        )
+        if section["paragraphs"] or section.get("visuals") or structural_parent:
             continue
         evidence_ids = planned.get("evidence_ids", []) if isinstance(planned, dict) else []
         targets.append(
@@ -110,6 +116,9 @@ def preserve_planned_sections(
                 ],
             }
         )
+    planned_ids = [item.get("id") for item in plan.get("sections", []) if isinstance(item, dict)]
+    order = {identifier: index for index, identifier in enumerate(planned_ids)}
+    result["sections"].sort(key=lambda item: order.get(item["id"], len(order)))
     return result, targets
 
 

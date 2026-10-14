@@ -1,0 +1,487 @@
+{
+  "method": "Read-only examination of frozen plans, first drafts, final candidates, Markdown, HTML source and provenance artifacts. No model calls or document changes.",
+  "runs": [
+    {
+      "run": "authoring-verified-risk-20261013",
+      "ready": true,
+      "status": "complete_with_limitations",
+      "presentation": {
+        "path": ".docgen\\authoring-verified-risk-20261013\\runs\\authoring-verified-risk-20261013\\output\\documentation.md",
+        "sha256": "4dd93443c9050f2f7d1a15a06d2a429696ebbf2321db2f1db192a0693890c1bd",
+        "headings": [
+          {
+            "line": 1,
+            "level": 1,
+            "title": "INV-100: Risk Profiling",
+            "number": null
+          },
+          {
+            "line": 3,
+            "level": 2,
+            "title": "1. Executive Summary",
+            "number": "1"
+          },
+          {
+            "line": 15,
+            "level": 2,
+            "title": "2. Business Context and Scope",
+            "number": "2"
+          },
+          {
+            "line": 21,
+            "level": 3,
+            "title": "2.1. Process Participants",
+            "number": "2.1"
+          },
+          {
+            "line": 29,
+            "level": 3,
+            "title": "2.2. Domain Dictionary",
+            "number": "2.2"
+          },
+          {
+            "line": 37,
+            "level": 2,
+            "title": "3. Core Functionalities and Feature Breakdown",
+            "number": "3"
+          },
+          {
+            "line": 41,
+            "level": 3,
+            "title": "3.1. Questionnaire Intake and Consent Validation",
+            "number": "3.1"
+          },
+          {
+            "line": 53,
+            "level": 3,
+            "title": "3.2. Risk Scoring and Profile Lifecycle Management",
+            "number": "3.2"
+          },
+          {
+            "line": 65,
+            "level": 2,
+            "title": "4. End-to-End Process Overview",
+            "number": "4"
+          },
+          {
+            "line": 69,
+            "level": 3,
+            "title": "4.1. Main Process Overview",
+            "number": "4.1"
+          },
+          {
+            "line": 79,
+            "level": 3,
+            "title": "4.2. Key Subprocesses",
+            "number": "4.2"
+          },
+          {
+            "line": 89,
+            "level": 2,
+            "title": "5. Detailed Business Reference",
+            "number": "5"
+          },
+          {
+            "line": 93,
+            "level": 3,
+            "title": "5.1. User Interface Mockups and View Directory",
+            "number": "5.1"
+          },
+          {
+            "line": 107,
+            "level": 3,
+            "title": "5.2. Questionnaire Validation Rules and Consent Requirements",
+            "number": "5.2"
+          },
+          {
+            "line": 119,
+            "level": 3,
+            "title": "5.3. Risk Evaluation, Recovery, and Profile Lifecycle",
+            "number": "5.3"
+          }
+        ],
+        "orphan_numbered_headings": [],
+        "heading_level_jumps": [],
+        "numbered_pseudo_headings": [],
+        "html_table_count": 0,
+        "visuals": [
+          {
+            "visual_line": 11,
+            "kind": "image",
+            "immediate_caption": true,
+            "next_nonempty_line": "**Figure 1. Risk questionnaire intake interface preview** [^11]"
+          },
+          {
+            "visual_line": 49,
+            "kind": "image",
+            "immediate_caption": true,
+            "next_nonempty_line": "**Figure 2. Questionnaire intake draft response fields and consent status preview** [^11]"
+          },
+          {
+            "visual_line": 61,
+            "kind": "image",
+            "immediate_caption": true,
+            "next_nonempty_line": "**Figure 3. Accepted assessment result profile view preview** [^38]"
+          },
+          {
+            "visual_line": 73,
+            "kind": "diagram",
+            "immediate_caption": true,
+            "next_nonempty_line": "**Figure 4. End-to-end risk profiling assessment and lifecycle workflow** [^1] [^3] [^8] [^4] [^31] [^33] [^34] [^35] [^5] [^6]"
+          },
+          {
+            "visual_line": 99,
+            "kind": "image",
+            "immediate_caption": true,
+            "next_nonempty_line": "**Figure 5. Risk questionnaire intake screen mockup** [^11] [^41]"
+          },
+          {
+            "visual_line": 103,
+            "kind": "image",
+            "immediate_caption": true,
+            "next_nonempty_line": "**Figure 6. Assessment result screen mockup** [^38] [^46]"
+          }
+        ],
+        "missing_immediate_visual_captions": 0,
+        "local_links": 57,
+        "broken_local_links": [],
+        "citation_uses": 141,
+        "citation_definitions": 52,
+        "unresolved_footnote_references": [],
+        "body_words": 2094,
+        "body_blocks_over_120_words": 2,
+        "longest_body_block_words": 153,
+        "qualification": "Mechanical presentation checks only. Heading patterns do not prove content hierarchy, exact citations do not prove entailment, block lengths do not establish readability, and rendered appearance requires separate inspection."
+      },
+      "planned_sections": 14,
+      "final_sections": 14,
+      "missing_planned_section_ids": [],
+      "changed_planned_parent_ids": [],
+      "changed_planned_titles": [],
+      "initial_paragraphs": 37,
+      "final_paragraphs": 37,
+      "missing_initial_paragraph_ids": [],
+      "new_paragraph_ids": [],
+      "exact_paragraph_citations": 124,
+      "invalid_exact_paragraph_citations": [],
+      "duplicated_caption_number_prefixes": [],
+      "structured_visuals": 6,
+      "visual_findings": [],
+      "structure_findings": [],
+      "html_preview_exists": true,
+      "html_hierarchy_headings": 15,
+      "html_preview_has_embedded_source_excerpts": true,
+      "plan_preview_exists": true,
+      "qualification": "Autopilot execution does not constitute human approval of the plan. Preserved paragraph IDs and exact quote matches do not prove preservation of meaning. No pixel-level QA was performed."
+    },
+    {
+      "run": "authoring-verified-library-20261013",
+      "ready": true,
+      "status": "complete_with_limitations",
+      "presentation": {
+        "path": ".docgen\\authoring-verified-library-20261013\\runs\\authoring-verified-library-20261013\\output\\documentation.md",
+        "sha256": "e4b9fa924cdbf25969337cfcb3013def5b6cbd7fb4330e6d041d58fc01ee586c",
+        "headings": [
+          {
+            "line": 1,
+            "level": 1,
+            "title": "Community Equipment Library",
+            "number": null
+          },
+          {
+            "line": 3,
+            "level": 2,
+            "title": "1. Executive Summary",
+            "number": "1"
+          },
+          {
+            "line": 11,
+            "level": 2,
+            "title": "2. Business Context and Scope",
+            "number": "2"
+          },
+          {
+            "line": 15,
+            "level": 3,
+            "title": "2.1. Process Participants",
+            "number": "2.1"
+          },
+          {
+            "line": 25,
+            "level": 3,
+            "title": "2.2. Domain Dictionary",
+            "number": "2.2"
+          },
+          {
+            "line": 31,
+            "level": 2,
+            "title": "3. Core Functionalities and Feature Breakdown",
+            "number": "3"
+          },
+          {
+            "line": 35,
+            "level": 3,
+            "title": "3.1. Equipment Reservation and Borrowing",
+            "number": "3.1"
+          },
+          {
+            "line": 41,
+            "level": 3,
+            "title": "3.2. Collection and Identity Verification",
+            "number": "3.2"
+          },
+          {
+            "line": 47,
+            "level": 3,
+            "title": "3.3. Loan Extensions and Equipment Returns",
+            "number": "3.3"
+          },
+          {
+            "line": 53,
+            "level": 2,
+            "title": "4. End-to-End Process Overview",
+            "number": "4"
+          },
+          {
+            "line": 57,
+            "level": 3,
+            "title": "4.1. Main Process Overview",
+            "number": "4.1"
+          },
+          {
+            "line": 67,
+            "level": 3,
+            "title": "4.2. Key Subprocesses",
+            "number": "4.2"
+          },
+          {
+            "line": 73,
+            "level": 2,
+            "title": "5. Detailed Business Reference",
+            "number": "5"
+          },
+          {
+            "line": 77,
+            "level": 3,
+            "title": "5.1. Equipment Reservation and Borrowing Rules",
+            "number": "5.1"
+          },
+          {
+            "line": 87,
+            "level": 3,
+            "title": "5.2. Collection and Identity Verification Rules",
+            "number": "5.2"
+          },
+          {
+            "line": 97,
+            "level": 3,
+            "title": "5.3. Loan Extensions and Equipment Returns Rules",
+            "number": "5.3"
+          }
+        ],
+        "orphan_numbered_headings": [],
+        "heading_level_jumps": [],
+        "numbered_pseudo_headings": [],
+        "html_table_count": 0,
+        "visuals": [
+          {
+            "visual_line": 61,
+            "kind": "diagram",
+            "immediate_caption": true,
+            "next_nonempty_line": "**Figure 1. Equipment lending lifecycle from reservation confirmation through return inspection** [^2] [^3] [^32] [^25] [^5]"
+          }
+        ],
+        "missing_immediate_visual_captions": 0,
+        "local_links": 35,
+        "broken_local_links": [],
+        "citation_uses": 79,
+        "citation_definitions": 35,
+        "unresolved_footnote_references": [],
+        "body_words": 2063,
+        "body_blocks_over_120_words": 1,
+        "longest_body_block_words": 136,
+        "qualification": "Mechanical presentation checks only. Heading patterns do not prove content hierarchy, exact citations do not prove entailment, block lengths do not establish readability, and rendered appearance requires separate inspection."
+      },
+      "planned_sections": 15,
+      "final_sections": 15,
+      "missing_planned_section_ids": [],
+      "changed_planned_parent_ids": [],
+      "changed_planned_titles": [],
+      "initial_paragraphs": 33,
+      "final_paragraphs": 34,
+      "missing_initial_paragraph_ids": [],
+      "new_paragraph_ids": [
+        "paragraph-ba9ebcf816cce2d0-2"
+      ],
+      "exact_paragraph_citations": 74,
+      "invalid_exact_paragraph_citations": [],
+      "duplicated_caption_number_prefixes": [],
+      "structured_visuals": 1,
+      "visual_findings": [],
+      "structure_findings": [],
+      "html_preview_exists": true,
+      "html_hierarchy_headings": 16,
+      "html_preview_has_embedded_source_excerpts": true,
+      "plan_preview_exists": true,
+      "qualification": "Autopilot execution does not constitute human approval of the plan. Preserved paragraph IDs and exact quote matches do not prove preservation of meaning. No pixel-level QA was performed."
+    },
+    {
+      "run": "authoring-verified-appointments-20261013",
+      "ready": true,
+      "status": "complete_with_limitations",
+      "presentation": {
+        "path": ".docgen\\authoring-verified-appointments-20261013\\runs\\authoring-verified-appointments-20261013\\output\\documentation.md",
+        "sha256": "3e5624a10341188a895a1748e54c07025b8f5aa647fe597ee3f21df2c6c5f54a",
+        "headings": [
+          {
+            "line": 1,
+            "level": 1,
+            "title": "Repair Appointment Service",
+            "number": null
+          },
+          {
+            "line": 3,
+            "level": 2,
+            "title": "1. Executive Summary",
+            "number": "1"
+          },
+          {
+            "line": 9,
+            "level": 2,
+            "title": "2. Business Context and Scope",
+            "number": "2"
+          },
+          {
+            "line": 13,
+            "level": 3,
+            "title": "2.1. Process Participants",
+            "number": "2.1"
+          },
+          {
+            "line": 23,
+            "level": 3,
+            "title": "2.2. Domain Dictionary",
+            "number": "2.2"
+          },
+          {
+            "line": 35,
+            "level": 2,
+            "title": "3. Core Functionalities",
+            "number": "3"
+          },
+          {
+            "line": 39,
+            "level": 3,
+            "title": "3.1. Booking and Visit Scheduling",
+            "number": "3.1"
+          },
+          {
+            "line": 45,
+            "level": 3,
+            "title": "3.2. Appointment Changes and Cancellations",
+            "number": "3.2"
+          },
+          {
+            "line": 53,
+            "level": 3,
+            "title": "3.3. Payment Tracking and Refund Management",
+            "number": "3.3"
+          },
+          {
+            "line": 61,
+            "level": 2,
+            "title": "4. End-to-End Process Overview",
+            "number": "4"
+          },
+          {
+            "line": 65,
+            "level": 3,
+            "title": "4.1. Main Process Overview",
+            "number": "4.1"
+          },
+          {
+            "line": 85,
+            "level": 3,
+            "title": "4.2. Key Subprocesses",
+            "number": "4.2"
+          },
+          {
+            "line": 97,
+            "level": 2,
+            "title": "5. Detailed Business Reference",
+            "number": "5"
+          },
+          {
+            "line": 101,
+            "level": 3,
+            "title": "5.1. Booking Validation, Preferred Slots, and Safety Reviews",
+            "number": "5.1"
+          },
+          {
+            "line": 109,
+            "level": 3,
+            "title": "5.2. Rescheduling Limits, Cancellation Policies, and Outage Fee Waivers",
+            "number": "5.2"
+          },
+          {
+            "line": 133,
+            "level": 3,
+            "title": "5.3. Payment Status Inquiries, Conflicting Refund Deadlines, and Fee Obligations",
+            "number": "5.3"
+          }
+        ],
+        "orphan_numbered_headings": [],
+        "heading_level_jumps": [],
+        "numbered_pseudo_headings": [],
+        "html_table_count": 0,
+        "visuals": [
+          {
+            "visual_line": 71,
+            "kind": "diagram",
+            "immediate_caption": true,
+            "next_nonempty_line": "**Figure 1. Figure 1. Appointment booking validation, confirmation, and pre-dispatch safety review workflow** [^17] [^9]"
+          },
+          {
+            "visual_line": 119,
+            "kind": "diagram",
+            "immediate_caption": true,
+            "next_nonempty_line": "**Figure 2. Figure 2. Cancellation pathways, 24-hour review threshold, standard fee, and outage waiver logic** [^14] [^11] [^19]"
+          }
+        ],
+        "missing_immediate_visual_captions": 0,
+        "local_links": 23,
+        "broken_local_links": [],
+        "citation_uses": 68,
+        "citation_definitions": 23,
+        "unresolved_footnote_references": [],
+        "body_words": 2163,
+        "body_blocks_over_120_words": 0,
+        "longest_body_block_words": 76,
+        "qualification": "Mechanical presentation checks only. Heading patterns do not prove content hierarchy, exact citations do not prove entailment, block lengths do not establish readability, and rendered appearance requires separate inspection."
+      },
+      "planned_sections": 15,
+      "final_sections": 15,
+      "missing_planned_section_ids": [],
+      "changed_planned_parent_ids": [],
+      "changed_planned_titles": [],
+      "initial_paragraphs": 42,
+      "final_paragraphs": 42,
+      "missing_initial_paragraph_ids": [],
+      "new_paragraph_ids": [],
+      "exact_paragraph_citations": 63,
+      "invalid_exact_paragraph_citations": [],
+      "duplicated_caption_number_prefixes": [
+        "**Figure 1. Figure 1. Appointment booking validation, confirmation, and pre-dispatch safety review workflow** [^17] [^9]",
+        "**Figure 2. Figure 2. Cancellation pathways, 24-hour review threshold, standard fee, and outage waiver logic** [^14] [^11] [^19]"
+      ],
+      "structured_visuals": 2,
+      "visual_findings": [],
+      "structure_findings": [],
+      "html_preview_exists": true,
+      "html_hierarchy_headings": 16,
+      "html_preview_has_embedded_source_excerpts": true,
+      "plan_preview_exists": true,
+      "qualification": "Autopilot execution does not constitute human approval of the plan. Preserved paragraph IDs and exact quote matches do not prove preservation of meaning. No pixel-level QA was performed."
+    }
+  ]
+}

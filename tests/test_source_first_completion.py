@@ -19,7 +19,9 @@ from docgen_graph.workflow import Pipeline
 
 class SourceModel:
     def __init__(self, path, fail_stage=None, audit_findings=None):
-        self.settings = replace(Settings.load(path), source_first=True, fast_mode=False)
+        self.settings = replace(
+            Settings.load(path), source_first=True, fast_mode=False, editorial_review=False
+        )
         self.calls = []
         self.fail_stage = fail_stage
         self.audit_findings = audit_findings or []

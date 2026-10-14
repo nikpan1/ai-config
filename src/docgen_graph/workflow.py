@@ -32,8 +32,10 @@ from docgen_graph.completion import (
     citation_excerpt_files,
     citation_findings,
     document_content_hash,
+    document_structure_findings,
     document_verification,
     render_grounded_document,
+    visual_findings,
 )
 from docgen_graph.completion_repairs import (
     DocumentRepairs,
@@ -51,8 +53,20 @@ from docgen_graph.contracts import (
     SectionDraft,
     VisualEvidenceDraft,
 )
+from docgen_graph.document_preview import render_document_preview
 from docgen_graph.document_repairs import repair_document_draft, unique_visual_quote
 from docgen_graph.documentation_contracts import AspectInventory, SourceAudit
+from docgen_graph.editorial import (
+    DocumentRevision,
+    EditorialReview,
+    RevisionVerification,
+    apply_editorial_revision,
+    merge_editorial_findings,
+    outstanding_audit_findings,
+    revision_accepted,
+    revision_findings,
+    unchanged_audit_targets,
+)
 from docgen_graph.evidence_contracts import (
     AnalysisProvenance,
     DeltaVerification,
@@ -66,7 +80,9 @@ from docgen_graph.knowledge import KnowledgeGraph, normalized_assertion
 from docgen_graph.model import implementation_signature
 from docgen_graph.planning import (
     bounded_source_overview,
+    normalize_plan_hierarchy,
     plan_findings,
+    render_source_plan,
     section_evidence_ids,
     section_queries,
 )
@@ -135,8 +151,13 @@ from docgen_graph.storage import ArtifactStore, digest
 
 
 class PipelineState(TypedDict, total=False):
+    editorial_review_ref: str
+    editorial_candidate_ref: str
+    editorial_history_ref: str
+    editorial_round: int
     completion_context_ref: str
     completion_plan_ref: str
+    completion_plan_path: str
     completion_draft_ref: str
     completion_audit_ref: str
     completion_findings_ref: str
@@ -380,8 +401,12 @@ class Pipeline:
             key: getattr(settings, key, None)
             for key in (
                 "output_tokens",
+                "authoring_output_tokens",
                 "thinking_level",
                 "audit_thinking_level",
+                "authoring_thinking_level",
+                "editorial_review",
+                "editorial_round_limit",
                 "request_tokens",
                 "timeout_seconds",
                 "authoring_turn_limit",
@@ -1084,7 +1109,13 @@ class Pipeline:
             min(
                 120000,
                 int(getattr(settings, "request_tokens", 100000))
-                - int(getattr(settings, "output_tokens", 8192))
+                - int(
+                    getattr(
+                        settings,
+                        "authoring_output_tokens",
+                        getattr(settings, "output_tokens", 8192),
+                    )
+                )
                 - 16000,
             ),
         )
@@ -1117,15 +1148,16 @@ class Pipeline:
             SourcePlan,
         )
         plan = SourcePlan.model_validate(plan).model_dump()
-        available = set(self.spans(state))
         binding_findings = plan_findings(plan, list(self.spans(state).values()))
+        plan = normalize_plan_hierarchy(plan)
+        available = set(self.spans(state))
         context_bindings = []
-        for index, section in enumerate(plan["sections"], 1):
-            section["id"] = f"section-{index}"
+        for section in plan["sections"]:
             section["evidence_ids"] = [key for key in section["evidence_ids"] if key in available]
             if not section["evidence_ids"]:
                 section["evidence_ids"] = [item["id"] for item in context["evidence"]]
                 context_bindings.append(section["id"])
+        self.store.write(f"runs/{self.run_id}/plan.md", render_source_plan(plan))
         self.store.write(
             f"runs/{self.run_id}/source-plan-review.json",
             json.dumps(
@@ -1139,9 +1171,14 @@ class Pipeline:
         )
         return {
             "completion_plan_ref": self.store.put(plan),
+            "completion_plan_path": str(self.store.root / "runs" / self.run_id / "plan.md"),
             "completion_context_ref": self.store.put(context),
             "completion_packet_index": 0,
             "completion_attempt": 0,
+            "editorial_round": 0,
+            "editorial_review_ref": "",
+            "editorial_candidate_ref": "",
+            "editorial_history_ref": self.store.put([]),
             "completion_sections_ref": self.store.put([]),
             "route": "write_source_document",
         }
@@ -1196,6 +1233,15 @@ class Pipeline:
                     "route": "write_source_document",
                 }
             draft["sections"] = sections
+        planned = {
+            section["id"]: section for section in plan["sections"] if isinstance(section, dict)
+        }
+        for section in draft["sections"]:
+            approved = planned.get(section.get("id")) or next(
+                (item for item in planned.values() if item["title"] == section["title"]), None
+            )
+            if approved:
+                section.update({key: approved.get(key, "") for key in ("id", "title", "parent_id")})
         return {
             "completion_draft_ref": self.store.put(assign_document_ids(draft)),
             "completion_sections_ref": self.store.put([]),
@@ -1293,8 +1339,8 @@ class Pipeline:
             dict.fromkeys(
                 source["evidence_id"]
                 for section in draft["sections"]
-                for paragraph in section["paragraphs"]
-                for source in paragraph["sources"]
+                for passage in section["paragraphs"] + section.get("visuals", [])
+                for source in passage.get("sources", [])
             )
         )
         context = self.completion_context(state)
@@ -1319,7 +1365,7 @@ class Pipeline:
                         "coverage_explanation": "Draft exceeds the bounded final audit context",
                     }
                 ),
-                "route": "finalize_source_document",
+                "route": self.editorial_destination(),
             }
         audit = self.call(
             "audit_source_document",
@@ -1334,8 +1380,269 @@ class Pipeline:
             "route": "repair_source_document"
             if audit_targets(draft, audit, list(self.spans(state).values()))[0]
             and not state.get("completion_repair_counts", {}).get("semantic")
-            else "finalize_source_document",
+            else self.editorial_destination(),
         }
+
+    def editorial_destination(self) -> str:
+        return (
+            "review_source_editorial"
+            if getattr(getattr(self.model, "settings", None), "editorial_review", False)
+            else "finalize_source_document"
+        )
+
+    def editorial_context(self, state: PipelineState, document: dict) -> dict:
+        evidence_ids = list(
+            dict.fromkeys(
+                source["evidence_id"]
+                for section in document["sections"]
+                for passage in section.get("paragraphs", []) + section.get("visuals", [])
+                for source in passage.get("sources", [])
+            )
+        )
+        return self.completion_context(
+            state, [section["title"] for section in document["sections"]], evidence_ids
+        )
+
+    def review_source_editorial(self, state: PipelineState) -> dict:
+        document = self.read(state, "completion_draft_ref")
+        context = self.editorial_context(state, document)
+        if context.get("omitted_evidence_ids") or context.get("excerpted_evidence_ids"):
+            return {
+                "limitations_ref": self.limitations(
+                    state,
+                    [
+                        "Whole-document editorial verification exceeded its context budget; "
+                        "the source-backed draft was retained without an unverified rewrite"
+                    ],
+                ),
+                "route": "finalize_source_document",
+            }
+        outstanding, diagnostics = outstanding_audit_findings(
+            document, self.read(state, "completion_audit_ref"), self.completion_evidence(state)
+        )
+        review = self.call(
+            "source_editorial",
+            {
+                "document": document,
+                "plan": self.read(state, "completion_plan_ref", {}),
+                "sources": context,
+                "previous_rounds": self.read(state, "editorial_history_ref", []),
+                "outstanding_factual_findings": outstanding,
+                "presentation_findings": document_structure_findings(document)
+                + visual_findings(
+                    document, self.completion_evidence(state), self.editorial_image_paths(state)
+                ),
+            },
+            EditorialReview,
+        )
+        review = merge_editorial_findings(review, outstanding)
+        for section in document["sections"]:
+            section_visual_findings = visual_findings(
+                {"sections": [section]},
+                self.completion_evidence(state),
+                self.editorial_image_paths(state),
+            )
+            if section_visual_findings and not any(
+                item["section_id"] == section["id"] and item["category"] == "visual"
+                for item in review["findings"]
+            ):
+                review["findings"].append(
+                    {
+                        "section_id": section["id"],
+                        "paragraph_id": "",
+                        "category": "visual",
+                        "explanation": "; ".join(section_visual_findings),
+                        "requested_change": (
+                            "Correct visual representation and exact citations "
+                            "while preserving supported meaning."
+                        ),
+                        "sources": [],
+                    }
+                )
+            for paragraph in section["paragraphs"]:
+                issues = document_structure_findings(
+                    {"sections": [{**section, "parent_id": "", "paragraphs": [paragraph]}]}
+                )
+                if issues and not any(
+                    item.get("paragraph_id") == paragraph["id"] for item in review["findings"]
+                ):
+                    review["findings"].append(
+                        {
+                            "section_id": section["id"],
+                            "paragraph_id": paragraph["id"],
+                            "category": "clarity",
+                            "explanation": "; ".join(issues),
+                            "requested_change": (
+                                "Use plain business prose under approved headings; "
+                                "preserve all supported information."
+                            ),
+                            "sources": paragraph["sources"],
+                        }
+                    )
+        return {
+            "editorial_review_ref": self.store.put(review),
+            "completion_audit_diagnostics_ref": self.store.put(
+                self.read(state, "completion_audit_diagnostics_ref", []) + diagnostics
+            ),
+            "route": "revise_source_document" if review["findings"] else "finalize_source_document",
+        }
+
+    def editorial_image_paths(self, state: PipelineState) -> dict[str, str]:
+        return {
+            asset["hash"]: f"assets/{asset['hash']}.{asset['format']}"
+            for asset in self.read(state, "inventory_ref", {}).get("assets", [])
+            if asset.get("hash") and asset.get("disposition") != "rejected"
+        }
+
+    def revise_source_document(self, state: PipelineState) -> dict:
+        document = self.read(state, "completion_draft_ref")
+        review = self.read(state, "editorial_review_ref")
+        number = state.get("editorial_round", 0) + 1
+        limit = getattr(getattr(self.model, "settings", None), "editorial_round_limit", 3)
+        if number > limit:
+            return {"route": "finalize_source_document"}
+        response = self.call(
+            "source_revision",
+            {
+                "document": document,
+                "plan": self.read(state, "completion_plan_ref", {}),
+                "review": review,
+                "sources": self.editorial_context(state, document),
+            },
+            DocumentRevision,
+        )
+        try:
+            candidate = apply_editorial_revision(document, response, review)
+            findings = revision_findings(
+                document,
+                candidate,
+                self.completion_evidence(state),
+                self.editorial_image_paths(state),
+            )
+        except ValueError as error:
+            candidate, findings = document, [str(error)]
+        record = {
+            "round": number,
+            "baseline_ref": state["completion_draft_ref"],
+            "baseline_hash": document_content_hash(document),
+            "candidate_ref": self.store.put(candidate),
+            "candidate_hash": document_content_hash(candidate),
+            "revision_ref": self.store.put(response),
+            "review_ref": state["editorial_review_ref"],
+            "structural_findings": findings,
+            "outcome": "rejected_structure" if findings else "pending_semantic_verification",
+        }
+        history = self.read(state, "editorial_history_ref", []) + [record]
+        unchanged = record["candidate_hash"] == record["baseline_hash"]
+        if unchanged and not findings:
+            record["outcome"] = "retained_unchanged"
+        update = {
+            "editorial_round": number,
+            "editorial_history_ref": self.store.put(history),
+            "editorial_candidate_ref": record["candidate_ref"] if not findings else "",
+            "route": "finalize_source_document"
+            if findings or unchanged
+            else "verify_source_revision",
+        }
+        if findings:
+            update["limitations_ref"] = self.limitations(
+                state,
+                [
+                    "An editorial revision failed structural or exact-source validation; "
+                    "the previous version was retained"
+                ],
+            )
+        elif unchanged:
+            update["limitations_ref"] = self.limitations(
+                state, ["Editorial review requested improvements but the model proposed no changes"]
+            )
+        return update
+
+    def verify_source_revision(self, state: PipelineState) -> dict:
+        baseline = self.read(state, "completion_draft_ref")
+        candidate = self.read(state, "editorial_candidate_ref")
+        context = self.editorial_context(state, candidate)
+        if context.get("omitted_evidence_ids") or context.get("excerpted_evidence_ids"):
+            history = self.read(state, "editorial_history_ref", [])
+            history[-1] = {**history[-1], "outcome": "rejected_incomplete_source_context"}
+            return {
+                "editorial_history_ref": self.store.put(history),
+                "editorial_candidate_ref": "",
+                "limitations_ref": self.limitations(
+                    state,
+                    [
+                        "Editorial candidate could not be verified within its context budget; "
+                        "the previous version was retained"
+                    ],
+                ),
+                "route": "finalize_source_document",
+            }
+        verification = self.call(
+            "verify_source_revision",
+            {
+                "previous_document": baseline,
+                "candidate": candidate,
+                "requested_changes": self.read(state, "editorial_review_ref"),
+                "outstanding_factual_findings": outstanding_audit_findings(
+                    baseline,
+                    self.read(state, "completion_audit_ref"),
+                    self.completion_evidence(state),
+                )[0],
+                "plan": self.read(state, "completion_plan_ref", {}),
+                "sources": context,
+                "minimum_coverage": self.minimum_coverage(),
+            },
+            RevisionVerification,
+        )
+        unchanged = unchanged_audit_targets(
+            baseline,
+            candidate,
+            outstanding_audit_findings(
+                baseline, self.read(state, "completion_audit_ref"), self.completion_evidence(state)
+            )[0],
+        )
+        accepted = revision_accepted(verification) and not unchanged
+        history = self.read(state, "editorial_history_ref", [])
+        history[-1] = {
+            **history[-1],
+            "verification_ref": self.store.put(verification),
+            "outcome": "accepted"
+            if accepted
+            else "rejected_unresolved_factual_targets"
+            if unchanged
+            else "rejected_semantic_regression",
+            "unchanged_factual_targets": unchanged,
+        }
+        update = {
+            "editorial_history_ref": self.store.put(history),
+            "editorial_candidate_ref": "",
+            "route": "finalize_source_document",
+        }
+        if not accepted:
+            update["limitations_ref"] = self.limitations(
+                state,
+                [
+                    "An editorial revision did not pass semantic preservation checks; "
+                    "the previous version was retained"
+                ],
+            )
+            return update
+        update["completion_draft_ref"] = state["editorial_candidate_ref"]
+        update["completion_audit_ref"] = self.store.put(
+            {**verification["audit"], "document_content_hash": document_content_hash(candidate)}
+        )
+        remaining = verification["remaining_editorial_findings"]
+        limit = getattr(getattr(self.model, "settings", None), "editorial_round_limit", 3)
+        if remaining and state.get("editorial_round", 0) < limit:
+            update["editorial_review_ref"] = self.store.put(
+                {"findings": remaining, "summary": verification["explanation"]}
+            )
+            update["route"] = "revise_source_document"
+        elif remaining:
+            update["limitations_ref"] = self.limitations(
+                state, ["The editorial correction limit was reached with remaining review findings"]
+            )
+        return update
 
     def finalize_source_document(self, state: PipelineState) -> dict:
         evidence = self.completion_evidence(state)
@@ -1383,6 +1690,15 @@ class Pipeline:
             ]
             diagnostics += invalid
         cleaned, final_repairs = apply_repairs(draft, targets, {}, evidence)
+        structure_issues = document_structure_findings(cleaned)
+        visual_issues = visual_findings(cleaned, evidence, self.editorial_image_paths(state))
+        if structure_issues:
+            limitations.append("Document presentation still has structural issues requiring review")
+        if visual_issues:
+            limitations.append(
+                "Some visuals failed validation and are retained in verification evidence "
+                "but excluded from the business rendering"
+            )
         repair_records = self.read(state, "completion_repair_records_ref", []) + final_repairs
         if any(item["outcome"] != "repaired" for item in repair_records):
             limitations.append("Some passages use original source extracts after bounded repair")
@@ -1510,6 +1826,12 @@ class Pipeline:
         selected_hashes = {
             value for section in cleaned["sections"] for value in section.get("image_hashes", [])
         }
+        selected_hashes.update(
+            visual["image_hash"]
+            for section in cleaned["sections"]
+            for visual in section.get("visuals", [])
+            if visual.get("kind") == "image" and visual.get("image_hash")
+        )
         known_hashes = {asset.get("hash") for asset in inventory_record.get("assets", [])}
         if selected_hashes - known_hashes:
             cleaned["limitations"].append("Unrecognized image references were omitted")
@@ -1520,11 +1842,13 @@ class Pipeline:
                 filename = f"assets/{asset['hash']}.{asset['format']}"
                 self.store.write(f"{directory}/{filename}", self.store.get_bytes(asset["hash"]))
                 image_paths[asset["hash"]] = filename
-        output = self.store.write(
-            f"{directory}/documentation.md",
-            render_grounded_document(cleaned, evidence, image_paths),
+        markdown = render_grounded_document(cleaned, evidence, image_paths)
+        excerpts = citation_excerpt_files(cleaned, evidence)
+        output = self.store.write(f"{directory}/documentation.md", markdown)
+        self.store.write(
+            f"{directory}/documentation.html", render_document_preview(markdown, excerpts)
         )
-        for path, content in citation_excerpt_files(cleaned, evidence).items():
+        for path, content in excerpts.items():
             self.store.write(f"{directory}/{path}", content)
         self.store.write(
             f"{directory}/verification.json",
@@ -1545,6 +1869,8 @@ class Pipeline:
                 else None
             ),
             "exact_citations_valid": not citation_findings(cleaned, evidence),
+            "structure_findings": structure_issues,
+            "visual_findings": visual_issues,
             "limitations": cleaned["limitations"],
             "source_revision": state.get("snapshot_ref"),
             "graph_revision": state.get("graph_revision"),
@@ -1556,6 +1882,9 @@ class Pipeline:
             "targeted_repair_counts": state.get("completion_repair_counts", {}),
             "paragraph_repairs": repair_records,
             "audit_target_diagnostics": diagnostics,
+            "editorial_rounds": state.get("editorial_round", 0),
+            "editorial_revisions": self.read(state, "editorial_history_ref", []),
+            "editorial_review": self.read(state, "editorial_review_ref", None),
         }
         self.store.write(
             f"{directory}/report.json", json.dumps(report, ensure_ascii=False, indent=2)
@@ -4130,6 +4459,9 @@ class Pipeline:
                     "repair_source_document",
                     "audit_source_document",
                     "finalize_source_document",
+                    "review_source_editorial",
+                    "revise_source_document",
+                    "verify_source_revision",
                 }
                 reserve = getattr(
                     getattr(self.model, "settings", None), "finalization_reserve_seconds", 180
@@ -4184,6 +4516,9 @@ class Pipeline:
                             "repair_source_document",
                             "audit_source_document",
                             "finalize_source_document",
+                            "review_source_editorial",
+                            "revise_source_document",
+                            "verify_source_revision",
                         }
                         else "write_source_document",
                     }
@@ -4295,6 +4630,11 @@ class Pipeline:
                 "kind": "stage",
                 **record,
                 "next": destination,
+                "readable_document": state.get("completion_plan_path", "")
+                if record["stage"] == "plan_source_document"
+                else state.get("completion_path", "")
+                if record["stage"] == "finalize_source_document"
+                else "",
                 "actions": ["approve", "request_correction", "reject"],
             }
         )
@@ -4354,6 +4694,10 @@ class Pipeline:
                 "completion_draft_ref": "",
                 "completion_audit_ref": "",
                 "completion_audit_count": 0,
+                "editorial_round": 0,
+                "editorial_review_ref": "",
+                "editorial_candidate_ref": "",
+                "editorial_history_ref": "",
                 "review_error": "",
                 "status": "running",
             }
@@ -4403,6 +4747,9 @@ class Pipeline:
                     "write_source_document": "finalize_source_document",
                     "repair_source_document": "finalize_source_document",
                     "audit_source_document": "finalize_source_document",
+                    "review_source_editorial": "finalize_source_document",
+                    "revise_source_document": "finalize_source_document",
+                    "verify_source_revision": "finalize_source_document",
                 }.get(stage, "plan_source_document")
             result = {
                 "route": target,

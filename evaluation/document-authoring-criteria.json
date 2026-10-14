@@ -1,0 +1,37 @@
+{
+  "declared_before_fresh_runs": true,
+  "date": "2026-10-13",
+  "purpose": "Compare document authoring after evidence preparation. This rubric separates presentation, claim entailment and source-information preservation.",
+  "evaluation_limits": [
+    "Risk and library sources are known development fixtures; the evaluator has read the baseline, so this is not a blinded experiment.",
+    "The appointment corpus is a newly authored acceptance fixture, not independently sampled production data.",
+    "One sample per corpus cannot establish statistical improvement or a general correctness percentage.",
+    "The same source brief is preferred. Record differences in brief, template, reasoning level and workflow instead of attributing every difference to one feature.",
+    "Exact citations, topic mentions, stable paragraph identities and model coverage estimates are not semantic correctness measurements."
+  ],
+  "dimensions": {
+    "consistency": ["No summary converts a necessary condition into authorization or a success guarantee.", "Rules, terminology, actors and scopes agree between summaries, details and diagrams.", "An unresolved source conflict remains visible without invented precedence.", "Approved plan hierarchy has no missing parent, heading-level discontinuity or pseudo-heading in prose."],
+    "sourcing": ["Every externally checkable business claim is supported by its actual cited excerpt, including qualifiers and negative boundaries.", "Local evidence links and source-image links exist.", "Visual descriptions cite the relevant image evidence, and diagram arrows do not invent causal or temporal guarantees.", "Audit explanations never become source facts; generated interpretations retain provenance outside customer prose."],
+    "preservation": ["Every declared source rule and exception is represented with its original modality, trigger, quantity and actor.", "Revisions retain supported clauses, not merely paragraph IDs.", "Planned-but-unavailable functionality remains distinct from current behavior.", "Unsupported elaborations are counted separately from omitted source information."],
+    "readability": ["A business reader can locate an operational rule without navigating repeated competing versions.", "Headings describe the actual content, paragraphs develop one topic, and details are scannable.", "The document does not expose pipeline status, raw audit notes or repetitive AI-production disclaimers.", "No filler is generated solely to populate a template."],
+    "appearance": ["Numbering and heading levels are consistent, with all parent headings present.", "Images and Mermaid diagrams have descriptive numbered captions immediately beneath them.", "Visuals do not use HTML table wrappers.", "Rendered output has no raw diagram fences, unreadably wide blocks, broken images or overwhelming citation clutter."
+    ]
+  },
+  "baselines": {
+    "risk": {
+      "document": ".docgen/business-final-risk-20261013/runs/business-final-risk-20261013/output/documentation.md",
+      "original": "data/test_data_2_quick/risk-profiling.md",
+      "semantic_regressions_to_check": ["Do not promise successful reliable assessment for all complete valid submissions.", "Returning a stored duplicate result does not prove there is never any internal re-evaluation.", "The isolated Retry once instruction does not identify a failure trigger.", "Q2 cannot be submitted after the stated date; do not assert it was permitted before that date.", "Source-image captions and excerpt citations must support displayed values, not merely field names.", "Reconciliation stays planned and subject to human review; do not present it as implemented."]
+    },
+    "library": {
+      "document": ".docgen/business-final-library-20261013/runs/business-final-library-20261013/output/documentation.md",
+      "originals": ["evaluation/fixtures/business-output/borrowing.md", "evaluation/fixtures/business-output/identity.md", "evaluation/fixtures/business-output/returns.md"],
+      "fact_checks": "evaluation/business-output-expectations.json",
+      "semantic_regressions_to_check": ["Successful identity verification is required, but does not alone authorize handover.", "No conflicting reservation is necessary for extension approval, not an approval guarantee.", "The delegated collector undergoes the check; do not assign them responsibility for conducting it.", "Both 30 and 45 days after notice remain visible with no invented winner."]
+    }
+  },
+  "appointment_acceptance": {
+    "sources": "evaluation/fixtures/appointment-output",
+    "checks": ["Address and contact number are required but do not guarantee confirmation; requesting a preferred slot does not reserve it.", "Change request cutoff is 18:00 local office time on the previous day, distinct from the cancellation 24-hour window.", "Original visit remains confirmed until a replacement is confirmed; unsuccessful change does not cancel it.", "Customer cancellation at least 24 hours before start gives eligibility for refund review, not approval.", "Within 24 hours standard fee is 20 credits; supervisor may waive it with evidence of service outage.", "Fee waiver does not grant compensation, create a payment or approve a refund.", "Technician cancellation gives a choice of new slot or full refund; rescheduling is not automatic or generalized to customer cancellation.", "Premium visits are unapproved and unavailable; safety concern requires review, not a declaration that the home is unsafe.", "Record payment status and reference, never full card numbers; failed payment alone does not cancel an appointment.", "Payment-status timeout permits one status refresh, not another card charge.", "Approved refund uses original payment method; settlement is distinct and bank availability has no promised time.", "Both conflicting two- and five-working-day submission deadlines after approval are retained, neither inferred to describe bank settlement.", "Separate compensation decision has no invented amount or automatic entitlement."]
+  }
+}

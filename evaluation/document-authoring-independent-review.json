@@ -1,0 +1,169 @@
+{
+  "review_type": "Independent read-only review against original source clauses and the predeclared authoring rubric",
+  "reviewer": "authoring_evaluation subagent",
+  "method_limits": [
+    "The evaluator read known baseline documents before the new outputs, so this is not a blinded comparison.",
+    "Risk and library are development fixtures, and initial-run findings influenced later prompts. These are regression checks, not held-out evidence.",
+    "No model calls, source edits, runtime edits or generated-output edits were performed for this review.",
+    "Source topic representation and exact quote matches are not correctness percentages. Rendered layout and Mermaid grammar are reviewed separately."
+  ],
+  "risk": {
+    "run_id": "authoring-verified-risk-20261013",
+    "document": ".docgen/authoring-verified-risk-20261013/runs/authoring-verified-risk-20261013/output/documentation.md",
+    "baseline": ".docgen/business-final-risk-20261013/runs/business-final-risk-20261013/output/documentation.md",
+    "original": "data/test_data_2_quick/risk-profiling.md",
+    "overall": "Hierarchy, Markdown captions and precision of some image-value citations improve. Semantic correctness and editorial readability do not improve in this run: unsupported implications remain, the process diagram adds a success guarantee, and expanded repetition makes the document harder to read. The provider returned 503 during semantic audit, and editorial review did not execute; this run does not validate the intended full authoring cycle.",
+    "information_preservation": "All eleven source rule topics remain represented, including their named values, provider exclusions, profile expiry and planned reconciliation status. Current-profile review before drafting and after recovery is present. This does not establish semantic preservation in every repeated formulation: stronger unsupported implications occur elsewhere.",
+    "improvements": [
+      "Chapter 5 exists and children have proper level-three headings; prior numbered pseudo-headings 3.1, 3.2, 3.3, 4.1 and 4.2 now have real headings.",
+      "Images and the process diagram have numbered Markdown captions directly underneath, with no HTML table wrappers.",
+      "Section 3.1 cites specific image-description excerpts for Beginner, 3-7 years, 5% and Flexible. The prior version cited a generic field-list excerpt for these values.",
+      "No raw auditor explanation, phantom withheld paragraph or standalone AI-generation disclaimer is inserted into customer prose."
+    ],
+    "findings": [
+      {
+        "id": "RISK-1",
+        "severity": "material",
+        "kind": "necessary_to_sufficient_in_prose_and_diagram",
+        "locations": ["documentation.md:71", "documentation.md:74"],
+        "output_quotes": ["complete responses yield an accepted profile", "F -- Complete Evaluation --> H[Issue Accepted Profile Valid for 365 Days]"],
+        "source_quote": "An incomplete RiskSignal response cannot become an accepted profile.",
+        "source_location": "risk-profiling.md:21",
+        "reason": "The prohibition on accepting incomplete responses does not establish that every complete response is accepted. The diagram and overview assert that stronger sufficient condition."
+      },
+      {
+        "id": "RISK-2",
+        "severity": "material",
+        "kind": "unsupported_internal_execution_guarantee",
+        "locations": ["documentation.md:55", "documentation.md:81"],
+        "output_quotes": ["without re-evaluating the profile", "the platform bypasses downstream evaluation"],
+        "source_quote": "A duplicate with the same answers returns the stored result.",
+        "source_location": "risk-profiling.md:20",
+        "reason": "Returned-result behavior does not specify all internal computation or downstream-call behavior. The baseline already had a no-re-evaluation claim; it remains and becomes an explicit bypass assertion."
+      },
+      {
+        "id": "RISK-3",
+        "severity": "material",
+        "kind": "invented_retry_trigger_and_generalized_recoverability",
+        "locations": ["documentation.md:57", "documentation.md:71", "documentation.md:74", "documentation.md:83"],
+        "output_quotes": ["Under these conditions, the system allows the caller to retry once", "Missing Reason Code / Incomplete -> Draft Remains Recoverable; Retry Once"],
+        "source_quotes": ["A missing reason code keeps the draft recoverable.", "Retry once."],
+        "source_locations": ["risk-profiling.md:21", "risk-profiling.md:36"],
+        "reason": "The isolated retry statement provides no triggering condition. The output binds it to specific response failures, and the diagram generalizes recoverability from missing reason codes to every incomplete response."
+      },
+      {
+        "id": "RISK-4",
+        "severity": "material",
+        "kind": "unsupported_exclusivity",
+        "locations": ["documentation.md:45", "documentation.md:109"],
+        "output_quotes": ["establishing Q3 as the exclusive intake standard", "Submissions under legacy formats are blocked"],
+        "source_quotes": ["Q3 is the current questionnaire version.", "A Q2 draft cannot be submitted after 2026-09-01."],
+        "source_location": "risk-profiling.md:14",
+        "reason": "The source gives current version and a specific Q2 deadline, not a universal exclusivity rule or a ban on every legacy format."
+      },
+      {
+        "id": "RISK-5",
+        "severity": "moderate",
+        "kind": "cited_excerpt_does_not_cover_multi_claim_paragraph",
+        "locations": ["documentation.md:39", "documentation.md:67", "documentation.md:91"],
+        "reason": "The feature overview at line 39 cites only review-current-profile instructions while describing consent, external scoring, idempotency, recovery, fallback and expiry. The process introduction includes recoverability and retained history without their corresponding excerpts. Exact citations exist, but do not support all accompanying clauses."
+      },
+      {
+        "id": "RISK-6",
+        "severity": "moderate",
+        "kind": "editorial_regression",
+        "locations": ["documentation.md:71", "documentation.md:95", "documentation.md:111", "documentation.md:117", "documentation.md:121"],
+        "output_quotes": ["The EXPERT is retired and rejected level", "strictly requires PROFILE_PROCESSING consent at CP-3 is required", "Unrelated systems MarketPulse and CustodyBridge are unrelated"],
+        "reason": "Several sentences are grammatically broken or tautological. The five-phase process is one long paragraph; the mockup section transcribes two screens in one dense paragraph; rules repeat through summary, dictionary, features, subprocesses and detailed reference. Two image assets appear five times. More headings and citations did not result in a more concise or attractive reading experience."
+      }
+    ],
+    "audit_state": {"semantic_audit": null, "editorial_review": null, "provider_error": "503 UNAVAILABLE during audit_source_document", "conclusion": "Do not report the exported content as semantically validated or editorially accepted."}
+  },
+  "library": {
+    "run_id": "authoring-verified-library-20261013",
+    "document": ".docgen/authoring-verified-library-20261013/runs/authoring-verified-library-20261013/output/documentation.md",
+    "baseline": ".docgen/business-final-library-20261013/runs/business-final-library-20261013/output/documentation.md",
+    "originals": ["evaluation/fixtures/business-output/borrowing.md", "evaluation/fixtures/business-output/identity.md", "evaluation/fixtures/business-output/returns.md"],
+    "overall": "The hierarchy improves and the previous explicit successful-identity-check authorization error is absent. All 17 declared topics remain represented. However, substantial repetition and a long chronological paragraph reduce readability, new unsupported operational restrictions appear, and a provider outage prevents final audit and editorial review. The result is a mixed change, not demonstrated overall content-quality improvement.",
+    "preservation_checks": [
+      {"check": 1, "result": "represented", "detail": "Active membership and no unpaid overdue charges are retained."},
+      {"check": 2, "result": "represented", "detail": "Staff waive only the charge requirement, not membership or recorded debt; exception appears in detail, not executive summary."},
+      {"check": 3, "result": "represented_with_new_overconstraint", "detail": "Successful check requirement and no-fraud inference are retained, but section 3.2 imposes matching names as a release prerequisite rather than preserving the unresolved staff-review route for mismatch."},
+      {"check": 4, "result": "represented", "detail": "48 hours after confirmation, expiry, history and no specified retention duration remain."},
+      {"check": 5, "result": "represented", "detail": "Other items remain reserved; resident chooses removal or waiting; automatic substitution prohibited."},
+      {"check": 6, "result": "represented", "detail": "Evening service is unapproved and unavailable; assisted collection remains a request."},
+      {"check": 7, "result": "represented", "detail": "Extension request does not change due date before approval."},
+      {"check": 8, "result": "represented", "detail": "Mismatch requires staff review; review is neither automatic approval nor permanent rejection."},
+      {"check": 9, "result": "represented", "detail": "Delegate needs authorization and their own unexpired document."},
+      {"check": 10, "result": "represented", "detail": "Outcome and reviewer reference stored; document image not stored."},
+      {"check": 11, "result": "represented", "detail": "Timeout permits one retry without extending original deadline."},
+      {"check": 12, "result": "represented", "detail": "Incomplete result cannot authorize collection; complete result alone is insufficient."},
+      {"check": 13, "result": "represented_with_ambiguous_summary", "detail": "One seven-day extension and necessary approval condition are retained in detailed sections; executive summary can attach conflict absence to the right to request."},
+      {"check": 14, "result": "represented_with_narrowed_repeated_prohibition", "detail": "Rejected request leaves due date unchanged, but repeated text narrows different extension to different duration; one source extract preserves the original broader rule."},
+      {"check": 15, "result": "represented", "detail": "Completeness and damage checks remain independent."},
+      {"check": 16, "result": "represented", "detail": "Dual-desk pilot remains limited to tools, not generalized to audio equipment."},
+      {"check": 17, "result": "represented", "detail": "Both 30 and 45 days after notice remain visible without precedence."}
+    ],
+    "improvements": [
+      "Chapter 5 now exists with nested numbered child headings, and participants, dictionary, features and subprocesses have real section headings.",
+      "The prior explicit statement that successful identity verification authorizes item handover is replaced by successful check and satisfaction of all collection requirements.",
+      "The initial fallback-run diagram that guaranteed extension approval when no conflict exists is not repeated. The new diagram shows extension request review without an approval branch.",
+      "The new diagram has a descriptive numbered Markdown caption and no HTML wrapper."
+    ],
+    "findings": [
+      {
+        "id": "LIBRARY-1",
+        "severity": "material",
+        "kind": "unsupported_name_match_precondition",
+        "section": "3.2 Collection and Identity Verification",
+        "output_quote": "An unexpired identity document must match the reservation name before an item can be released",
+        "source_quotes": ["The collection identity check compares the reservation name with an unexpired identity document.", "A name mismatch requires staff review. Staff review is not automatic approval and is not a permanent rejection."],
+        "source_location": "identity.md:5",
+        "reason": "The source requires comparison and routes mismatch to review. It does not establish matching names as an absolute prerequisite to release. This is particularly problematic for delegated collection, whose name-comparison resolution is not specified."
+      },
+      {
+        "id": "LIBRARY-2",
+        "severity": "moderate",
+        "kind": "unsupported_final_decision",
+        "section": "4.2 Key Subprocesses",
+        "output_quote": "any conflicting subsequent reservation results in an extension rejection",
+        "source_quote": "Approval requires that no subsequent reservation conflicts with the extended period.",
+        "source_location": "returns.md:5",
+        "reason": "A conflict prevents approval under the stated condition, but the source does not specify immediate or inevitable rejection instead of a pending/review outcome. The output invents the terminal decision."
+      },
+      {
+        "id": "LIBRARY-3",
+        "severity": "moderate",
+        "kind": "narrowed_prohibition_and_changed_modality",
+        "sections": ["3.3 Loan Extensions and Equipment Returns", "5.3 Loan Extensions and Equipment Returns Rules"],
+        "output_quotes": ["staff cannot substitute an alternative extension period", "staff cannot silently replace the rejected request with a different extension duration"],
+        "source_quote": "Staff may explain the decision but cannot silently replace it with a different extension.",
+        "source_location": "returns.md:5",
+        "reason": "The detailed wording narrows different extension to duration. The summary also drops silently, changing the condition on the prohibition. An exact source extract in the participants section preserves the original, so repeated formulations no longer agree."
+      },
+      {
+        "id": "LIBRARY-4",
+        "severity": "minor",
+        "kind": "summary_condition_attachment",
+        "section": "1 Executive Summary",
+        "output_quote": "a resident may request a single extension of seven days, which requires that no subsequent reservation conflicts",
+        "reason": "The relative clause can condition the ability to request rather than approval. Detailed sections preserve the distinction. This is an ambiguity rather than a confidently established semantic error."
+      },
+      {
+        "id": "LIBRARY-5",
+        "severity": "moderate",
+        "kind": "diagram_happy_path_qualification",
+        "section": "4.1 Main Process Overview, Figure 1",
+        "output_quote": "Collection Requirements Evaluation --> Item Released on Loan",
+        "reason": "The diagram has no successful-evaluation qualifier or non-release branch. As an abstract happy-path overview it may be acceptable, but neither title nor caption identifies that restricted scope. It can suggest evaluation invariably leads to release, unlike the explicit conditions in prose. This is weaker evidence than the earlier explicit No conflict -> Approved diagram error."
+      },
+      {
+        "id": "LIBRARY-6",
+        "severity": "moderate",
+        "kind": "readability_and_citation_coverage",
+        "reason": "Rules repeat in executive summary, dictionary, feature descriptions, process phases, subprocesses and detailed reference. The chronological overview is one long paragraph with a long citation tail. Several overview citations are narrower than their claims: the lifecycle introduction cites the return-inspection sentence while additionally describing handling of left personal property. Source-extract fallback leaves two disconnected statements under Process Participants, without a coherent explanation of roles."
+      }
+    ],
+    "audit_state": {"initial_semantic_audit_accepted": false, "post_repair_audit_completed": false, "semantic_audit_matches_exported_content": false, "editorial_review": null, "provider_error": "503 UNAVAILABLE during targeted repair and post-repair audit", "conclusion": "One identified actor-responsibility claim was replaced by exact source extracts. Other claims were not accepted by a final audit, and the editorial cycle was not exercised."}
+  }
+}

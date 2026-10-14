@@ -1,0 +1,177 @@
+[
+  {
+    "run_id": "authoring-risk-20261013",
+    "process": {
+      "user_interventions": 0,
+      "exit_code": 15,
+      "started_utc": "2026-10-13T22:30:52.6458160+00:00",
+      "coordinator_interventions": 0,
+      "run_id": "authoring-risk-20261013",
+      "finished_utc": "2026-10-13T22:39:11.6267890+00:00",
+      "elapsed_seconds": 498.980973,
+      "process_starts": 1
+    },
+    "status": "degraded_source_bundle",
+    "events": {
+      "completed": 18,
+      "request": 8,
+      "response": 4,
+      "provider_error": 2,
+      "incomplete_response": 2
+    },
+    "ledger": [
+      {
+        "status": "settled",
+        "entries": 4,
+        "charged_pln": 0.1868977962
+      },
+      {
+        "status": "uncertain",
+        "entries": 4,
+        "charged_pln": 6.49947017655
+      }
+    ]
+  },
+  {
+    "run_id": "authoring-library-20261013",
+    "process": {
+      "process_starts": 1,
+      "exit_code": 0,
+      "user_interventions": 0,
+      "finished_utc": "2026-10-13T22:37:51.8745699+00:00",
+      "run_id": "authoring-library-20261013",
+      "elapsed_seconds": 407.0446121,
+      "started_utc": "2026-10-13T22:31:04.8299578+00:00",
+      "coordinator_interventions": 0
+    },
+    "status": "complete_with_limitations",
+    "events": {
+      "completed": 22,
+      "request": 9,
+      "response": 7,
+      "provider_error": 2
+    },
+    "ledger": [
+      {
+        "status": "settled",
+        "entries": 7,
+        "charged_pln": 1.016563816575
+      },
+      {
+        "status": "uncertain",
+        "entries": 2,
+        "charged_pln": 3.1983270288749996
+      }
+    ]
+  },
+  {
+    "run_id": "authoring-appointments-20261013",
+    "process": {
+      "process_starts": 1,
+      "finished_utc": "2026-10-13T22:34:25.2449433+00:00",
+      "started_utc": "2026-10-13T22:31:17.3146157+00:00",
+      "coordinator_interventions": 0,
+      "user_interventions": 0,
+      "exit_code": 0,
+      "elapsed_seconds": 187.9303276,
+      "run_id": "authoring-appointments-20261013"
+    },
+    "status": "complete_with_limitations",
+    "events": {
+      "completed": 20,
+      "request": 7,
+      "response": 5,
+      "provider_error": 2
+    },
+    "ledger": [
+      {
+        "status": "settled",
+        "entries": 5,
+        "charged_pln": 0.455000698575
+      },
+      {
+        "status": "uncertain",
+        "entries": 2,
+        "charged_pln": 3.1839412344749993
+      }
+    ]
+  },
+  {
+    "run_id": "authoring-final-risk-20261013",
+    "process": {
+      "finished_utc": "2026-10-13T22:42:50.9715781+00:00",
+      "run_id": "authoring-final-risk-20261013",
+      "exit_code": 15,
+      "coordinator_interventions": 0,
+      "process_starts": 1,
+      "user_interventions": 0,
+      "elapsed_seconds": 29.2141924,
+      "started_utc": "2026-10-13T22:42:21.7573857+00:00"
+    },
+    "status": "degraded_source_bundle",
+    "events": {
+      "completed": 10,
+      "request": 24,
+      "provider_error": 24
+    },
+    "ledger": [
+      {
+        "status": "uncertain",
+        "entries": 24,
+        "charged_pln": 54.7497815945625
+      }
+    ]
+  },
+  {
+    "run_id": "authoring-final-library-20261013",
+    "process": {
+      "run_id": "authoring-final-library-20261013",
+      "user_interventions": 0,
+      "started_utc": "2026-10-13T22:42:21.7570168+00:00",
+      "process_starts": 1,
+      "elapsed_seconds": 23.2359271,
+      "finished_utc": "2026-10-13T22:42:44.9929439+00:00",
+      "coordinator_interventions": 0,
+      "exit_code": 15
+    },
+    "status": "degraded_source_bundle",
+    "events": {
+      "completed": 10,
+      "request": 18,
+      "provider_error": 18
+    },
+    "ledger": [
+      {
+        "status": "uncertain",
+        "entries": 18,
+        "charged_pln": 45.694638020587504
+      }
+    ]
+  },
+  {
+    "run_id": "authoring-final-appointments-20261013",
+    "process": {
+      "finished_utc": "2026-10-13T22:42:44.9110255+00:00",
+      "user_interventions": 0,
+      "coordinator_interventions": 0,
+      "process_starts": 1,
+      "exit_code": 15,
+      "started_utc": "2026-10-13T22:42:21.7567518+00:00",
+      "run_id": "authoring-final-appointments-20261013",
+      "elapsed_seconds": 23.1542737
+    },
+    "status": "degraded_source_bundle",
+    "events": {
+      "completed": 10,
+      "request": 18,
+      "provider_error": 18
+    },
+    "ledger": [
+      {
+        "status": "uncertain",
+        "entries": 18,
+        "charged_pln": 45.5655625381125
+      }
+    ]
+  }
+]

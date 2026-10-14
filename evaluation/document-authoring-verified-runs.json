@@ -1,0 +1,2530 @@
+[
+  {
+    "run_id": "authoring-verified-risk-20261013",
+    "process": {
+      "elapsed_seconds": 472.2296713,
+      "finished_utc": "2026-10-13T22:51:31.4910443+00:00",
+      "run_id": "authoring-verified-risk-20261013",
+      "process_starts": 1,
+      "exit_code": 0,
+      "started_utc": "2026-10-13T22:43:39.2613730+00:00",
+      "coordinator_interventions": 0,
+      "user_interventions": 0
+    },
+    "status": "complete_with_limitations",
+    "event_counts": {
+      "completed": 19,
+      "request": 12,
+      "response": 6,
+      "provider_error": 6
+    },
+    "stage_metrics": {
+      "snapshot_inputs": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "inventory_sources": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "describe_image": {
+        "requests": 2,
+        "responses": 2,
+        "response_seconds_sum": 8.59039330000087
+      },
+      "prepare_source_images": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "extract_document": {
+        "requests": 1,
+        "responses": 1,
+        "response_seconds_sum": 28.652858800000104
+      },
+      "extract_document_batch": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "verify_document_batch": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "link_graph_batch": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "verify_graph_batch": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "semantic_graph": {
+        "requests": 1,
+        "responses": 1,
+        "response_seconds_sum": 26.32400559999951
+      },
+      "propose_semantic_graph": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "audit_semantic_graph": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "publish_semantic_graph": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "finalize_graph": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "source_plan": {
+        "requests": 1,
+        "responses": 1,
+        "response_seconds_sum": 59.69595489999847
+      },
+      "plan_source_document": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "source_document": {
+        "requests": 1,
+        "responses": 1,
+        "response_seconds_sum": 238.61390290000054
+      },
+      "write_source_document": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "repair_source_document": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "audit_source_document": {
+        "requests": 6,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "finalize_source_document": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      }
+    },
+    "ledger": [
+      {
+        "status": "settled",
+        "entries": 6,
+        "charged_pln": 1.089421283475
+      },
+      {
+        "status": "uncertain",
+        "entries": 6,
+        "charged_pln": 18.811356624675
+      }
+    ],
+    "quality_artifacts": {
+      "completion_audit_diagnostics_ref": [],
+      "limitations_ref": [
+        "Automatic reconciliation for orphan Mongo audits remains planned and unexecuted; current handling strictly requires manual review decisions.",
+        "Mockup images and currency examples (e.g., S\u0142awomir's z\u0142oty) are synthetic fixtures intended for testing and illustration rather than live operational definitions.",
+        "Graph interpretation withheld: Withheld graph concept concept_synthetic_fixtures: concept_synthetic_fixtures: quote does not match exact source characters",
+        "Graph interpretation withheld: Withheld graph relationship 3: Mockup images illustrate synthetic draft inputs (such as Beginner experience and 5% loss tolerance) conforming to profiling attributes.: quote does not match exact source characters; Unknown or withheld relationship endpoint",
+        "audit_source_document: Recoverable ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+      ],
+      "semantic_audit_ref": {
+        "accepted": null,
+        "findings": [
+          "Automatic reconciliation for orphan Mongo audits remains planned and unexecuted; current handling strictly requires manual review decisions.",
+          "Mockup images and currency examples (e.g., S\u0142awomir's z\u0142oty) are synthetic fixtures intended for testing and illustration rather than live operational definitions.",
+          "Withheld graph concept concept_synthetic_fixtures: concept_synthetic_fixtures: quote does not match exact source characters",
+          "Withheld graph relationship 3: Mockup images illustrate synthetic draft inputs (such as Beginner experience and 5% loss tolerance) conforming to profiling attributes.: quote does not match exact source characters; Unknown or withheld relationship endpoint"
+        ],
+        "status": "source_links_validated_semantics_unreviewed"
+      },
+      "graph_quality_ref": {
+        "accepted": true,
+        "allocated_fact_count": 14,
+        "batch_count": 1,
+        "citations": [
+          {
+            "end": 2515,
+            "end_column": 99,
+            "end_line": 23,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 2515,
+              "kind": "characters",
+              "start": 2426
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 2515,
+              "kind": "characters",
+              "start": 2426
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 2426,
+            "start_column": 10,
+            "start_line": 23,
+            "text": "A result expires 365 days after acceptance. | It remains visible in history after expiry."
+          },
+          {
+            "end": 2031,
+            "end_column": 78,
+            "end_line": 21,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 2031,
+              "kind": "characters",
+              "start": 1963
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 2031,
+              "kind": "characters",
+              "start": 1963
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 1963,
+            "start_column": 10,
+            "start_line": 21,
+            "text": "An incomplete RiskSignal response cannot become an accepted profile."
+          },
+          {
+            "end": 1353,
+            "end_column": 109,
+            "end_line": 18,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 1353,
+              "kind": "characters",
+              "start": 1254
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 1353,
+              "kind": "characters",
+              "start": 1254
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 1254,
+            "start_column": 10,
+            "start_line": 18,
+            "text": "PROFILE_PROCESSING consent at CP-3 is required. | Marketing consent alone never permits submission."
+          },
+          {
+            "end": 2469,
+            "end_column": 53,
+            "end_line": 23,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 2469,
+              "kind": "characters",
+              "start": 2426
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 2469,
+              "kind": "characters",
+              "start": 2426
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 2426,
+            "start_column": 10,
+            "start_line": 23,
+            "text": "A result expires 365 days after acceptance."
+          },
+          {
+            "end": 2734,
+            "end_column": 115,
+            "end_line": 24,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 2734,
+              "kind": "characters",
+              "start": 2629
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 2734,
+              "kind": "characters",
+              "start": 2629
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 2629,
+            "start_column": 10,
+            "start_line": 24,
+            "text": "An orphan Mongo audit needs a review decision. | Automatic reconciliation is planned and not implemented."
+          },
+          {
+            "end": 1140,
+            "end_column": 87,
+            "end_line": 17,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 1140,
+              "kind": "characters",
+              "start": 1063
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 1140,
+              "kind": "characters",
+              "start": 1063
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 1063,
+            "start_column": 10,
+            "start_line": 17,
+            "text": "Exactly 5 percent belongs to L5. | A 5.1 percent free-text answer is invalid."
+          },
+          {
+            "end": 3420,
+            "end_column": 142,
+            "end_line": 38,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 3420,
+              "kind": "characters",
+              "start": 3371
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 3420,
+              "kind": "characters",
+              "start": 3371
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 3371,
+            "start_column": 93,
+            "start_line": 38,
+            "text": "RiskSignal &amp; platform share a correlation ID."
+          },
+          {
+            "end": 785,
+            "end_column": 102,
+            "end_line": 15,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 785,
+              "kind": "characters",
+              "start": 693
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 785,
+              "kind": "characters",
+              "start": 693
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 693,
+            "start_column": 10,
+            "start_line": 15,
+            "text": "Experience uses NONE, BEGINNER, INTERMEDIATE and ADVANCED. | EXPERT is retired and rejected."
+          },
+          {
+            "end": 2084,
+            "end_column": 131,
+            "end_line": 21,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 2084,
+              "kind": "characters",
+              "start": 1963
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 2084,
+              "kind": "characters",
+              "start": 1963
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 1963,
+            "start_column": 10,
+            "start_line": 21,
+            "text": "An incomplete RiskSignal response cannot become an accepted profile. | A missing reason code keeps the draft recoverable."
+          },
+          {
+            "end": 1849,
+            "end_column": 130,
+            "end_line": 20,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 1849,
+              "kind": "characters",
+              "start": 1729
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 1849,
+              "kind": "characters",
+              "start": 1729
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 1729,
+            "start_column": 10,
+            "start_line": 20,
+            "text": "A complete Q3 submission uses one stable idempotency key. | A duplicate with the same answers returns the stored result."
+          },
+          {
+            "end": 3277,
+            "end_column": 12,
+            "end_line": 36,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 3277,
+              "kind": "characters",
+              "start": 3266
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 3277,
+              "kind": "characters",
+              "start": 3266
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 3266,
+            "start_column": 1,
+            "start_line": 36,
+            "text": "Retry once."
+          },
+          {
+            "end": 2312,
+            "end_column": 124,
+            "end_line": 22,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 2312,
+              "kind": "characters",
+              "start": 2198
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 2312,
+              "kind": "characters",
+              "start": 2198
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 2198,
+            "start_column": 10,
+            "start_line": 22,
+            "text": "A failed reassessment leaves the prior unexpired profile active. | The failed attempt is not a new active profile."
+          },
+          {
+            "end": 949,
+            "end_column": 60,
+            "end_line": 16,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 949,
+              "kind": "characters",
+              "start": 899
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 949,
+              "kind": "characters",
+              "start": 899
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 899,
+            "start_column": 10,
+            "start_line": 16,
+            "text": "Month 36 starts horizon H3. | Month 35 remains H1."
+          },
+          {
+            "end": 366,
+            "end_column": 156,
+            "end_line": 10,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 366,
+              "kind": "characters",
+              "start": 316
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 366,
+              "kind": "characters",
+              "start": 316
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 316,
+            "start_column": 106,
+            "start_line": 10,
+            "text": "Review the current profile after recovery as well."
+          },
+          {
+            "end": 3722,
+            "end_column": 121,
+            "end_line": 40,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 3722,
+              "kind": "characters",
+              "start": 3602
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 3722,
+              "kind": "characters",
+              "start": 3602
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 3602,
+            "start_column": 1,
+            "start_line": 40,
+            "text": "Uncertainty: automatic reconciliation of an orphan audit is planned; current inclusion requires a human review decision."
+          },
+          {
+            "end": 3600,
+            "end_column": 322,
+            "end_line": 38,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 3600,
+              "kind": "characters",
+              "start": 3510
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 3600,
+              "kind": "characters",
+              "start": 3510
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 3510,
+            "start_column": 232,
+            "start_line": 38,
+            "text": "A failed reassessment leaves the prior unexpired profile active until its original expiry."
+          },
+          {
+            "end": 3330,
+            "end_column": 52,
+            "end_line": 38,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 3330,
+              "kind": "characters",
+              "start": 3279
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 3330,
+              "kind": "characters",
+              "start": 3279
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 3279,
+            "start_column": 1,
+            "start_line": 38,
+            "text": "**No provider call** occurs for an incomplete draft"
+          },
+          {
+            "end": 1301,
+            "end_column": 57,
+            "end_line": 18,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 1301,
+              "kind": "characters",
+              "start": 1254
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 1301,
+              "kind": "characters",
+              "start": 1254
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 1254,
+            "start_column": 10,
+            "start_line": 18,
+            "text": "PROFILE_PROCESSING consent at CP-3 is required."
+          },
+          {
+            "end": 1615,
+            "end_column": 158,
+            "end_line": 19,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 1615,
+              "kind": "characters",
+              "start": 1467
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 1615,
+              "kind": "characters",
+              "start": 1467
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 1467,
+            "start_column": 10,
+            "start_line": 19,
+            "text": "RiskSignal is the only external business provider called by risk profiling. | MarketPulse and CustodyBridge are unrelated to the profile submission."
+          },
+          {
+            "end": 579,
+            "end_column": 101,
+            "end_line": 14,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 579,
+              "kind": "characters",
+              "start": 488
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 579,
+              "kind": "characters",
+              "start": 488
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 488,
+            "start_column": 10,
+            "start_line": 14,
+            "text": "Q3 is the current questionnaire version. | A Q2 draft cannot be submitted after 2026-09-01."
+          },
+          {
+            "end": 3444,
+            "end_column": 166,
+            "end_line": 38,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 3444,
+              "kind": "characters",
+              "start": 3421
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 3444,
+              "kind": "characters",
+              "start": 3421
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 3421,
+            "start_column": 143,
+            "start_line": 38,
+            "text": "Q3\u00a0consent is required."
+          },
+          {
+            "end": 366,
+            "end_column": 156,
+            "end_line": 10,
+            "evidence_id": "13148b72a8052994bd5d",
+            "file_hash": "b6e3143fb5ab3629346e870f65cd8cbc4eceee675fd2d614cebda5087f74cf90",
+            "locator": {
+              "end": 366,
+              "kind": "characters",
+              "start": 260
+            },
+            "path": "risk-profiling.md",
+            "quote_locator": {
+              "end": 366,
+              "kind": "characters",
+              "start": 260
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 3723,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 260,
+            "start_column": 50,
+            "start_line": 10,
+            "text": "Review the current profile before starting a new draft. Review the current profile after recovery as well."
+          }
+        ],
+        "counts": {
+          "Concept": 7
+        },
+        "fact_count": 17,
+        "findings": [],
+        "graph_hash": "9c6207b090f5ebbca3fac140272823b7ec4685a8632e7ef1455522861d999eff",
+        "owned_source_count": 3,
+        "quote_count": 22,
+        "quoted_source_count": 1,
+        "schema_version": 1,
+        "semantic_edges": 24,
+        "source_count": 3,
+        "source_coverage": {
+          "accepted": null,
+          "aspects": {
+            "represented": 0,
+            "total": 0
+          },
+          "blocks": {
+            "total": 0
+          },
+          "complete": null,
+          "coverage_ratio": null,
+          "graph_revision": "fac55d87f2e6f9a1bc531acd6a3e940af29abb551d57402874db341bd8c24abd",
+          "integrity_findings": [],
+          "minimum_coverage": 0.9,
+          "omitted_aspects": [],
+          "qualifiers": {
+            "coverage_ratio": null,
+            "represented": 0,
+            "total": 0
+          },
+          "reason": "Source-first mode uses original context and a final document audit; no separate source-aspect inventory was audited",
+          "snapshot_id": "7eedeb073efb9703b75ae300de93274256e682a60eeb5db7384b09d1ea90feba",
+          "status": "not_independently_measured",
+          "unresolved_attachments": []
+        },
+        "unallocated_fact_ids": [
+          "15ff16aec18c0defc97803ab",
+          "8a5fdb3100fe51cb137d3ea2",
+          "dfb21854755de93faab0781a"
+        ],
+        "uncertainties": [
+          "Automatic reconciliation for orphan Mongo audits remains planned and unexecuted; current handling strictly requires manual review decisions.",
+          "Mockup images and currency examples (e.g., S\u0142awomir's z\u0142oty) are synthetic fixtures intended for testing and illustration rather than live operational definitions.",
+          "Withheld graph concept concept_synthetic_fixtures: concept_synthetic_fixtures: quote does not match exact source characters",
+          "Withheld graph relationship 3: Mockup images illustrate synthetic draft inputs (such as Beginner experience and 5% loss tolerance) conforming to profiling attributes.: quote does not match exact source characters; Unknown or withheld relationship endpoint"
+        ],
+        "verification": "Exact provenance and structure; semantic correctness requires independent model audit"
+      },
+      "source_coverage_ref": {
+        "audit_target_diagnostics": [],
+        "automatic_recovery_counts": {
+          "audit_source_document": 2
+        },
+        "citation_repair_attempts_current_packet": 0,
+        "coordinator_interventions": "Measure externally; not observable inside pipeline",
+        "coverage_kind": "model_estimate_not_measured_information_recall",
+        "editorial_review": null,
+        "editorial_revisions": [],
+        "editorial_rounds": 0,
+        "exact_citations_valid": true,
+        "exported_content_hash": "dfe46a34c53b14d4943aee35b96246c1184d1614200b80de8ac92ef8cb1cfa21",
+        "exported_coverage_estimate": null,
+        "graph_revision": "fac55d87f2e6f9a1bc531acd6a3e940af29abb551d57402874db341bd8c24abd",
+        "limitations": [
+          "Automatic reconciliation for orphan Mongo audits remains planned and unexecuted; current handling strictly requires manual review decisions.",
+          "Mockup images and currency examples (e.g., S\u0142awomir's z\u0142oty) are synthetic fixtures intended for testing and illustration rather than live operational definitions.",
+          "The specific operational criteria and business roles governing manual review decisions for orphan audit records prior to automated reconciliation are unspecified in source evidence.",
+          "The fallback process or escalation path triggered if the single allowed retry to RiskSignal fails or returns a consecutive incomplete response is unspecified in source evidence.",
+          "Whether an investor can initiate a voluntary reassessment prior to the scheduled 365-day expiry date, and whether an in-flight reassessment impacts active trading permissions, are unspecified in source evidence.",
+          "Graph interpretation withheld: Withheld graph concept concept_synthetic_fixtures: concept_synthetic_fixtures: quote does not match exact source characters",
+          "Graph interpretation withheld: Withheld graph relationship 3: Mockup images illustrate synthetic draft inputs (such as Beginner experience and 5% loss tolerance) conforming to profiling attributes.: quote does not match exact source characters; Unknown or withheld relationship endpoint",
+          "audit_source_document: Recoverable ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}",
+          "Final semantic audit was not completed"
+        ],
+        "paragraph_repairs": [],
+        "semantic_audit": null,
+        "semantic_audit_matches_exported_content": false,
+        "source_revision": "7eedeb073efb9703b75ae300de93274256e682a60eeb5db7384b09d1ea90feba",
+        "status": "complete_with_limitations",
+        "structure_findings": [],
+        "targeted_repair_counts": {},
+        "visual_findings": [],
+        "withheld_paragraphs": []
+      }
+    }
+  },
+  {
+    "run_id": "authoring-verified-library-20261013",
+    "process": {
+      "coordinator_interventions": 0,
+      "run_id": "authoring-verified-library-20261013",
+      "finished_utc": "2026-10-13T22:52:21.1892619+00:00",
+      "elapsed_seconds": 505.482052,
+      "exit_code": 0,
+      "started_utc": "2026-10-13T22:43:55.7072099+00:00",
+      "process_starts": 1,
+      "user_interventions": 0
+    },
+    "status": "complete_with_limitations",
+    "event_counts": {
+      "completed": 21,
+      "request": 14,
+      "response": 5,
+      "provider_error": 9
+    },
+    "stage_metrics": {
+      "snapshot_inputs": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "inventory_sources": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "prepare_source_images": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "extract_document": {
+        "requests": 1,
+        "responses": 1,
+        "response_seconds_sum": 27.659658799999306
+      },
+      "extract_document_batch": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "verify_document_batch": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "link_graph_batch": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "verify_graph_batch": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "semantic_graph": {
+        "requests": 1,
+        "responses": 1,
+        "response_seconds_sum": 22.621781800000463
+      },
+      "propose_semantic_graph": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "audit_semantic_graph": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "publish_semantic_graph": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "finalize_graph": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "source_plan": {
+        "requests": 1,
+        "responses": 1,
+        "response_seconds_sum": 57.52345509999941
+      },
+      "plan_source_document": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "source_document": {
+        "requests": 1,
+        "responses": 1,
+        "response_seconds_sum": 226.765446100002
+      },
+      "write_source_document": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "repair_source_document": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "audit_source_document": {
+        "requests": 7,
+        "responses": 1,
+        "response_seconds_sum": 68.24269819999972
+      },
+      "source_document_repair": {
+        "requests": 3,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "finalize_source_document": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      }
+    },
+    "ledger": [
+      {
+        "status": "settled",
+        "entries": 5,
+        "charged_pln": 1.150390489725
+      },
+      {
+        "status": "uncertain",
+        "entries": 9,
+        "charged_pln": 27.553106725425
+      }
+    ],
+    "quality_artifacts": {
+      "completion_audit_ref": {
+        "accepted": false,
+        "coverage_estimate": 0.98,
+        "coverage_explanation": "The documentation provides comprehensive coverage of all core business rules across the three source documents, including borrowing eligibility, the staff overdue charge waiver distinction, 48-hour reservation holds and cancellation releases, multi-item reservation handling, collection identity verification and timeout retry limits, record storage restrictions, loan extensions, return inspections, the workshop tool return pilot scope, and the unresolved 30-day versus 45-day unclaimed property retention conflict.",
+        "document_content_hash": "fa14e9808d98b03c30fce81afdc2ddf31613625916de7eea54aee459051e11b2",
+        "findings": [
+          {
+            "explanation": "The paragraph asserts that library staff members are responsible for 'explaining extension rejection decisions, and accessing collection records.' The source documentation states that 'Staff may explain the decision but cannot silently replace it with a different extension' and that 'Collection records are available to authorized library staff.' Converting permissive explanation ('may explain') and read/access entitlement ('available to') into assigned affirmative staff responsibilities exceeds the cited sources. The supported statements regarding active membership requirements, resolving overdue charges, staff review for name mismatches, and the staff borrowing charge waiver should be preserved.",
+            "paragraph_id": "paragraph-ba9ebcf816cce2d0",
+            "paragraph_index": 0,
+            "section_id": "section-3",
+            "section_index": 2,
+            "severity": "unsupported",
+            "sources": [
+              {
+                "evidence_id": "ef3bd9ed1dcf2ef7beec",
+                "quote": "Staff may explain the decision but cannot silently replace it with a different extension."
+              },
+              {
+                "evidence_id": "391df58e28a9cfc12aa4",
+                "quote": "Collection records are available to authorized library staff."
+              }
+            ]
+          }
+        ]
+      },
+      "completion_audit_diagnostics_ref": [],
+      "limitations_ref": [
+        "Unresolved conflict between Policy A (30-day retention) and Policy B (45-day retention) for unclaimed personal property after notice, with no precedence rule or effective date defined.",
+        "The evening collection service is currently an unapproved proposal and cannot be utilized as an active collection method.",
+        "Retry rules are defined only for identity service timeouts (one retry permitted); system retry behavior for other failure types remains unspecified.",
+        "audit_source_document: Recoverable ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+      ],
+      "semantic_audit_ref": {
+        "accepted": null,
+        "findings": [
+          "Unresolved conflict between Policy A (30-day retention) and Policy B (45-day retention) for unclaimed personal property after notice, with no precedence rule or effective date defined.",
+          "The evening collection service is currently an unapproved proposal and cannot be utilized as an active collection method.",
+          "Retry rules are defined only for identity service timeouts (one retry permitted); system retry behavior for other failure types remains unspecified."
+        ],
+        "status": "source_links_validated_semantics_unreviewed"
+      },
+      "graph_quality_ref": {
+        "accepted": true,
+        "allocated_fact_count": 16,
+        "batch_count": 1,
+        "citations": [
+          {
+            "end": 228,
+            "end_column": 114,
+            "end_line": 5,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "file_hash": "7de01798e54c79c5292243362594e4ba68fcbb9b0724f418cdfecb59cada10db",
+            "locator": {
+              "end": 228,
+              "kind": "characters",
+              "start": 162
+            },
+            "path": "borrowing.md",
+            "quote_locator": {
+              "end": 228,
+              "kind": "characters",
+              "start": 162
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1504,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 162,
+            "start_column": 48,
+            "start_line": 5,
+            "text": "Borrowing requires active membership and no unpaid overdue charge."
+          },
+          {
+            "end": 513,
+            "end_column": 228,
+            "end_line": 7,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "file_hash": "37e02000a1efd45d5b52dd008ff3b81195f13a1d86d72d39b400e3b62d6fbf4a",
+            "locator": {
+              "end": 513,
+              "kind": "characters",
+              "start": 286
+            },
+            "path": "identity.md",
+            "quote_locator": {
+              "end": 513,
+              "kind": "characters",
+              "start": 286
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1134,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 286,
+            "start_column": 1,
+            "start_line": 7,
+            "text": "A delegated collector needs a recorded authorization from the reservation holder. The delegated collector must also present their own unexpired identity document. Authorization does not waive that identity-document requirement."
+          },
+          {
+            "end": 946,
+            "end_column": 243,
+            "end_line": 11,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "file_hash": "37e02000a1efd45d5b52dd008ff3b81195f13a1d86d72d39b400e3b62d6fbf4a",
+            "locator": {
+              "end": 946,
+              "kind": "characters",
+              "start": 704
+            },
+            "path": "identity.md",
+            "quote_locator": {
+              "end": 946,
+              "kind": "characters",
+              "start": 704
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1134,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 704,
+            "start_column": 1,
+            "start_line": 11,
+            "text": "If the identity service times out, the reservation stays active until its original hold deadline. The timeout does not extend the hold. One retry is allowed for this timeout; this instruction does not define retry behavior for other failures."
+          },
+          {
+            "end": 1503,
+            "end_column": 202,
+            "end_line": 15,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "file_hash": "7de01798e54c79c5292243362594e4ba68fcbb9b0724f418cdfecb59cada10db",
+            "locator": {
+              "end": 1503,
+              "kind": "characters",
+              "start": 1373
+            },
+            "path": "borrowing.md",
+            "quote_locator": {
+              "end": 1503,
+              "kind": "characters",
+              "start": 1373
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1504,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 1373,
+            "start_column": 72,
+            "start_line": 15,
+            "text": "An extension request does not itself change the due date. The previous due date remains effective until the extension is approved."
+          },
+          {
+            "end": 385,
+            "end_column": 271,
+            "end_line": 5,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "file_hash": "7de01798e54c79c5292243362594e4ba68fcbb9b0724f418cdfecb59cada10db",
+            "locator": {
+              "end": 385,
+              "kind": "characters",
+              "start": 229
+            },
+            "path": "borrowing.md",
+            "quote_locator": {
+              "end": 385,
+              "kind": "characters",
+              "start": 229
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1504,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 229,
+            "start_column": 115,
+            "start_line": 5,
+            "text": "Staff borrowing waives the overdue-charge requirement; active membership is still required. A waived charge requirement does not cancel the recorded charge."
+          },
+          {
+            "end": 839,
+            "end_column": 136,
+            "end_line": 11,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "file_hash": "37e02000a1efd45d5b52dd008ff3b81195f13a1d86d72d39b400e3b62d6fbf4a",
+            "locator": {
+              "end": 839,
+              "kind": "characters",
+              "start": 704
+            },
+            "path": "identity.md",
+            "quote_locator": {
+              "end": 839,
+              "kind": "characters",
+              "start": 704
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1134,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 704,
+            "start_column": 1,
+            "start_line": 11,
+            "text": "If the identity service times out, the reservation stays active until its original hold deadline. The timeout does not extend the hold."
+          },
+          {
+            "end": 1106,
+            "end_column": 227,
+            "end_line": 11,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "file_hash": "7de01798e54c79c5292243362594e4ba68fcbb9b0724f418cdfecb59cada10db",
+            "locator": {
+              "end": 1106,
+              "kind": "characters",
+              "start": 880
+            },
+            "path": "borrowing.md",
+            "quote_locator": {
+              "end": 1106,
+              "kind": "characters",
+              "start": 880
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1504,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 880,
+            "start_column": 1,
+            "start_line": 11,
+            "text": "A reservation may include several items. If one item is unavailable, the remaining items stay reserved. The resident chooses whether to remove the unavailable item or wait; the system must not substitute an item automatically."
+          },
+          {
+            "end": 605,
+            "end_column": 219,
+            "end_line": 7,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "file_hash": "7de01798e54c79c5292243362594e4ba68fcbb9b0724f418cdfecb59cada10db",
+            "locator": {
+              "end": 605,
+              "kind": "characters",
+              "start": 474
+            },
+            "path": "borrowing.md",
+            "quote_locator": {
+              "end": 605,
+              "kind": "characters",
+              "start": 474
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1504,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 474,
+            "start_column": 88,
+            "start_line": 7,
+            "text": "A successful check is required before releasing a reserved item. A failed identity check must not be interpreted as proof of fraud."
+          },
+          {
+            "end": 878,
+            "end_column": 272,
+            "end_line": 9,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "file_hash": "7de01798e54c79c5292243362594e4ba68fcbb9b0724f418cdfecb59cada10db",
+            "locator": {
+              "end": 878,
+              "kind": "characters",
+              "start": 607
+            },
+            "path": "borrowing.md",
+            "quote_locator": {
+              "end": 878,
+              "kind": "characters",
+              "start": 607
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1504,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 607,
+            "start_column": 1,
+            "start_line": 9,
+            "text": "Reservations hold an available item for 48 hours after the confirmation time. A hold expires at that deadline. An expired hold remains in reservation history; no retention duration is specified here. Cancelling before collection releases the item for another reservation."
+          },
+          {
+            "end": 1133,
+            "end_column": 186,
+            "end_line": 13,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "file_hash": "37e02000a1efd45d5b52dd008ff3b81195f13a1d86d72d39b400e3b62d6fbf4a",
+            "locator": {
+              "end": 1133,
+              "kind": "characters",
+              "start": 948
+            },
+            "path": "identity.md",
+            "quote_locator": {
+              "end": 1133,
+              "kind": "characters",
+              "start": 948
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1134,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 948,
+            "start_column": 1,
+            "start_line": 13,
+            "text": "The service can report an incomplete result. An incomplete result cannot authorize collection. A complete result alone does not establish that every collection requirement has been met."
+          },
+          {
+            "end": 640,
+            "end_column": 126,
+            "end_line": 9,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "file_hash": "37e02000a1efd45d5b52dd008ff3b81195f13a1d86d72d39b400e3b62d6fbf4a",
+            "locator": {
+              "end": 640,
+              "kind": "characters",
+              "start": 515
+            },
+            "path": "identity.md",
+            "quote_locator": {
+              "end": 640,
+              "kind": "characters",
+              "start": 515
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1134,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 515,
+            "start_column": 1,
+            "start_line": 9,
+            "text": "Only the check outcome and reviewer reference are stored in the collection record. The identity document image is not stored."
+          },
+          {
+            "end": 1300,
+            "end_column": 193,
+            "end_line": 13,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "file_hash": "7de01798e54c79c5292243362594e4ba68fcbb9b0724f418cdfecb59cada10db",
+            "locator": {
+              "end": 1300,
+              "kind": "characters",
+              "start": 1108
+            },
+            "path": "borrowing.md",
+            "quote_locator": {
+              "end": 1300,
+              "kind": "characters",
+              "start": 1108
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1504,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 1108,
+            "start_column": 1,
+            "start_line": 13,
+            "text": "The workshop team can request an assisted collection. The proposed evening collection service is planned but has not been approved. Do not treat the proposal as an available collection option."
+          },
+          {
+            "end": 808,
+            "end_column": 187,
+            "end_line": 9,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "file_hash": "f17004656cfc30e9e043287e28f9f5dc147f24613588aeb94767537433ed1d80",
+            "locator": {
+              "end": 808,
+              "kind": "characters",
+              "start": 622
+            },
+            "path": "returns.md",
+            "quote_locator": {
+              "end": 808,
+              "kind": "characters",
+              "start": 622
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1204,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 622,
+            "start_column": 1,
+            "start_line": 9,
+            "text": "The current workshop pilot accepts a tool return at either the main desk or the workshop desk. This pilot is limited to tools. It does not establish return locations for audio equipment."
+          },
+          {
+            "end": 620,
+            "end_column": 258,
+            "end_line": 7,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "file_hash": "f17004656cfc30e9e043287e28f9f5dc147f24613588aeb94767537433ed1d80",
+            "locator": {
+              "end": 620,
+              "kind": "characters",
+              "start": 363
+            },
+            "path": "returns.md",
+            "quote_locator": {
+              "end": 620,
+              "kind": "characters",
+              "start": 363
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1204,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 363,
+            "start_column": 1,
+            "start_line": 7,
+            "text": "Returned equipment is inspected for completeness and damage. A missing accessory keeps the return open for follow-up. Damage sends the item to maintenance review. These are independent outcomes: a complete but damaged item still requires maintenance review."
+          },
+          {
+            "end": 361,
+            "end_column": 286,
+            "end_line": 5,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "file_hash": "f17004656cfc30e9e043287e28f9f5dc147f24613588aeb94767537433ed1d80",
+            "locator": {
+              "end": 361,
+              "kind": "characters",
+              "start": 76
+            },
+            "path": "returns.md",
+            "quote_locator": {
+              "end": 361,
+              "kind": "characters",
+              "start": 76
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1204,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 76,
+            "start_column": 1,
+            "start_line": 5,
+            "text": "A resident can request one extension of seven days. Approval requires that no subsequent reservation conflicts with the extended period. A rejected request leaves the original due date unchanged. Staff may explain the decision but cannot silently replace it with a different extension."
+          },
+          {
+            "end": 1042,
+            "end_column": 95,
+            "end_line": 13,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "file_hash": "37e02000a1efd45d5b52dd008ff3b81195f13a1d86d72d39b400e3b62d6fbf4a",
+            "locator": {
+              "end": 1042,
+              "kind": "characters",
+              "start": 993
+            },
+            "path": "identity.md",
+            "quote_locator": {
+              "end": 1042,
+              "kind": "characters",
+              "start": 993
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1134,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 993,
+            "start_column": 46,
+            "start_line": 13,
+            "text": "An incomplete result cannot authorize collection."
+          },
+          {
+            "end": 212,
+            "end_column": 137,
+            "end_line": 5,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "file_hash": "f17004656cfc30e9e043287e28f9f5dc147f24613588aeb94767537433ed1d80",
+            "locator": {
+              "end": 212,
+              "kind": "characters",
+              "start": 128
+            },
+            "path": "returns.md",
+            "quote_locator": {
+              "end": 212,
+              "kind": "characters",
+              "start": 128
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1204,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 128,
+            "start_column": 53,
+            "start_line": 5,
+            "text": "Approval requires that no subsequent reservation conflicts with the extended period."
+          },
+          {
+            "end": 1203,
+            "end_column": 72,
+            "end_line": 15,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "file_hash": "f17004656cfc30e9e043287e28f9f5dc147f24613588aeb94767537433ed1d80",
+            "locator": {
+              "end": 1203,
+              "kind": "characters",
+              "start": 1059
+            },
+            "path": "returns.md",
+            "quote_locator": {
+              "end": 1203,
+              "kind": "characters",
+              "start": 1059
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1204,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 1059,
+            "start_column": 1,
+            "start_line": 13,
+            "text": "Policy A: Unclaimed personal property is held for 30 days after notice.\n\nPolicy B: Unclaimed personal property is held for 45 days after notice."
+          },
+          {
+            "end": 538,
+            "end_column": 152,
+            "end_line": 7,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "file_hash": "7de01798e54c79c5292243362594e4ba68fcbb9b0724f418cdfecb59cada10db",
+            "locator": {
+              "end": 538,
+              "kind": "characters",
+              "start": 387
+            },
+            "path": "borrowing.md",
+            "quote_locator": {
+              "end": 538,
+              "kind": "characters",
+              "start": 387
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1504,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 387,
+            "start_column": 1,
+            "start_line": 7,
+            "text": "Collection uses the identity check described in [Identity at collection](identity.md). A successful check is required before releasing a reserved item."
+          },
+          {
+            "end": 284,
+            "end_column": 209,
+            "end_line": 5,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "file_hash": "37e02000a1efd45d5b52dd008ff3b81195f13a1d86d72d39b400e3b62d6fbf4a",
+            "locator": {
+              "end": 284,
+              "kind": "characters",
+              "start": 76
+            },
+            "path": "identity.md",
+            "quote_locator": {
+              "end": 284,
+              "kind": "characters",
+              "start": 76
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1134,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 76,
+            "start_column": 1,
+            "start_line": 5,
+            "text": "The collection identity check compares the reservation name with an unexpired identity document. A name mismatch requires staff review. Staff review is not automatic approval and is not a permanent rejection."
+          },
+          {
+            "end": 702,
+            "end_column": 188,
+            "end_line": 9,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "file_hash": "37e02000a1efd45d5b52dd008ff3b81195f13a1d86d72d39b400e3b62d6fbf4a",
+            "locator": {
+              "end": 702,
+              "kind": "characters",
+              "start": 515
+            },
+            "path": "identity.md",
+            "quote_locator": {
+              "end": 702,
+              "kind": "characters",
+              "start": 515
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1134,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 515,
+            "start_column": 1,
+            "start_line": 9,
+            "text": "Only the check outcome and reviewer reference are stored in the collection record. The identity document image is not stored. Collection records are available to authorized library staff."
+          },
+          {
+            "end": 1057,
+            "end_column": 248,
+            "end_line": 11,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "file_hash": "f17004656cfc30e9e043287e28f9f5dc147f24613588aeb94767537433ed1d80",
+            "locator": {
+              "end": 1057,
+              "kind": "characters",
+              "start": 810
+            },
+            "path": "returns.md",
+            "quote_locator": {
+              "end": 1057,
+              "kind": "characters",
+              "start": 810
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1204,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 810,
+            "start_column": 1,
+            "start_line": 11,
+            "text": "The 30-day handling period in policy A and the 45-day handling period in policy B below conflict for the same unclaimed-property process. No effective date or precedence rule is supplied. Keep the difference visible; do not invent a policy winner."
+          }
+        ],
+        "counts": {
+          "Concept": 8
+        },
+        "fact_count": 16,
+        "findings": [],
+        "graph_hash": "796a06e4ba9ef801e0d538e63ab91a83061174251e5f9500a1df4db634600613",
+        "owned_source_count": 3,
+        "quote_count": 22,
+        "quoted_source_count": 3,
+        "schema_version": 1,
+        "semantic_edges": 31,
+        "source_count": 3,
+        "source_coverage": {
+          "accepted": null,
+          "aspects": {
+            "represented": 0,
+            "total": 0
+          },
+          "blocks": {
+            "total": 0
+          },
+          "complete": null,
+          "coverage_ratio": null,
+          "graph_revision": "78106515f7a5794b6c7dd8c9ac558de8d6a5f1059745f2e14bad4bd9e6e6472f",
+          "integrity_findings": [],
+          "minimum_coverage": 0.9,
+          "omitted_aspects": [],
+          "qualifiers": {
+            "coverage_ratio": null,
+            "represented": 0,
+            "total": 0
+          },
+          "reason": "Source-first mode uses original context and a final document audit; no separate source-aspect inventory was audited",
+          "snapshot_id": "4e640990a76161bebb7bdb2c8e66d61c83767f3ab330e5f95f5e3545a6100010",
+          "status": "not_independently_measured",
+          "unresolved_attachments": []
+        },
+        "unallocated_fact_ids": [],
+        "uncertainties": [
+          "Unresolved conflict between Policy A (30-day retention) and Policy B (45-day retention) for unclaimed personal property after notice, with no precedence rule or effective date defined.",
+          "The evening collection service is currently an unapproved proposal and cannot be utilized as an active collection method.",
+          "Retry rules are defined only for identity service timeouts (one retry permitted); system retry behavior for other failure types remains unspecified."
+        ],
+        "verification": "Exact provenance and structure; semantic correctness requires independent model audit"
+      },
+      "source_coverage_ref": {
+        "audit_target_diagnostics": [],
+        "automatic_recovery_counts": {
+          "audit_source_document": 2
+        },
+        "citation_repair_attempts_current_packet": 0,
+        "coordinator_interventions": "Measure externally; not observable inside pipeline",
+        "coverage_kind": "model_estimate_not_measured_information_recall",
+        "editorial_review": null,
+        "editorial_revisions": [],
+        "editorial_rounds": 0,
+        "exact_citations_valid": true,
+        "exported_content_hash": "921b6ab08567b9dcc0dc14c04141e1bf89671942e0e22a58c5883ceafb437e3e",
+        "exported_coverage_estimate": null,
+        "graph_revision": "78106515f7a5794b6c7dd8c9ac558de8d6a5f1059745f2e14bad4bd9e6e6472f",
+        "limitations": [
+          "Unresolved policy conflict between Policy A (30 days) and Policy B (45 days) for unclaimed personal property retention following notice, with no precedence rule or effective date defined in documentation.",
+          "The designated return locations for audio equipment and other non-tool items are unspecified, as the dual return desk policy is restricted to the workshop tool pilot.",
+          "The mandatory retention period for expired reservation records preserved in reservation history is unspecified in the documentation.",
+          "The implementation timeline and operational approval status for the proposed evening collection service are unspecified; the service remains an unapproved plan.",
+          "Error handling, retry limits, and recovery procedures for collection identity verification service failures other than timeouts are unspecified.",
+          "Unresolved conflict between Policy A (30-day retention) and Policy B (45-day retention) for unclaimed personal property after notice, with no precedence rule or effective date defined.",
+          "The evening collection service is currently an unapproved proposal and cannot be utilized as an active collection method.",
+          "Retry rules are defined only for identity service timeouts (one retry permitted); system retry behavior for other failure types remains unspecified.",
+          "audit_source_document: Recoverable ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}",
+          "Some passages use original source extracts after bounded repair"
+        ],
+        "paragraph_repairs": [
+          {
+            "failure": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}",
+            "outcome": "source_extract_fallback",
+            "phase": "semantic",
+            "replacement_ids": [
+              "paragraph-ba9ebcf816cce2d0",
+              "paragraph-ba9ebcf816cce2d0-2"
+            ],
+            "section_id": "section-3",
+            "target_id": "paragraph-ba9ebcf816cce2d0"
+          }
+        ],
+        "semantic_audit": {
+          "accepted": false,
+          "coverage_estimate": 0.98,
+          "coverage_explanation": "The documentation provides comprehensive coverage of all core business rules across the three source documents, including borrowing eligibility, the staff overdue charge waiver distinction, 48-hour reservation holds and cancellation releases, multi-item reservation handling, collection identity verification and timeout retry limits, record storage restrictions, loan extensions, return inspections, the workshop tool return pilot scope, and the unresolved 30-day versus 45-day unclaimed property retention conflict.",
+          "document_content_hash": "fa14e9808d98b03c30fce81afdc2ddf31613625916de7eea54aee459051e11b2",
+          "findings": [
+            {
+              "explanation": "The paragraph asserts that library staff members are responsible for 'explaining extension rejection decisions, and accessing collection records.' The source documentation states that 'Staff may explain the decision but cannot silently replace it with a different extension' and that 'Collection records are available to authorized library staff.' Converting permissive explanation ('may explain') and read/access entitlement ('available to') into assigned affirmative staff responsibilities exceeds the cited sources. The supported statements regarding active membership requirements, resolving overdue charges, staff review for name mismatches, and the staff borrowing charge waiver should be preserved.",
+              "paragraph_id": "paragraph-ba9ebcf816cce2d0",
+              "paragraph_index": 0,
+              "section_id": "section-3",
+              "section_index": 2,
+              "severity": "unsupported",
+              "sources": [
+                {
+                  "evidence_id": "ef3bd9ed1dcf2ef7beec",
+                  "quote": "Staff may explain the decision but cannot silently replace it with a different extension."
+                },
+                {
+                  "evidence_id": "391df58e28a9cfc12aa4",
+                  "quote": "Collection records are available to authorized library staff."
+                }
+              ]
+            }
+          ]
+        },
+        "semantic_audit_matches_exported_content": false,
+        "source_revision": "4e640990a76161bebb7bdb2c8e66d61c83767f3ab330e5f95f5e3545a6100010",
+        "status": "complete_with_limitations",
+        "structure_findings": [],
+        "targeted_repair_counts": {
+          "semantic": 1
+        },
+        "visual_findings": [],
+        "withheld_paragraphs": []
+      }
+    }
+  },
+  {
+    "run_id": "authoring-verified-appointments-20261013",
+    "process": {
+      "elapsed_seconds": 441.6633313,
+      "run_id": "authoring-verified-appointments-20261013",
+      "started_utc": "2026-10-13T22:43:56.9384998+00:00",
+      "finished_utc": "2026-10-13T22:51:18.6018311+00:00",
+      "exit_code": 0,
+      "process_starts": 1,
+      "coordinator_interventions": 0,
+      "user_interventions": 0
+    },
+    "status": "complete_with_limitations",
+    "event_counts": {
+      "completed": 19,
+      "request": 10,
+      "response": 4,
+      "provider_error": 6
+    },
+    "stage_metrics": {
+      "snapshot_inputs": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "inventory_sources": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "prepare_source_images": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "extract_document": {
+        "requests": 1,
+        "responses": 1,
+        "response_seconds_sum": 25.087896799999726
+      },
+      "extract_document_batch": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "verify_document_batch": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "link_graph_batch": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "verify_graph_batch": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "semantic_graph": {
+        "requests": 1,
+        "responses": 1,
+        "response_seconds_sum": 15.706153000002814
+      },
+      "propose_semantic_graph": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "audit_semantic_graph": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "publish_semantic_graph": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "finalize_graph": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "source_plan": {
+        "requests": 1,
+        "responses": 1,
+        "response_seconds_sum": 67.6283803999977
+      },
+      "plan_source_document": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "source_document": {
+        "requests": 1,
+        "responses": 1,
+        "response_seconds_sum": 172.86208839999745
+      },
+      "write_source_document": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "repair_source_document": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "audit_source_document": {
+        "requests": 6,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      },
+      "finalize_source_document": {
+        "requests": 0,
+        "responses": 0,
+        "response_seconds_sum": 0.0
+      }
+    },
+    "ledger": [
+      {
+        "status": "settled",
+        "entries": 4,
+        "charged_pln": 0.822531888675
+      },
+      {
+        "status": "uncertain",
+        "entries": 6,
+        "charged_pln": 18.641239317
+      }
+    ],
+    "quality_artifacts": {
+      "completion_audit_diagnostics_ref": [],
+      "limitations_ref": [
+        "Conflicting internal desk instructions: Instruction A dictates refund submission within two working days of approval, whereas Instruction B sets the deadline at five working days. Neither instruction defines precedence.",
+        "audit_source_document: Recoverable ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+      ],
+      "semantic_audit_ref": {
+        "accepted": null,
+        "findings": [
+          "Conflicting internal desk instructions: Instruction A dictates refund submission within two working days of approval, whereas Instruction B sets the deadline at five working days. Neither instruction defines precedence."
+        ],
+        "status": "source_links_validated_semantics_unreviewed"
+      },
+      "graph_quality_ref": {
+        "accepted": true,
+        "allocated_fact_count": 15,
+        "batch_count": 1,
+        "citations": [
+          {
+            "end": 288,
+            "end_column": 190,
+            "end_line": 3,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+            "locator": {
+              "end": 288,
+              "kind": "characters",
+              "start": 99
+            },
+            "path": "appointments.md",
+            "quote_locator": {
+              "end": 288,
+              "kind": "characters",
+              "start": 99
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1533,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 99,
+            "start_column": 1,
+            "start_line": 3,
+            "text": "A confirmed address and a contact number are required before a booking can be confirmed. Providing both does not guarantee an appointment: the customer must receive a separate confirmation."
+          },
+          {
+            "end": 228,
+            "end_column": 167,
+            "end_line": 3,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "file_hash": "a9201fcfdbdd8bea8a6cef2de307d91dfa4bf8e8aa05f4f186c06a3466fc4b8f",
+            "locator": {
+              "end": 228,
+              "kind": "characters",
+              "start": 161
+            },
+            "path": "payments.md",
+            "quote_locator": {
+              "end": 228,
+              "kind": "characters",
+              "start": 161
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1167,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 161,
+            "start_column": 100,
+            "start_line": 3,
+            "text": "A failed payment does not by itself cancel a confirmed appointment."
+          },
+          {
+            "end": 626,
+            "end_column": 230,
+            "end_line": 6,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+            "locator": {
+              "end": 626,
+              "kind": "characters",
+              "start": 399
+            },
+            "path": "appointments.md",
+            "quote_locator": {
+              "end": 626,
+              "kind": "characters",
+              "start": 399
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1533,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 399,
+            "start_column": 3,
+            "start_line": 6,
+            "text": "A customer can request a change until 18:00 local office time on the day before the confirmed visit. The old slot remains confirmed until a replacement is confirmed. An unsuccessful change request does not cancel the old visit."
+          },
+          {
+            "end": 791,
+            "end_column": 165,
+            "end_line": 7,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+            "locator": {
+              "end": 791,
+              "kind": "characters",
+              "start": 629
+            },
+            "path": "appointments.md",
+            "quote_locator": {
+              "end": 791,
+              "kind": "characters",
+              "start": 629
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1533,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 629,
+            "start_column": 3,
+            "start_line": 7,
+            "text": "A cancellation received at least 24 hours before the confirmed start is eligible for review for a full refund. Eligibility for review is not approval of a refund."
+          },
+          {
+            "end": 1305,
+            "end_column": 59,
+            "end_line": 12,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+            "locator": {
+              "end": 1305,
+              "kind": "characters",
+              "start": 1247
+            },
+            "path": "appointments.md",
+            "quote_locator": {
+              "end": 1305,
+              "kind": "characters",
+              "start": 1247
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1533,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 1247,
+            "start_column": 1,
+            "start_line": 12,
+            "text": "Refund processing is described in [Payments](payments.md)."
+          },
+          {
+            "end": 1048,
+            "end_column": 104,
+            "end_line": 9,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "file_hash": "a9201fcfdbdd8bea8a6cef2de307d91dfa4bf8e8aa05f4f186c06a3466fc4b8f",
+            "locator": {
+              "end": 1048,
+              "kind": "characters",
+              "start": 945
+            },
+            "path": "payments.md",
+            "quote_locator": {
+              "end": 1048,
+              "kind": "characters",
+              "start": 945
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1167,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 945,
+            "start_column": 1,
+            "start_line": 9,
+            "text": "For an unpaid booking, a fee waiver is a cancellation of the fee obligation, not a payment or a refund."
+          },
+          {
+            "end": 1166,
+            "end_column": 222,
+            "end_line": 9,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "file_hash": "a9201fcfdbdd8bea8a6cef2de307d91dfa4bf8e8aa05f4f186c06a3466fc4b8f",
+            "locator": {
+              "end": 1166,
+              "kind": "characters",
+              "start": 945
+            },
+            "path": "payments.md",
+            "quote_locator": {
+              "end": 1166,
+              "kind": "characters",
+              "start": 945
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1167,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 945,
+            "start_column": 1,
+            "start_line": 9,
+            "text": "For an unpaid booking, a fee waiver is a cancellation of the fee obligation, not a payment or a refund. A customer's compensation request requires a separate decision. No amount or automatic entitlement is specified here."
+          },
+          {
+            "end": 1397,
+            "end_column": 151,
+            "end_line": 12,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+            "locator": {
+              "end": 1397,
+              "kind": "characters",
+              "start": 1306
+            },
+            "path": "appointments.md",
+            "quote_locator": {
+              "end": 1397,
+              "kind": "characters",
+              "start": 1306
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1533,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 1306,
+            "start_column": 60,
+            "start_line": 12,
+            "text": "The premium-visit proposal is not approved and must not be offered as an available service."
+          },
+          {
+            "end": 64,
+            "end_column": 65,
+            "end_line": 1,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+            "locator": {
+              "end": 64,
+              "kind": "characters",
+              "start": 0
+            },
+            "path": "appointments.md",
+            "quote_locator": {
+              "end": 64,
+              "kind": "characters",
+              "start": 0
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1533,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 0,
+            "start_column": 1,
+            "start_line": 1,
+            "text": "The repair appointment service accepts bookings for home visits."
+          },
+          {
+            "end": 943,
+            "end_column": 389,
+            "end_line": 7,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "file_hash": "a9201fcfdbdd8bea8a6cef2de307d91dfa4bf8e8aa05f4f186c06a3466fc4b8f",
+            "locator": {
+              "end": 943,
+              "kind": "characters",
+              "start": 555
+            },
+            "path": "payments.md",
+            "quote_locator": {
+              "end": 943,
+              "kind": "characters",
+              "start": 555
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1167,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 555,
+            "start_column": 1,
+            "start_line": 7,
+            "text": "Two current desk instructions conflict about the service's own submission deadline for an approved refund. Instruction A says: submit within two working days after approval. Instruction B says: submit within five working days after approval. Neither instruction supplies a precedence rule. Preserve both deadlines and the unresolved difference; neither deadline describes bank settlement."
+          },
+          {
+            "end": 1038,
+            "end_column": 247,
+            "end_line": 8,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+            "locator": {
+              "end": 1038,
+              "kind": "characters",
+              "start": 956
+            },
+            "path": "appointments.md",
+            "quote_locator": {
+              "end": 1038,
+              "kind": "characters",
+              "start": 956
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1533,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 956,
+            "start_column": 165,
+            "start_line": 8,
+            "text": "The waiver removes the fee; it does not approve any separate compensation request."
+          },
+          {
+            "end": 368,
+            "end_column": 270,
+            "end_line": 3,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+            "locator": {
+              "end": 368,
+              "kind": "characters",
+              "start": 289
+            },
+            "path": "appointments.md",
+            "quote_locator": {
+              "end": 368,
+              "kind": "characters",
+              "start": 289
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1533,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 289,
+            "start_column": 191,
+            "start_line": 3,
+            "text": "A request records the customer's preferred slot; it does not reserve that slot."
+          },
+          {
+            "end": 1038,
+            "end_column": 247,
+            "end_line": 8,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+            "locator": {
+              "end": 1038,
+              "kind": "characters",
+              "start": 794
+            },
+            "path": "appointments.md",
+            "quote_locator": {
+              "end": 1038,
+              "kind": "characters",
+              "start": 794
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1533,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 794,
+            "start_column": 3,
+            "start_line": 8,
+            "text": "Inside that 24-hour window, the standard cancellation fee is 20 credits. A supervisor may waive this fee when the customer provides evidence of a service outage. The waiver removes the fee; it does not approve any separate compensation request."
+          },
+          {
+            "end": 1245,
+            "end_column": 206,
+            "end_line": 10,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+            "locator": {
+              "end": 1245,
+              "kind": "characters",
+              "start": 1040
+            },
+            "path": "appointments.md",
+            "quote_locator": {
+              "end": 1245,
+              "kind": "characters",
+              "start": 1040
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1533,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 1040,
+            "start_column": 1,
+            "start_line": 10,
+            "text": "If the technician cancels, the customer can choose a new slot or a full refund. A reschedule is not automatic. These technician-cancellation options do not establish the options for a customer who cancels."
+          },
+          {
+            "end": 368,
+            "end_column": 307,
+            "end_line": 3,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "file_hash": "a9201fcfdbdd8bea8a6cef2de307d91dfa4bf8e8aa05f4f186c06a3466fc4b8f",
+            "locator": {
+              "end": 368,
+              "kind": "characters",
+              "start": 229
+            },
+            "path": "payments.md",
+            "quote_locator": {
+              "end": 368,
+              "kind": "characters",
+              "start": 229
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1167,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 229,
+            "start_column": 168,
+            "start_line": 3,
+            "text": "If the payment-status service times out, support may request one status refresh; this permission does not authorize retrying a card charge."
+          },
+          {
+            "end": 160,
+            "end_column": 99,
+            "end_line": 3,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "file_hash": "a9201fcfdbdd8bea8a6cef2de307d91dfa4bf8e8aa05f4f186c06a3466fc4b8f",
+            "locator": {
+              "end": 160,
+              "kind": "characters",
+              "start": 62
+            },
+            "path": "payments.md",
+            "quote_locator": {
+              "end": 160,
+              "kind": "characters",
+              "start": 62
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1167,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 62,
+            "start_column": 1,
+            "start_line": 3,
+            "text": "The service records payment status and the payment reference. It does not store full card numbers."
+          },
+          {
+            "end": 1532,
+            "end_column": 286,
+            "end_line": 12,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+            "locator": {
+              "end": 1532,
+              "kind": "characters",
+              "start": 1398
+            },
+            "path": "appointments.md",
+            "quote_locator": {
+              "end": 1532,
+              "kind": "characters",
+              "start": 1398
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1533,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 1398,
+            "start_column": 152,
+            "start_line": 12,
+            "text": "A booking with a safety concern requires review before a technician is dispatched; a concern is not a finding that the home is unsafe."
+          },
+          {
+            "end": 553,
+            "end_column": 184,
+            "end_line": 5,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "file_hash": "a9201fcfdbdd8bea8a6cef2de307d91dfa4bf8e8aa05f4f186c06a3466fc4b8f",
+            "locator": {
+              "end": 553,
+              "kind": "characters",
+              "start": 370
+            },
+            "path": "payments.md",
+            "quote_locator": {
+              "end": 553,
+              "kind": "characters",
+              "start": 370
+            },
+            "quote_locator_basis": "evidence_text",
+            "source_locator": {
+              "end": 1167,
+              "kind": "characters",
+              "start": 0
+            },
+            "start": 370,
+            "start_column": 1,
+            "start_line": 5,
+            "text": "An approved refund is sent to the original payment method. Approval and settlement are separate events. The service does not promise when the receiving bank will make funds available."
+          }
+        ],
+        "counts": {
+          "Concept": 7
+        },
+        "fact_count": 15,
+        "findings": [],
+        "graph_hash": "dee5fa627e77691fa450922f0944ba08b1684062fadb84348451c3f9fb5a0e05",
+        "owned_source_count": 2,
+        "quote_count": 18,
+        "quoted_source_count": 2,
+        "schema_version": 1,
+        "semantic_edges": 25,
+        "source_count": 2,
+        "source_coverage": {
+          "accepted": null,
+          "aspects": {
+            "represented": 0,
+            "total": 0
+          },
+          "blocks": {
+            "total": 0
+          },
+          "complete": null,
+          "coverage_ratio": null,
+          "graph_revision": "27160b8b4e0ec313340ddf39981163814e88d9ae17beb1443d7de56621d0d2a4",
+          "integrity_findings": [],
+          "minimum_coverage": 0.9,
+          "omitted_aspects": [],
+          "qualifiers": {
+            "coverage_ratio": null,
+            "represented": 0,
+            "total": 0
+          },
+          "reason": "Source-first mode uses original context and a final document audit; no separate source-aspect inventory was audited",
+          "snapshot_id": "ee40bd3807f84c48e56c5a16cb8bfda84736449d1586b4e97e32af36465d5cc2",
+          "status": "not_independently_measured",
+          "unresolved_attachments": []
+        },
+        "unallocated_fact_ids": [],
+        "uncertainties": [
+          "Conflicting internal desk instructions: Instruction A dictates refund submission within two working days of approval, whereas Instruction B sets the deadline at five working days. Neither instruction defines precedence."
+        ],
+        "verification": "Exact provenance and structure; semantic correctness requires independent model audit"
+      },
+      "source_coverage_ref": {
+        "audit_target_diagnostics": [],
+        "automatic_recovery_counts": {
+          "audit_source_document": 2
+        },
+        "citation_repair_attempts_current_packet": 0,
+        "coordinator_interventions": "Measure externally; not observable inside pipeline",
+        "coverage_kind": "model_estimate_not_measured_information_recall",
+        "editorial_review": null,
+        "editorial_revisions": [],
+        "editorial_rounds": 0,
+        "exact_citations_valid": true,
+        "exported_content_hash": "f3528410ad578fffa335eb33233835818f186afac6ad21641d10e6668be27aec",
+        "exported_coverage_estimate": null,
+        "graph_revision": "27160b8b4e0ec313340ddf39981163814e88d9ae17beb1443d7de56621d0d2a4",
+        "limitations": [
+          "Two current desk instructions conflict regarding the submission deadline for approved refunds: Instruction A mandates submission within two working days after approval, while Instruction B mandates submission within five working days after approval. Neither instruction provides a precedence rule.",
+          "Evaluation criteria and entitlement limits for customer compensation requests submitted alongside outage-related fee waivers are unspecified in the source documentation.",
+          "The substantive evaluation criteria for approving or denying a refund after a customer cancellation is submitted at least 24 hours prior to the appointment start are not documented.",
+          "The objective indicators defining a safety concern and the specific procedures required to clear the concern before technician dispatch are not specified in the source documentation.",
+          "Conflicting internal desk instructions: Instruction A dictates refund submission within two working days of approval, whereas Instruction B sets the deadline at five working days. Neither instruction defines precedence.",
+          "audit_source_document: Recoverable ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}",
+          "Final semantic audit was not completed"
+        ],
+        "paragraph_repairs": [],
+        "semantic_audit": null,
+        "semantic_audit_matches_exported_content": false,
+        "source_revision": "ee40bd3807f84c48e56c5a16cb8bfda84736449d1586b4e97e32af36465d5cc2",
+        "status": "complete_with_limitations",
+        "structure_findings": [],
+        "targeted_repair_counts": {},
+        "visual_findings": [],
+        "withheld_paragraphs": []
+      }
+    }
+  }
+]

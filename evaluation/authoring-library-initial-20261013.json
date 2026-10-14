@@ -1,0 +1,2010 @@
+{
+  "schema_version": 1,
+  "run_id": "authoring-library-20261013",
+  "workspace": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\.docgen\\authoring-library-20261013",
+  "status": "complete_with_limitations",
+  "state_references": {
+    "editorial_review_ref": "1bcb6e091c23484e72eaffe51a4fa03b0b7307f1ea42a615d891a65016543e39",
+    "completion_draft_ref": "d120c4c6d252fb6294ccb926b6ee824c7d7f37f2fd1a90ebbfdd4d66ca4c753e",
+    "completion_audit_ref": "0c7d2fb000b1cadd130ca44529fa95109ef55e365bf036aaa36befa271c96f2e",
+    "completion_findings_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "completion_repair_records_ref": "303a9117b9dfc7590484c282626b2c318965d19ba59d90e67dd1af22510c2961",
+    "completion_audit_diagnostics_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "completion_sections_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "limitations_ref": "0124c243aa7454763b06ee9367c730d5412a9eb66e9a9044dd4db0c774d4f7a0",
+    "prefetched_extractions_ref": "60022c7616aea545402e758cc3895522b0da3d67704929917646dc293c6d80f0",
+    "fact_batches_ref": "5b2747b504bb32dae57e441da0feb23bbbe5d92b7e8537df2e2a77c89b76a12c",
+    "semantic_payload_ref": "d42c50e5d9647de04699561f4b8fd4312fb8901c364e7e3b7a50e4ff8c947b95",
+    "semantic_draft_ref": "a5536ff6fa93d4501d6ac7d87a9894d3ba58c321f66735bbc12a31abd46e98c2",
+    "semantic_raw_draft_ref": "112684524cd06275d54de34d05c7d69afbe58f53f2b381cd6e02f64d386879f1",
+    "semantic_anchoring_ref": "6fa04bc3c3c05a3c65d6be8dabb97788f3e666ddf3186bfc1d9fd203548030fe",
+    "semantic_canonical_ref": "31724a2cca5919f51eedf548ba6252d63ace402aef81b490de820b05e3b4213f",
+    "semantic_audit_ref": "27866a1c0ba14308407f4f9bcff59efb1ea2e513ead4a4c6f5f83765e2795d8b",
+    "graph_quality_ref": "b5842dc6c7812ef37848bf42ee545857f84f420cc2f3ddba6ad481945e7c95d5",
+    "source_aspects_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "source_decisions_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "source_non_substantive_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "source_coverage_ref": "be9076f532fcedef8012570521dc2dc3edd1243159e4d6905a1957426a7d302b",
+    "document_provenance_ref": "33c428104683529d89f35d502213d85831daa93301cd4e1a78f6f3551487183c",
+    "document_candidate_provenance_ref": "b30308f579a8989a0743a2c24a8f12919ae5688d982be88fee899022ecc2ffa4",
+    "snapshot_ref": "e05f7e1a20f42a87a6d3c988cae39e265f451569cd22de8202661750300dc954",
+    "inventory_ref": "b0d5704afaedc9d5012660e45ea9d570c782a1e889b3dd076a3fd0fb44cef2a2",
+    "draft_ref": "",
+    "feedback_ref": "",
+    "assertions_ref": "53e03c6226dfc0d4258dd98bd75d2c83e25413ae987939ad89c8cecff4f1c585",
+    "exclusions_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "candidate_ref": "d120c4c6d252fb6294ccb926b6ee824c7d7f37f2fd1a90ebbfdd4d66ca4c753e",
+    "issue_ref": "f42693779c32519df9cc7b2c596789094db123ff155e5bc4f26bc8b22515bc57"
+  },
+  "recorded_event_window_seconds": 405.4759523868561,
+  "model_response_wall_union_seconds": 402.0627534389496,
+  "event_counts": {
+    "completed": 22,
+    "request": 9,
+    "response": 7,
+    "provider_error": 2
+  },
+  "stage_metrics": {
+    "snapshot_inputs": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "inventory_sources": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "prepare_source_images": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "extract_document": {
+      "requests": 1,
+      "responses": 1,
+      "response_seconds_sum": 29.968549299999722
+    },
+    "extract_document_batch": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "verify_document_batch": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "link_graph_batch": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "verify_graph_batch": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "semantic_graph": {
+      "requests": 1,
+      "responses": 1,
+      "response_seconds_sum": 26.25101469999936
+    },
+    "propose_semantic_graph": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "audit_semantic_graph": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "publish_semantic_graph": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "finalize_graph": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "source_plan": {
+      "requests": 2,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "plan_source_document": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "source_document": {
+      "requests": 1,
+      "responses": 1,
+      "response_seconds_sum": 171.28660509999827
+    },
+    "write_source_document": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "repair_source_document": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "audit_source_document": {
+      "requests": 2,
+      "responses": 2,
+      "response_seconds_sum": 138.8216470999978
+    },
+    "source_document_repair": {
+      "requests": 1,
+      "responses": 1,
+      "response_seconds_sum": 17.34884520000196
+    },
+    "source_editorial": {
+      "requests": 1,
+      "responses": 1,
+      "response_seconds_sum": 18.38609190000352
+    },
+    "review_source_editorial": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "finalize_source_document": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    }
+  },
+  "quality_artifacts": {
+    "completion_audit_ref": {
+      "accepted": true,
+      "coverage_estimate": 1.0,
+      "coverage_explanation": "All substantive business requirements, operational constraints, and edge cases from borrowing.md, identity.md, and returns.md are accurately represented with precise condition preservation. The documentation captures borrowing qualifications, hold expirations, multi-item reservation behavior, identity verification and timeout handling, return inspection pathways, pilot scope restrictions, and the unresolved holding period conflict between Policy A and Policy B without introducing unsupported claims.",
+      "document_content_hash": "cdf02c3144ece4a778cd987be5738ec5608f76b9a26d2df1cfa1c9a280d753b6",
+      "findings": []
+    },
+    "completion_audit_diagnostics_ref": [],
+    "limitations_ref": [
+      "Unresolved conflict: Policy A specifies a 30-day holding period after notice for unclaimed personal property, whereas Policy B specifies a 45-day holding period; no precedence rule or effective date is provided.",
+      "Proposed evening collection service is explicitly planned but unapproved and barred from current operational availability.",
+      "The workshop pilot allowing drop-offs at the workshop desk applies strictly to tools and does not provide return authorization for audio equipment.",
+      "plan_source_document: Recoverable ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+    ],
+    "semantic_audit_ref": {
+      "accepted": null,
+      "findings": [
+        "Unresolved conflict: Policy A specifies a 30-day holding period after notice for unclaimed personal property, whereas Policy B specifies a 45-day holding period; no precedence rule or effective date is provided.",
+        "Proposed evening collection service is explicitly planned but unapproved and barred from current operational availability.",
+        "The workshop pilot allowing drop-offs at the workshop desk applies strictly to tools and does not provide return authorization for audio equipment."
+      ],
+      "status": "source_links_validated_semantics_unreviewed"
+    },
+    "graph_quality_ref": {
+      "accepted": true,
+      "allocated_fact_count": 16,
+      "batch_count": 1,
+      "citations": [
+        {
+          "end": 228,
+          "end_column": 114,
+          "end_line": 5,
+          "evidence_id": "0bac7f179a3365549d0a",
+          "file_hash": "7de01798e54c79c5292243362594e4ba68fcbb9b0724f418cdfecb59cada10db",
+          "locator": {
+            "end": 228,
+            "kind": "characters",
+            "start": 162
+          },
+          "path": "borrowing.md",
+          "quote_locator": {
+            "end": 228,
+            "kind": "characters",
+            "start": 162
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1504,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 162,
+          "start_column": 48,
+          "start_line": 5,
+          "text": "Borrowing requires active membership and no unpaid overdue charge."
+        },
+        {
+          "end": 513,
+          "end_column": 228,
+          "end_line": 7,
+          "evidence_id": "391df58e28a9cfc12aa4",
+          "file_hash": "37e02000a1efd45d5b52dd008ff3b81195f13a1d86d72d39b400e3b62d6fbf4a",
+          "locator": {
+            "end": 513,
+            "kind": "characters",
+            "start": 286
+          },
+          "path": "identity.md",
+          "quote_locator": {
+            "end": 513,
+            "kind": "characters",
+            "start": 286
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1134,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 286,
+          "start_column": 1,
+          "start_line": 7,
+          "text": "A delegated collector needs a recorded authorization from the reservation holder. The delegated collector must also present their own unexpired identity document. Authorization does not waive that identity-document requirement."
+        },
+        {
+          "end": 946,
+          "end_column": 243,
+          "end_line": 11,
+          "evidence_id": "391df58e28a9cfc12aa4",
+          "file_hash": "37e02000a1efd45d5b52dd008ff3b81195f13a1d86d72d39b400e3b62d6fbf4a",
+          "locator": {
+            "end": 946,
+            "kind": "characters",
+            "start": 704
+          },
+          "path": "identity.md",
+          "quote_locator": {
+            "end": 946,
+            "kind": "characters",
+            "start": 704
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1134,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 704,
+          "start_column": 1,
+          "start_line": 11,
+          "text": "If the identity service times out, the reservation stays active until its original hold deadline. The timeout does not extend the hold. One retry is allowed for this timeout; this instruction does not define retry behavior for other failures."
+        },
+        {
+          "end": 1503,
+          "end_column": 202,
+          "end_line": 15,
+          "evidence_id": "0bac7f179a3365549d0a",
+          "file_hash": "7de01798e54c79c5292243362594e4ba68fcbb9b0724f418cdfecb59cada10db",
+          "locator": {
+            "end": 1503,
+            "kind": "characters",
+            "start": 1373
+          },
+          "path": "borrowing.md",
+          "quote_locator": {
+            "end": 1503,
+            "kind": "characters",
+            "start": 1373
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1504,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 1373,
+          "start_column": 72,
+          "start_line": 15,
+          "text": "An extension request does not itself change the due date. The previous due date remains effective until the extension is approved."
+        },
+        {
+          "end": 385,
+          "end_column": 271,
+          "end_line": 5,
+          "evidence_id": "0bac7f179a3365549d0a",
+          "file_hash": "7de01798e54c79c5292243362594e4ba68fcbb9b0724f418cdfecb59cada10db",
+          "locator": {
+            "end": 385,
+            "kind": "characters",
+            "start": 229
+          },
+          "path": "borrowing.md",
+          "quote_locator": {
+            "end": 385,
+            "kind": "characters",
+            "start": 229
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1504,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 229,
+          "start_column": 115,
+          "start_line": 5,
+          "text": "Staff borrowing waives the overdue-charge requirement; active membership is still required. A waived charge requirement does not cancel the recorded charge."
+        },
+        {
+          "end": 839,
+          "end_column": 136,
+          "end_line": 11,
+          "evidence_id": "391df58e28a9cfc12aa4",
+          "file_hash": "37e02000a1efd45d5b52dd008ff3b81195f13a1d86d72d39b400e3b62d6fbf4a",
+          "locator": {
+            "end": 839,
+            "kind": "characters",
+            "start": 704
+          },
+          "path": "identity.md",
+          "quote_locator": {
+            "end": 839,
+            "kind": "characters",
+            "start": 704
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1134,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 704,
+          "start_column": 1,
+          "start_line": 11,
+          "text": "If the identity service times out, the reservation stays active until its original hold deadline. The timeout does not extend the hold."
+        },
+        {
+          "end": 1106,
+          "end_column": 227,
+          "end_line": 11,
+          "evidence_id": "0bac7f179a3365549d0a",
+          "file_hash": "7de01798e54c79c5292243362594e4ba68fcbb9b0724f418cdfecb59cada10db",
+          "locator": {
+            "end": 1106,
+            "kind": "characters",
+            "start": 880
+          },
+          "path": "borrowing.md",
+          "quote_locator": {
+            "end": 1106,
+            "kind": "characters",
+            "start": 880
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1504,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 880,
+          "start_column": 1,
+          "start_line": 11,
+          "text": "A reservation may include several items. If one item is unavailable, the remaining items stay reserved. The resident chooses whether to remove the unavailable item or wait; the system must not substitute an item automatically."
+        },
+        {
+          "end": 605,
+          "end_column": 219,
+          "end_line": 7,
+          "evidence_id": "0bac7f179a3365549d0a",
+          "file_hash": "7de01798e54c79c5292243362594e4ba68fcbb9b0724f418cdfecb59cada10db",
+          "locator": {
+            "end": 605,
+            "kind": "characters",
+            "start": 474
+          },
+          "path": "borrowing.md",
+          "quote_locator": {
+            "end": 605,
+            "kind": "characters",
+            "start": 474
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1504,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 474,
+          "start_column": 88,
+          "start_line": 7,
+          "text": "A successful check is required before releasing a reserved item. A failed identity check must not be interpreted as proof of fraud."
+        },
+        {
+          "end": 878,
+          "end_column": 272,
+          "end_line": 9,
+          "evidence_id": "0bac7f179a3365549d0a",
+          "file_hash": "7de01798e54c79c5292243362594e4ba68fcbb9b0724f418cdfecb59cada10db",
+          "locator": {
+            "end": 878,
+            "kind": "characters",
+            "start": 607
+          },
+          "path": "borrowing.md",
+          "quote_locator": {
+            "end": 878,
+            "kind": "characters",
+            "start": 607
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1504,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 607,
+          "start_column": 1,
+          "start_line": 9,
+          "text": "Reservations hold an available item for 48 hours after the confirmation time. A hold expires at that deadline. An expired hold remains in reservation history; no retention duration is specified here. Cancelling before collection releases the item for another reservation."
+        },
+        {
+          "end": 1133,
+          "end_column": 186,
+          "end_line": 13,
+          "evidence_id": "391df58e28a9cfc12aa4",
+          "file_hash": "37e02000a1efd45d5b52dd008ff3b81195f13a1d86d72d39b400e3b62d6fbf4a",
+          "locator": {
+            "end": 1133,
+            "kind": "characters",
+            "start": 948
+          },
+          "path": "identity.md",
+          "quote_locator": {
+            "end": 1133,
+            "kind": "characters",
+            "start": 948
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1134,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 948,
+          "start_column": 1,
+          "start_line": 13,
+          "text": "The service can report an incomplete result. An incomplete result cannot authorize collection. A complete result alone does not establish that every collection requirement has been met."
+        },
+        {
+          "end": 1130,
+          "end_column": 72,
+          "end_line": 13,
+          "evidence_id": "ef3bd9ed1dcf2ef7beec",
+          "file_hash": "f17004656cfc30e9e043287e28f9f5dc147f24613588aeb94767537433ed1d80",
+          "locator": {
+            "end": 1130,
+            "kind": "characters",
+            "start": 1059
+          },
+          "path": "returns.md",
+          "quote_locator": {
+            "end": 1130,
+            "kind": "characters",
+            "start": 1059
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1204,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 1059,
+          "start_column": 1,
+          "start_line": 13,
+          "text": "Policy A: Unclaimed personal property is held for 30 days after notice."
+        },
+        {
+          "end": 1300,
+          "end_column": 193,
+          "end_line": 13,
+          "evidence_id": "0bac7f179a3365549d0a",
+          "file_hash": "7de01798e54c79c5292243362594e4ba68fcbb9b0724f418cdfecb59cada10db",
+          "locator": {
+            "end": 1300,
+            "kind": "characters",
+            "start": 1108
+          },
+          "path": "borrowing.md",
+          "quote_locator": {
+            "end": 1300,
+            "kind": "characters",
+            "start": 1108
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1504,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 1108,
+          "start_column": 1,
+          "start_line": 13,
+          "text": "The workshop team can request an assisted collection. The proposed evening collection service is planned but has not been approved. Do not treat the proposal as an available collection option."
+        },
+        {
+          "end": 808,
+          "end_column": 187,
+          "end_line": 9,
+          "evidence_id": "ef3bd9ed1dcf2ef7beec",
+          "file_hash": "f17004656cfc30e9e043287e28f9f5dc147f24613588aeb94767537433ed1d80",
+          "locator": {
+            "end": 808,
+            "kind": "characters",
+            "start": 622
+          },
+          "path": "returns.md",
+          "quote_locator": {
+            "end": 808,
+            "kind": "characters",
+            "start": 622
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1204,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 622,
+          "start_column": 1,
+          "start_line": 9,
+          "text": "The current workshop pilot accepts a tool return at either the main desk or the workshop desk. This pilot is limited to tools. It does not establish return locations for audio equipment."
+        },
+        {
+          "end": 620,
+          "end_column": 258,
+          "end_line": 7,
+          "evidence_id": "ef3bd9ed1dcf2ef7beec",
+          "file_hash": "f17004656cfc30e9e043287e28f9f5dc147f24613588aeb94767537433ed1d80",
+          "locator": {
+            "end": 620,
+            "kind": "characters",
+            "start": 363
+          },
+          "path": "returns.md",
+          "quote_locator": {
+            "end": 620,
+            "kind": "characters",
+            "start": 363
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1204,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 363,
+          "start_column": 1,
+          "start_line": 7,
+          "text": "Returned equipment is inspected for completeness and damage. A missing accessory keeps the return open for follow-up. Damage sends the item to maintenance review. These are independent outcomes: a complete but damaged item still requires maintenance review."
+        },
+        {
+          "end": 361,
+          "end_column": 286,
+          "end_line": 5,
+          "evidence_id": "ef3bd9ed1dcf2ef7beec",
+          "file_hash": "f17004656cfc30e9e043287e28f9f5dc147f24613588aeb94767537433ed1d80",
+          "locator": {
+            "end": 361,
+            "kind": "characters",
+            "start": 76
+          },
+          "path": "returns.md",
+          "quote_locator": {
+            "end": 361,
+            "kind": "characters",
+            "start": 76
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1204,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 76,
+          "start_column": 1,
+          "start_line": 5,
+          "text": "A resident can request one extension of seven days. Approval requires that no subsequent reservation conflicts with the extended period. A rejected request leaves the original due date unchanged. Staff may explain the decision but cannot silently replace it with a different extension."
+        },
+        {
+          "end": 212,
+          "end_column": 137,
+          "end_line": 5,
+          "evidence_id": "ef3bd9ed1dcf2ef7beec",
+          "file_hash": "f17004656cfc30e9e043287e28f9f5dc147f24613588aeb94767537433ed1d80",
+          "locator": {
+            "end": 212,
+            "kind": "characters",
+            "start": 128
+          },
+          "path": "returns.md",
+          "quote_locator": {
+            "end": 212,
+            "kind": "characters",
+            "start": 128
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1204,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 128,
+          "start_column": 53,
+          "start_line": 5,
+          "text": "Approval requires that no subsequent reservation conflicts with the extended period."
+        },
+        {
+          "end": 1430,
+          "end_column": 129,
+          "end_line": 15,
+          "evidence_id": "0bac7f179a3365549d0a",
+          "file_hash": "7de01798e54c79c5292243362594e4ba68fcbb9b0724f418cdfecb59cada10db",
+          "locator": {
+            "end": 1430,
+            "kind": "characters",
+            "start": 1302
+          },
+          "path": "borrowing.md",
+          "quote_locator": {
+            "end": 1430,
+            "kind": "characters",
+            "start": 1302
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1504,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 1302,
+          "start_column": 1,
+          "start_line": 15,
+          "text": "Loan extensions are described in [Extensions and returns](returns.md). An extension request does not itself change the due date."
+        },
+        {
+          "end": 538,
+          "end_column": 152,
+          "end_line": 7,
+          "evidence_id": "0bac7f179a3365549d0a",
+          "file_hash": "7de01798e54c79c5292243362594e4ba68fcbb9b0724f418cdfecb59cada10db",
+          "locator": {
+            "end": 538,
+            "kind": "characters",
+            "start": 387
+          },
+          "path": "borrowing.md",
+          "quote_locator": {
+            "end": 538,
+            "kind": "characters",
+            "start": 387
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1504,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 387,
+          "start_column": 1,
+          "start_line": 7,
+          "text": "Collection uses the identity check described in [Identity at collection](identity.md). A successful check is required before releasing a reserved item."
+        },
+        {
+          "end": 1203,
+          "end_column": 72,
+          "end_line": 15,
+          "evidence_id": "ef3bd9ed1dcf2ef7beec",
+          "file_hash": "f17004656cfc30e9e043287e28f9f5dc147f24613588aeb94767537433ed1d80",
+          "locator": {
+            "end": 1203,
+            "kind": "characters",
+            "start": 1132
+          },
+          "path": "returns.md",
+          "quote_locator": {
+            "end": 1203,
+            "kind": "characters",
+            "start": 1132
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1204,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 1132,
+          "start_column": 1,
+          "start_line": 15,
+          "text": "Policy B: Unclaimed personal property is held for 45 days after notice."
+        },
+        {
+          "end": 284,
+          "end_column": 209,
+          "end_line": 5,
+          "evidence_id": "391df58e28a9cfc12aa4",
+          "file_hash": "37e02000a1efd45d5b52dd008ff3b81195f13a1d86d72d39b400e3b62d6fbf4a",
+          "locator": {
+            "end": 284,
+            "kind": "characters",
+            "start": 76
+          },
+          "path": "identity.md",
+          "quote_locator": {
+            "end": 284,
+            "kind": "characters",
+            "start": 76
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1134,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 76,
+          "start_column": 1,
+          "start_line": 5,
+          "text": "The collection identity check compares the reservation name with an unexpired identity document. A name mismatch requires staff review. Staff review is not automatic approval and is not a permanent rejection."
+        },
+        {
+          "end": 702,
+          "end_column": 188,
+          "end_line": 9,
+          "evidence_id": "391df58e28a9cfc12aa4",
+          "file_hash": "37e02000a1efd45d5b52dd008ff3b81195f13a1d86d72d39b400e3b62d6fbf4a",
+          "locator": {
+            "end": 702,
+            "kind": "characters",
+            "start": 515
+          },
+          "path": "identity.md",
+          "quote_locator": {
+            "end": 702,
+            "kind": "characters",
+            "start": 515
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1134,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 515,
+          "start_column": 1,
+          "start_line": 9,
+          "text": "Only the check outcome and reviewer reference are stored in the collection record. The identity document image is not stored. Collection records are available to authorized library staff."
+        },
+        {
+          "end": 1057,
+          "end_column": 248,
+          "end_line": 11,
+          "evidence_id": "ef3bd9ed1dcf2ef7beec",
+          "file_hash": "f17004656cfc30e9e043287e28f9f5dc147f24613588aeb94767537433ed1d80",
+          "locator": {
+            "end": 1057,
+            "kind": "characters",
+            "start": 810
+          },
+          "path": "returns.md",
+          "quote_locator": {
+            "end": 1057,
+            "kind": "characters",
+            "start": 810
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1204,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 810,
+          "start_column": 1,
+          "start_line": 11,
+          "text": "The 30-day handling period in policy A and the 45-day handling period in policy B below conflict for the same unclaimed-property process. No effective date or precedence rule is supplied. Keep the difference visible; do not invent a policy winner."
+        }
+      ],
+      "counts": {
+        "Concept": 7
+      },
+      "fact_count": 16,
+      "findings": [],
+      "graph_hash": "3c4415245d7c5123786c3fca5aec60f9692eceb11f6846cf2c37e726e2abf82b",
+      "owned_source_count": 3,
+      "quote_count": 22,
+      "quoted_source_count": 3,
+      "schema_version": 1,
+      "semantic_edges": 30,
+      "source_count": 3,
+      "source_coverage": {
+        "accepted": null,
+        "aspects": {
+          "represented": 0,
+          "total": 0
+        },
+        "blocks": {
+          "total": 0
+        },
+        "complete": null,
+        "coverage_ratio": null,
+        "graph_revision": "c45592a728edb999e9a94c19ebaa0f489ab957cc17e9e7efe4d01f4d04366934",
+        "integrity_findings": [],
+        "minimum_coverage": 0.9,
+        "omitted_aspects": [],
+        "qualifiers": {
+          "coverage_ratio": null,
+          "represented": 0,
+          "total": 0
+        },
+        "reason": "Source-first mode uses original context and a final document audit; no separate source-aspect inventory was audited",
+        "snapshot_id": "e05f7e1a20f42a87a6d3c988cae39e265f451569cd22de8202661750300dc954",
+        "status": "not_independently_measured",
+        "unresolved_attachments": []
+      },
+      "unallocated_fact_ids": [],
+      "uncertainties": [
+        "Unresolved conflict: Policy A specifies a 30-day holding period after notice for unclaimed personal property, whereas Policy B specifies a 45-day holding period; no precedence rule or effective date is provided.",
+        "Proposed evening collection service is explicitly planned but unapproved and barred from current operational availability.",
+        "The workshop pilot allowing drop-offs at the workshop desk applies strictly to tools and does not provide return authorization for audio equipment."
+      ],
+      "verification": "Exact provenance and structure; semantic correctness requires independent model audit"
+    },
+    "source_coverage_ref": {
+      "audit_target_diagnostics": [],
+      "automatic_recovery_counts": {
+        "plan_source_document": 2
+      },
+      "citation_repair_attempts_current_packet": 0,
+      "coordinator_interventions": "Measure externally; not observable inside pipeline",
+      "coverage_kind": "model_estimate_not_measured_information_recall",
+      "editorial_review": {
+        "findings": [],
+        "summary": "The document accurately and comprehensively reflects all source material, adhering strictly to constraints, policy conflicts, and process details without any substantive or readability defects."
+      },
+      "editorial_revisions": [],
+      "editorial_rounds": 0,
+      "exact_citations_valid": true,
+      "exported_content_hash": "cdf02c3144ece4a778cd987be5738ec5608f76b9a26d2df1cfa1c9a280d753b6",
+      "exported_coverage_estimate": 1.0,
+      "graph_revision": "c45592a728edb999e9a94c19ebaa0f489ab957cc17e9e7efe4d01f4d04366934",
+      "limitations": [
+        "Unresolved conflict: Policy A specifies a 30-day holding period after notice for unclaimed personal property, whereas Policy B specifies a 45-day holding period; no precedence rule or effective date is provided.",
+        "Proposed evening collection service is explicitly planned but unapproved and barred from current operational availability.",
+        "The workshop pilot allowing drop-offs at the workshop desk applies strictly to tools and does not provide return authorization for audio equipment.",
+        "No retention duration is specified for expired holds preserved in reservation history.",
+        "Retry behavior is defined only for identity service timeouts (one retry allowed) and is unspecified for other failures.",
+        "plan_source_document: Recoverable ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+      ],
+      "paragraph_repairs": [
+        {
+          "outcome": "repaired",
+          "phase": "semantic",
+          "replacement_ids": [
+            "paragraph-52520e8d4532d1cb"
+          ],
+          "section_id": "source-backed-behavior",
+          "target_id": "paragraph-52520e8d4532d1cb"
+        }
+      ],
+      "semantic_audit": {
+        "accepted": true,
+        "coverage_estimate": 1.0,
+        "coverage_explanation": "All substantive business requirements, operational constraints, and edge cases from borrowing.md, identity.md, and returns.md are accurately represented with precise condition preservation. The documentation captures borrowing qualifications, hold expirations, multi-item reservation behavior, identity verification and timeout handling, return inspection pathways, pilot scope restrictions, and the unresolved holding period conflict between Policy A and Policy B without introducing unsupported claims.",
+        "document_content_hash": "cdf02c3144ece4a778cd987be5738ec5608f76b9a26d2df1cfa1c9a280d753b6",
+        "findings": []
+      },
+      "semantic_audit_matches_exported_content": true,
+      "source_revision": "e05f7e1a20f42a87a6d3c988cae39e265f451569cd22de8202661750300dc954",
+      "status": "complete_with_limitations",
+      "structure_findings": [],
+      "targeted_repair_counts": {
+        "semantic": 1
+      },
+      "visual_findings": [],
+      "withheld_paragraphs": []
+    }
+  },
+  "ledger": [
+    {
+      "status": "settled",
+      "entries": 7,
+      "charged_pln": 1.016563816575
+    },
+    {
+      "status": "uncertain",
+      "entries": 2,
+      "charged_pln": 3.1983270288749996
+    }
+  ],
+  "graph": {
+    "node_types": {
+      "Assertion": 16,
+      "Concept": 7,
+      "SourceSpan": 3
+    },
+    "edge_types": {
+      "INTERPRETS": 16,
+      "RELATED": 4,
+      "SUPPORTED_BY": 26
+    },
+    "assertions": [
+      {
+        "id": "72d886e4e6231aa05e40a13b",
+        "statement": "Borrowing equipment requires active membership and no unpaid overdue charge.",
+        "subject": "Equipment borrowing",
+        "predicate": "requires active membership and no unpaid overdue charge",
+        "scope": "Community equipment library borrowing",
+        "modality": "MUST",
+        "conditions": "[\"Borrower is a resident\", \"Membership is active\", \"No unpaid overdue charges exist\"]",
+        "exceptions": "[]",
+        "source_role": "requirement"
+      },
+      {
+        "id": "f9423b132ee00c00b279d48e",
+        "statement": "Staff borrowing waives the overdue-charge requirement, but active membership is still required, and a waived charge requirement does not cancel the recorded charge.",
+        "subject": "Staff equipment borrowing",
+        "predicate": "waives the overdue-charge requirement while retaining the active membership requirement and preserving recorded charges",
+        "scope": "Community equipment library borrowing",
+        "modality": "MAY",
+        "conditions": "[\"Borrower is staff\"]",
+        "exceptions": "[\"Overdue charge requirement is waived\"]",
+        "source_role": "exception_rule"
+      },
+      {
+        "id": "2d54a61838c33ed399b0b7b5",
+        "statement": "A successful identity check is required before releasing a reserved item, and a failed identity check must not be interpreted as proof of fraud.",
+        "subject": "Reserved item release",
+        "predicate": "requires a successful identity check and prohibits treating a failed check as proof of fraud",
+        "scope": "Community equipment library collection",
+        "modality": "MUST",
+        "conditions": "[\"Item is reserved\"]",
+        "exceptions": "[]",
+        "source_role": "requirement"
+      },
+      {
+        "id": "b8a3ae3379120c8946730d11",
+        "statement": "Reservations hold an available item for 48 hours after confirmation time, expiring at that deadline and remaining in reservation history with unspecified retention duration, whereas cancelling before collection releases the item for another reservation.",
+        "subject": "Reservation hold",
+        "predicate": "holds an available item for 48 hours until expiration, retains expired holds in history, and releases item upon early cancellation",
+        "scope": "Community equipment library reservations",
+        "modality": "MUST",
+        "conditions": "[\"Item is available and confirmed\"]",
+        "exceptions": "[]",
+        "source_role": "requirement"
+      },
+      {
+        "id": "d60b836bcb75e3c75c5f35b9",
+        "statement": "If one item in a multi-item reservation is unavailable, the remaining items stay reserved; the resident chooses whether to remove the unavailable item or wait, and the system must not substitute an item automatically.",
+        "subject": "Multi-item reservation",
+        "predicate": "keeps remaining items reserved upon partial unavailability, lets resident decide whether to wait or remove the item, and prohibits automatic substitution",
+        "scope": "Community equipment library reservations",
+        "modality": "MUST",
+        "conditions": "[\"Reservation includes multiple items\", \"At least one item is unavailable\"]",
+        "exceptions": "[]",
+        "source_role": "requirement"
+      },
+      {
+        "id": "315ef0929c31b3676ffe46d8",
+        "statement": "The workshop team can request an assisted collection, while the proposed evening collection service is planned but unapproved and must not be treated as an available collection option.",
+        "subject": "Assisted and evening collection",
+        "predicate": "permits workshop team assisted collection requests and excludes the unapproved proposed evening collection service from available options",
+        "scope": "Community equipment library collection",
+        "modality": "MUST",
+        "conditions": "[\"Assisted collection is requested by the workshop team\"]",
+        "exceptions": "[]",
+        "source_role": "requirement"
+      },
+      {
+        "id": "16774790835c14afa4430c6b",
+        "statement": "An extension request does not itself change the due date; the previous due date remains effective until the extension is approved.",
+        "subject": "Loan extension request",
+        "predicate": "leaves the previous due date effective until approval",
+        "scope": "Community equipment library loan extensions",
+        "modality": "MUST",
+        "conditions": "[\"Extension has been requested but not approved\"]",
+        "exceptions": "[]",
+        "source_role": "requirement"
+      },
+      {
+        "id": "54cc78d3305b815d6980a815",
+        "statement": "The collection identity check compares the reservation name with an unexpired identity document; a name mismatch requires staff review, which is neither automatic approval nor permanent rejection.",
+        "subject": "Collection identity check",
+        "predicate": "compares reservation name against an unexpired identity document and routes mismatches to non-automatic, non-final staff review",
+        "scope": "Identity at collection",
+        "modality": "MUST",
+        "conditions": "[\"Identity document is unexpired\"]",
+        "exceptions": "[\"Name mismatch triggers staff review\"]",
+        "source_role": "requirement"
+      },
+      {
+        "id": "3744f970438c97240cd64fe1",
+        "statement": "A delegated collector must present their own unexpired identity document and have recorded authorization from the reservation holder; authorization does not waive the unexpired identity-document requirement.",
+        "subject": "Delegated collection",
+        "predicate": "requires recorded authorization from the reservation holder and an unexpired identity document presented by the collector",
+        "scope": "Identity at collection",
+        "modality": "MUST",
+        "conditions": "[\"Collector is delegated by reservation holder\"]",
+        "exceptions": "[]",
+        "source_role": "requirement"
+      },
+      {
+        "id": "4c7740d6d5ef7fca6702fc5f",
+        "statement": "Only the check outcome and reviewer reference are stored in the collection record (accessible to authorized library staff); the identity document image is not stored.",
+        "subject": "Collection record storage",
+        "predicate": "stores check outcome and reviewer reference for authorized staff access while excluding identity document images",
+        "scope": "Identity at collection",
+        "modality": "MUST",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "requirement"
+      },
+      {
+        "id": "e1792612d1ae8b4d8df09de0",
+        "statement": "If the identity service times out, the reservation remains active until its original hold deadline without extension, and exactly one retry is allowed for this timeout with retry behavior for other failures left undefined.",
+        "subject": "Identity service timeout",
+        "predicate": "maintains reservation until original hold deadline without extension and permits exactly one retry for timeouts",
+        "scope": "Identity at collection",
+        "modality": "MUST",
+        "conditions": "[\"Identity service times out\"]",
+        "exceptions": "[]",
+        "source_role": "requirement"
+      },
+      {
+        "id": "63043b9ce2c74b235b11d6d2",
+        "statement": "An incomplete result reported by the identity service cannot authorize collection, and a complete result alone does not establish that every collection requirement has been met.",
+        "subject": "Identity service result interpretation",
+        "predicate": "prohibits incomplete results from authorizing collection and treats complete results as non-exhaustive of all collection requirements",
+        "scope": "Identity at collection",
+        "modality": "MUST",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "requirement"
+      },
+      {
+        "id": "1427d14df62ed2e59c53981e",
+        "statement": "A resident can request one extension of seven days, which requires no conflicting subsequent reservations for approval; a rejected request leaves the original due date unchanged, and staff may explain the decision but cannot silently replace it with a different extension.",
+        "subject": "Loan extension",
+        "predicate": "permits one seven-day extension contingent on no conflicting reservations, retaining original due date if rejected, and barring silent replacement by staff",
+        "scope": "Extensions and returns",
+        "modality": "MUST",
+        "conditions": "[\"Extension is requested by resident\", \"No subsequent reservation conflicts with the extended period\"]",
+        "exceptions": "[]",
+        "source_role": "requirement"
+      },
+      {
+        "id": "7faf4c887f3bf95a1ea98d3d",
+        "statement": "Returned equipment is inspected for completeness and damage: a missing accessory keeps the return open for follow-up, while damage independently routes the item to maintenance review even if the item is complete.",
+        "subject": "Equipment return inspection",
+        "predicate": "inspects completeness and damage, keeping return open for missing accessories and routing damaged items to maintenance review independently",
+        "scope": "Extensions and returns",
+        "modality": "MUST",
+        "conditions": "[\"Equipment is returned\"]",
+        "exceptions": "[]",
+        "source_role": "requirement"
+      },
+      {
+        "id": "f16dd72ca729c27d2e3033e0",
+        "statement": "The current workshop pilot accepts tool returns at either the main desk or the workshop desk, but this pilot is limited to tools and does not establish return locations for audio equipment.",
+        "subject": "Tool return location pilot",
+        "predicate": "accepts tool returns at either main desk or workshop desk without establishing return locations for audio equipment",
+        "scope": "Extensions and returns",
+        "modality": "MAY",
+        "conditions": "[\"Item returned is a tool under the workshop pilot\"]",
+        "exceptions": "[]",
+        "source_role": "requirement"
+      },
+      {
+        "id": "86d33199ccbd4c308be81101",
+        "statement": "The unclaimed-property process has conflicting handling periods between Policy A (held for 30 days after notice) and Policy B (held for 45 days after notice) with no supplied effective date or precedence rule.",
+        "subject": "Unclaimed personal property holding period",
+        "predicate": "exhibits an unresolved conflict between a 30-day holding period after notice (Policy A) and a 45-day holding period after notice (Policy B)",
+        "scope": "Extensions and returns",
+        "modality": "UNKNOWN",
+        "conditions": "[\"Notice has been given for unclaimed personal property\"]",
+        "exceptions": "[]",
+        "source_role": "conflicting_policies"
+      }
+    ],
+    "source_count": 3,
+    "semantic_nodes": [
+      {
+        "concept_kind": "Policy Rule",
+        "description": "Residents can request a single seven-day extension, which requires that no conflicting subsequent reservations exist; requesting an extension does not change the due date prior to approval, rejection keeps the existing due date, and staff cannot substitute an alternate extension silently.",
+        "fact_ids": [
+          "1427d14df62ed2e59c53981e",
+          "16774790835c14afa4430c6b"
+        ],
+        "id": "semantic:concept:27eb74b39ce6f1bfc2d94ddc",
+        "name": "Loan Extension Rules",
+        "quotes": [
+          {
+            "end": 1503,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 1373,
+            "text": "An extension request does not itself change the due date. The previous due date remains effective until the extension is approved."
+          },
+          {
+            "end": 361,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 76,
+            "text": "A resident can request one extension of seven days. Approval requires that no subsequent reservation conflicts with the extended period. A rejected request leaves the original due date unchanged. Staff may explain the decision but cannot silently replace it with a different extension."
+          }
+        ],
+        "scope": "Extensions and returns",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "Verification Procedure",
+        "description": "A successful identity check comparing the reservation name to an unexpired document is required before releasing reserved items; a failed check must not be interpreted as proof of fraud. Delegated collectors must provide recorded holder authorization and their own unexpired identity document. Stored records contain only the check outcome and reviewer reference, never document images. Incomplete identity service results cannot authorize collection, and complete results do not guarantee all release conditions are met.",
+        "fact_ids": [
+          "2d54a61838c33ed399b0b7b5",
+          "3744f970438c97240cd64fe1",
+          "4c7740d6d5ef7fca6702fc5f",
+          "54cc78d3305b815d6980a815",
+          "63043b9ce2c74b235b11d6d2"
+        ],
+        "id": "semantic:concept:2a5a02241ace875e0e5b642f",
+        "name": "Collection Identity Verification",
+        "quotes": [
+          {
+            "end": 513,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 286,
+            "text": "A delegated collector needs a recorded authorization from the reservation holder. The delegated collector must also present their own unexpired identity document. Authorization does not waive that identity-document requirement."
+          },
+          {
+            "end": 605,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 474,
+            "text": "A successful check is required before releasing a reserved item. A failed identity check must not be interpreted as proof of fraud."
+          },
+          {
+            "end": 1133,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 948,
+            "text": "The service can report an incomplete result. An incomplete result cannot authorize collection. A complete result alone does not establish that every collection requirement has been met."
+          },
+          {
+            "end": 284,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 76,
+            "text": "The collection identity check compares the reservation name with an unexpired identity document. A name mismatch requires staff review. Staff review is not automatic approval and is not a permanent rejection."
+          },
+          {
+            "end": 702,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 515,
+            "text": "Only the check outcome and reviewer reference are stored in the collection record. The identity document image is not stored. Collection records are available to authorized library staff."
+          }
+        ],
+        "scope": "Identity at collection",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "Operational Service",
+        "description": "Assisted collection can be requested by the workshop team, whereas a proposed evening collection service is unapproved and cannot be treated as available. If the identity service times out, the reservation remains held until the original deadline without extension, and exactly one timeout retry is permitted.",
+        "fact_ids": [
+          "315ef0929c31b3676ffe46d8",
+          "e1792612d1ae8b4d8df09de0"
+        ],
+        "id": "semantic:concept:84880684a9e8c161acca44c2",
+        "name": "Collection Services and Exception Handling",
+        "quotes": [
+          {
+            "end": 946,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 704,
+            "text": "If the identity service times out, the reservation stays active until its original hold deadline. The timeout does not extend the hold. One retry is allowed for this timeout; this instruction does not define retry behavior for other failures."
+          },
+          {
+            "end": 1300,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 1108,
+            "text": "The workshop team can request an assisted collection. The proposed evening collection service is planned but has not been approved. Do not treat the proposal as an available collection option."
+          }
+        ],
+        "scope": "Community equipment library collection",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "Policy Rule",
+        "description": "Borrowing equipment requires an active membership and no unpaid overdue charges for residents. For staff borrowing, the overdue-charge requirement is waived, but active membership is still mandatory, and waiving the requirement does not cancel the recorded charge.",
+        "fact_ids": [
+          "72d886e4e6231aa05e40a13b",
+          "f9423b132ee00c00b279d48e"
+        ],
+        "id": "semantic:concept:bd8f3ca9f4835f0dd695db3f",
+        "name": "Equipment Borrowing Eligibility",
+        "quotes": [
+          {
+            "end": 228,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 162,
+            "text": "Borrowing requires active membership and no unpaid overdue charge."
+          },
+          {
+            "end": 385,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 229,
+            "text": "Staff borrowing waives the overdue-charge requirement; active membership is still required. A waived charge requirement does not cancel the recorded charge."
+          }
+        ],
+        "scope": "Community equipment library borrowing",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "System Lifecycle",
+        "description": "Reservations hold an available item for 48 hours following confirmation. Expired holds remain in reservation history without a specified retention limit. Cancelling prior to collection releases the item. In multi-item reservations with an unavailable item, remaining items remain reserved, residents choose whether to wait or remove the missing item, and automated item substitution is prohibited.",
+        "fact_ids": [
+          "b8a3ae3379120c8946730d11",
+          "d60b836bcb75e3c75c5f35b9"
+        ],
+        "id": "semantic:concept:d204283bb1994bf5c77f3376",
+        "name": "Reservation Hold Lifecycle",
+        "quotes": [
+          {
+            "end": 1106,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 880,
+            "text": "A reservation may include several items. If one item is unavailable, the remaining items stay reserved. The resident chooses whether to remove the unavailable item or wait; the system must not substitute an item automatically."
+          },
+          {
+            "end": 878,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 607,
+            "text": "Reservations hold an available item for 48 hours after the confirmation time. A hold expires at that deadline. An expired hold remains in reservation history; no retention duration is specified here. Cancelling before collection releases the item for another reservation."
+          }
+        ],
+        "scope": "Community equipment library reservations",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "Inspection & Logistics",
+        "description": "Returns undergo completeness and damage inspection: missing accessories keep the return ticket open, while damage triggers maintenance review independently of completeness. Tools under the workshop pilot may be returned to the main desk or workshop desk, but this pilot does not apply to audio equipment.",
+        "fact_ids": [
+          "7faf4c887f3bf95a1ea98d3d",
+          "f16dd72ca729c27d2e3033e0"
+        ],
+        "id": "semantic:concept:d6de597381c6e2bf801cf5af",
+        "name": "Return Inspection and Drop-off Locations",
+        "quotes": [
+          {
+            "end": 808,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 622,
+            "text": "The current workshop pilot accepts a tool return at either the main desk or the workshop desk. This pilot is limited to tools. It does not establish return locations for audio equipment."
+          },
+          {
+            "end": 620,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 363,
+            "text": "Returned equipment is inspected for completeness and damage. A missing accessory keeps the return open for follow-up. Damage sends the item to maintenance review. These are independent outcomes: a complete but damaged item still requires maintenance review."
+          }
+        ],
+        "scope": "Extensions and returns",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "Policy Conflict",
+        "description": "An unresolved conflict exists between Policy A (retaining unclaimed property for 30 days after notice) and Policy B (retaining for 45 days after notice) with no established precedence rule or effective date.",
+        "fact_ids": [
+          "86d33199ccbd4c308be81101"
+        ],
+        "id": "semantic:concept:faa4eeaf318afb7667cade26",
+        "name": "Unclaimed Property Retention Conflict",
+        "quotes": [
+          {
+            "end": 1130,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 1059,
+            "text": "Policy A: Unclaimed personal property is held for 30 days after notice."
+          },
+          {
+            "end": 1203,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 1132,
+            "text": "Policy B: Unclaimed personal property is held for 45 days after notice."
+          },
+          {
+            "end": 1057,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 810,
+            "text": "The 30-day handling period in policy A and the 45-day handling period in policy B below conflict for the same unclaimed-property process. No effective date or precedence rule is supplied. Keep the difference visible; do not invent a policy winner."
+          }
+        ],
+        "scope": "Extensions and returns",
+        "status": "direct",
+        "type": "Concept"
+      }
+    ],
+    "semantic_edges": [
+      {
+        "id": "semantic:edge:0c544cbaed52bf9222eabcc8",
+        "quotes": [
+          {
+            "end": 1106,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 880,
+            "text": "A reservation may include several items. If one item is unavailable, the remaining items stay reserved. The resident chooses whether to remove the unavailable item or wait; the system must not substitute an item automatically."
+          },
+          {
+            "end": 878,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 607,
+            "text": "Reservations hold an available item for 48 hours after the confirmation time. A hold expires at that deadline. An expired hold remains in reservation history; no retention duration is specified here. Cancelling before collection releases the item for another reservation."
+          }
+        ],
+        "source_id": "semantic:concept:d204283bb1994bf5c77f3376",
+        "target_id": "b8a3ae3379120c8946730d11",
+        "type": "INTERPRETS"
+      },
+      {
+        "description": "Identity service timeouts preserve the original 48-hour hold deadline without extending it.",
+        "id": "semantic:edge:0c931c2eb6868de073819cc6",
+        "label": "preserves hold on timeout",
+        "quotes": [
+          {
+            "end": 839,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 704,
+            "text": "If the identity service times out, the reservation stays active until its original hold deadline. The timeout does not extend the hold."
+          }
+        ],
+        "source_id": "semantic:concept:84880684a9e8c161acca44c2",
+        "status": "direct",
+        "target_id": "semantic:concept:d204283bb1994bf5c77f3376",
+        "type": "RELATED"
+      },
+      {
+        "id": "semantic:edge:170a24dd40dde60deedd3eb8",
+        "quotes": [
+          {
+            "end": 808,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 622,
+            "text": "The current workshop pilot accepts a tool return at either the main desk or the workshop desk. This pilot is limited to tools. It does not establish return locations for audio equipment."
+          },
+          {
+            "end": 620,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 363,
+            "text": "Returned equipment is inspected for completeness and damage. A missing accessory keeps the return open for follow-up. Damage sends the item to maintenance review. These are independent outcomes: a complete but damaged item still requires maintenance review."
+          }
+        ],
+        "source_id": "semantic:concept:d6de597381c6e2bf801cf5af",
+        "target_id": "f16dd72ca729c27d2e3033e0",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:1b4397d15dd5fee5d3a9c0ad",
+        "quotes": [
+          {
+            "end": 361,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 76,
+            "text": "A resident can request one extension of seven days. Approval requires that no subsequent reservation conflicts with the extended period. A rejected request leaves the original due date unchanged. Staff may explain the decision but cannot silently replace it with a different extension."
+          }
+        ],
+        "source_id": "semantic:concept:27eb74b39ce6f1bfc2d94ddc",
+        "target_id": "ef3bd9ed1dcf2ef7beec",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "description": "Equipment borrowing links to loan extension governance, which enforces that unapproved extension requests leave the existing return deadline intact.",
+        "id": "semantic:edge:1cc3ecf36fa6960e73b0b9b3",
+        "label": "referenced loan extension",
+        "quotes": [
+          {
+            "end": 1430,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 1302,
+            "text": "Loan extensions are described in [Extensions and returns](returns.md). An extension request does not itself change the due date."
+          }
+        ],
+        "source_id": "semantic:concept:bd8f3ca9f4835f0dd695db3f",
+        "status": "direct",
+        "target_id": "semantic:concept:27eb74b39ce6f1bfc2d94ddc",
+        "type": "RELATED"
+      },
+      {
+        "id": "semantic:edge:1d78a98833ce1066d6a55cb3",
+        "quotes": [
+          {
+            "end": 228,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 162,
+            "text": "Borrowing requires active membership and no unpaid overdue charge."
+          },
+          {
+            "end": 385,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 229,
+            "text": "Staff borrowing waives the overdue-charge requirement; active membership is still required. A waived charge requirement does not cancel the recorded charge."
+          }
+        ],
+        "source_id": "semantic:concept:bd8f3ca9f4835f0dd695db3f",
+        "target_id": "0bac7f179a3365549d0a",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:1e1beea20b2ede9e838eac99",
+        "quotes": [
+          {
+            "end": 1300,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 1108,
+            "text": "The workshop team can request an assisted collection. The proposed evening collection service is planned but has not been approved. Do not treat the proposal as an available collection option."
+          }
+        ],
+        "source_id": "semantic:concept:84880684a9e8c161acca44c2",
+        "target_id": "0bac7f179a3365549d0a",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:31e336e3ea3289b4b7757811",
+        "quotes": [
+          {
+            "end": 228,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 162,
+            "text": "Borrowing requires active membership and no unpaid overdue charge."
+          },
+          {
+            "end": 385,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 229,
+            "text": "Staff borrowing waives the overdue-charge requirement; active membership is still required. A waived charge requirement does not cancel the recorded charge."
+          }
+        ],
+        "source_id": "semantic:concept:bd8f3ca9f4835f0dd695db3f",
+        "target_id": "72d886e4e6231aa05e40a13b",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:45d0a31298a41d0f0eea3c9e",
+        "quotes": [
+          {
+            "end": 1130,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 1059,
+            "text": "Policy A: Unclaimed personal property is held for 30 days after notice."
+          },
+          {
+            "end": 1203,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 1132,
+            "text": "Policy B: Unclaimed personal property is held for 45 days after notice."
+          },
+          {
+            "end": 1057,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 810,
+            "text": "The 30-day handling period in policy A and the 45-day handling period in policy B below conflict for the same unclaimed-property process. No effective date or precedence rule is supplied. Keep the difference visible; do not invent a policy winner."
+          }
+        ],
+        "source_id": "semantic:concept:faa4eeaf318afb7667cade26",
+        "target_id": "86d33199ccbd4c308be81101",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:4940f18d5594d0711fdd7ea0",
+        "quotes": [
+          {
+            "end": 946,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 704,
+            "text": "If the identity service times out, the reservation stays active until its original hold deadline. The timeout does not extend the hold. One retry is allowed for this timeout; this instruction does not define retry behavior for other failures."
+          }
+        ],
+        "source_id": "semantic:concept:84880684a9e8c161acca44c2",
+        "target_id": "391df58e28a9cfc12aa4",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:5fdaf58eacef78ea266bbe4a",
+        "quotes": [
+          {
+            "end": 1106,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 880,
+            "text": "A reservation may include several items. If one item is unavailable, the remaining items stay reserved. The resident chooses whether to remove the unavailable item or wait; the system must not substitute an item automatically."
+          },
+          {
+            "end": 878,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 607,
+            "text": "Reservations hold an available item for 48 hours after the confirmation time. A hold expires at that deadline. An expired hold remains in reservation history; no retention duration is specified here. Cancelling before collection releases the item for another reservation."
+          }
+        ],
+        "source_id": "semantic:concept:d204283bb1994bf5c77f3376",
+        "target_id": "d60b836bcb75e3c75c5f35b9",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:6adf6804990ebd19a1fb5def",
+        "quotes": [
+          {
+            "end": 513,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 286,
+            "text": "A delegated collector needs a recorded authorization from the reservation holder. The delegated collector must also present their own unexpired identity document. Authorization does not waive that identity-document requirement."
+          },
+          {
+            "end": 605,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 474,
+            "text": "A successful check is required before releasing a reserved item. A failed identity check must not be interpreted as proof of fraud."
+          },
+          {
+            "end": 1133,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 948,
+            "text": "The service can report an incomplete result. An incomplete result cannot authorize collection. A complete result alone does not establish that every collection requirement has been met."
+          },
+          {
+            "end": 284,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 76,
+            "text": "The collection identity check compares the reservation name with an unexpired identity document. A name mismatch requires staff review. Staff review is not automatic approval and is not a permanent rejection."
+          },
+          {
+            "end": 702,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 515,
+            "text": "Only the check outcome and reviewer reference are stored in the collection record. The identity document image is not stored. Collection records are available to authorized library staff."
+          }
+        ],
+        "source_id": "semantic:concept:2a5a02241ace875e0e5b642f",
+        "target_id": "2d54a61838c33ed399b0b7b5",
+        "type": "INTERPRETS"
+      },
+      {
+        "description": "Reserved items held under the 48-hour reservation lifecycle require identity verification before being released for collection.",
+        "id": "semantic:edge:7c1072e6c257d9e038731bea",
+        "label": "governs release of",
+        "quotes": [
+          {
+            "end": 538,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 387,
+            "text": "Collection uses the identity check described in [Identity at collection](identity.md). A successful check is required before releasing a reserved item."
+          }
+        ],
+        "source_id": "semantic:concept:d204283bb1994bf5c77f3376",
+        "status": "direct",
+        "target_id": "semantic:concept:2a5a02241ace875e0e5b642f",
+        "type": "RELATED"
+      },
+      {
+        "id": "semantic:edge:7d331d934892c2befcb473bf",
+        "quotes": [
+          {
+            "end": 808,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 622,
+            "text": "The current workshop pilot accepts a tool return at either the main desk or the workshop desk. This pilot is limited to tools. It does not establish return locations for audio equipment."
+          },
+          {
+            "end": 620,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 363,
+            "text": "Returned equipment is inspected for completeness and damage. A missing accessory keeps the return open for follow-up. Damage sends the item to maintenance review. These are independent outcomes: a complete but damaged item still requires maintenance review."
+          }
+        ],
+        "source_id": "semantic:concept:d6de597381c6e2bf801cf5af",
+        "target_id": "7faf4c887f3bf95a1ea98d3d",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:81bd31bd6349a875c861c220",
+        "quotes": [
+          {
+            "end": 1503,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 1373,
+            "text": "An extension request does not itself change the due date. The previous due date remains effective until the extension is approved."
+          }
+        ],
+        "source_id": "semantic:concept:27eb74b39ce6f1bfc2d94ddc",
+        "target_id": "0bac7f179a3365549d0a",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:83ef655ce73a7343374fd264",
+        "quotes": [
+          {
+            "end": 513,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 286,
+            "text": "A delegated collector needs a recorded authorization from the reservation holder. The delegated collector must also present their own unexpired identity document. Authorization does not waive that identity-document requirement."
+          },
+          {
+            "end": 605,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 474,
+            "text": "A successful check is required before releasing a reserved item. A failed identity check must not be interpreted as proof of fraud."
+          },
+          {
+            "end": 1133,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 948,
+            "text": "The service can report an incomplete result. An incomplete result cannot authorize collection. A complete result alone does not establish that every collection requirement has been met."
+          },
+          {
+            "end": 284,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 76,
+            "text": "The collection identity check compares the reservation name with an unexpired identity document. A name mismatch requires staff review. Staff review is not automatic approval and is not a permanent rejection."
+          },
+          {
+            "end": 702,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 515,
+            "text": "Only the check outcome and reviewer reference are stored in the collection record. The identity document image is not stored. Collection records are available to authorized library staff."
+          }
+        ],
+        "source_id": "semantic:concept:2a5a02241ace875e0e5b642f",
+        "target_id": "54cc78d3305b815d6980a815",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:8b092cb2e03f41b98d2b8d3d",
+        "quotes": [
+          {
+            "end": 228,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 162,
+            "text": "Borrowing requires active membership and no unpaid overdue charge."
+          },
+          {
+            "end": 385,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 229,
+            "text": "Staff borrowing waives the overdue-charge requirement; active membership is still required. A waived charge requirement does not cancel the recorded charge."
+          }
+        ],
+        "source_id": "semantic:concept:bd8f3ca9f4835f0dd695db3f",
+        "target_id": "f9423b132ee00c00b279d48e",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:8c409bf5eb07370db81ecac0",
+        "quotes": [
+          {
+            "end": 1130,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 1059,
+            "text": "Policy A: Unclaimed personal property is held for 30 days after notice."
+          },
+          {
+            "end": 1203,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 1132,
+            "text": "Policy B: Unclaimed personal property is held for 45 days after notice."
+          },
+          {
+            "end": 1057,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 810,
+            "text": "The 30-day handling period in policy A and the 45-day handling period in policy B below conflict for the same unclaimed-property process. No effective date or precedence rule is supplied. Keep the difference visible; do not invent a policy winner."
+          }
+        ],
+        "source_id": "semantic:concept:faa4eeaf318afb7667cade26",
+        "target_id": "ef3bd9ed1dcf2ef7beec",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:8d31cfa11d5c6c1e2b339c18",
+        "quotes": [
+          {
+            "end": 513,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 286,
+            "text": "A delegated collector needs a recorded authorization from the reservation holder. The delegated collector must also present their own unexpired identity document. Authorization does not waive that identity-document requirement."
+          },
+          {
+            "end": 605,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 474,
+            "text": "A successful check is required before releasing a reserved item. A failed identity check must not be interpreted as proof of fraud."
+          },
+          {
+            "end": 1133,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 948,
+            "text": "The service can report an incomplete result. An incomplete result cannot authorize collection. A complete result alone does not establish that every collection requirement has been met."
+          },
+          {
+            "end": 284,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 76,
+            "text": "The collection identity check compares the reservation name with an unexpired identity document. A name mismatch requires staff review. Staff review is not automatic approval and is not a permanent rejection."
+          },
+          {
+            "end": 702,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 515,
+            "text": "Only the check outcome and reviewer reference are stored in the collection record. The identity document image is not stored. Collection records are available to authorized library staff."
+          }
+        ],
+        "source_id": "semantic:concept:2a5a02241ace875e0e5b642f",
+        "target_id": "63043b9ce2c74b235b11d6d2",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:9af78887519e5186f1e339af",
+        "quotes": [
+          {
+            "end": 513,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 286,
+            "text": "A delegated collector needs a recorded authorization from the reservation holder. The delegated collector must also present their own unexpired identity document. Authorization does not waive that identity-document requirement."
+          },
+          {
+            "end": 605,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 474,
+            "text": "A successful check is required before releasing a reserved item. A failed identity check must not be interpreted as proof of fraud."
+          },
+          {
+            "end": 1133,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 948,
+            "text": "The service can report an incomplete result. An incomplete result cannot authorize collection. A complete result alone does not establish that every collection requirement has been met."
+          },
+          {
+            "end": 284,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 76,
+            "text": "The collection identity check compares the reservation name with an unexpired identity document. A name mismatch requires staff review. Staff review is not automatic approval and is not a permanent rejection."
+          },
+          {
+            "end": 702,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 515,
+            "text": "Only the check outcome and reviewer reference are stored in the collection record. The identity document image is not stored. Collection records are available to authorized library staff."
+          }
+        ],
+        "source_id": "semantic:concept:2a5a02241ace875e0e5b642f",
+        "target_id": "4c7740d6d5ef7fca6702fc5f",
+        "type": "INTERPRETS"
+      },
+      {
+        "description": "Approval of a seven-day loan extension requires verifying that no subsequent item reservation conflicts with the extended period.",
+        "id": "semantic:edge:afb3ff9effa9ff60f391aa16",
+        "label": "constrained by reservations",
+        "quotes": [
+          {
+            "end": 212,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 128,
+            "text": "Approval requires that no subsequent reservation conflicts with the extended period."
+          }
+        ],
+        "source_id": "semantic:concept:27eb74b39ce6f1bfc2d94ddc",
+        "status": "direct",
+        "target_id": "semantic:concept:d204283bb1994bf5c77f3376",
+        "type": "RELATED"
+      },
+      {
+        "id": "semantic:edge:b6ab3b0d7b1bafcd3897940b",
+        "quotes": [
+          {
+            "end": 808,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 622,
+            "text": "The current workshop pilot accepts a tool return at either the main desk or the workshop desk. This pilot is limited to tools. It does not establish return locations for audio equipment."
+          },
+          {
+            "end": 620,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 363,
+            "text": "Returned equipment is inspected for completeness and damage. A missing accessory keeps the return open for follow-up. Damage sends the item to maintenance review. These are independent outcomes: a complete but damaged item still requires maintenance review."
+          }
+        ],
+        "source_id": "semantic:concept:d6de597381c6e2bf801cf5af",
+        "target_id": "ef3bd9ed1dcf2ef7beec",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:bfdb71422a95cc3aa1c51b54",
+        "quotes": [
+          {
+            "end": 1106,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 880,
+            "text": "A reservation may include several items. If one item is unavailable, the remaining items stay reserved. The resident chooses whether to remove the unavailable item or wait; the system must not substitute an item automatically."
+          },
+          {
+            "end": 878,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 607,
+            "text": "Reservations hold an available item for 48 hours after the confirmation time. A hold expires at that deadline. An expired hold remains in reservation history; no retention duration is specified here. Cancelling before collection releases the item for another reservation."
+          }
+        ],
+        "source_id": "semantic:concept:d204283bb1994bf5c77f3376",
+        "target_id": "0bac7f179a3365549d0a",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:d9395f7c512199e069068ccc",
+        "quotes": [
+          {
+            "end": 605,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 474,
+            "text": "A successful check is required before releasing a reserved item. A failed identity check must not be interpreted as proof of fraud."
+          }
+        ],
+        "source_id": "semantic:concept:2a5a02241ace875e0e5b642f",
+        "target_id": "0bac7f179a3365549d0a",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:ddc9063f9feee3d2d05efc85",
+        "quotes": [
+          {
+            "end": 946,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 704,
+            "text": "If the identity service times out, the reservation stays active until its original hold deadline. The timeout does not extend the hold. One retry is allowed for this timeout; this instruction does not define retry behavior for other failures."
+          },
+          {
+            "end": 1300,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 1108,
+            "text": "The workshop team can request an assisted collection. The proposed evening collection service is planned but has not been approved. Do not treat the proposal as an available collection option."
+          }
+        ],
+        "source_id": "semantic:concept:84880684a9e8c161acca44c2",
+        "target_id": "315ef0929c31b3676ffe46d8",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:e0d57c45924d7805ca4dcd2d",
+        "quotes": [
+          {
+            "end": 513,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 286,
+            "text": "A delegated collector needs a recorded authorization from the reservation holder. The delegated collector must also present their own unexpired identity document. Authorization does not waive that identity-document requirement."
+          },
+          {
+            "end": 605,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 474,
+            "text": "A successful check is required before releasing a reserved item. A failed identity check must not be interpreted as proof of fraud."
+          },
+          {
+            "end": 1133,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 948,
+            "text": "The service can report an incomplete result. An incomplete result cannot authorize collection. A complete result alone does not establish that every collection requirement has been met."
+          },
+          {
+            "end": 284,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 76,
+            "text": "The collection identity check compares the reservation name with an unexpired identity document. A name mismatch requires staff review. Staff review is not automatic approval and is not a permanent rejection."
+          },
+          {
+            "end": 702,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 515,
+            "text": "Only the check outcome and reviewer reference are stored in the collection record. The identity document image is not stored. Collection records are available to authorized library staff."
+          }
+        ],
+        "source_id": "semantic:concept:2a5a02241ace875e0e5b642f",
+        "target_id": "3744f970438c97240cd64fe1",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:e4be69ac99c6b7abf58f0bc0",
+        "quotes": [
+          {
+            "end": 1503,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 1373,
+            "text": "An extension request does not itself change the due date. The previous due date remains effective until the extension is approved."
+          },
+          {
+            "end": 361,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 76,
+            "text": "A resident can request one extension of seven days. Approval requires that no subsequent reservation conflicts with the extended period. A rejected request leaves the original due date unchanged. Staff may explain the decision but cannot silently replace it with a different extension."
+          }
+        ],
+        "source_id": "semantic:concept:27eb74b39ce6f1bfc2d94ddc",
+        "target_id": "16774790835c14afa4430c6b",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:ee42aa3879682da1dc9f77da",
+        "quotes": [
+          {
+            "end": 1503,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 1373,
+            "text": "An extension request does not itself change the due date. The previous due date remains effective until the extension is approved."
+          },
+          {
+            "end": 361,
+            "evidence_id": "ef3bd9ed1dcf2ef7beec",
+            "start": 76,
+            "text": "A resident can request one extension of seven days. Approval requires that no subsequent reservation conflicts with the extended period. A rejected request leaves the original due date unchanged. Staff may explain the decision but cannot silently replace it with a different extension."
+          }
+        ],
+        "source_id": "semantic:concept:27eb74b39ce6f1bfc2d94ddc",
+        "target_id": "1427d14df62ed2e59c53981e",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:ef5f7de3747944a5a9069351",
+        "quotes": [
+          {
+            "end": 513,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 286,
+            "text": "A delegated collector needs a recorded authorization from the reservation holder. The delegated collector must also present their own unexpired identity document. Authorization does not waive that identity-document requirement."
+          },
+          {
+            "end": 1133,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 948,
+            "text": "The service can report an incomplete result. An incomplete result cannot authorize collection. A complete result alone does not establish that every collection requirement has been met."
+          },
+          {
+            "end": 284,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 76,
+            "text": "The collection identity check compares the reservation name with an unexpired identity document. A name mismatch requires staff review. Staff review is not automatic approval and is not a permanent rejection."
+          },
+          {
+            "end": 702,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 515,
+            "text": "Only the check outcome and reviewer reference are stored in the collection record. The identity document image is not stored. Collection records are available to authorized library staff."
+          }
+        ],
+        "source_id": "semantic:concept:2a5a02241ace875e0e5b642f",
+        "target_id": "391df58e28a9cfc12aa4",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:f1a78b93e5feeab7614a3068",
+        "quotes": [
+          {
+            "end": 946,
+            "evidence_id": "391df58e28a9cfc12aa4",
+            "start": 704,
+            "text": "If the identity service times out, the reservation stays active until its original hold deadline. The timeout does not extend the hold. One retry is allowed for this timeout; this instruction does not define retry behavior for other failures."
+          },
+          {
+            "end": 1300,
+            "evidence_id": "0bac7f179a3365549d0a",
+            "start": 1108,
+            "text": "The workshop team can request an assisted collection. The proposed evening collection service is planned but has not been approved. Do not treat the proposal as an available collection option."
+          }
+        ],
+        "source_id": "semantic:concept:84880684a9e8c161acca44c2",
+        "target_id": "e1792612d1ae8b4d8df09de0",
+        "type": "INTERPRETS"
+      }
+    ]
+  },
+  "limitations": [
+    "Node counts and successful audits are not semantic accuracy measurements.",
+    "The recorded event window excludes process startup and shutdown.",
+    "Model response sums can include concurrent requests.",
+    "Coordinator interventions must be supplied from the execution record, not inferred."
+  ]
+}

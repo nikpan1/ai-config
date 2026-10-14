@@ -1,0 +1,80 @@
+{
+  "method": "Read-only comparison of three frozen risk documents. Text/markup metrics only; no pixel QA and no inference of semantic completeness from lengths or stable IDs.",
+  "comparison": [
+    {
+      "version": "baseline",
+      "path": ".docgen\\business-final-risk-20261013\\runs\\business-final-risk-20261013\\output\\documentation.md",
+      "sha256": "9dd1379e3e7fa4e0fbdcdfa760354bd8559d6afb70bdb1b9379e14a44905a33e",
+      "heading_count": 8,
+      "orphan_headings": 4,
+      "pseudo_headings": 5,
+      "html_tables": 3,
+      "images": 3,
+      "unique_images": 2,
+      "image_occurrences": {
+        "assets/7ff702a0ae3648f2128692b828e4faf53e99aaa9047e7c6cad1eb35ea7dbf3ad.jpeg": 2,
+        "assets/f3e53d07855ffbec9bc74d87dcd8a81a130d6bc8a5cb6c26479357d89c1f3795.jpeg": 1
+      },
+      "diagrams": 1,
+      "missing_captions": 4,
+      "broken_links": 0,
+      "body_words": 1354,
+      "longest_body_block_words": 116,
+      "blocks_over_120_words": 0,
+      "citation_uses": 63,
+      "citation_definitions": 24
+    },
+    {
+      "version": "verified",
+      "path": ".docgen\\authoring-verified-risk-20261013\\runs\\authoring-verified-risk-20261013\\output\\documentation.md",
+      "sha256": "4dd93443c9050f2f7d1a15a06d2a429696ebbf2321db2f1db192a0693890c1bd",
+      "heading_count": 14,
+      "orphan_headings": 0,
+      "pseudo_headings": 0,
+      "html_tables": 0,
+      "images": 5,
+      "unique_images": 2,
+      "image_occurrences": {
+        "assets/7ff702a0ae3648f2128692b828e4faf53e99aaa9047e7c6cad1eb35ea7dbf3ad.jpeg": 3,
+        "assets/f3e53d07855ffbec9bc74d87dcd8a81a130d6bc8a5cb6c26479357d89c1f3795.jpeg": 2
+      },
+      "diagrams": 1,
+      "missing_captions": 0,
+      "broken_links": 0,
+      "body_words": 2094,
+      "longest_body_block_words": 153,
+      "blocks_over_120_words": 2,
+      "citation_uses": 141,
+      "citation_definitions": 52
+    },
+    {
+      "version": "release",
+      "path": ".docgen\\authoring-release-risk-20261013\\runs\\authoring-release-risk-20261013\\output\\documentation.md",
+      "sha256": "b73b74c6cd8ba10218714ec92673c2818c884b7afdbd40c5678c310b32a5a8a4",
+      "heading_count": 14,
+      "orphan_headings": 0,
+      "pseudo_headings": 0,
+      "html_tables": 0,
+      "images": 4,
+      "unique_images": 2,
+      "image_occurrences": {
+        "assets/7ff702a0ae3648f2128692b828e4faf53e99aaa9047e7c6cad1eb35ea7dbf3ad.jpeg": 2,
+        "assets/f3e53d07855ffbec9bc74d87dcd8a81a130d6bc8a5cb6c26479357d89c1f3795.jpeg": 2
+      },
+      "diagrams": 1,
+      "missing_captions": 0,
+      "broken_links": 0,
+      "body_words": 1674,
+      "longest_body_block_words": 64,
+      "blocks_over_120_words": 0,
+      "citation_uses": 105,
+      "citation_definitions": 35
+    }
+  ],
+  "observations": [
+    "The release retains all approved-structure sections and fixes missing parent headings, body pseudoheadings and HTML wrappers.",
+    "The release still repeats two distinct image assets across four placements; this is fewer than five image placements in the earlier verified output.",
+    "Word counts and citation counts measure document volume, not factual completeness or improved readability.",
+    "The release contains one diagram and its syntax passed the real Mermaid parser; this does not validate the meaning of its arrows."
+  ]
+}

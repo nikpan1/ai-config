@@ -1,0 +1,10 @@
+{
+  "method": "Mermaid parser in isolated Node and jsdom; grammar validation only, no pixel rendering or semantic entailment check.",
+  "results": [
+    {
+      "path": ".docgen/authoring-release-risk-20261013/runs/authoring-release-risk-20261013/output/documentation.md",
+      "diagram": 1,
+      "valid": true
+    }
+  ]
+}

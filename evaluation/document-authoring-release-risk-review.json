@@ -1,0 +1,130 @@
+{
+  "run_id": "authoring-release-risk-20261013",
+  "review_type": "Independent read-only comparison with original source, frozen old baseline and earlier verified-risk run",
+  "document": ".docgen/authoring-release-risk-20261013/runs/authoring-release-risk-20261013/output/documentation.md",
+  "source": "data/test_data_2_quick/risk-profiling.md",
+  "baseline": ".docgen/business-final-risk-20261013/runs/business-final-risk-20261013/output/documentation.md",
+  "earlier_comparison": "evaluation/document-authoring-independent-review.json",
+  "overall": "This run exercises the intended semantic repair, editorial review, revision and revision-verification stages. It improves hierarchy and captions over the old baseline, and improves retry boundaries, response recoverability and the acceptance diagram over the earlier degraded run. It still contains unsupported statements and incomplete claim-level citations. A material validation problem remains: previously rejected semantic findings survive unchanged while the final report replaces them with accepted=true and no findings after a diagram revision. The result cannot be described as fully verified business documentation.",
+  "method_limits": [
+    "Known synthetic development corpus, not a blind or independent production benchmark.",
+    "Generic prompt changes followed earlier reviews; this is regression assessment, not held-out evaluation.",
+    "One final sample cannot establish a general correctness rate or isolate the effects of reasoning, prompt, schema and workflow changes.",
+    "No model calls or changes to generated content, source material or runtime were made during this review.",
+    "Rendered layout and Mermaid parsing are evaluated separately. Topic representation does not prove all repeated claims preserve meaning."
+  ],
+  "source_rule_checks": [
+    {"id": "QF01", "result": "preserved", "detail": "Q3 current and Q2 submission cutoff retained without the earlier explicit Q3-exclusive inference."},
+    {"id": "QF02", "result": "preserved", "detail": "NONE, BEGINNER, INTERMEDIATE and ADVANCED retained; EXPERT retired and rejected."},
+    {"id": "QF03", "result": "preserved_with_generalized_framing", "detail": "Month 36 H3 and month 35 H1 retained. General monthly-boundary language goes beyond the two supplied boundary examples."},
+    {"id": "QF04", "result": "preserved_with_unsupported_generalization", "detail": "Exactly 5 percent L5 and 5.1 percent free-text invalid retained; exact discrete classification is an inferred general rule."},
+    {"id": "QF05", "result": "preserved_with_scope_and_origin_drift", "detail": "CP-3 PROFILE_PROCESSING required and marketing insufficient retained, but regulatory origin and blocking any draft progress are unsupported additions."},
+    {"id": "QF06", "result": "preserved", "detail": "RiskSignal exclusivity and unrelated MarketPulse/CustodyBridge retained; descriptions of those systems as investment or administrative systems are ungrounded classifications."},
+    {"id": "QF07", "result": "preserved_with_execution_overclaim", "detail": "Stable idempotency key and stored result retained; rather than re-executing scoring adds an internal execution guarantee."},
+    {"id": "QF08", "result": "improved", "detail": "Incomplete responses cannot be accepted; missing reason code keeps draft recoverable. Previously generalized recovery and retry triggers were removed. Diagram now evaluates complete responses for acceptance instead of guaranteeing acceptance."},
+    {"id": "QF09", "result": "preserved_in_prose_diagram_underqualified", "detail": "Failed reassessment preserves prior unexpired profile until original expiry and is not a new active profile. Diagram applies prior-profile preservation to Failed Attempt without explicitly restricting that branch to reassessment."},
+    {"id": "QF10", "result": "preserved", "detail": "365 days after acceptance and history visibility after expiry retained; draft's permanent-retention guarantee was repaired."},
+    {"id": "QF11", "result": "preserved_with_role_elaboration", "detail": "Orphan audit review decision required and automatic reconciliation planned/unimplemented retained. Operational personnel resolving discrepancies adds a more specific responsibility than the source decision requirement."}
+  ],
+  "additional_source_information": {
+    "review_current_profile_before_draft_and_after_recovery": "present, although opening paragraph adds active",
+    "no_provider_call_for_incomplete_draft": "present",
+    "shared_correlation_id": "present",
+    "retry_once_without_defined_trigger": "present and now separated from a specific failure trigger",
+    "images": "Both source images represented; each appears twice. Specific screen values have image-description citations.",
+    "fixture_note": "The non-business Sławomir synthetic-currency fixture note is not included in final business prose; historical provenance remains in original source artifacts."
+  },
+  "actual_review_effect": {
+    "first_semantic_audit_accepted": false,
+    "first_semantic_audit_findings": 6,
+    "targeted_repair_rounds": 1,
+    "targeted_paragraphs_repaired": 6,
+    "demonstrable_repairs": [
+      "Removed permanent historical retention guarantee.",
+      "Separated missing-reason-code recoverability from a general incomplete-response condition.",
+      "Removed communication-failure trigger from the isolated Retry once instruction.",
+      "Removed explicit test-fixture commentary from the two screen-description paragraphs."
+    ],
+    "second_semantic_audit_accepted": false,
+    "second_semantic_audit_findings": 7,
+    "editorial_findings": 1,
+    "editorial_rounds": 1,
+    "editorial_revision_outcome": "accepted",
+    "demonstrable_editorial_change": "Added CP-3 consent and response acceptance evaluation to the Mermaid diagram, removing direct Complete Response -> Accepted Profile sufficiency.",
+    "final_report_audit_accepted": true,
+    "final_report_audit_findings": 0,
+    "final_report_hash_matches_export": true,
+    "validation_problem": "Seven earlier rejected findings concern text that remains unchanged in the final document. Revision verification accepted the diagram change and the final report displays no semantic findings, without showing that those earlier objections were resolved. Matching the content hash does not resolve this loss of outstanding findings."
+  },
+  "remaining_findings": [
+    {
+      "id": "RELEASE-1",
+      "severity": "material",
+      "kind": "unresolved_semantic_findings_lost_from_final_status",
+      "evidence": "step47/revisions/r0002/completion_audit_ref.json rejects seven findings; output/report.json reports accepted=true/findings=[] after one visual revision. The corresponding paragraphs still contain current active profile, unsupported scope descriptions, regulatory consent, discrete classification and gap commentary.",
+      "reason": "The final accepted label does not accurately convey the unresolved earlier review. This is a pipeline-level validation issue, not merely an independent disagreement with model judgment."
+    },
+    {
+      "id": "RELEASE-2",
+      "severity": "material",
+      "kind": "unsupported_execution_guarantee",
+      "line": 71,
+      "output_quote": "the system returns the stored result rather than re-executing scoring",
+      "source_quote": "A duplicate with the same answers returns the stored result.",
+      "source_line": 20,
+      "reason": "Stored-result behavior does not define every internal execution or scoring call. This error persisted across baseline and successive versions."
+    },
+    {
+      "id": "RELEASE-3",
+      "severity": "material",
+      "kind": "consent_origin_and_scope_strengthening",
+      "lines": [31, 37],
+      "output_quotes": ["explicit regulatory consent validation", "before allowing any draft to proceed"],
+      "source_quote": "PROFILE_PROCESSING consent at CP-3 is required. Marketing consent alone never permits submission.",
+      "source_line": 18,
+      "reason": "The source does not identify a regulatory origin or say that all draft progress is blocked before consent, as opposed to submission. The second semantic audit identified the first issue, but it remains."
+    },
+    {
+      "id": "RELEASE-4",
+      "severity": "moderate",
+      "kind": "generalization_from_numeric_examples",
+      "line": 105,
+      "output_quote": "Loss tolerance requires exact discrete classification",
+      "source_quotes": ["Exactly 5 percent belongs to L5.", "A 5.1 percent free-text answer is invalid."],
+      "source_line": 17,
+      "reason": "Two specified cases do not define a general discrete value domain. The exact examples are preserved, but an additional overarching constraint is inferred."
+    },
+    {
+      "id": "RELEASE-5",
+      "severity": "moderate",
+      "kind": "inadequate_claim_level_citation",
+      "lines": [11, 31, 55, 83],
+      "cited_excerpt": "A concise synthetic profile journey for INV-100.",
+      "reason": "This short description is cited as support for operational boundaries, regulatory consent, detailed workflow stages and comprehensive lifecycle guarantees. Some individual topics have evidence elsewhere, but the actual cited excerpt does not substantiate these paragraphs."
+    },
+    {
+      "id": "RELEASE-6",
+      "severity": "moderate",
+      "kind": "underqualified_reassessment_diagram_branch",
+      "line": 64,
+      "output_quote": "Failed Attempt -> Prior Unexpired Profile Remains Active",
+      "source_quote": "A failed reassessment leaves the prior unexpired profile active until its original expiry.",
+      "source_line": 38,
+      "reason": "The condition is specifically failed reassessment with a prior unexpired profile. The general assessment diagram does not identify that scope on the failure branch. The nearby prose states the qualification correctly, reducing but not eliminating the diagram ambiguity."
+    },
+    {
+      "id": "RELEASE-7",
+      "severity": "minor",
+      "kind": "business_readability_and_remaining_metadata_language",
+      "lines": [101, 119],
+      "output_quotes": ["Specific data migration, notification, or handling policies ... are unspecified", "not specified in current evidence"],
+      "reason": "These are documentation-gap statements rather than direct AI disclaimers, but they remain despite earlier audit requests to move technical verification commentary out of customer prose. Their business usefulness is limited in this small document."
+    }
+  ],
+  "readability_comparison": {
+    "versus_old_baseline": "Better navigation and visual caption consistency. Still repetitive: the same rules appear in dictionary, features, process, subprocesses and detailed reference. Four image occurrences repeat two assets, versus three occurrences in the old baseline. No overall aesthetic superiority is established by Markdown inspection alone.",
+    "versus_earlier_verified_run": "Shorter process paragraphs and screen descriptions; prior broken constructions such as strictly requires ... is required are absent. The process diagram preserves the important acceptance-evaluation distinction. Repetition and inflated generic business phrasing remain.",
+    "sourcing": "Exact excerpt links are useful and some screen values are more precisely sourced, but more footnotes do not fix weak excerpt-to-claim relationships in overview paragraphs.",
+    "preservation": "All eleven named rules and the additional core business instructions are represented. Several repeated formulations still strengthen or generalize source meaning; reporting perfect information preservation would be misleading."
+  }
+}

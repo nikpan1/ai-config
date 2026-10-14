@@ -1,3 +1,4 @@
+import re
 from typing import Literal
 from urllib.parse import unquote
 
@@ -6,6 +7,7 @@ from markdown_it.rules_inline.image import image as parse_image
 from pydantic import BaseModel, Field
 
 from docgen_graph.planning import SourcePlan as SourcePlan
+from docgen_graph.planning import clean_section_title, hierarchy_findings, section_outline
 from docgen_graph.storage import digest
 
 
@@ -21,11 +23,22 @@ class GroundedParagraph(BaseModel):
     uncertainty: str = ""
 
 
+class GroundedVisual(BaseModel):
+    kind: Literal["image", "mermaid"]
+    image_hash: str = ""
+    mermaid: str = ""
+    caption: str = Field(min_length=1)
+    alt: str = Field(min_length=1)
+    sources: list[SourceCitation] = Field(min_length=1)
+
+
 class GroundedSection(BaseModel):
     id: str = ""
+    parent_id: str = ""
     title: str
     paragraphs: list[GroundedParagraph]
     image_hashes: list[str] = []
+    visuals: list[GroundedVisual] = []
 
 
 class GroundedDocument(BaseModel):
@@ -88,7 +101,9 @@ def citation_findings(document: dict, evidence: list[dict]) -> list[str]:
     available = {span["id"]: span for span in evidence}
     findings = []
     for section_index, section in enumerate(document["sections"]):
-        for paragraph_index, paragraph in enumerate(section["paragraphs"]):
+        for paragraph_index, paragraph in enumerate(
+            [*section["paragraphs"], *section.get("visuals", [])]
+        ):
             if not paragraph["sources"]:
                 findings.append(f"Missing sources at {section_index}:{paragraph_index}")
             for source in paragraph["sources"]:
@@ -97,6 +112,59 @@ def citation_findings(document: dict, evidence: list[dict]) -> list[str]:
                     findings.append(f"Invalid exact citation at {section_index}:{paragraph_index}")
     if not any(section["paragraphs"] for section in document["sections"]):
         findings.append("Document contains no grounded paragraphs")
+    return findings
+
+
+def document_structure_findings(document: dict) -> list[str]:
+    findings = hierarchy_findings(document["sections"])
+    identifiers = [item.get("id", "") for item in document["sections"]]
+    if len(set(identifiers)) != len(identifiers):
+        findings.append("Duplicate document section IDs")
+    for section in document["sections"]:
+        for paragraph in section["paragraphs"]:
+            text = paragraph["text"]
+            if re.search(r"(?im)^\s*(?:#{1,6}\s+|(?:\*\*)?\d+\.\d+(?:\.\d+)*[.)]?\s+)", text):
+                findings.append(f"Heading embedded in paragraph: {paragraph.get('id', '')}")
+            if re.search(r"</?(?:table|tr|td|div|figure|figcaption)\b", text, re.I):
+                findings.append(f"HTML presentation wrapper: {paragraph.get('id', '')}")
+            if "```mermaid" in text or re.search(r"!\[[^\]]*\]\(", text):
+                findings.append(f"Visual embedded in paragraph: {paragraph.get('id', '')}")
+    return findings
+
+
+def visual_findings(document: dict, evidence: list[dict], image_paths: dict[str, str]) -> list[str]:
+    available = {span["id"]: span for span in evidence}
+    findings = []
+    for section in document["sections"]:
+        for index, visual in enumerate(section.get("visuals", [])):
+            label = f"{section.get('id', '')}:visual-{index + 1}"
+            if not visual.get("caption", "").strip() or not visual.get("alt", "").strip():
+                findings.append(f"Missing visual caption or alternative text: {label}")
+            if visual.get("kind") == "image":
+                if visual.get("image_hash") not in image_paths:
+                    findings.append(f"Unknown visual image: {label}")
+            elif visual.get("kind") == "mermaid":
+                diagram = visual.get("mermaid", "").strip()
+                if not re.match(r"^(?:flowchart|graph)\s+(?:TD|TB|BT|RL|LR)\b", diagram):
+                    findings.append(f"Unsupported Mermaid declaration: {label}")
+                if "```" in diagram or re.search(
+                    r"<\s*(?:script|iframe)|click\s|%%\{", diagram, re.I
+                ):
+                    findings.append(f"Unsafe Mermaid content: {label}")
+                if any(
+                    diagram.count(left) != diagram.count(right)
+                    for left, right in [("[", "]"), ("{", "}"), ("(", ")")]
+                ):
+                    findings.append(f"Unbalanced Mermaid delimiters: {label}")
+            else:
+                findings.append(f"Unknown visual kind: {label}")
+            if not visual.get("sources") or any(
+                source.get("evidence_id") not in available
+                or not source.get("quote")
+                or source["quote"] not in available[source["evidence_id"]]["text"]
+                for source in visual.get("sources", [])
+            ):
+                findings.append(f"Invalid exact visual citation: {label}")
     return findings
 
 
@@ -140,26 +208,18 @@ def render_grounded_document(
     available = {span["id"]: span for span in evidence}
     lines, notes = [f"# {document['title']}", ""], []
     citation_numbers = {}
-    for section in document["sections"]:
-        if not section["paragraphs"] and not any(
-            image_hash in image_paths for image_hash in section.get("image_hashes", [])
-        ):
-            continue
-        lines.extend([f"## {section['title']}", ""])
-        displayed_images = set()
-        for paragraph in section["paragraphs"]:
-            citations = []
-            for source in paragraph["sources"]:
-                span = available[source["evidence_id"]]
-                citation_key = (source["evidence_id"], source["quote"])
-                if citation_key in citation_numbers:
-                    citation = f"[^{citation_numbers[citation_key]}]"
-                    if citation not in citations:
-                        citations.append(citation)
-                    continue
+    figure_number = 0
+
+    def references(sources):
+        citations = []
+        for source in sources:
+            span = available.get(source["evidence_id"])
+            if not span or not source["quote"] or source["quote"] not in span["text"]:
+                continue
+            key = (source["evidence_id"], source["quote"])
+            if key not in citation_numbers:
                 number = len(notes) + 1
-                citation_numbers[citation_key] = number
-                citations.append(f"[^{number}]")
+                citation_numbers[key] = number
                 location = "; ".join(
                     f"L{item['start_line']}:{item['start_column']}-"
                     f"L{item['end_line']}:{item['end_column']}"
@@ -169,14 +229,61 @@ def render_grounded_document(
                     f"[^{number}]: [{span.get('source_image_path') or span['path']}, {location}]"
                     f"({citation_target(source)})"
                 )
+            citation = f"[^{citation_numbers[key]}]"
+            if citation not in citations:
+                citations.append(citation)
+        return " ".join(citations)
+
+    for section, number, level in section_outline(document["sections"]):
+        lines.extend(
+            [f"{'#' * min(level, 6)} {number}. {clean_section_title(section['title'])}", ""]
+        )
+        displayed_images = set()
+        for paragraph in section["paragraphs"]:
             text, _ = resolve_paragraph_images(
                 paragraph["text"], evidence, image_paths, displayed_images
             )
-            lines.extend([text + " " + " ".join(citations), ""])
+            text = re.sub(
+                r"</?(?:table|tbody|tr|td|div|figure|figcaption)\b[^>]*>", "", text, flags=re.I
+            )
+            lines.extend([text.strip() + " " + references(paragraph["sources"]), ""])
+        for visual in section.get("visuals", []):
+            if visual_findings(
+                {"sections": [{**section, "visuals": [visual]}]}, evidence, image_paths
+            ):
+                continue
+            if visual["kind"] == "image":
+                image_hash = visual["image_hash"]
+                if image_hash in displayed_images:
+                    continue
+                displayed_images.add(image_hash)
+                alt = visual["alt"].replace("[", "\\[").replace("]", "\\]")
+                lines.extend([f"![{alt}]({image_paths[image_hash]})", ""])
+            else:
+                lines.extend(["```mermaid", visual["mermaid"].strip(), "```", ""])
+            figure_number += 1
+            caption = visual["caption"].strip().replace("\n", " ")
+            caption = re.sub(
+                r"^(?:Figure|Diagram|Image|Illustration)\s+\d+(?:\.\d+)*[.:]?\s+",
+                "",
+                caption,
+                flags=re.I,
+            )
+            lines.extend(
+                [f"**Figure {figure_number}. {caption}** " + references(visual["sources"]), ""]
+            )
         for image_hash in section.get("image_hashes", []):
             if image_hash in image_paths and image_hash not in displayed_images:
                 displayed_images.add(image_hash)
-                lines.extend([f"![Source illustration]({image_paths[image_hash]})", ""])
+                figure_number += 1
+                lines.extend(
+                    [
+                        f"![{clean_section_title(section['title'])}]({image_paths[image_hash]})",
+                        "",
+                        f"**Figure {figure_number}. {clean_section_title(section['title'])}**",
+                        "",
+                    ]
+                )
     return "\n".join(lines + notes) + "\n"
 
 
@@ -247,9 +354,11 @@ def citation_excerpt_files(document: dict, evidence: list[dict]) -> dict[str, st
     available = {span["id"]: span for span in evidence}
     files = {}
     for section in document["sections"]:
-        for paragraph in section["paragraphs"]:
+        for paragraph in [*section["paragraphs"], *section.get("visuals", [])]:
             for source in paragraph["sources"]:
-                span = available[source["evidence_id"]]
+                span = available.get(source["evidence_id"])
+                if not span or not source["quote"] or source["quote"] not in span["text"]:
+                    continue
                 location = "; ".join(
                     f"L{item['start_line']}:{item['start_column']}-"
                     f"L{item['end_line']}:{item['end_column']}"
@@ -307,5 +416,12 @@ def document_verification(
         "document_hash": document_content_hash(document),
         "citation_check": "Exact quote matching does not establish semantic entailment.",
         "paragraphs": paragraphs,
+        "visuals": [
+            {"section_id": section.get("id", ""), **visual}
+            for section in document["sections"]
+            for visual in section.get("visuals", [])
+        ],
+        "structure_findings": document_structure_findings(document),
+        "visual_findings": visual_findings(document, evidence, image_paths or {}),
         "limitations": document.get("limitations", []),
     }

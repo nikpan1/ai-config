@@ -1,0 +1,21 @@
+{
+  "run_id": "authoring-appointments-20261013",
+  "review_type": "Independent read-only comparison against the newly authored fixture and predeclared checks",
+  "artifact": ".docgen/authoring-appointments-20261013/runs/authoring-appointments-20261013/output/documentation.md",
+  "status_of_run": "Planning received a provider 400 error and used the fallback one-section plan. This output evaluates recovery behavior, not successful planned document authoring.",
+  "semantic_assessment": "All 13 declared appointment checks are represented with their key limits preserved. No material unsupported business claim was identified in this reading. This is a judgment on this small engineered corpus, not measured general accuracy.",
+  "preserved_distinctions": [
+    "Address and contact number remain necessary but not sufficient for confirmed appointment; requested slot is not reserved.",
+    "18:00 office-local change cutoff remains distinct from the rolling 24-hour cancellation window.",
+    "Old appointment remains active until replacement confirmation, including failed change requests.",
+    "Refund review eligibility is distinct from refund approval.",
+    "20-credit fee waiver is discretionary, requires outage evidence and does not approve compensation.",
+    "Technician cancellation options are not generalized to customer cancellation.",
+    "An unapproved premium service stays unavailable; safety concern is not a finding of unsafe premises.",
+    "Payment failure alone does not cancel appointment; status refresh does not authorize another charge.",
+    "Refund approval, submission and bank settlement remain distinct; both conflicting working-day deadlines remain visible."
+  ],
+  "presentation_assessment": "Readable paragraphs and compact source footnotes, but the single heading Source-backed behavior and generic title Documentation provide poor navigation across booking, changes, cancellation, payment and refund rules. No summary or topic subsections are provided. The absence of structural defects in this one-section fallback does not validate the intended hierarchical authoring workflow.",
+  "comparison_limit": "There is no older appointment baseline. This is a third-corpus acceptance check, not a before-and-after quality comparison.",
+  "modifications": "No source, runtime, prompt or generated document was changed during review."
+}

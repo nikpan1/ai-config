@@ -195,8 +195,8 @@ def test_missing_planned_section_is_preserved_from_its_own_sources():
     }
     draft, targets = preserve_planned_sections(draft, plan, EVIDENCE)
     repaired, _ = apply_repairs(draft, targets, {}, EVIDENCE)
-    assert repaired["sections"][1]["id"] == "retention-section"
-    assert repaired["sections"][1]["paragraphs"][0]["text"] == EVIDENCE[1]["text"]
+    assert repaired["sections"][0]["id"] == "retention-section"
+    assert repaired["sections"][0]["paragraphs"][0]["text"] == EVIDENCE[1]["text"]
 
 
 def test_global_sourced_omission_uses_existing_section():

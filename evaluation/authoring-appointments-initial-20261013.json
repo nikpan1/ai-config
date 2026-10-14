@@ -1,0 +1,1454 @@
+{
+  "schema_version": 1,
+  "run_id": "authoring-appointments-20261013",
+  "workspace": "C:\\Users\\nikod\\Documents\\GitHub\\doc-gen\\.docgen\\authoring-appointments-20261013",
+  "status": "complete_with_limitations",
+  "state_references": {
+    "editorial_review_ref": "f6b93b1209643f846bc7cb4a7bc96ceacec165e5660b9a7c1091ff61a0e7cc0d",
+    "completion_draft_ref": "a94348f9e117e0bbda4d9e3b29ba4733b6987ca53fcbb2a4aea74a616d807d60",
+    "completion_audit_ref": "6bfa61c5f151cc9326b40d720f0c2a4852bee9a0fd94f1a341f60021bf4256c0",
+    "completion_findings_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "completion_repair_records_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "completion_audit_diagnostics_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "completion_sections_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "limitations_ref": "35d5dacccbed863bff8ef833846a177bcbeaf4bb2203f1646386fb8715a8eb5d",
+    "prefetched_extractions_ref": "6f566b56fe0ba981734b872e3a02af68266f17fce3fab3d1893fb337b2c22cae",
+    "fact_batches_ref": "36bf33eedb6eafd258e2a0d0efcf9e2c787dafb421104de93994abe59509954e",
+    "semantic_payload_ref": "74eb2ddda478acea555b524854520f083c57e685a734bf7cd618c932ab4aa27f",
+    "semantic_draft_ref": "f424c522a2794f603ac04aa42c9a350f58ab498885e6451f9ea6ceb84cdc840b",
+    "semantic_raw_draft_ref": "fe2d0af065ad11f4b39721663ecc864da5b4da7b569d059882eea832eb3d49e6",
+    "semantic_anchoring_ref": "eeb947a9b85c986a05214eebe07b364dcf2364cbe774c58e06d430347bd2911d",
+    "semantic_canonical_ref": "714f4feb0e338e9c635c3a023803a8bd6885d791b6ca3ef95dd5d7ce4c6c28a7",
+    "semantic_audit_ref": "18006118ba0a397480aa032b90d596983a489a97324b0b24b4f651095aa74933",
+    "graph_quality_ref": "0e32e8f2dcf297f3317073f65d9489aaeddf966b0bf5bf3978d1a7ddde931238",
+    "source_aspects_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "source_decisions_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "source_non_substantive_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "source_coverage_ref": "81195ffd7b82c21a47576ec51ef5722dd2d80e7e6aadc29f89e079278d878b3f",
+    "document_provenance_ref": "a5fa9c1d7644e71798f7b57bdfd97c90fb8f48544dea6364bdaeba9f779ea93c",
+    "document_candidate_provenance_ref": "397ace22fe66710a55f5c9e95417c9f30e6246ca85389c7a16d4e0c5852b1fc8",
+    "snapshot_ref": "8d055465a09f88ad518e43bc8c9561df994417ed85c5c205ee4f2bf6454bc68c",
+    "inventory_ref": "c3e848ab20542bf80710037cb34371174e9e4dedda5e9210ef474462cd4685cb",
+    "draft_ref": "",
+    "feedback_ref": "",
+    "assertions_ref": "b203daf2cc7796a466407a30cc9122cd99733ad9b0cab3103380e777157bcedb",
+    "exclusions_ref": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "candidate_ref": "1ff69795a84decdaf222bbfed3cff4f6bbef71861db0925c56d05dc0138a3632",
+    "issue_ref": "152febc926037022e7e9f1adb6acc9dedc993b9ba77e5b9b60c8bcb6718f65bd"
+  },
+  "recorded_event_window_seconds": 186.422504901886,
+  "model_response_wall_union_seconds": 180.54262113571167,
+  "event_counts": {
+    "completed": 20,
+    "request": 7,
+    "response": 5,
+    "provider_error": 2
+  },
+  "stage_metrics": {
+    "snapshot_inputs": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "inventory_sources": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "prepare_source_images": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "extract_document": {
+      "requests": 1,
+      "responses": 1,
+      "response_seconds_sum": 21.291956000000937
+    },
+    "extract_document_batch": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "verify_document_batch": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "link_graph_batch": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "verify_graph_batch": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "semantic_graph": {
+      "requests": 1,
+      "responses": 1,
+      "response_seconds_sum": 17.162787400000525
+    },
+    "propose_semantic_graph": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "audit_semantic_graph": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "publish_semantic_graph": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "finalize_graph": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "source_plan": {
+      "requests": 2,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "plan_source_document": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "source_document": {
+      "requests": 1,
+      "responses": 1,
+      "response_seconds_sum": 106.61195679999946
+    },
+    "write_source_document": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "repair_source_document": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "audit_source_document": {
+      "requests": 1,
+      "responses": 1,
+      "response_seconds_sum": 18.798255399997288
+    },
+    "source_editorial": {
+      "requests": 1,
+      "responses": 1,
+      "response_seconds_sum": 16.67766549999942
+    },
+    "review_source_editorial": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    },
+    "finalize_source_document": {
+      "requests": 0,
+      "responses": 0,
+      "response_seconds_sum": 0.0
+    }
+  },
+  "quality_artifacts": {
+    "completion_audit_ref": {
+      "accepted": true,
+      "coverage_estimate": 1.0,
+      "coverage_explanation": "The documentation accurately and comprehensively covers all substantive business rules and boundaries from both source documents without extrapolation. Conditions regarding booking prerequisites, change deadlines, refund review eligibility, technician cancellation options, payment status recording, fee waivers, and the unresolved conflict between desk instructions A and B are preserved exactly as stated.",
+      "document_content_hash": "f2e457814e5b752caf8fb0c97675ac54a1ceaf56d61ff5c20071b9396600897f",
+      "findings": []
+    },
+    "completion_audit_diagnostics_ref": [],
+    "limitations_ref": [
+      "Unresolved procedural conflict: Instruction A specifies submitting an approved refund within two working days, whereas Instruction B specifies five working days, with no precedence rule provided.",
+      "The premium-visit proposal is explicitly unapproved and prohibited from being offered.",
+      "plan_source_document: Recoverable ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+    ],
+    "semantic_audit_ref": {
+      "accepted": null,
+      "findings": [
+        "Unresolved procedural conflict: Instruction A specifies submitting an approved refund within two working days, whereas Instruction B specifies five working days, with no precedence rule provided.",
+        "The premium-visit proposal is explicitly unapproved and prohibited from being offered."
+      ],
+      "status": "source_links_validated_semantics_unreviewed"
+    },
+    "graph_quality_ref": {
+      "accepted": true,
+      "allocated_fact_count": 13,
+      "batch_count": 1,
+      "citations": [
+        {
+          "end": 288,
+          "end_column": 190,
+          "end_line": 3,
+          "evidence_id": "0f9c77f023741b79aa55",
+          "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+          "locator": {
+            "end": 288,
+            "kind": "characters",
+            "start": 99
+          },
+          "path": "appointments.md",
+          "quote_locator": {
+            "end": 288,
+            "kind": "characters",
+            "start": 99
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1533,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 99,
+          "start_column": 1,
+          "start_line": 3,
+          "text": "A confirmed address and a contact number are required before a booking can be confirmed. Providing both does not guarantee an appointment: the customer must receive a separate confirmation."
+        },
+        {
+          "end": 499,
+          "end_column": 103,
+          "end_line": 6,
+          "evidence_id": "0f9c77f023741b79aa55",
+          "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+          "locator": {
+            "end": 499,
+            "kind": "characters",
+            "start": 370
+          },
+          "path": "appointments.md",
+          "quote_locator": {
+            "end": 499,
+            "kind": "characters",
+            "start": 370
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1533,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 370,
+          "start_column": 1,
+          "start_line": 5,
+          "text": "Changes and cancellations:\n- A customer can request a change until 18:00 local office time on the day before the confirmed visit."
+        },
+        {
+          "end": 626,
+          "end_column": 230,
+          "end_line": 6,
+          "evidence_id": "0f9c77f023741b79aa55",
+          "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+          "locator": {
+            "end": 626,
+            "kind": "characters",
+            "start": 399
+          },
+          "path": "appointments.md",
+          "quote_locator": {
+            "end": 626,
+            "kind": "characters",
+            "start": 399
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1533,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 399,
+          "start_column": 3,
+          "start_line": 6,
+          "text": "A customer can request a change until 18:00 local office time on the day before the confirmed visit. The old slot remains confirmed until a replacement is confirmed. An unsuccessful change request does not cancel the old visit."
+        },
+        {
+          "end": 791,
+          "end_column": 165,
+          "end_line": 7,
+          "evidence_id": "0f9c77f023741b79aa55",
+          "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+          "locator": {
+            "end": 791,
+            "kind": "characters",
+            "start": 629
+          },
+          "path": "appointments.md",
+          "quote_locator": {
+            "end": 791,
+            "kind": "characters",
+            "start": 629
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1533,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 629,
+          "start_column": 3,
+          "start_line": 7,
+          "text": "A cancellation received at least 24 hours before the confirmed start is eligible for review for a full refund. Eligibility for review is not approval of a refund."
+        },
+        {
+          "end": 1305,
+          "end_column": 59,
+          "end_line": 12,
+          "evidence_id": "0f9c77f023741b79aa55",
+          "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+          "locator": {
+            "end": 1305,
+            "kind": "characters",
+            "start": 1247
+          },
+          "path": "appointments.md",
+          "quote_locator": {
+            "end": 1305,
+            "kind": "characters",
+            "start": 1247
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1533,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 1247,
+          "start_column": 1,
+          "start_line": 12,
+          "text": "Refund processing is described in [Payments](payments.md)."
+        },
+        {
+          "end": 1048,
+          "end_column": 104,
+          "end_line": 9,
+          "evidence_id": "4b452a9ec172a840b54b",
+          "file_hash": "a9201fcfdbdd8bea8a6cef2de307d91dfa4bf8e8aa05f4f186c06a3466fc4b8f",
+          "locator": {
+            "end": 1048,
+            "kind": "characters",
+            "start": 945
+          },
+          "path": "payments.md",
+          "quote_locator": {
+            "end": 1048,
+            "kind": "characters",
+            "start": 945
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1167,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 945,
+          "start_column": 1,
+          "start_line": 9,
+          "text": "For an unpaid booking, a fee waiver is a cancellation of the fee obligation, not a payment or a refund."
+        },
+        {
+          "end": 1479,
+          "end_column": 233,
+          "end_line": 12,
+          "evidence_id": "0f9c77f023741b79aa55",
+          "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+          "locator": {
+            "end": 1479,
+            "kind": "characters",
+            "start": 1398
+          },
+          "path": "appointments.md",
+          "quote_locator": {
+            "end": 1479,
+            "kind": "characters",
+            "start": 1398
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1533,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 1398,
+          "start_column": 152,
+          "start_line": 12,
+          "text": "A booking with a safety concern requires review before a technician is dispatched"
+        },
+        {
+          "end": 64,
+          "end_column": 65,
+          "end_line": 1,
+          "evidence_id": "0f9c77f023741b79aa55",
+          "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+          "locator": {
+            "end": 64,
+            "kind": "characters",
+            "start": 0
+          },
+          "path": "appointments.md",
+          "quote_locator": {
+            "end": 64,
+            "kind": "characters",
+            "start": 0
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1533,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 0,
+          "start_column": 1,
+          "start_line": 1,
+          "text": "The repair appointment service accepts bookings for home visits."
+        },
+        {
+          "end": 955,
+          "end_column": 164,
+          "end_line": 8,
+          "evidence_id": "0f9c77f023741b79aa55",
+          "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+          "locator": {
+            "end": 955,
+            "kind": "characters",
+            "start": 794
+          },
+          "path": "appointments.md",
+          "quote_locator": {
+            "end": 955,
+            "kind": "characters",
+            "start": 794
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1533,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 794,
+          "start_column": 3,
+          "start_line": 8,
+          "text": "Inside that 24-hour window, the standard cancellation fee is 20 credits. A supervisor may waive this fee when the customer provides evidence of a service outage."
+        },
+        {
+          "end": 428,
+          "end_column": 59,
+          "end_line": 5,
+          "evidence_id": "4b452a9ec172a840b54b",
+          "file_hash": "a9201fcfdbdd8bea8a6cef2de307d91dfa4bf8e8aa05f4f186c06a3466fc4b8f",
+          "locator": {
+            "end": 428,
+            "kind": "characters",
+            "start": 370
+          },
+          "path": "payments.md",
+          "quote_locator": {
+            "end": 428,
+            "kind": "characters",
+            "start": 370
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1167,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 370,
+          "start_column": 1,
+          "start_line": 5,
+          "text": "An approved refund is sent to the original payment method."
+        },
+        {
+          "end": 844,
+          "end_column": 290,
+          "end_line": 7,
+          "evidence_id": "4b452a9ec172a840b54b",
+          "file_hash": "a9201fcfdbdd8bea8a6cef2de307d91dfa4bf8e8aa05f4f186c06a3466fc4b8f",
+          "locator": {
+            "end": 844,
+            "kind": "characters",
+            "start": 555
+          },
+          "path": "payments.md",
+          "quote_locator": {
+            "end": 844,
+            "kind": "characters",
+            "start": 555
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1167,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 555,
+          "start_column": 1,
+          "start_line": 7,
+          "text": "Two current desk instructions conflict about the service's own submission deadline for an approved refund. Instruction A says: submit within two working days after approval. Instruction B says: submit within five working days after approval. Neither instruction supplies a precedence rule."
+        },
+        {
+          "end": 1245,
+          "end_column": 206,
+          "end_line": 10,
+          "evidence_id": "0f9c77f023741b79aa55",
+          "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+          "locator": {
+            "end": 1245,
+            "kind": "characters",
+            "start": 1040
+          },
+          "path": "appointments.md",
+          "quote_locator": {
+            "end": 1245,
+            "kind": "characters",
+            "start": 1040
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1533,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 1040,
+          "start_column": 1,
+          "start_line": 10,
+          "text": "If the technician cancels, the customer can choose a new slot or a full refund. A reschedule is not automatic. These technician-cancellation options do not establish the options for a customer who cancels."
+        },
+        {
+          "end": 160,
+          "end_column": 99,
+          "end_line": 3,
+          "evidence_id": "4b452a9ec172a840b54b",
+          "file_hash": "a9201fcfdbdd8bea8a6cef2de307d91dfa4bf8e8aa05f4f186c06a3466fc4b8f",
+          "locator": {
+            "end": 160,
+            "kind": "characters",
+            "start": 62
+          },
+          "path": "payments.md",
+          "quote_locator": {
+            "end": 160,
+            "kind": "characters",
+            "start": 62
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1167,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 62,
+          "start_column": 1,
+          "start_line": 3,
+          "text": "The service records payment status and the payment reference. It does not store full card numbers."
+        },
+        {
+          "end": 1532,
+          "end_column": 286,
+          "end_line": 12,
+          "evidence_id": "0f9c77f023741b79aa55",
+          "file_hash": "3bebf63f64af518c810c80e4593dcc857b0d049f0454564dbfc87ee8d1cfde0f",
+          "locator": {
+            "end": 1532,
+            "kind": "characters",
+            "start": 1398
+          },
+          "path": "appointments.md",
+          "quote_locator": {
+            "end": 1532,
+            "kind": "characters",
+            "start": 1398
+          },
+          "quote_locator_basis": "evidence_text",
+          "source_locator": {
+            "end": 1533,
+            "kind": "characters",
+            "start": 0
+          },
+          "start": 1398,
+          "start_column": 152,
+          "start_line": 12,
+          "text": "A booking with a safety concern requires review before a technician is dispatched; a concern is not a finding that the home is unsafe."
+        }
+      ],
+      "counts": {
+        "Concept": 5
+      },
+      "fact_count": 14,
+      "findings": [],
+      "graph_hash": "d324a8a52c5c0c8b78613a9f9e10e7d652d7a6153bdc88d6b4c45ad592502e22",
+      "owned_source_count": 2,
+      "quote_count": 14,
+      "quoted_source_count": 2,
+      "schema_version": 1,
+      "semantic_edges": 21,
+      "source_count": 2,
+      "source_coverage": {
+        "accepted": null,
+        "aspects": {
+          "represented": 0,
+          "total": 0
+        },
+        "blocks": {
+          "total": 0
+        },
+        "complete": null,
+        "coverage_ratio": null,
+        "graph_revision": "3271e90c3244befdb3b2bc5996fe52c4f21ea9ed13e3578615f052597c1ef717",
+        "integrity_findings": [],
+        "minimum_coverage": 0.9,
+        "omitted_aspects": [],
+        "qualifiers": {
+          "coverage_ratio": null,
+          "represented": 0,
+          "total": 0
+        },
+        "reason": "Source-first mode uses original context and a final document audit; no separate source-aspect inventory was audited",
+        "snapshot_id": "8d055465a09f88ad518e43bc8c9561df994417ed85c5c205ee4f2bf6454bc68c",
+        "status": "not_independently_measured",
+        "unresolved_attachments": []
+      },
+      "unallocated_fact_ids": [
+        "5aefcaaa3e1c3945b04740ea"
+      ],
+      "uncertainties": [
+        "Unresolved procedural conflict: Instruction A specifies submitting an approved refund within two working days, whereas Instruction B specifies five working days, with no precedence rule provided.",
+        "The premium-visit proposal is explicitly unapproved and prohibited from being offered."
+      ],
+      "verification": "Exact provenance and structure; semantic correctness requires independent model audit"
+    },
+    "source_coverage_ref": {
+      "audit_target_diagnostics": [],
+      "automatic_recovery_counts": {
+        "plan_source_document": 2
+      },
+      "citation_repair_attempts_current_packet": 0,
+      "coordinator_interventions": "Measure externally; not observable inside pipeline",
+      "coverage_kind": "model_estimate_not_measured_information_recall",
+      "editorial_review": {
+        "findings": [],
+        "summary": "The document accurately, completely, and clearly reflects all policy rules, exceptions, and procedural conflicts from the source materials without introducing unsupported claims or omissions."
+      },
+      "editorial_revisions": [],
+      "editorial_rounds": 0,
+      "exact_citations_valid": true,
+      "exported_content_hash": "f2e457814e5b752caf8fb0c97675ac54a1ceaf56d61ff5c20071b9396600897f",
+      "exported_coverage_estimate": 1.0,
+      "graph_revision": "3271e90c3244befdb3b2bc5996fe52c4f21ea9ed13e3578615f052597c1ef717",
+      "limitations": [
+        "Unresolved procedural conflict: Instruction A specifies submitting an approved refund within two working days, whereas Instruction B specifies five working days, with no precedence rule provided.",
+        "The premium-visit proposal is explicitly unapproved and prohibited from being offered.",
+        "Compensation amounts and automatic entitlements for customers are not specified in the sources.",
+        "plan_source_document: Recoverable ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+      ],
+      "paragraph_repairs": [],
+      "semantic_audit": {
+        "accepted": true,
+        "coverage_estimate": 1.0,
+        "coverage_explanation": "The documentation accurately and comprehensively covers all substantive business rules and boundaries from both source documents without extrapolation. Conditions regarding booking prerequisites, change deadlines, refund review eligibility, technician cancellation options, payment status recording, fee waivers, and the unresolved conflict between desk instructions A and B are preserved exactly as stated.",
+        "document_content_hash": "f2e457814e5b752caf8fb0c97675ac54a1ceaf56d61ff5c20071b9396600897f",
+        "findings": []
+      },
+      "semantic_audit_matches_exported_content": true,
+      "source_revision": "8d055465a09f88ad518e43bc8c9561df994417ed85c5c205ee4f2bf6454bc68c",
+      "status": "complete_with_limitations",
+      "structure_findings": [],
+      "targeted_repair_counts": {},
+      "visual_findings": [],
+      "withheld_paragraphs": []
+    }
+  },
+  "ledger": [
+    {
+      "status": "settled",
+      "entries": 5,
+      "charged_pln": 0.455000698575
+    },
+    {
+      "status": "uncertain",
+      "entries": 2,
+      "charged_pln": 3.1839412344749993
+    }
+  ],
+  "graph": {
+    "node_types": {
+      "Assertion": 14,
+      "Concept": 5,
+      "SourceSpan": 2
+    },
+    "edge_types": {
+      "INTERPRETS": 13,
+      "RELATED": 3,
+      "SUPPORTED_BY": 19
+    },
+    "assertions": [
+      {
+        "id": "024b4c9963e46dc4ec6f76a5",
+        "statement": "The repair appointment service accepts bookings for home visits.",
+        "subject": "repair appointment service",
+        "predicate": "accepts bookings for home visits",
+        "scope": "appointments.md",
+        "modality": "factual",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "53a4eb981b7e1eedd17d16c0",
+        "statement": "A confirmed address and a contact number are required before a booking can be confirmed, but providing both does not guarantee an appointment (the customer must receive a separate confirmation), and a request records preferred slot without reserving it.",
+        "subject": "booking confirmation",
+        "predicate": "requires confirmed address and contact number and separate confirmation",
+        "scope": "appointments.md",
+        "modality": "requirement",
+        "conditions": "[\"address is confirmed\", \"contact number is provided\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "9795ca3bc9bd50b43c014b4d",
+        "statement": "A customer can request a change until 18:00 local office time on the day before the confirmed visit; the old slot remains confirmed until a replacement is confirmed, and an unsuccessful change request does not cancel the old visit.",
+        "subject": "change request",
+        "predicate": "is permitted until 18:00 local office time on day before visit without cancelling old slot until replacement is confirmed",
+        "scope": "appointments.md",
+        "modality": "permissive",
+        "conditions": "[\"request is made before 18:00 local office time on the day before the confirmed visit\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "b0ed81b871e775df3a1e799b",
+        "statement": "A cancellation received at least 24 hours before the confirmed start is eligible for review for a full refund, though eligibility for review is not approval of a refund.",
+        "subject": "cancellation refund review",
+        "predicate": "is eligible when received at least 24 hours before confirmed start",
+        "scope": "appointments.md",
+        "modality": "permissive",
+        "conditions": "[\"cancellation is received at least 24 hours before the confirmed start\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "c51b876664a250ef891c939a",
+        "statement": "Inside the 24-hour window before the confirmed start, the standard cancellation fee is 20 credits, which a supervisor may waive when the customer provides evidence of a service outage (removing the fee without approving any separate compensation request).",
+        "subject": "standard cancellation fee",
+        "predicate": "is 20 credits inside 24-hour window, waivable by supervisor upon evidence of service outage",
+        "scope": "appointments.md",
+        "modality": "obligation",
+        "conditions": "[\"cancellation is inside 24-hour window before confirmed start\"]",
+        "exceptions": "[\"supervisor waives fee upon customer providing evidence of a service outage\"]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "66d4cd21d29f521eff7ae120",
+        "statement": "If the technician cancels, the customer can choose a new slot or a full refund, reschedule is not automatic, and technician-cancellation options do not establish options for a customer who cancels.",
+        "subject": "technician cancellation",
+        "predicate": "permits customer to choose new slot or full refund without automatic reschedule",
+        "scope": "appointments.md",
+        "modality": "permissive",
+        "conditions": "[\"technician cancels\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "5aefcaaa3e1c3945b04740ea",
+        "statement": "The premium-visit proposal is not approved and must not be offered as an available service.",
+        "subject": "premium-visit proposal",
+        "predicate": "is not approved and must not be offered",
+        "scope": "appointments.md",
+        "modality": "prohibition",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "2fbdc0137248dd368b2a97cd",
+        "statement": "A booking with a safety concern requires review before a technician is dispatched, but a concern is not a finding that the home is unsafe.",
+        "subject": "booking with a safety concern",
+        "predicate": "requires review prior to dispatching technician",
+        "scope": "appointments.md",
+        "modality": "requirement",
+        "conditions": "[\"safety concern exists on booking\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "262e08a91ba21ca2b6bdb414",
+        "statement": "The service records payment status and the payment reference, but does not store full card numbers.",
+        "subject": "payment service",
+        "predicate": "records status and reference but does not store full card numbers",
+        "scope": "payments.md",
+        "modality": "factual",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "e9fd2e83d4444a344d8fd0fa",
+        "statement": "A failed payment does not by itself cancel a confirmed appointment.",
+        "subject": "failed payment",
+        "predicate": "does not automatically cancel confirmed appointment",
+        "scope": "payments.md",
+        "modality": "factual",
+        "conditions": "[]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "d8e0d069b0a1c49ae26a1d0b",
+        "statement": "If the payment-status service times out, support may request one status refresh, but this does not authorize retrying a card charge.",
+        "subject": "support role",
+        "predicate": "may request one status refresh upon payment-status timeout without retrying card charge",
+        "scope": "payments.md",
+        "modality": "permissive",
+        "conditions": "[\"payment-status service times out\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "fe6a3ef0514552354a8bc256",
+        "statement": "An approved refund is sent to the original payment method; approval and settlement are separate events, and the service does not promise when the receiving bank will make funds available.",
+        "subject": "approved refund",
+        "predicate": "is sent to original payment method without bank availability guarantee",
+        "scope": "payments.md",
+        "modality": "obligation",
+        "conditions": "[\"refund is approved\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "fe330f37bb349bc15267db05",
+        "statement": "Submission deadline for an approved refund has an unresolved conflict between two desk instructions: Instruction A specifies submission within two working days after approval, while Instruction B specifies within five working days after approval, with no precedence rule provided and neither deadline describing bank settlement.",
+        "subject": "submission deadline for approved refund",
+        "predicate": "conflicts between two working days (Instruction A) and five working days (Instruction B) after approval without precedence",
+        "scope": "payments.md",
+        "modality": "requirement",
+        "conditions": "[\"refund is approved\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      },
+      {
+        "id": "246511fa3c915929d71d757d",
+        "statement": "For an unpaid booking, a fee waiver is a cancellation of the fee obligation rather than a payment or refund, and a customer's compensation request requires a separate decision with no amount or automatic entitlement specified.",
+        "subject": "fee waiver for unpaid booking",
+        "predicate": "cancels fee obligation and does not constitute payment, refund, or automatic compensation entitlement",
+        "scope": "payments.md",
+        "modality": "factual",
+        "conditions": "[\"booking is unpaid\"]",
+        "exceptions": "[]",
+        "source_role": "legacy_document"
+      }
+    ],
+    "source_count": 2,
+    "semantic_nodes": [
+      {
+        "concept_kind": "service",
+        "description": "The service accepts bookings for home visits, requiring a confirmed address, contact number, and separate confirmation before an appointment is confirmed.",
+        "fact_ids": [
+          "024b4c9963e46dc4ec6f76a5",
+          "53a4eb981b7e1eedd17d16c0"
+        ],
+        "id": "semantic:concept:35a0e8e4ae491c2d42c8ac31",
+        "name": "Repair Appointment Service",
+        "quotes": [
+          {
+            "end": 288,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 99,
+            "text": "A confirmed address and a contact number are required before a booking can be confirmed. Providing both does not guarantee an appointment: the customer must receive a separate confirmation."
+          },
+          {
+            "end": 64,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 0,
+            "text": "The repair appointment service accepts bookings for home visits."
+          }
+        ],
+        "scope": "appointments.md",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "operational_procedure",
+        "description": "Bookings with an identified safety concern require review before dispatching a technician, though a concern does not equate to a finding of an unsafe home.",
+        "fact_ids": [
+          "2fbdc0137248dd368b2a97cd"
+        ],
+        "id": "semantic:concept:7a71bd31fcde331f5bb13d49",
+        "name": "Safety Concern Review",
+        "quotes": [
+          {
+            "end": 1532,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 1398,
+            "text": "A booking with a safety concern requires review before a technician is dispatched; a concern is not a finding that the home is unsafe."
+          }
+        ],
+        "scope": "appointments.md",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "payment_rules",
+        "description": "Payment records store status and references without storing card numbers. Approved refunds are routed to the original payment method, while internal desk instructions conflict on whether refund submission must occur within two or five working days.",
+        "fact_ids": [
+          "246511fa3c915929d71d757d",
+          "262e08a91ba21ca2b6bdb414",
+          "d8e0d069b0a1c49ae26a1d0b",
+          "e9fd2e83d4444a344d8fd0fa",
+          "fe330f37bb349bc15267db05",
+          "fe6a3ef0514552354a8bc256"
+        ],
+        "id": "semantic:concept:a1a1822b98b5815c27d8ecdd",
+        "name": "Payment and Refund Processing",
+        "quotes": [
+          {
+            "end": 428,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 370,
+            "text": "An approved refund is sent to the original payment method."
+          },
+          {
+            "end": 844,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 555,
+            "text": "Two current desk instructions conflict about the service's own submission deadline for an approved refund. Instruction A says: submit within two working days after approval. Instruction B says: submit within five working days after approval. Neither instruction supplies a precedence rule."
+          },
+          {
+            "end": 160,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 62,
+            "text": "The service records payment status and the payment reference. It does not store full card numbers."
+          }
+        ],
+        "scope": "payments.md",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "policy",
+        "description": "When a technician cancels, the customer can choose a new slot or a full refund, but rescheduling is not automatic, and these terms do not extend to customer-initiated cancellations.",
+        "fact_ids": [
+          "66d4cd21d29f521eff7ae120"
+        ],
+        "id": "semantic:concept:a9c0249a3f917ccb9d6d7d72",
+        "name": "Technician Cancellation Policy",
+        "quotes": [
+          {
+            "end": 1245,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 1040,
+            "text": "If the technician cancels, the customer can choose a new slot or a full refund. A reschedule is not automatic. These technician-cancellation options do not establish the options for a customer who cancels."
+          }
+        ],
+        "scope": "appointments.md",
+        "status": "direct",
+        "type": "Concept"
+      },
+      {
+        "concept_kind": "policy",
+        "description": "Customers may request changes until 18:00 local office time the day before a visit without cancelling their current slot. Cancellations at least 24 hours prior are eligible for refund review, while cancellations within 24 hours incur a standard 20-credit fee waivable for service outages.",
+        "fact_ids": [
+          "9795ca3bc9bd50b43c014b4d",
+          "b0ed81b871e775df3a1e799b",
+          "c51b876664a250ef891c939a"
+        ],
+        "id": "semantic:concept:aa7561548e785f5e20ee3e6d",
+        "name": "Visit Changes and Cancellations",
+        "quotes": [
+          {
+            "end": 626,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 399,
+            "text": "A customer can request a change until 18:00 local office time on the day before the confirmed visit. The old slot remains confirmed until a replacement is confirmed. An unsuccessful change request does not cancel the old visit."
+          },
+          {
+            "end": 791,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 629,
+            "text": "A cancellation received at least 24 hours before the confirmed start is eligible for review for a full refund. Eligibility for review is not approval of a refund."
+          },
+          {
+            "end": 955,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 794,
+            "text": "Inside that 24-hour window, the standard cancellation fee is 20 credits. A supervisor may waive this fee when the customer provides evidence of a service outage."
+          }
+        ],
+        "scope": "appointments.md",
+        "status": "direct",
+        "type": "Concept"
+      }
+    ],
+    "semantic_edges": [
+      {
+        "id": "semantic:edge:0254c3880f5d54b1d72d0eef",
+        "quotes": [
+          {
+            "end": 428,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 370,
+            "text": "An approved refund is sent to the original payment method."
+          },
+          {
+            "end": 844,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 555,
+            "text": "Two current desk instructions conflict about the service's own submission deadline for an approved refund. Instruction A says: submit within two working days after approval. Instruction B says: submit within five working days after approval. Neither instruction supplies a precedence rule."
+          },
+          {
+            "end": 160,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 62,
+            "text": "The service records payment status and the payment reference. It does not store full card numbers."
+          }
+        ],
+        "source_id": "semantic:concept:a1a1822b98b5815c27d8ecdd",
+        "target_id": "246511fa3c915929d71d757d",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:079aaa0e27767e6b38f7beb8",
+        "quotes": [
+          {
+            "end": 626,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 399,
+            "text": "A customer can request a change until 18:00 local office time on the day before the confirmed visit. The old slot remains confirmed until a replacement is confirmed. An unsuccessful change request does not cancel the old visit."
+          },
+          {
+            "end": 791,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 629,
+            "text": "A cancellation received at least 24 hours before the confirmed start is eligible for review for a full refund. Eligibility for review is not approval of a refund."
+          },
+          {
+            "end": 955,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 794,
+            "text": "Inside that 24-hour window, the standard cancellation fee is 20 credits. A supervisor may waive this fee when the customer provides evidence of a service outage."
+          }
+        ],
+        "source_id": "semantic:concept:aa7561548e785f5e20ee3e6d",
+        "target_id": "0f9c77f023741b79aa55",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:14c4231b1832068ef8e3a0c2",
+        "quotes": [
+          {
+            "end": 288,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 99,
+            "text": "A confirmed address and a contact number are required before a booking can be confirmed. Providing both does not guarantee an appointment: the customer must receive a separate confirmation."
+          },
+          {
+            "end": 64,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 0,
+            "text": "The repair appointment service accepts bookings for home visits."
+          }
+        ],
+        "source_id": "semantic:concept:35a0e8e4ae491c2d42c8ac31",
+        "target_id": "0f9c77f023741b79aa55",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:2045a448be28b06ce71c9694",
+        "quotes": [
+          {
+            "end": 428,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 370,
+            "text": "An approved refund is sent to the original payment method."
+          },
+          {
+            "end": 844,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 555,
+            "text": "Two current desk instructions conflict about the service's own submission deadline for an approved refund. Instruction A says: submit within two working days after approval. Instruction B says: submit within five working days after approval. Neither instruction supplies a precedence rule."
+          },
+          {
+            "end": 160,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 62,
+            "text": "The service records payment status and the payment reference. It does not store full card numbers."
+          }
+        ],
+        "source_id": "semantic:concept:a1a1822b98b5815c27d8ecdd",
+        "target_id": "262e08a91ba21ca2b6bdb414",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:27bbda82368fafec59c100fd",
+        "quotes": [
+          {
+            "end": 428,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 370,
+            "text": "An approved refund is sent to the original payment method."
+          },
+          {
+            "end": 844,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 555,
+            "text": "Two current desk instructions conflict about the service's own submission deadline for an approved refund. Instruction A says: submit within two working days after approval. Instruction B says: submit within five working days after approval. Neither instruction supplies a precedence rule."
+          },
+          {
+            "end": 160,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 62,
+            "text": "The service records payment status and the payment reference. It does not store full card numbers."
+          }
+        ],
+        "source_id": "semantic:concept:a1a1822b98b5815c27d8ecdd",
+        "target_id": "d8e0d069b0a1c49ae26a1d0b",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:3a995d3498a37eb4346ba729",
+        "quotes": [
+          {
+            "end": 288,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 99,
+            "text": "A confirmed address and a contact number are required before a booking can be confirmed. Providing both does not guarantee an appointment: the customer must receive a separate confirmation."
+          },
+          {
+            "end": 64,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 0,
+            "text": "The repair appointment service accepts bookings for home visits."
+          }
+        ],
+        "source_id": "semantic:concept:35a0e8e4ae491c2d42c8ac31",
+        "target_id": "53a4eb981b7e1eedd17d16c0",
+        "type": "INTERPRETS"
+      },
+      {
+        "description": "Cancellations eligible for refund review and fee waivers on unpaid bookings are governed by payment handling and refund submission procedures.",
+        "id": "semantic:edge:3f2b493e7c3f1d566905b69d",
+        "label": "governed by payment processing",
+        "quotes": [
+          {
+            "end": 1305,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 1247,
+            "text": "Refund processing is described in [Payments](payments.md)."
+          },
+          {
+            "end": 1048,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 945,
+            "text": "For an unpaid booking, a fee waiver is a cancellation of the fee obligation, not a payment or a refund."
+          }
+        ],
+        "source_id": "semantic:concept:aa7561548e785f5e20ee3e6d",
+        "status": "direct",
+        "target_id": "semantic:concept:a1a1822b98b5815c27d8ecdd",
+        "type": "RELATED"
+      },
+      {
+        "id": "semantic:edge:449efe8e067cf3dd4c19bb5c",
+        "quotes": [
+          {
+            "end": 626,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 399,
+            "text": "A customer can request a change until 18:00 local office time on the day before the confirmed visit. The old slot remains confirmed until a replacement is confirmed. An unsuccessful change request does not cancel the old visit."
+          },
+          {
+            "end": 791,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 629,
+            "text": "A cancellation received at least 24 hours before the confirmed start is eligible for review for a full refund. Eligibility for review is not approval of a refund."
+          },
+          {
+            "end": 955,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 794,
+            "text": "Inside that 24-hour window, the standard cancellation fee is 20 credits. A supervisor may waive this fee when the customer provides evidence of a service outage."
+          }
+        ],
+        "source_id": "semantic:concept:aa7561548e785f5e20ee3e6d",
+        "target_id": "9795ca3bc9bd50b43c014b4d",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:49fa9fd085a33042ebe08948",
+        "quotes": [
+          {
+            "end": 1245,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 1040,
+            "text": "If the technician cancels, the customer can choose a new slot or a full refund. A reschedule is not automatic. These technician-cancellation options do not establish the options for a customer who cancels."
+          }
+        ],
+        "source_id": "semantic:concept:a9c0249a3f917ccb9d6d7d72",
+        "target_id": "0f9c77f023741b79aa55",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:55d52c0a1020e18eac1ec569",
+        "quotes": [
+          {
+            "end": 1532,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 1398,
+            "text": "A booking with a safety concern requires review before a technician is dispatched; a concern is not a finding that the home is unsafe."
+          }
+        ],
+        "source_id": "semantic:concept:7a71bd31fcde331f5bb13d49",
+        "target_id": "0f9c77f023741b79aa55",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "id": "semantic:edge:6583149080b8295d199946fe",
+        "quotes": [
+          {
+            "end": 428,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 370,
+            "text": "An approved refund is sent to the original payment method."
+          },
+          {
+            "end": 844,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 555,
+            "text": "Two current desk instructions conflict about the service's own submission deadline for an approved refund. Instruction A says: submit within two working days after approval. Instruction B says: submit within five working days after approval. Neither instruction supplies a precedence rule."
+          },
+          {
+            "end": 160,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 62,
+            "text": "The service records payment status and the payment reference. It does not store full card numbers."
+          }
+        ],
+        "source_id": "semantic:concept:a1a1822b98b5815c27d8ecdd",
+        "target_id": "e9fd2e83d4444a344d8fd0fa",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:71fb393ffb7405c6919d5407",
+        "quotes": [
+          {
+            "end": 626,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 399,
+            "text": "A customer can request a change until 18:00 local office time on the day before the confirmed visit. The old slot remains confirmed until a replacement is confirmed. An unsuccessful change request does not cancel the old visit."
+          },
+          {
+            "end": 791,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 629,
+            "text": "A cancellation received at least 24 hours before the confirmed start is eligible for review for a full refund. Eligibility for review is not approval of a refund."
+          },
+          {
+            "end": 955,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 794,
+            "text": "Inside that 24-hour window, the standard cancellation fee is 20 credits. A supervisor may waive this fee when the customer provides evidence of a service outage."
+          }
+        ],
+        "source_id": "semantic:concept:aa7561548e785f5e20ee3e6d",
+        "target_id": "c51b876664a250ef891c939a",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:7a169a4bb2c54881d7a404c7",
+        "quotes": [
+          {
+            "end": 428,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 370,
+            "text": "An approved refund is sent to the original payment method."
+          },
+          {
+            "end": 844,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 555,
+            "text": "Two current desk instructions conflict about the service's own submission deadline for an approved refund. Instruction A says: submit within two working days after approval. Instruction B says: submit within five working days after approval. Neither instruction supplies a precedence rule."
+          },
+          {
+            "end": 160,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 62,
+            "text": "The service records payment status and the payment reference. It does not store full card numbers."
+          }
+        ],
+        "source_id": "semantic:concept:a1a1822b98b5815c27d8ecdd",
+        "target_id": "4b452a9ec172a840b54b",
+        "type": "SUPPORTED_BY"
+      },
+      {
+        "description": "Bookings accepted by the repair appointment service that contain a safety concern must undergo review prior to dispatching technicians.",
+        "id": "semantic:edge:8b53da61aeccdbaff03a2c06",
+        "label": "requires dispatch review",
+        "quotes": [
+          {
+            "end": 1479,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 1398,
+            "text": "A booking with a safety concern requires review before a technician is dispatched"
+          }
+        ],
+        "source_id": "semantic:concept:35a0e8e4ae491c2d42c8ac31",
+        "status": "direct",
+        "target_id": "semantic:concept:7a71bd31fcde331f5bb13d49",
+        "type": "RELATED"
+      },
+      {
+        "id": "semantic:edge:8f15003ce0154f505efd52db",
+        "quotes": [
+          {
+            "end": 428,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 370,
+            "text": "An approved refund is sent to the original payment method."
+          },
+          {
+            "end": 844,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 555,
+            "text": "Two current desk instructions conflict about the service's own submission deadline for an approved refund. Instruction A says: submit within two working days after approval. Instruction B says: submit within five working days after approval. Neither instruction supplies a precedence rule."
+          },
+          {
+            "end": 160,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 62,
+            "text": "The service records payment status and the payment reference. It does not store full card numbers."
+          }
+        ],
+        "source_id": "semantic:concept:a1a1822b98b5815c27d8ecdd",
+        "target_id": "fe330f37bb349bc15267db05",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:9f634e6006f61fae8c05556a",
+        "quotes": [
+          {
+            "end": 626,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 399,
+            "text": "A customer can request a change until 18:00 local office time on the day before the confirmed visit. The old slot remains confirmed until a replacement is confirmed. An unsuccessful change request does not cancel the old visit."
+          },
+          {
+            "end": 791,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 629,
+            "text": "A cancellation received at least 24 hours before the confirmed start is eligible for review for a full refund. Eligibility for review is not approval of a refund."
+          },
+          {
+            "end": 955,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 794,
+            "text": "Inside that 24-hour window, the standard cancellation fee is 20 credits. A supervisor may waive this fee when the customer provides evidence of a service outage."
+          }
+        ],
+        "source_id": "semantic:concept:aa7561548e785f5e20ee3e6d",
+        "target_id": "b0ed81b871e775df3a1e799b",
+        "type": "INTERPRETS"
+      },
+      {
+        "description": "The appointment service applies specific cutoffs and fees for modifications or cancellations of confirmed visits.",
+        "id": "semantic:edge:ca3b2a5f4d616b44f77b8fa7",
+        "label": "regulates visit adjustments",
+        "quotes": [
+          {
+            "end": 499,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 370,
+            "text": "Changes and cancellations:\n- A customer can request a change until 18:00 local office time on the day before the confirmed visit."
+          }
+        ],
+        "source_id": "semantic:concept:35a0e8e4ae491c2d42c8ac31",
+        "status": "direct",
+        "target_id": "semantic:concept:aa7561548e785f5e20ee3e6d",
+        "type": "RELATED"
+      },
+      {
+        "id": "semantic:edge:cc615091b2af1113dbd6d103",
+        "quotes": [
+          {
+            "end": 1245,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 1040,
+            "text": "If the technician cancels, the customer can choose a new slot or a full refund. A reschedule is not automatic. These technician-cancellation options do not establish the options for a customer who cancels."
+          }
+        ],
+        "source_id": "semantic:concept:a9c0249a3f917ccb9d6d7d72",
+        "target_id": "66d4cd21d29f521eff7ae120",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:d8405c9438598a97d77139d5",
+        "quotes": [
+          {
+            "end": 1532,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 1398,
+            "text": "A booking with a safety concern requires review before a technician is dispatched; a concern is not a finding that the home is unsafe."
+          }
+        ],
+        "source_id": "semantic:concept:7a71bd31fcde331f5bb13d49",
+        "target_id": "2fbdc0137248dd368b2a97cd",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:f5e3fd7322f1860a837beee4",
+        "quotes": [
+          {
+            "end": 288,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 99,
+            "text": "A confirmed address and a contact number are required before a booking can be confirmed. Providing both does not guarantee an appointment: the customer must receive a separate confirmation."
+          },
+          {
+            "end": 64,
+            "evidence_id": "0f9c77f023741b79aa55",
+            "start": 0,
+            "text": "The repair appointment service accepts bookings for home visits."
+          }
+        ],
+        "source_id": "semantic:concept:35a0e8e4ae491c2d42c8ac31",
+        "target_id": "024b4c9963e46dc4ec6f76a5",
+        "type": "INTERPRETS"
+      },
+      {
+        "id": "semantic:edge:f77e0ec7ce5c385cb7c44ea6",
+        "quotes": [
+          {
+            "end": 428,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 370,
+            "text": "An approved refund is sent to the original payment method."
+          },
+          {
+            "end": 844,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 555,
+            "text": "Two current desk instructions conflict about the service's own submission deadline for an approved refund. Instruction A says: submit within two working days after approval. Instruction B says: submit within five working days after approval. Neither instruction supplies a precedence rule."
+          },
+          {
+            "end": 160,
+            "evidence_id": "4b452a9ec172a840b54b",
+            "start": 62,
+            "text": "The service records payment status and the payment reference. It does not store full card numbers."
+          }
+        ],
+        "source_id": "semantic:concept:a1a1822b98b5815c27d8ecdd",
+        "target_id": "fe6a3ef0514552354a8bc256",
+        "type": "INTERPRETS"
+      }
+    ]
+  },
+  "limitations": [
+    "Node counts and successful audits are not semantic accuracy measurements.",
+    "The recorded event window excludes process startup and shutdown.",
+    "Model response sums can include concurrent requests.",
+    "Coordinator interventions must be supplied from the execution record, not inferred."
+  ]
+}
